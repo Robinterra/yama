@@ -4,7 +4,12 @@ namespace LearnCsStuf.CommandLines
 {
     public class ParseCommandLine
     {
+
+        // -----------------------------------------------
+
         #region get/set
+
+        // -----------------------------------------------
 
         public List<ICommandLine> CommandLines
         {
@@ -12,11 +17,15 @@ namespace LearnCsStuf.CommandLines
             set;
         }
 
+        // -----------------------------------------------
+
         public List<ICommandLine> Result
         {
             get;
             set;
         }
+
+        // -----------------------------------------------
 
         private ICommandLine LastCommand
         {
@@ -24,23 +33,37 @@ namespace LearnCsStuf.CommandLines
             set;
         }
 
+        // -----------------------------------------------
+
         #endregion get/set
 
+        // -----------------------------------------------
+
         #region ctor
+
+        // -----------------------------------------------
 
         public ParseCommandLine()
         {
             this.Result = new List<ICommandLine> (  );
         }
 
+        // -----------------------------------------------
+
         ~ParseCommandLine (  )
         {
 
         }
 
+        // -----------------------------------------------
+
         #endregion ctor
 
+        // -----------------------------------------------
+
         #region methods
+
+        // -----------------------------------------------
 
         private bool SetLastCommandValue ( string arg )
         {
@@ -48,6 +71,8 @@ namespace LearnCsStuf.CommandLines
                 this.LastCommand = null;
                 return true;
         }
+
+        // -----------------------------------------------
 
         public bool ArgumentAuswerten ( string arg )
         {
@@ -71,9 +96,15 @@ namespace LearnCsStuf.CommandLines
             return false;
         }
 
+        // -----------------------------------------------
+
         #endregion methods
 
+        // -----------------------------------------------
+
         #region static
+
+        // -----------------------------------------------
 
         public static bool CheckArgs ( string[] args )
         {
@@ -82,6 +113,8 @@ namespace LearnCsStuf.CommandLines
 
             return true;
         }
+
+        // -----------------------------------------------
 
         public static bool TestArg(string arg, string para, ref string Variable)
         {
@@ -93,6 +126,14 @@ namespace LearnCsStuf.CommandLines
             return true;
         }
 
+        // -----------------------------------------------
+
         #endregion static
+
+        // -----------------------------------------------
+
     }
+
 }
+
+// -- [EOF] --

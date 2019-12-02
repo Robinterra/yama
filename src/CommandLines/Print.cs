@@ -2,7 +2,12 @@ namespace LearnCsStuf.CommandLines
 {
     public class Print : ICommandLine
     {
+
+        // -----------------------------------------------
+
         #region get/set
+
+        // -----------------------------------------------
 
         public string Key
         {
@@ -12,6 +17,8 @@ namespace LearnCsStuf.CommandLines
             }
         }
 
+        // -----------------------------------------------
+
         public bool HasValue
         {
             get
@@ -19,6 +26,8 @@ namespace LearnCsStuf.CommandLines
                 return true;
             }
         }
+
+        // -----------------------------------------------
 
         public string HelpLine
         {
@@ -28,15 +37,23 @@ namespace LearnCsStuf.CommandLines
             }
         }
 
+        // -----------------------------------------------
+
         public string Value
         {
             get;
             set;
         }
 
+        // -----------------------------------------------
+
         #endregion get/set
 
+        // -----------------------------------------------
+
         #region methods
+
+        // -----------------------------------------------
 
         public ICommandLine Check ( string command )
         {
@@ -45,7 +62,14 @@ namespace LearnCsStuf.CommandLines
             return this;
         }
 
+        // -----------------------------------------------
+
         #endregion methods
 
+        // -----------------------------------------------
+
     }
+
 }
+
+// -- [EOF] --

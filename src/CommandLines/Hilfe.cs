@@ -5,7 +5,12 @@ namespace LearnCsStuf.CommandLines
 {
     public class Hilfe
     {
+
+        // -----------------------------------------------
+
         #region get/set
+
+        // -----------------------------------------------
 
         public List<ICommandLine> CommandLines
         {
@@ -13,8 +18,12 @@ namespace LearnCsStuf.CommandLines
             set;
         }
 
+        // -----------------------------------------------
+
         public int EmptyPlace
         {get;set;}= 20;
+
+        // -----------------------------------------------
 
         public static string HilfePattern
         {
@@ -24,9 +33,15 @@ namespace LearnCsStuf.CommandLines
             }
         }
 
+        // -----------------------------------------------
+
         #endregion get/set
 
+        // -----------------------------------------------
+
         #region methods
+
+        // -----------------------------------------------
 
         public bool Print (  )
         {
@@ -45,6 +60,8 @@ namespace LearnCsStuf.CommandLines
             return true;
         }
 
+        // -----------------------------------------------
+
         private bool PrintLine ( string line )
         {
             int pos = line.IndexOf ( "<!placeholder!>" );
@@ -59,7 +76,6 @@ namespace LearnCsStuf.CommandLines
                 leerzeichen[i] = ' ';
             }
 
-
             line = line.Replace ( "<!placeholder!>", new string(leerzeichen) );
 
             Console.WriteLine ( line );
@@ -67,6 +83,14 @@ namespace LearnCsStuf.CommandLines
             return true;
         }
 
+        // -----------------------------------------------
+
         #endregion methods
+
+        // -----------------------------------------------
+
     }
+
 }
+
+// -- [EOF] --

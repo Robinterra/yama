@@ -8,11 +8,15 @@ namespace LearnCsStuf
     public static class Program
     {
 
+        // -----------------------------------------------
+
         public static List<ICommandLine> EnabledCommandLines
         {
             get;
             set;
         }
+
+        // -----------------------------------------------
 
         public static int Main ( string[] args )
         {
@@ -36,6 +40,8 @@ namespace LearnCsStuf
             return 0;
         }
 
+        // -----------------------------------------------
+
         private static int HilfeP (  )
         {
             Hilfe hilfe = new Hilfe { CommandLines = Program.EnabledCommandLines };
@@ -45,12 +51,16 @@ namespace LearnCsStuf
             return 1;
         }
 
+        // -----------------------------------------------
+
         private static bool Init (  )
         {
             Program.InitCommandLines (  );
 
             return true;
         }
+
+        // -----------------------------------------------
 
         private static bool InitCommandLines (  )
         {
@@ -61,5 +71,11 @@ namespace LearnCsStuf
 
             return true;
         }
+
+        // -----------------------------------------------
+
     }
+
 }
+
+// -- [EOF] --
