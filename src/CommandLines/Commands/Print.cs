@@ -1,4 +1,4 @@
-namespace LearnCsStuf.CommandLines
+namespace LearnCsStuf.CommandLines.Commands
 {
     public class Print : ICommandLine
     {
@@ -59,7 +59,7 @@ namespace LearnCsStuf.CommandLines
         {
             if (string.Format ( "{0}", this.Key ) != command) return null;
 
-            return this;
+            return new Print();
         }
 
         // -----------------------------------------------

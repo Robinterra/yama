@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using LearnCsStuf.CommandLines;
+using LearnCsStuf.CommandLines.Commands;
 
 namespace LearnCsStuf
 {
@@ -22,6 +23,13 @@ namespace LearnCsStuf
         {
             Program.Init (  );
 
+            return Program.NormalStart ( args );
+        }
+
+        // -----------------------------------------------
+
+        private static int NormalStart ( string[] args )
+        {
             if ( !ParseCommandLine.CheckArgs ( args ) ) return HilfeP (  );
 
             ParseCommandLine pcl = new ParseCommandLine { CommandLines = EnabledCommandLines };
@@ -31,13 +39,26 @@ namespace LearnCsStuf
                 pcl.ArgumentAuswerten ( arg );
             }
 
-            foreach ( ICommandLine command in pcl.Result )
-            {
-                if (command.Key == "print") Console.WriteLine (command.Value);
-                if (command.Key == "printn") Console.WriteLine (command.Value);
-            }
+            Program.Execute ( pcl.Result );
 
             return 0;
+        }
+
+        // -----------------------------------------------
+
+        private static bool Execute ( List<ICommandLine> commands )
+        {
+            List<string> parseFiles = new List<string>();
+
+            foreach ( ICommandLine command in commands )
+            {
+                if (command.Key == "help") return Program.HilfeP (  ) == 1;
+                if (command.Key == "print") Console.WriteLine ( command.Value );
+                if (command.Key == "printn") Console.WriteLine ( command.Value );
+                if (command.Key == "basic") parseFiles.Add ( command.Value );
+            }
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -68,6 +89,8 @@ namespace LearnCsStuf
 
             Program.EnabledCommandLines.Add ( new Print (  ) );
             Program.EnabledCommandLines.Add ( new PrintN (  ) );
+            Program.EnabledCommandLines.Add ( new BasicExpression (  ) );
+            Program.EnabledCommandLines.Add ( new Help (  ) );
 
             return true;
         }

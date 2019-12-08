@@ -1,6 +1,6 @@
-namespace LearnCsStuf.CommandLines
+namespace LearnCsStuf.CommandLines.Commands
 {
-    public class PrintN : ICommandLine
+    public class Help : ICommandLine
     {
 
         // -----------------------------------------------
@@ -13,7 +13,7 @@ namespace LearnCsStuf.CommandLines
         {
             get
             {
-                return "printn";
+                return "help";
             }
         }
 
@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, string.Format ( "--{0}:<Text>", this.Key ), string.Empty, "Gibt <text> in der Console aus" );
+                return string.Format ( Hilfe.HilfePattern, this.Key, string.Empty, "Gibt die Hilfe in der Console aus" );
             }
         }
 
@@ -57,13 +57,12 @@ namespace LearnCsStuf.CommandLines
 
         public ICommandLine Check ( string command )
         {
-            string value = null;
+            if (string.Format ( "{0}", this.Key ) == command) return this;
+            if (string.Format ( "--{0}", this.Key ) == command) return this;
+            if ("-h" == command) return this;
+            if ("/?" == command) return this;
 
-            if ( !ParseCommandLine.TestArg ( command, string.Format ( "--{0}:", this.Key ), ref value ) ) return null;
-
-            this.Value = value;
-
-            return this;
+            return null;
         }
 
         // -----------------------------------------------

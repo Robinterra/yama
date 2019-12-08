@@ -48,7 +48,7 @@ namespace LearnCsStuf.CommandLines
             Console.WriteLine ( "Dies ist ein kleines LearnCsStuff programm" );
             Console.WriteLine (  );
 
-            foreach ( ICommandLine line in CommandLines )
+            foreach ( ICommandLine line in this.CommandLines )
             {
                 if ( line == null ) continue;
 
