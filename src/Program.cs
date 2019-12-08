@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using LearnCsStuf.CommandLines;
+using LearnCsStuf.Basic;
 using LearnCsStuf.CommandLines.Commands;
 
 namespace LearnCsStuf
@@ -56,6 +57,13 @@ namespace LearnCsStuf
                 if (command.Key == "print") Console.WriteLine ( command.Value );
                 if (command.Key == "printn") Console.WriteLine ( command.Value );
                 if (command.Key == "basic") parseFiles.Add ( command.Value );
+            }
+
+            BasicExpressionEvaluator expression = new BasicExpressionEvaluator (  );
+            foreach (string value in parseFiles)
+            {
+                expression.ExpressionLine = value;
+                expression.DoStuff (  );
             }
 
             return true;
