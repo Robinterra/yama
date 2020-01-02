@@ -4,6 +4,9 @@ namespace LearnCsStuf.Basic
 {
     public class BasicExpressionEvaluator
     {
+
+        #region get/set
+
         public string File
         {
             get;
@@ -22,11 +25,18 @@ namespace LearnCsStuf.Basic
             set;
         }
 
+        #endregion get/set
+
+        #region methods
+
         private bool InitLexer (  )
         {
             this.Tokenizer = new Lexer ( this.ExpressionLine );
 
             this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
+            this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
+            this.Tokenizer.LexerTokens.Add ( new Plus (  ) );
+            this.Tokenizer.LexerTokens.Add ( new Sternchen (  ) );
 
             return true;
         }
@@ -44,6 +54,11 @@ namespace LearnCsStuf.Basic
 
             return true;
         }
+
+        #endregion methods
+
     }
 
 }
+
+// -- [EOF] --

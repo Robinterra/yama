@@ -41,6 +41,10 @@ namespace LearnCsStuf.Basic
     public enum SyntaxKind
     {
         Unknown,
-        NumberToken
+        NumberToken,
+        Whitespaces,
+        PlusToken,
+        Subtraktion,
+        SternchenToken
     }
 }
