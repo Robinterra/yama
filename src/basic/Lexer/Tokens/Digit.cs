@@ -2,6 +2,13 @@ namespace LearnCsStuf.Basic
 {
     public class Digit : ILexerToken
     {
+
+        // -----------------------------------------------
+
+        #region get/set
+
+        // -----------------------------------------------
+
         public SyntaxKind Kind
         {
             get
@@ -10,10 +17,22 @@ namespace LearnCsStuf.Basic
             }
         }
 
+        // -----------------------------------------------
+
+        #endregion get/set
+
+        // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
         public bool CheckChar ( char zeichen )
         {
             return char.IsDigit(zeichen);
         }
+
+        // -----------------------------------------------
 
         public object GetValue ( string text )
         {
@@ -21,5 +40,14 @@ namespace LearnCsStuf.Basic
 
             return result;
         }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
+
     }
 }
+
+// -- [EOF] --

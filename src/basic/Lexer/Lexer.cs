@@ -6,23 +6,37 @@ namespace LearnCsStuf.Basic
     public class Lexer : IEnumerator, IEnumerable
     {
 
+        // -----------------------------------------------
+
         #region vars
+
+        // -----------------------------------------------
 
         private int position;
 
+        // -----------------------------------------------
+
         #endregion vars
 
+        // -----------------------------------------------
+
         #region get/set
+
+        // -----------------------------------------------
 
         public string Text
         {
             get;
         }
 
+        // -----------------------------------------------
+
         public List<ILexerToken> LexerTokens
         {
             get;
         } = new List<ILexerToken> ();
+
+        // -----------------------------------------------
 
         private char current
         {
@@ -33,24 +47,38 @@ namespace LearnCsStuf.Basic
             }
         }
 
+        // -----------------------------------------------
+
         public object Current
         {
             get;
             set;
         }
 
+        // -----------------------------------------------
+
         #endregion get/set
 
+        // -----------------------------------------------
+
         #region ctor
+
+        // -----------------------------------------------
 
         public Lexer ( string text )
         {
             this.Text = text;
         }
 
+        // -----------------------------------------------
+
         #endregion ctor
 
+        // -----------------------------------------------
+
         #region methods
+
+        // -----------------------------------------------
 
         public SyntaxToken NextToken (  )
         {
@@ -70,6 +98,8 @@ namespace LearnCsStuf.Basic
             return UnknownToken;
         }
 
+        // -----------------------------------------------
+
         private bool NextChar (  )
         {
             this.position++;
@@ -77,10 +107,14 @@ namespace LearnCsStuf.Basic
             return this.position <= this.Text.Length;
         }
 
+        // -----------------------------------------------
+
         private bool IsEnde (  )
         {
             return this.position >= this.Text.Length;
         }
+
+        // -----------------------------------------------
 
         private SyntaxToken ExecuteLexerToken ( ILexerToken lexer )
         {
@@ -96,22 +130,34 @@ namespace LearnCsStuf.Basic
             return new SyntaxToken ( lexer.Kind, this.position, text, lexer.GetValue ( text ) );
         }
 
+        // -----------------------------------------------
+
         public bool MoveNext()
         {
             this.Current = this.NextToken (  );
             return this.Current != null;
         }
 
+        // -----------------------------------------------
+
         public void Reset()
         {
             this.position = 0;
         }
+
+        // -----------------------------------------------
 
         public IEnumerator GetEnumerator()
         {
             return this;
         }
 
+        // -----------------------------------------------
+
         #endregion methods
+
+        // -----------------------------------------------
     }
 }
+
+// -- [EOF] --

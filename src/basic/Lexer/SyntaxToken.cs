@@ -3,29 +3,47 @@ namespace LearnCsStuf.Basic
     public class SyntaxToken
     {
 
+        // -----------------------------------------------
+
         #region get/set
+
+        // -----------------------------------------------
 
         public SyntaxKind Kind
         {
             get;
         }
 
+        // -----------------------------------------------
+
         public int Position
         {
             get;
         }
+
+        // -----------------------------------------------
+
         public string Text
         {
             get;
         }
+
+        // -----------------------------------------------
+
         private object Value
         {
             get;
         }
 
+        // -----------------------------------------------
+
         #endregion get/set
 
+        // -----------------------------------------------
+
         #region ctor
+
+        // -----------------------------------------------
 
         public SyntaxToken ( SyntaxKind kind, int position, string text, object value )
         {
@@ -35,7 +53,12 @@ namespace LearnCsStuf.Basic
             this.Value = value;
         }
 
+        // -----------------------------------------------
+
         #endregion ctor
+
+        // -----------------------------------------------
+
     }
 
     public enum SyntaxKind
@@ -48,3 +71,5 @@ namespace LearnCsStuf.Basic
         SternchenToken
     }
 }
+
+// -- [EOF] --

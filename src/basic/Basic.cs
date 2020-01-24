@@ -5,7 +5,11 @@ namespace LearnCsStuf.Basic
     public class BasicExpressionEvaluator
     {
 
+        // -----------------------------------------------
+
         #region get/set
+
+        // -----------------------------------------------
 
         public string File
         {
@@ -13,11 +17,15 @@ namespace LearnCsStuf.Basic
             set;
         }
 
+        // -----------------------------------------------
+
         public string ExpressionLine
         {
             get;
             set;
         }
+
+        // -----------------------------------------------
 
         private Lexer Tokenizer
         {
@@ -25,9 +33,15 @@ namespace LearnCsStuf.Basic
             set;
         }
 
+        // -----------------------------------------------
+
         #endregion get/set
 
+        // -----------------------------------------------
+
         #region methods
+
+        // -----------------------------------------------
 
         private bool InitLexer (  )
         {
@@ -40,6 +54,8 @@ namespace LearnCsStuf.Basic
 
             return true;
         }
+
+        // -----------------------------------------------
 
         public bool DoStuff()
         {
@@ -55,7 +71,11 @@ namespace LearnCsStuf.Basic
             return true;
         }
 
+        // -----------------------------------------------
+
         #endregion methods
+
+        // -----------------------------------------------
 
     }
 
