@@ -51,6 +51,8 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~' ) );
             this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
             this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
+            this.Tokenizer.LexerTokens.Add ( new OpenKlammer (  ) );
+            this.Tokenizer.LexerTokens.Add ( new CloseKlammer (  ) );
             //this.Tokenizer.LexerTokens.Add ( new Plus (  ) );
             //this.Tokenizer.LexerTokens.Add ( new Sternchen (  ) );
 

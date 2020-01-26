@@ -85,7 +85,9 @@ namespace LearnCsStuf.Basic
         PlusToken,
         Subtraktion,
         SternchenToken,
-        Operator
+        Operator,
+        OpenKlammer,
+        CloseKlammer
     }
 }
 
