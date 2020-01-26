@@ -1,6 +1,8 @@
+using System.Collections.Generic;
+
 namespace LearnCsStuf.Basic
 {
-    public class OpenKlammer : ILexerToken
+    public class LowerAlpabet : ILexerToken
     {
 
         // -----------------------------------------------
@@ -13,7 +15,7 @@ namespace LearnCsStuf.Basic
         {
             get
             {
-                return SyntaxKind.OpenKlammer;
+                return SyntaxKind.LowerAlpabet;
             }
         }
 
@@ -29,7 +31,9 @@ namespace LearnCsStuf.Basic
 
         public bool CheckChar ( char zeichen, bool kettenauswertung )
         {
-            return '(' == zeichen;
+            if (!char.IsLower ( zeichen )) return false;
+
+            return char.IsLetter ( zeichen );
         }
 
         // -----------------------------------------------

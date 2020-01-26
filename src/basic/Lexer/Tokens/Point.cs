@@ -1,6 +1,6 @@
 namespace LearnCsStuf.Basic
 {
-    public class OpenKlammer : ILexerToken
+    public class Point : ILexerToken
     {
 
         // -----------------------------------------------
@@ -13,7 +13,7 @@ namespace LearnCsStuf.Basic
         {
             get
             {
-                return SyntaxKind.OpenKlammer;
+                return SyntaxKind.Point;
             }
         }
 
@@ -29,7 +29,7 @@ namespace LearnCsStuf.Basic
 
         public bool CheckChar ( char zeichen, bool kettenauswertung )
         {
-            return '(' == zeichen;
+            return '.' == zeichen;
         }
 
         // -----------------------------------------------

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
@@ -47,12 +48,14 @@ namespace LearnCsStuf.Basic
         {
             this.Tokenizer = new Lexer ( this.ExpressionLine );
 
-
             this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~' ) );
             this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
             this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
             this.Tokenizer.LexerTokens.Add ( new OpenKlammer (  ) );
             this.Tokenizer.LexerTokens.Add ( new CloseKlammer (  ) );
+            this.Tokenizer.LexerTokens.Add ( new Text (  ) );
+            this.Tokenizer.LexerTokens.Add ( new Point (  ) );
+            this.Tokenizer.LexerTokens.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ) } ) );
             //this.Tokenizer.LexerTokens.Add ( new Plus (  ) );
             //this.Tokenizer.LexerTokens.Add ( new Sternchen (  ) );
 
@@ -85,7 +88,7 @@ namespace LearnCsStuf.Basic
             {
                 if (this.PrintSyntaxError(token)) continue;
 
-                Console.WriteLine ( token.Text );
+                Console.WriteLine ( token.Value );
             }
 
             return true;

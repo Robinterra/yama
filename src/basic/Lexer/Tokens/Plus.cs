@@ -27,7 +27,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool CheckChar ( char zeichen )
+        public bool CheckChar ( char zeichen, bool kettenauswertung )
         {
             return '+' == zeichen;
         }

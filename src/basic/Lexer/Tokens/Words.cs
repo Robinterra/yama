@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
+
 namespace LearnCsStuf.Basic
 {
-    public class OpenKlammer : ILexerToken
+    public class Words : ILexerToken
     {
 
         // -----------------------------------------------
@@ -9,11 +12,18 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        private List<ILexerToken> operators
+        {
+            get;
+        }
+
+        // -----------------------------------------------
+
         public SyntaxKind Kind
         {
             get
             {
-                return SyntaxKind.OpenKlammer;
+                return SyntaxKind.Word;
             }
         }
 
@@ -23,21 +33,31 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public Words ( List<ILexerToken> tokens )
+        {
+            this.operators = tokens;
+        }
+
+        // -----------------------------------------------
+
         #region methods
 
         // -----------------------------------------------
 
         public bool CheckChar ( char zeichen, bool kettenauswertung )
         {
-            return '(' == zeichen;
+            foreach (ILexerToken lexer in this.operators)
+            {
+                if (lexer.CheckChar(zeichen, false)) return true;
+            }
+
+            return false;
         }
 
         // -----------------------------------------------
 
         public object GetValue ( string text )
         {
-            //if (!int.TryParse ( text, out int result )) return 0;
-
             return text;
         }
 

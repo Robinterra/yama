@@ -44,7 +44,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private object Value
+        public object Value
         {
             get;
         }
@@ -87,7 +87,12 @@ namespace LearnCsStuf.Basic
         SternchenToken,
         Operator,
         OpenKlammer,
-        CloseKlammer
+        CloseKlammer,
+        Text,
+        Word,
+        Point,
+        LowerAlpabet,
+        HigherAlpabet
     }
 }
 

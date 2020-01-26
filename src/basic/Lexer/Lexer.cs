@@ -90,7 +90,7 @@ namespace LearnCsStuf.Basic
 
             foreach ( ILexerToken lexerToken in this.LexerTokens )
             {
-                if ( !lexerToken.CheckChar ( this.current ) ) continue;
+                if ( !lexerToken.CheckChar ( this.current, false ) ) continue;
 
                 return this.ExecuteLexerToken ( lexerToken );
             }
@@ -126,7 +126,7 @@ namespace LearnCsStuf.Basic
         {
             int start = this.position;
 
-            while ( lexer.CheckChar ( this.current ) )
+            while ( lexer.CheckChar ( this.current, true ) )
             {
                 if (!this.NextChar (  )) return null;
 
