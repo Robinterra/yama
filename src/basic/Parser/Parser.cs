@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class Lexer : IEnumerator, IEnumerable
+    public class Parser : IEnumerator, IEnumerable
     {
 
         // -----------------------------------------------
@@ -13,10 +13,6 @@ namespace LearnCsStuf.Basic
         // -----------------------------------------------
 
         private int position;
-
-        private int line = 1;
-
-        private int column = 1;
 
         // -----------------------------------------------
 
@@ -69,10 +65,10 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public Lexer ( string text )
+        /*public Parser ( List<> )
         {
             this.Text = text;
-        }
+        }*/
 
         // -----------------------------------------------
 
@@ -95,11 +91,11 @@ namespace LearnCsStuf.Basic
                 return this.ExecuteLexerToken ( lexerToken );
             }
 
-            SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, this.current.ToString(), null );
+            //SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.current.ToString(), null );
 
-            this.NextChar (  );
+            this.position++;
 
-            return UnknownToken;
+            return null;
         }
 
         // -----------------------------------------------
@@ -107,8 +103,6 @@ namespace LearnCsStuf.Basic
         private bool NextChar (  )
         {
             this.position++;
-
-            this.column++;
 
             return this.position <= this.Text.Length;
         }
@@ -129,17 +123,13 @@ namespace LearnCsStuf.Basic
             while ( lexer.CheckChar ( this.current ) )
             {
                 if (!this.NextChar (  )) return null;
-
-                if (this.current != '\n') continue;
-
-                this.line++;
-
-                this.column = 1;
             }
 
             string text = this.Text.Substring ( start, this.position - start );
 
-            return new SyntaxToken ( lexer.Kind, this.position, this.line, this.column, text, lexer.GetValue ( text ) );
+            //return new SyntaxToken ( lexer.Kind, this.position, text, lexer.GetValue ( text ) );
+
+            return null;
         }
 
         // -----------------------------------------------
@@ -155,8 +145,6 @@ namespace LearnCsStuf.Basic
         public void Reset()
         {
             this.position = 0;
-            this.column = 1;
-            this.line = 1;
         }
 
         // -----------------------------------------------

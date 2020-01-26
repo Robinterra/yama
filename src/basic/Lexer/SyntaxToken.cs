@@ -23,6 +23,20 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public int Line
+        {
+            get;
+        }
+
+        // -----------------------------------------------
+
+        public int  Column
+        {
+            get;
+        }
+
+        // -----------------------------------------------
+
         public string Text
         {
             get;
@@ -45,10 +59,12 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public SyntaxToken ( SyntaxKind kind, int position, string text, object value )
+        public SyntaxToken ( SyntaxKind kind, int position, int line, int column, string text, object value )
         {
             this.Kind = kind;
             this.Position = position;
+            this.Line = line;
+            this.Column = column;
             this.Text = text;
             this.Value = value;
         }
@@ -68,7 +84,8 @@ namespace LearnCsStuf.Basic
         Whitespaces,
         PlusToken,
         Subtraktion,
-        SternchenToken
+        SternchenToken,
+        Operator
     }
 }
 

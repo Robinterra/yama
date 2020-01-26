@@ -47,10 +47,28 @@ namespace LearnCsStuf.Basic
         {
             this.Tokenizer = new Lexer ( this.ExpressionLine );
 
+
+            this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~' ) );
             this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
             this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
-            this.Tokenizer.LexerTokens.Add ( new Plus (  ) );
-            this.Tokenizer.LexerTokens.Add ( new Sternchen (  ) );
+            //this.Tokenizer.LexerTokens.Add ( new Plus (  ) );
+            //this.Tokenizer.LexerTokens.Add ( new Sternchen (  ) );
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public bool PrintSyntaxError(SyntaxToken token)
+        {
+            if (token.Kind != SyntaxKind.Unknown) return false;
+
+            ConsoleColor colr = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+
+            Console.Error.WriteLine ( "({0},{1}) Syntax error - unknown char \"{2}\"", token.Line, token.Column, token.Text );
+
+            Console.ForegroundColor = colr;
 
             return true;
         }
@@ -63,7 +81,7 @@ namespace LearnCsStuf.Basic
 
             foreach (SyntaxToken token in this.Tokenizer)
             {
-                if (token.Kind == SyntaxKind.Unknown) continue;
+                if (this.PrintSyntaxError(token)) continue;
 
                 Console.WriteLine ( token.Text );
             }
