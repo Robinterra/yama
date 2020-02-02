@@ -24,7 +24,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        bool CheckChar ( char zeichen, bool kettenauswertung );
+        TokenStatus CheckChar ( char zeichen, bool kettenauswertung );
 
         // -----------------------------------------------
 
