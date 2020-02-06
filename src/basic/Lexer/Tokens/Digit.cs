@@ -27,9 +27,13 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
-            return char.IsDigit(zeichen);
+            bool isok = char.IsDigit(zeichen);
+
+            if (kettenauswertung) return isok ? TokenStatus.Accept : TokenStatus.Complete;
+
+            return isok ? TokenStatus.Accept : TokenStatus.Cancel;
         }
 
         // -----------------------------------------------

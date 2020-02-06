@@ -5,6 +5,7 @@ namespace LearnCsStuf.Basic
         SyntaxError,
         Accept,
         Complete,
+        CompleteOne,
         Cancel,
     }
 }

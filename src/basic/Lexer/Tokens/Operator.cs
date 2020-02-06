@@ -65,14 +65,14 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
             foreach (char vergleichswert in this.operators)
             {
-                if (zeichen == vergleichswert) return true;
+                if (zeichen == vergleichswert) return TokenStatus.Accept;
             }
 
-            return false;
+            return kettenauswertung ? TokenStatus.Complete : TokenStatus.Cancel;
         }
 
         // -----------------------------------------------

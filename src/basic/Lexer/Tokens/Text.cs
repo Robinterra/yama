@@ -42,22 +42,22 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
             if ( zeichen == '"' && !isonEscape )
             {
                 if (kettenauswertung) this.actuallyOnZeichenkette = !this.actuallyOnZeichenkette;
 
-                return true;
+                return TokenStatus.Accept;
             }
 
-            if (!this.actuallyOnZeichenkette) return false;
+            if (!this.actuallyOnZeichenkette) return kettenauswertung ? TokenStatus.Complete : TokenStatus.Cancel;
 
-            if (zeichen == '\\') return isonEscape = true;
+            if (zeichen == '\\') return (isonEscape = true) ? TokenStatus.Accept : TokenStatus.SyntaxError;
 
             isonEscape = false;
 
-            return true;
+            return TokenStatus.Accept;
         }
 
         // -----------------------------------------------

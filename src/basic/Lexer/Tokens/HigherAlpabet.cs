@@ -29,11 +29,11 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
-            if (!char.IsUpper ( zeichen )) return false;
+            if (!char.IsUpper ( zeichen )) return kettenauswertung ? TokenStatus.Complete : TokenStatus.Cancel;
 
-            return char.IsLetter ( zeichen );
+            return char.IsLetter ( zeichen ) ? TokenStatus.Accept : TokenStatus.SyntaxError;
         }
 
         // -----------------------------------------------

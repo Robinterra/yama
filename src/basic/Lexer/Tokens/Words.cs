@@ -44,14 +44,13 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
-            foreach (ILexerToken lexer in this.operators)
-            {
-                if (lexer.CheckChar(zeichen, false)) return true;
-            }
+            bool isok = char.IsLetter(zeichen);
 
-            return false;
+            if (kettenauswertung) return isok ? TokenStatus.Accept : TokenStatus.Complete;
+
+            return isok ? TokenStatus.Accept : TokenStatus.Cancel;
         }
 
         // -----------------------------------------------

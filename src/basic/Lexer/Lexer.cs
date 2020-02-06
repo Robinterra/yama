@@ -92,7 +92,11 @@ namespace LearnCsStuf.Basic
             {
                 if ( lexerToken.CheckChar ( this.current, false ) == TokenStatus.Cancel ) continue;
 
-                return this.ExecuteLexerToken ( lexerToken );
+                SyntaxToken result = this.ExecuteLexerToken ( lexerToken );
+
+                if (result == null) continue;
+
+                return result;
             }
 
             SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, this.current.ToString(), null );
@@ -126,7 +130,9 @@ namespace LearnCsStuf.Basic
         {
             int start = this.position;
 
-            while ( lexer.CheckChar ( this.current, true ) )
+            TokenStatus status = TokenStatus.Accept;
+
+            while ( (status = lexer.CheckChar ( this.current, true )) == TokenStatus.Accept )
             {
                 if (!this.NextChar (  )) return null;
 
@@ -135,6 +141,18 @@ namespace LearnCsStuf.Basic
                 this.line++;
 
                 this.column = 1;
+            }
+
+            if (status == TokenStatus.CompleteOne)
+            {
+                status = TokenStatus.Complete;
+                this.NextChar();
+            }
+
+            if (status != TokenStatus.Complete)
+            {
+                this.position = start;
+                return null;
             }
 
             string text = this.Text.Substring ( start, this.position - start );
