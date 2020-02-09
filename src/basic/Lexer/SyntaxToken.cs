@@ -102,6 +102,7 @@ namespace LearnCsStuf.Basic
         EckigeKlammerZu,
         DoublePoint,
         Comma,
+        Comment,
     }
 }
 

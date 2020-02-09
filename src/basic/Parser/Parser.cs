@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
@@ -12,7 +13,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public string File
+        public FileInfo Fileinfo
         {
             get;
             set;
@@ -20,7 +21,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public string ExpressionLine
+        public string InputText
         {
             get;
             set;
@@ -48,14 +49,40 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        #region ctor
+
+        // -----------------------------------------------
+
+        private Parser (  )
+        {
+            this.InitLexer (  );
+        }
+
+        // -----------------------------------------------
+
+        public Parser ( FileInfo file )
+            : this (  )
+        {
+            this.Fileinfo = file;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
         #region methods
 
         // -----------------------------------------------
 
         private bool InitLexer (  )
         {
-            this.Tokenizer = new Lexer ( this.ExpressionLine );
+            this.Tokenizer = new Lexer (  );
+            this.SyntaxErrors = new List<SyntaxToken> (  );
 
+            this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
+            this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
             this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~' ) );
             this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
             this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
@@ -105,6 +132,7 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "this" ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "base" ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "sizeof" ) );
+            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "namespace" ) );
             this.Tokenizer.LexerTokens.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
             this.Tokenizer.LexerTokens.Add ( new EndOfCommand ( ';' ) );
 
@@ -131,17 +159,34 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool Parse()
+        private bool CheckTokens()
         {
-            this.InitLexer (  );
+            this.Tokenizer.Text = this.InputText;
 
             foreach (SyntaxToken token in this.Tokenizer)
             {
+                if (token.Kind == SyntaxKind.Whitespaces) continue;
+                if (token.Kind == SyntaxKind.Comment) continue;
                 if (this.PrintSyntaxError(token)) continue;
 
                 Console.Write ( token.Kind.ToString() + " : " );
                 Console.WriteLine ( token.Value );
             }
+
+            return this.SyntaxErrors.Count == 0;
+        }
+
+        // -----------------------------------------------
+
+        public bool Parse()
+        {
+            if (!this.Fileinfo.Exists) return false;
+
+            this.InputText = File.ReadAllText ( this.Fileinfo.FullName );
+
+            if (!this.CheckTokens (  )) return false;
+
+            
 
             return true;
         }

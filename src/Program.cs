@@ -59,11 +59,10 @@ namespace LearnCsStuf
                 if (command.Key == "basic") parseFiles.Add ( command.Value );
             }
 
-            BasicExpressionEvaluator expression = new BasicExpressionEvaluator (  );
             foreach (string value in parseFiles)
             {
-                expression.ExpressionLine = value;
-                expression.DoStuff (  );
+                Parser p = new Parser ( new System.IO.FileInfo ( value ) );
+                p.Parse (  );
             }
 
             return true;
