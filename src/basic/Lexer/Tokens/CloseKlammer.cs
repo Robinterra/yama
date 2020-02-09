@@ -31,7 +31,7 @@ namespace LearnCsStuf.Basic
         {
             bool isok = ')' == zeichen;
 
-            if (kettenauswertung) return isok ? TokenStatus.Complete : TokenStatus.SyntaxError;
+            if (kettenauswertung) return isok ? TokenStatus.CompleteOne : TokenStatus.SyntaxError;
 
             return isok ? TokenStatus.Accept : TokenStatus.Cancel;
         }
