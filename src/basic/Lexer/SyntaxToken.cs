@@ -100,6 +100,8 @@ namespace LearnCsStuf.Basic
         GeschweifteKlammerZu,
         EckigeKlammerAuf,
         EckigeKlammerZu,
+        DoublePoint,
+        Comma,
     }
 }
 
