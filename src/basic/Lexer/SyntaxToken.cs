@@ -94,6 +94,7 @@ namespace LearnCsStuf.Basic
         LowerAlpabet,
         HigherAlpabet,
         KeyWord,
+        Underscore,
     }
 }
 

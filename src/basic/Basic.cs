@@ -59,7 +59,7 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "string" ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "char" ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "byte" ) );
-            this.Tokenizer.LexerTokens.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ) } ) );
+            this.Tokenizer.LexerTokens.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
             //this.Tokenizer.LexerTokens.Add ( new Plus (  ) );
             //this.Tokenizer.LexerTokens.Add ( new Sternchen (  ) );
 

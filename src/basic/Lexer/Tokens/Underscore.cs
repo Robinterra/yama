@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-
 namespace LearnCsStuf.Basic
 {
-    public class Words : ILexerToken
+    public class Underscore : ILexerToken
     {
 
         // -----------------------------------------------
@@ -12,18 +9,11 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private List<ILexerToken> operators
-        {
-            get;
-        }
-
-        // -----------------------------------------------
-
         public SyntaxKind Kind
         {
             get
             {
-                return SyntaxKind.Word;
+                return SyntaxKind.Underscore;
             }
         }
 
@@ -33,31 +23,25 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public Words ( List<ILexerToken> tokens )
-        {
-            this.operators = tokens;
-        }
-
-        // -----------------------------------------------
-
         #region methods
 
         // -----------------------------------------------
 
         public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
-            foreach ( ILexerToken token in this.operators )
-            {
-                if (token.CheckChar ( zeichen, false ) == TokenStatus.Accept) return TokenStatus.Accept;
-            }
+            bool isok = '_' == zeichen;
 
-            return kettenauswertung ? TokenStatus.Complete : TokenStatus.Cancel;
+            if (kettenauswertung) return isok ? TokenStatus.CompleteOne : TokenStatus.SyntaxError;
+
+            return isok ? TokenStatus.Accept : TokenStatus.Cancel;
         }
 
         // -----------------------------------------------
 
         public object GetValue ( string text )
         {
+            //if (!int.TryParse ( text, out int result )) return 0;
+
             return text;
         }
 
