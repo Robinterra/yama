@@ -95,6 +95,7 @@ namespace LearnCsStuf.Basic
         HigherAlpabet,
         KeyWord,
         Underscore,
+        Semikolon,
     }
 }
 
