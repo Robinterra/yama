@@ -107,6 +107,8 @@ namespace LearnCsStuf.Basic
                 return result;
             }
 
+            if (this.current == '\0') return new SyntaxToken ( SyntaxKind.Whitespaces, this.position, this.line, this.column, "EndOfFile", "EndOfFile" );
+
             SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, this.current.ToString(), null );
 
             this.NextChar (  );
@@ -122,7 +124,15 @@ namespace LearnCsStuf.Basic
 
             this.column++;
 
-            return this.position <= this.Text.Length;
+            if (this.position > this.Text.Length) return false;
+
+            if (this.current != '\n') return true;
+
+            this.line++;
+
+            this.column = 1;
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -137,29 +147,28 @@ namespace LearnCsStuf.Basic
         private SyntaxToken ExecuteLexerToken ( ILexerToken lexer )
         {
             int start = this.position;
+            int column = this.column;
+            int line = this.line;
 
             TokenStatus status = TokenStatus.Accept;
 
             while ( (status = lexer.CheckChar ( this.current, true )) == TokenStatus.Accept )
             {
                 if (!this.NextChar (  )) return null;
-
-                if (this.current != '\n') continue;
-
-                this.line++;
-
-                this.column = 1;
             }
 
             if (status == TokenStatus.CompleteOne)
             {
                 status = TokenStatus.Complete;
+
                 this.NextChar();
             }
 
             if (status != TokenStatus.Complete)
             {
                 this.position = start;
+                this.column = column;
+                this.line = line;
                 return null;
             }
 
