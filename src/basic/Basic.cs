@@ -54,6 +54,10 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new OpenKlammer (  ) );
             this.Tokenizer.LexerTokens.Add ( new CloseKlammer (  ) );
             this.Tokenizer.LexerTokens.Add ( new Text (  ) );
+            this.Tokenizer.LexerTokens.Add ( new GeschweifteKlammerAuf (  ) );
+            this.Tokenizer.LexerTokens.Add ( new GeschweifteKlammerZu (  ) );
+            this.Tokenizer.LexerTokens.Add ( new EckigeKlammerZu (  ) );
+            this.Tokenizer.LexerTokens.Add ( new EckigeKlammerAuf (  ) );
             this.Tokenizer.LexerTokens.Add ( new Point (  ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "int" ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "char" ) );

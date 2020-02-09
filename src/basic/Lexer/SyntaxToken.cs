@@ -96,6 +96,10 @@ namespace LearnCsStuf.Basic
         KeyWord,
         Underscore,
         Semikolon,
+        GeschweifteKlammerAuf,
+        GeschweifteKlammerZu,
+        EckigeKlammerAuf,
+        EckigeKlammerZu,
     }
 }
 
