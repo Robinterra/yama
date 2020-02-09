@@ -60,6 +60,7 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new EckigeKlammerAuf (  ) );
             this.Tokenizer.LexerTokens.Add ( new Point (  ) );
             this.Tokenizer.LexerTokens.Add ( new Comma (  ) );
+            this.Tokenizer.LexerTokens.Add ( new DoublePoint (  ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "int" ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "char" ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "byte" ) );
