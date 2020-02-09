@@ -54,8 +54,8 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new OpenKlammer (  ) );
             this.Tokenizer.LexerTokens.Add ( new CloseKlammer (  ) );
             this.Tokenizer.LexerTokens.Add ( new Text (  ) );
-            this.Tokenizer.LexerTokens.Add ( new GeschweifteKlammerAuf (  ) );
-            this.Tokenizer.LexerTokens.Add ( new GeschweifteKlammerZu (  ) );
+            this.Tokenizer.LexerTokens.Add ( new BeginContainer ( '{' ) );
+            this.Tokenizer.LexerTokens.Add ( new CloseContainer ( '}' ) );
             this.Tokenizer.LexerTokens.Add ( new EckigeKlammerZu (  ) );
             this.Tokenizer.LexerTokens.Add ( new EckigeKlammerAuf (  ) );
             this.Tokenizer.LexerTokens.Add ( new Point (  ) );
@@ -98,7 +98,7 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "base" ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "sizeof" ) );
             this.Tokenizer.LexerTokens.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
-            this.Tokenizer.LexerTokens.Add ( new Semikolon (  ) );
+            this.Tokenizer.LexerTokens.Add ( new EndOfCommand ( ';' ) );
             //this.Tokenizer.LexerTokens.Add ( new Plus (  ) );
             //this.Tokenizer.LexerTokens.Add ( new Sternchen (  ) );
 

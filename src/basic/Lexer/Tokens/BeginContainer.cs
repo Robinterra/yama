@@ -1,11 +1,18 @@
 namespace LearnCsStuf.Basic
 {
-    public class GeschweifteKlammerAuf : ILexerToken
+    public class BeginContainer : ILexerToken
     {
 
         // -----------------------------------------------
 
         #region get/set
+
+        // -----------------------------------------------
+
+        private char zeichen
+        {
+            get;
+        }
 
         // -----------------------------------------------
 
@@ -23,13 +30,28 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        #region ctor
+
+        // -----------------------------------------------
+
+        public BeginContainer ( char zeichen )
+        {
+            this.zeichen = zeichen;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
         #region methods
 
         // -----------------------------------------------
 
         public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
-            bool isok = '{' == zeichen;
+            bool isok = this.zeichen == zeichen;
 
             if (kettenauswertung) return isok ? TokenStatus.CompleteOne : TokenStatus.SyntaxError;
 

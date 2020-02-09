@@ -1,6 +1,6 @@
 namespace LearnCsStuf.Basic
 {
-    public class Semikolon : ILexerToken
+    public class CloseContainer : ILexerToken
     {
 
         // -----------------------------------------------
@@ -13,13 +13,27 @@ namespace LearnCsStuf.Basic
         {
             get
             {
-                return SyntaxKind.Semikolon;
+                return SyntaxKind.GeschweifteKlammerZu;
             }
         }
 
         // -----------------------------------------------
 
+        private char zeichen
+        {
+            get;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
+
+        // -----------------------------------------------
+
+        public CloseContainer ( char zeichen )
+        {
+            this.zeichen = zeichen;
+        }
 
         // -----------------------------------------------
 
@@ -29,7 +43,7 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
-            bool isok = ';' == zeichen;
+            bool isok = this.zeichen == zeichen;
 
             if (kettenauswertung) return isok ? TokenStatus.CompleteOne : TokenStatus.SyntaxError;
 

@@ -1,6 +1,6 @@
-namespace LearnCsStuf.Basic
+﻿namespace LearnCsStuf.Basic
 {
-    public class GeschweifteKlammerZu : ILexerToken
+    public class EndOfCommand : ILexerToken
     {
 
         // -----------------------------------------------
@@ -9,11 +9,16 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        private char zeichen
+        {
+            get;
+        }
+
         public SyntaxKind Kind
         {
             get
             {
-                return SyntaxKind.GeschweifteKlammerZu;
+                return SyntaxKind.Semikolon;
             }
         }
 
@@ -23,13 +28,28 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        #region ctor
+
+        // -----------------------------------------------
+
+        public EndOfCommand ( char zeichen )
+        {
+            this.zeichen = zeichen;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
         #region methods
 
         // -----------------------------------------------
 
         public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
-            bool isok = '}' == zeichen;
+            bool isok = this.zeichen == zeichen;
 
             if (kettenauswertung) return isok ? TokenStatus.CompleteOne : TokenStatus.SyntaxError;
 

@@ -95,7 +95,7 @@ namespace LearnCsStuf.Basic
         HigherAlpabet,
         KeyWord,
         Underscore,
-        Semikolon,
+        EndOfCommand,
         GeschweifteKlammerAuf,
         GeschweifteKlammerZu,
         EckigeKlammerAuf,
