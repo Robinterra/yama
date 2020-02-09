@@ -92,7 +92,8 @@ namespace LearnCsStuf.Basic
         Word,
         Point,
         LowerAlpabet,
-        HigherAlpabet
+        HigherAlpabet,
+        KeyWord,
     }
 }
 

@@ -55,6 +55,10 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new CloseKlammer (  ) );
             this.Tokenizer.LexerTokens.Add ( new Text (  ) );
             this.Tokenizer.LexerTokens.Add ( new Point (  ) );
+            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "int" ) );
+            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "string" ) );
+            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "char" ) );
+            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "byte" ) );
             this.Tokenizer.LexerTokens.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ) } ) );
             //this.Tokenizer.LexerTokens.Add ( new Plus (  ) );
             //this.Tokenizer.LexerTokens.Add ( new Sternchen (  ) );
@@ -88,6 +92,7 @@ namespace LearnCsStuf.Basic
             {
                 if (this.PrintSyntaxError(token)) continue;
 
+                Console.Write ( token.Kind.ToString() + " : " );
                 Console.WriteLine ( token.Value );
             }
 
