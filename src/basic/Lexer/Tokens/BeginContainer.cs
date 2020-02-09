@@ -20,7 +20,7 @@ namespace LearnCsStuf.Basic
         {
             get
             {
-                return SyntaxKind.GeschweifteKlammerAuf;
+                return SyntaxKind.BeginContainer;
             }
         }
 

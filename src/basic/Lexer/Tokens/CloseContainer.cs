@@ -13,7 +13,7 @@ namespace LearnCsStuf.Basic
         {
             get
             {
-                return SyntaxKind.GeschweifteKlammerZu;
+                return SyntaxKind.CloseContainer;
             }
         }
 

@@ -18,7 +18,7 @@
         {
             get
             {
-                return SyntaxKind.Semikolon;
+                return SyntaxKind.EndOfCommand;
             }
         }
 
