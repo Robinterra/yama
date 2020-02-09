@@ -107,8 +107,6 @@ namespace LearnCsStuf.Basic
                 return result;
             }
 
-            if (this.current == '\0') return new SyntaxToken ( SyntaxKind.Whitespaces, this.position, this.line, this.column, "EndOfFile", "EndOfFile" );
-
             SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, this.current.ToString(), null );
 
             this.NextChar (  );

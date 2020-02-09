@@ -67,6 +67,8 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
         {
+            if (zeichen == '\0') return TokenStatus.Complete;
+
             if (this.isonEscape && !this.actuallyOnZeichenkette)
             {
                 TokenStatus status = this.Begin.CheckChar(zeichen, true);

@@ -85,6 +85,7 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
             this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~' ) );
             this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
+            this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
             this.Tokenizer.LexerTokens.Add ( new OpenKlammer (  ) );
             this.Tokenizer.LexerTokens.Add ( new CloseKlammer (  ) );
             this.Tokenizer.LexerTokens.Add ( new Text (  ) );
@@ -134,7 +135,6 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "namespace" ) );
             this.Tokenizer.LexerTokens.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
             this.Tokenizer.LexerTokens.Add ( new EndOfCommand ( ';' ) );
-            this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
 
             return true;
         }
