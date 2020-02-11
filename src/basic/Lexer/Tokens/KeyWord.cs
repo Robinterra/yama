@@ -29,10 +29,7 @@ namespace LearnCsStuf.Basic
 
         public SyntaxKind Kind
         {
-            get
-            {
-                return SyntaxKind.KeyWord;
-            }
+            get;
         }
 
         // -----------------------------------------------
@@ -41,9 +38,10 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public KeyWord ( string keyword )
+        public KeyWord ( string keyword, SyntaxKind keywordkind )
         {
             this.Word = keyword;
+            this.Kind = keywordkind;
         }
 
         // -----------------------------------------------
