@@ -142,6 +142,8 @@ namespace LearnCsStuf.Basic
         Namespace,
         BedingtesCompilieren,
         Zeichen,
+        Set,
+        Get,
     }
 }
 

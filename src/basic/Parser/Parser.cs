@@ -9,7 +9,27 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        #region vars
+
+        // -----------------------------------------------
+
+        
+
+        // -----------------------------------------------
+
+        #endregion vars
+
+        // -----------------------------------------------
+
         #region get/set
+
+        // -----------------------------------------------
+
+        public int Position
+        {
+            get;
+            private set;
+        }
 
         // -----------------------------------------------
 
@@ -30,6 +50,14 @@ namespace LearnCsStuf.Basic
         // -----------------------------------------------
 
         private Lexer Tokenizer
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        private List<SyntaxToken> CleanTokens
         {
             get;
             set;
@@ -102,6 +130,8 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "int", SyntaxKind.Int32Bit ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "char", SyntaxKind.Char ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "byte", SyntaxKind.Byte ) );
+            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "set", SyntaxKind.Set ) );
+            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "get", SyntaxKind.Get ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "for", SyntaxKind.For ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "while", SyntaxKind.While ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "bool", SyntaxKind.Boolean ) );
@@ -143,7 +173,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool PrintSyntaxError(SyntaxToken token)
+        private bool PrintSyntaxError(SyntaxToken token)
         {
             if (token.Kind != SyntaxKind.Unknown) return false;
 
@@ -164,13 +194,15 @@ namespace LearnCsStuf.Basic
         private bool CheckTokens()
         {
             this.Tokenizer.Text = this.InputText;
+            this.CleanTokens = new List<SyntaxToken>();
 
             foreach (SyntaxToken token in this.Tokenizer)
             {
                 if (token.Kind == SyntaxKind.Whitespaces) continue;
                 if (token.Kind == SyntaxKind.Comment) continue;
-                if (this.PrintSyntaxError(token)) continue;
+                if (this.PrintSyntaxError ( token )) continue;
 
+                this.CleanTokens.Add ( token );
                 //Console.Write ( token.Kind.ToString() + " : " );
                 //Console.WriteLine ( token.Value );
             }
@@ -180,7 +212,11 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool Parse()
+
+
+        // -----------------------------------------------
+
+        public bool Parse (  )
         {
             if (!this.Fileinfo.Exists) return false;
 
@@ -191,6 +227,16 @@ namespace LearnCsStuf.Basic
             
 
             return true;
+        }
+
+        // -----------------------------------------------
+
+        public SyntaxToken Peek ( int offset )
+        {
+            if (this.CleanTokens.Count <= offset + this.Position) return null;
+            if (0 > offset + this.Position) return null;
+
+            return this.CleanTokens[offset + this.Position];
         }
 
         // -----------------------------------------------
