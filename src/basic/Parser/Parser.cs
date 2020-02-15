@@ -87,16 +87,17 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~', '√', '?' ) );
             this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
             this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
-            this.Tokenizer.LexerTokens.Add ( new OpenKlammer (  ) );
-            this.Tokenizer.LexerTokens.Add ( new CloseKlammer (  ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "(" ), SyntaxKind.OpenKlammer ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( ")" ), SyntaxKind.CloseKlammer ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "{" ), SyntaxKind.BeginContainer ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "}" ), SyntaxKind.CloseContainer ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "[" ), SyntaxKind.EckigeKlammerAuf ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "]" ), SyntaxKind.EckigeKlammerZu ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "." ), SyntaxKind.Point ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "," ), SyntaxKind.Comma ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( ":" ), SyntaxKind.DoublePoint ) );
+            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( ";" ), SyntaxKind.EndOfCommand ) );
             this.Tokenizer.LexerTokens.Add ( new Text (  ) );
-            this.Tokenizer.LexerTokens.Add ( new BeginContainer ( '{' ) );
-            this.Tokenizer.LexerTokens.Add ( new CloseContainer ( '}' ) );
-            this.Tokenizer.LexerTokens.Add ( new EckigeKlammerZu (  ) );
-            this.Tokenizer.LexerTokens.Add ( new EckigeKlammerAuf (  ) );
-            this.Tokenizer.LexerTokens.Add ( new Point (  ) );
-            this.Tokenizer.LexerTokens.Add ( new Comma (  ) );
-            this.Tokenizer.LexerTokens.Add ( new DoublePoint (  ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "int", SyntaxKind.Int32Bit ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "char", SyntaxKind.Char ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "byte", SyntaxKind.Byte ) );
@@ -135,7 +136,6 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "sizeof", SyntaxKind.Sizeof ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "namespace", SyntaxKind.Namespace ) );
             this.Tokenizer.LexerTokens.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
-            this.Tokenizer.LexerTokens.Add ( new EndOfCommand ( ';' ) );
 
             return true;
         }
