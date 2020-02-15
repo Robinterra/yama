@@ -43,7 +43,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private char current
+        public char CurrentChar
         {
             get
             {
@@ -98,8 +98,6 @@ namespace LearnCsStuf.Basic
 
             foreach ( ILexerToken lexerToken in this.LexerTokens )
             {
-                if ( lexerToken.CheckChar ( this.current, false ) == TokenStatus.Cancel ) continue;
-
                 SyntaxToken result = this.ExecuteLexerToken ( lexerToken );
 
                 if (result == null) continue;
@@ -107,7 +105,7 @@ namespace LearnCsStuf.Basic
                 return result;
             }
 
-            SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, this.current.ToString(), null );
+            SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, this.CurrentChar.ToString(), null );
 
             this.NextChar (  );
 
@@ -116,7 +114,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private bool NextChar (  )
+        public bool NextChar (  )
         {
             this.position++;
 
@@ -124,7 +122,7 @@ namespace LearnCsStuf.Basic
 
             if (this.position > this.Text.Length) return false;
 
-            if (this.current != '\n') return true;
+            if (this.CurrentChar != '\n') return true;
 
             this.line++;
 
@@ -142,37 +140,26 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private SyntaxToken ExecuteLexerToken ( ILexerToken lexer )
+        private SyntaxToken ExecuteLexerToken ( ILexerToken token )
         {
             int start = this.position;
             int column = this.column;
             int line = this.line;
 
-            TokenStatus status = TokenStatus.Accept;
-
-            while ( (status = lexer.CheckChar ( this.current, true )) == TokenStatus.Accept )
-            {
-                if (!this.NextChar (  )) return null;
-            }
-
-            if (status == TokenStatus.CompleteOne)
-            {
-                status = TokenStatus.Complete;
-
-                this.NextChar();
-            }
+            TokenStatus status = token.CheckChar ( this );
 
             if (status != TokenStatus.Complete)
             {
                 this.position = start;
                 this.column = column;
                 this.line = line;
+
                 return null;
             }
 
             string text = this.Text.Substring ( start, this.position - start );
 
-            return new SyntaxToken ( lexer.Kind, this.position, this.line, this.column, text, lexer.GetValue ( text ) );
+            return new SyntaxToken ( token.Kind, this.position, this.line, this.column, text, token.GetValue ( text ) );
         }
 
         // -----------------------------------------------

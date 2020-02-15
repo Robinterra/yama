@@ -19,14 +19,6 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private int Counter
-        {
-            get;
-            set;
-        }
-
-        // -----------------------------------------------
-
         public SyntaxKind Kind
         {
             get
@@ -52,24 +44,16 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( Lexer lexer )
         {
-            if (!kettenauswertung) return this.Word[0] == zeichen ? TokenStatus.Accept : TokenStatus.Cancel;
-
-            if (this.Counter >= this.Word.Length)
+            foreach ( char zeichen in this.Word )
             {
-                this.Counter = 0;
+                if (lexer.CurrentChar != zeichen) return TokenStatus.Cancel;
 
-                return TokenStatus.Complete;
+                lexer.NextChar();
             }
 
-            bool isok = this.Word[this.Counter] == zeichen;
-
-            if (!isok) { this.Counter = 0; return TokenStatus.Cancel; }
-
-            this.Counter += 1;
-
-            return TokenStatus.Accept;
+            return TokenStatus.Complete;
         }
 
         // -----------------------------------------------

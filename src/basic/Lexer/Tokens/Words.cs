@@ -44,14 +44,26 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( Lexer lexer )
         {
-            foreach ( ILexerToken token in this.operators )
+            bool isok = true;
+            bool firstrun = true;
+            while (isok)
             {
-                if (token.CheckChar ( zeichen, false ) == TokenStatus.Accept) return TokenStatus.Accept;
+                bool allCancel = true;
+                foreach ( ILexerToken token in this.operators )
+                {
+                    if (token.CheckChar ( lexer ) != TokenStatus.Complete) continue;
+
+                    allCancel = false;
+                    firstrun = false;
+                    lexer.NextChar (  );
+                }
+
+                isok = !allCancel;
             }
 
-            return kettenauswertung ? TokenStatus.Complete : TokenStatus.Cancel;
+            return firstrun ? TokenStatus.Cancel : TokenStatus.Complete;
         }
 
         // -----------------------------------------------

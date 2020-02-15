@@ -27,13 +27,19 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( Lexer lexer )
         {
-            bool isok = char.IsWhiteSpace(zeichen);
+            if (!char.IsWhiteSpace ( lexer.CurrentChar)) return TokenStatus.Cancel;
 
-            if (kettenauswertung) return isok ? TokenStatus.Accept : TokenStatus.Complete;
+            bool isok = true;
 
-            return isok ? TokenStatus.Accept : TokenStatus.Cancel;
+            while ( isok )
+            {
+                isok = char.IsWhiteSpace ( lexer.CurrentChar );
+                lexer.NextChar (  );
+            }
+
+            return TokenStatus.Complete;
         }
 
         // -----------------------------------------------
