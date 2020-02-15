@@ -141,6 +141,7 @@ namespace LearnCsStuf.Basic
         Sizeof,
         Namespace,
         BedingtesCompilieren,
+        Zeichen,
     }
 }
 
