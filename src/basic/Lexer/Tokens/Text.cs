@@ -53,9 +53,7 @@ namespace LearnCsStuf.Basic
 
             if (!this.actuallyOnZeichenkette) return kettenauswertung ? TokenStatus.Complete : TokenStatus.Cancel;
 
-            if (zeichen == '\\') return (isonEscape = true) ? TokenStatus.Accept : TokenStatus.SyntaxError;
-
-            isonEscape = false;
+            isonEscape = zeichen == '\\';
 
             return TokenStatus.Accept;
         }
