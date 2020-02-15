@@ -126,7 +126,7 @@ namespace LearnCsStuf.Basic
 
             this.line++;
 
-            this.column = 1;
+            this.column = 0;
 
             return true;
         }

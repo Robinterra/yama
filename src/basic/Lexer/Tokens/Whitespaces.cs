@@ -31,11 +31,8 @@ namespace LearnCsStuf.Basic
         {
             if (!char.IsWhiteSpace ( lexer.CurrentChar)) return TokenStatus.Cancel;
 
-            bool isok = true;
-
-            while ( isok )
+            while ( char.IsWhiteSpace ( lexer.CurrentChar ) )
             {
-                isok = char.IsWhiteSpace ( lexer.CurrentChar );
                 lexer.NextChar (  );
             }
 

@@ -11,7 +11,6 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private bool actuallyOnZeichenkette = false;
         private bool isonEscape = false;
 
         // -----------------------------------------------
@@ -42,20 +41,25 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( Lexer lexer )
         {
-            if ( zeichen == '"' && !isonEscape )
-            {
-                if (kettenauswertung) this.actuallyOnZeichenkette = !this.actuallyOnZeichenkette;
+            bool actuallyOnZeichenkette = true;
 
-                return TokenStatus.Accept;
+            if (lexer.CurrentChar != '"') return TokenStatus.Cancel;
+
+            while (actuallyOnZeichenkette)
+            {
+                lexer.NextChar();
+
+                if (lexer.CurrentChar == '\0') return TokenStatus.SyntaxError;
+                if (lexer.CurrentChar == '"' && !isonEscape) actuallyOnZeichenkette = false;
+
+                isonEscape = lexer.CurrentChar == '\\';
             }
 
-            if (!this.actuallyOnZeichenkette) return kettenauswertung ? TokenStatus.Complete : TokenStatus.Cancel;
+            lexer.NextChar();
 
-            isonEscape = zeichen == '\\';
-
-            return TokenStatus.Accept;
+            return TokenStatus.Complete;
         }
 
         // -----------------------------------------------

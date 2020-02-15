@@ -27,13 +27,11 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( Lexer lexer )
         {
-            bool isok = '_' == zeichen;
+            bool isok = '_' == lexer.CurrentChar;
 
-            if (kettenauswertung) return isok ? TokenStatus.CompleteOne : TokenStatus.SyntaxError;
-
-            return isok ? TokenStatus.Accept : TokenStatus.Cancel;
+            return isok ? TokenStatus.CompleteOne : TokenStatus.Cancel;
         }
 
         // -----------------------------------------------

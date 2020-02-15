@@ -50,20 +50,33 @@ namespace LearnCsStuf.Basic
             bool firstrun = true;
             while (isok)
             {
-                bool allCancel = true;
-                foreach ( ILexerToken token in this.operators )
-                {
-                    if (token.CheckChar ( lexer ) != TokenStatus.Complete) continue;
-
-                    allCancel = false;
-                    firstrun = false;
-                    lexer.NextChar (  );
-                }
-
-                isok = !allCancel;
+                isok = this.CheckAllOperators ( lexer );
+                if (isok) firstrun = false;
             }
 
             return firstrun ? TokenStatus.Cancel : TokenStatus.Complete;
+        }
+
+        // -----------------------------------------------
+
+        private bool CheckAllOperators ( Lexer lexer )
+        {
+            foreach ( ILexerToken token in this.operators )
+            {
+                TokenStatus status = token.CheckChar ( lexer );
+
+                if (status == TokenStatus.CompleteOne)
+                {
+                    lexer.NextChar (  );
+                    status = TokenStatus.Complete;
+                }
+
+                if (status != TokenStatus.Complete) continue;
+
+                return true;
+            }
+
+            return false;
         }
 
         // -----------------------------------------------

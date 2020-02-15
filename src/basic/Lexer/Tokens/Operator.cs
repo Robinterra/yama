@@ -65,14 +65,28 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( Lexer lexer )
+        {
+            if ( !this.ConatinsOperator ( lexer.CurrentChar ) ) return TokenStatus.Cancel;
+
+            while ( this.ConatinsOperator ( lexer.CurrentChar ) )
+            {
+                lexer.NextChar (  );
+            }
+
+            return TokenStatus.Complete;
+        }
+
+        // -----------------------------------------------
+
+        private bool ConatinsOperator ( char zeichen )
         {
             foreach (char vergleichswert in this.operators)
             {
-                if (zeichen == vergleichswert) return TokenStatus.Accept;
+                if (zeichen == vergleichswert) return true;
             }
 
-            return kettenauswertung ? TokenStatus.Complete : TokenStatus.Cancel;
+            return false;
         }
 
         // -----------------------------------------------

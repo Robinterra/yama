@@ -11,9 +11,6 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private bool actuallyOnZeichenkette = false;
-        private bool isonEscape = false;
-
         // -----------------------------------------------
 
         #endregion vars
@@ -65,52 +62,22 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( Lexer lexer )
         {
-            if (this.isonEscape && !this.actuallyOnZeichenkette)
+            if ( this.Begin.CheckChar ( lexer ) != TokenStatus.Complete ) return TokenStatus.Cancel;
+
+            bool isOnBox = true;
+
+            while ( isOnBox )
             {
-                TokenStatus status = this.Begin.CheckChar(zeichen, true);
+                if ( lexer.CurrentChar == '\0' ) return TokenStatus.Complete;
 
-                if (status == TokenStatus.Accept) return TokenStatus.Accept;
+                isOnBox = this.End.CheckChar ( lexer ) != TokenStatus.Complete;
 
-                this.isonEscape = false;
-
-                if (status == TokenStatus.Cancel) return TokenStatus.Cancel;
-
-                this.actuallyOnZeichenkette = true;
-
-                return TokenStatus.Accept;
+                if ( isOnBox ) lexer.NextChar (  );
             }
 
-            if ( !this.actuallyOnZeichenkette )
-            {
-                if (this.Begin.CheckChar(zeichen, kettenauswertung) != TokenStatus.Accept) return TokenStatus.Cancel;
-
-                if (kettenauswertung) this.isonEscape = true;
-
-                return TokenStatus.Accept;
-            }
-
-            if (zeichen == '\0') return TokenStatus.Complete;
-
-            if (this.isonEscape)
-            {
-                TokenStatus status = this.End.CheckChar(zeichen, true);
-
-                if (status == TokenStatus.Accept) return TokenStatus.Accept;
-
-                this.isonEscape = false;
-
-                if (status == TokenStatus.Cancel) return TokenStatus.Accept;
-
-                this.actuallyOnZeichenkette = false;
-
-                return TokenStatus.CompleteOne;
-            }
-
-            if (this.End.CheckChar(zeichen, true) == TokenStatus.Accept) this.isonEscape = true;
-
-            return TokenStatus.Accept;
+            return TokenStatus.Complete;
         }
 
         // -----------------------------------------------

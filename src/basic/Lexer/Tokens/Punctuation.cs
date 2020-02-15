@@ -50,9 +50,9 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( char zeichen, bool kettenauswertung )
+        public TokenStatus CheckChar ( Lexer lexer )
         {
-            return this.punctuation.CheckChar ( zeichen, kettenauswertung );
+            return this.punctuation.CheckChar ( lexer );
 
             /*if (!kettenauswertung) return this.punctuation[0] == zeichen ? TokenStatus.Accept : TokenStatus.Cancel;
 
