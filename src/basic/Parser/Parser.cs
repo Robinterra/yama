@@ -148,15 +148,17 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new Number (  ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "|" }, 1 ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "^" }, 2 ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "&" }, 3 ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "==", "!=", "<", ">", "<=", ">=" }, 4 ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "&&", "||" }, 5 ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "<<", ">>" }, 6 ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "+", "-" }, 7 ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "*", "/", "%" }, 8 ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "=" }, 0 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 1 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 2 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 3 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<", ">", "<=", ">=" }, 4 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 5 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 6 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 7 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 8 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 9 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=" }, 0 ) );
+            this.ParserMembers.Add ( new ContainerExpression (  ) );
             this.ErrorNode = new ParserError (  );
 
             return true;
@@ -278,7 +280,7 @@ namespace LearnCsStuf.Basic
         public List<IParseTreeNode> ParseCleanTokens ( int von, int bis )
         {
             if (this.CleanTokens.Count == 0) return null;
-            if ( von == bis ) return null;
+            if ( von >= bis ) return null;
 
             int currentpos = this.Position;
             this.Position = von;
@@ -389,7 +391,7 @@ namespace LearnCsStuf.Basic
 
             this.ParentContainer = new Container (  );
             this.ParentContainer.Statements = parentNodes;
-            this.ParentContainer.Token = new SyntaxToken ( SyntaxKind.BeginContainer, 0, 0, 0, "File", "File" );
+            this.ParentContainer.Token = new SyntaxToken ( SyntaxKind.BeginContainer, 0, 0, 0, "File", this.Fileinfo.FullName );
 
             foreach ( IParseTreeNode node in parentNodes )
             {
@@ -397,6 +399,15 @@ namespace LearnCsStuf.Basic
             }
 
             this.PrintPretty ( this.ParentContainer );
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public bool Repleace ( SyntaxToken token, int pos )
+        {
+            this.CleanTokens[pos] = token;
 
             return true;
         }

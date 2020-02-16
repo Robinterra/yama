@@ -10,8 +10,8 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.0/learncsStuff.dll",
-            "args": [],
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/learncsStuff.exe",
+            "args": [ "basic", "${workspaceFolder}/bin/Debug/netcoreapp3.1/calc.cs" ],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
