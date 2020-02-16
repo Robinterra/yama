@@ -73,6 +73,21 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public IParseTreeToken ParentOfTree
+        {
+            get;
+            private set;
+        }
+
+        // -----------------------------------------------
+
+        public List<IParseTreeToken> ParserMembers
+        {
+            get;
+        } = new List<IParseTreeToken> ();
+
+        // -----------------------------------------------
+
         public SyntaxToken Current
         {
             get
@@ -123,6 +138,7 @@ namespace LearnCsStuf.Basic
 
             this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
             this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
+            this.Tokenizer.LexerTokens.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
             this.Tokenizer.LexerTokens.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
             this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~', '√', '?' ) );
             this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
@@ -226,7 +242,47 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        private bool ParseCleanTokens (  )
+        {
+            if (this.CleanTokens.Count == 0) return false;
 
+            this.ParentOfTree = this.ParseCleanToken ( this.Current );
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public IParseTreeToken ParseCleanToken ( SyntaxToken token )
+        {
+            foreach ( IParseTreeToken member in this.ParserMembers )
+            {
+                IParseTreeToken result = member.Parse ( this );
+
+                if ( result != null ) return result;
+            }
+
+            token.Kind = SyntaxKind.Unknown;
+
+            this.PrintSyntaxError ( token, "Parser fehler" );
+
+            return null;
+        }
+
+        // -----------------------------------------------
+
+        private IParseTreeToken ParseOneMember ( IParseTreeToken member, SyntaxToken token )
+        {
+            int pos = this.Position;
+
+            IParseTreeToken result = member.Parse ( this );
+
+            if ( result != null ) return result;
+
+            this.Position = pos;
+
+            return null;
+        }
 
         // -----------------------------------------------
 
@@ -239,6 +295,15 @@ namespace LearnCsStuf.Basic
             if (!this.CheckTokens (  )) return false;
 
             
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public bool SetPos ( int pos )
+        {
+            this.Position = pos;
 
             return true;
         }

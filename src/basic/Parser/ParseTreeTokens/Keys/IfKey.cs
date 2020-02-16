@@ -30,6 +30,8 @@ namespace LearnCsStuf.Basic
         public IParseTreeToken Parse ( Parser parser )
         {
             if ( parser.Current.Kind != SyntaxKind.If ) return null;
+            if ( parser.Peek ( 1 ).Kind != SyntaxKind.OpenKlammer ) return null;
+
 
             return null;
         }

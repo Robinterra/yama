@@ -12,6 +12,7 @@ namespace LearnCsStuf.Basic
         public SyntaxKind Kind
         {
             get;
+            set;
         }
 
         // -----------------------------------------------
