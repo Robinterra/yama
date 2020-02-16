@@ -1,23 +1,23 @@
 namespace LearnCsStuf.Basic
 {
-    public class IfKey : IParseTreeToken
+    public class IfKey : IParseTreeNode
     {
 
         #region get/set
 
-        public IParseTreeToken Condition
+        public IParseTreeNode Condition
         {
             get;
             set;
         }
 
-        public IParseTreeToken IfStatement
+        public IParseTreeNode IfStatement
         {
             get;
             set;
         }
 
-        public IParseTreeToken ElseStatement
+        public IParseTreeNode ElseStatement
         {
             get;
             set;
@@ -27,7 +27,7 @@ namespace LearnCsStuf.Basic
 
         #region methods
 
-        public IParseTreeToken Parse ( Parser parser )
+        public IParseTreeNode Parse ( Parser parser )
         {
             if ( parser.Current.Kind != SyntaxKind.If ) return null;
             if ( parser.Peek ( 1 ).Kind != SyntaxKind.OpenKlammer ) return null;

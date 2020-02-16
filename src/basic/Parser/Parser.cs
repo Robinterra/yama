@@ -73,7 +73,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public IParseTreeToken ParentOfTree
+        public IParseTreeNode ParentOfTree
         {
             get;
             private set;
@@ -81,10 +81,10 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public List<IParseTreeToken> ParserMembers
+        public List<IParseTreeNode> ParserMembers
         {
             get;
-        } = new List<IParseTreeToken> ();
+        } = new List<IParseTreeNode> ();
 
         // -----------------------------------------------
 
@@ -253,11 +253,11 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public IParseTreeToken ParseCleanToken ( SyntaxToken token )
+        public IParseTreeNode ParseCleanToken ( SyntaxToken token )
         {
-            foreach ( IParseTreeToken member in this.ParserMembers )
+            foreach ( IParseTreeNode member in this.ParserMembers )
             {
-                IParseTreeToken result = member.Parse ( this );
+                IParseTreeNode result = member.Parse ( this );
 
                 if ( result != null ) return result;
             }
@@ -271,11 +271,11 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private IParseTreeToken ParseOneMember ( IParseTreeToken member, SyntaxToken token )
+        private IParseTreeNode ParseOneMember ( IParseTreeNode member, SyntaxToken token )
         {
             int pos = this.Position;
 
-            IParseTreeToken result = member.Parse ( this );
+            IParseTreeNode result = member.Parse ( this );
 
             if ( result != null ) return result;
 
@@ -294,7 +294,7 @@ namespace LearnCsStuf.Basic
 
             if (!this.CheckTokens (  )) return false;
 
-            
+            if (!this.ParseCleanTokens (  )) return false;
 
             return true;
         }

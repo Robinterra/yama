@@ -1,6 +1,6 @@
 namespace LearnCsStuf.Basic
 {
-    public interface IParseTreeToken
+    public interface IParseTreeNode
     {
 
         // -----------------------------------------------
@@ -20,7 +20,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        IParseTreeToken Parse ( Parser parser );
+        IParseTreeNode Parse ( Parser parser );
 
         // -----------------------------------------------
 
