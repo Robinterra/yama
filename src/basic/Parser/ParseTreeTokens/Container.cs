@@ -7,11 +7,6 @@ namespace LearnCsStuf.Basic
 
         #region get/set
 
-        public SyntaxKind Kind
-        {
-            get;
-        }
-
         public List<IParseTreeToken> Statements
         {
             get;
@@ -20,9 +15,11 @@ namespace LearnCsStuf.Basic
 
         #endregion get/set
 
-        public bool Parse ( Parser parser )
+        public IParseTreeToken Parse ( Parser parser )
         {
-            return true;
+            if ( parser.Current.Kind != SyntaxKind.BeginContainer ) return null;
+
+            return null;
         }
     }
 }

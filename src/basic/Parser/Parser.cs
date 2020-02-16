@@ -73,6 +73,18 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public SyntaxToken Current
+        {
+            get
+            {
+                if (this.CleanTokens.Count <= this.Position) return null;
+
+                return this.CleanTokens[this.Position];
+            }
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -157,6 +169,8 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "is", SyntaxKind.Is ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "in", SyntaxKind.In ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "as", SyntaxKind.As ) );
+            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "if", SyntaxKind.If ) );
+            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "else", SyntaxKind.Else ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "foreach", SyntaxKind.Foreach ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "float", SyntaxKind.Float32Bit ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "new", SyntaxKind.New ) );
@@ -173,7 +187,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private bool PrintSyntaxError(SyntaxToken token)
+        private bool PrintSyntaxError(SyntaxToken token, string msg)
         {
             if (token.Kind != SyntaxKind.Unknown) return false;
 
@@ -182,7 +196,7 @@ namespace LearnCsStuf.Basic
             ConsoleColor colr = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
 
-            Console.Error.WriteLine ( "({0},{1}) Syntax error - unknown char \"{2}\"", token.Line, token.Column, token.Text );
+            Console.Error.WriteLine ( "({0},{1}) Syntax error - {3} \"{2}\"", token.Line, token.Column, token.Text, msg );
 
             Console.ForegroundColor = colr;
 
@@ -200,7 +214,7 @@ namespace LearnCsStuf.Basic
             {
                 if (token.Kind == SyntaxKind.Whitespaces) continue;
                 if (token.Kind == SyntaxKind.Comment) continue;
-                if (this.PrintSyntaxError ( token )) continue;
+                if (this.PrintSyntaxError ( token, "unkown char" )) continue;
 
                 this.CleanTokens.Add ( token );
                 //Console.Write ( token.Kind.ToString() + " : " );

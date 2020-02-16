@@ -144,6 +144,8 @@ namespace LearnCsStuf.Basic
         Zeichen,
         Set,
         Get,
+        Else,
+        If,
     }
 }
 

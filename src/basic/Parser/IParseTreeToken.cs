@@ -9,10 +9,6 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        SyntaxKind Kind
-        {
-            get;
-        }
 
         // -----------------------------------------------
 
@@ -24,7 +20,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        bool Parse ( Parser parser );
+        IParseTreeToken Parse ( Parser parser );
 
         // -----------------------------------------------
 
