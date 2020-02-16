@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace LearnCsStuf.Basic
 {
     public interface IParseTreeNode
@@ -13,6 +15,11 @@ namespace LearnCsStuf.Basic
         {
             get;
             set;
+        }
+
+        List<IParseTreeNode> GetAllChilds
+        {
+            get;
         }
 
         // -----------------------------------------------

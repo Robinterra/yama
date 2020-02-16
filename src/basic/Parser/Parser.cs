@@ -262,6 +262,7 @@ namespace LearnCsStuf.Basic
 
             this.ParentContainer = new Container (  );
             this.ParentContainer.Statements = new List<IParseTreeNode> (  );
+            this.ParentContainer.Token = new SyntaxToken ( SyntaxKind.BeginContainer, 0, 0, 0, "File", "File" );
             List<IParseTreeNode> possibleParents = new List<IParseTreeNode>();
 
             bool isok = true;
@@ -280,8 +281,9 @@ namespace LearnCsStuf.Basic
             {
                 if ( node == null ) continue;
                 if ( node.Token.ParentNode != null ) continue;
-                Console.WriteLine ( node.Token.Value );
+
                 node.Token.ParentNode = this.ParentContainer;
+
                 this.ParentContainer.Statements.Add ( node );
             }
 
@@ -365,6 +367,46 @@ namespace LearnCsStuf.Basic
             if (!this.CheckTokens (  )) return false;
 
             if (!this.ParseCleanTokens (  )) return false;
+
+            this.PrintPretty ( this.ParentContainer );
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool PrintPretty ( IParseTreeNode node, string lebchilds = "" )
+        {
+            //└──
+            //├──
+            //
+            if (node == null) return true;
+
+            Console.Write ( node.Token.Value );
+            Console.WriteLine (  );
+
+            List<IParseTreeNode> childs = node.GetAllChilds;
+
+            if ( childs == null ) return true;
+
+            string neuchild = lebchilds + "│   ";
+            int counter = 0;
+            string normalChildPrint = "├── ";
+            foreach (IParseTreeNode child in childs)
+            {
+                if (counter >= childs.Count - 1)
+                {
+                    normalChildPrint = "└── ";
+                    neuchild = lebchilds + "    ";
+                }
+
+                Console.Write ( lebchilds );
+                Console.Write ( normalChildPrint );
+
+                this.PrintPretty ( child, neuchild );
+
+                counter++;
+            }
 
             return true;
         }

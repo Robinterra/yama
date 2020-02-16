@@ -25,6 +25,19 @@ namespace LearnCsStuf.Basic
             set;
         }
 
+        public List<IParseTreeNode> GetAllChilds
+        {
+            get
+            {
+                List<IParseTreeNode> result = new List<IParseTreeNode> (  );
+
+                result.Add ( this.LeftNode );
+                result.Add ( this.RightNode );
+
+                return result;
+            }
+        }
+
         #endregion get/set
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )

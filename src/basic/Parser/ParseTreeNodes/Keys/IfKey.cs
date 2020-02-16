@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace LearnCsStuf.Basic
 {
     public class IfKey : IParseTreeNode
@@ -27,6 +29,20 @@ namespace LearnCsStuf.Basic
         {
             get;
             set;
+        }
+
+        public List<IParseTreeNode> GetAllChilds
+        {
+            get
+            {
+                List<IParseTreeNode> result = new List<IParseTreeNode> (  );
+
+                result.Add ( this.Condition );
+                result.Add ( this.IfStatement );
+                result.Add ( this.ElseStatement );
+
+                return result;
+            }
         }
 
         #endregion get/set
