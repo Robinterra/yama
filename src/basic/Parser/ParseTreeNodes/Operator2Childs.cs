@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class Operator2ChildsLevel1 : IParseTreeNode, IPriority
+    public class Operator2Childs : IParseTreeNode, IPriority
     {
 
         #region get/set
@@ -27,10 +27,7 @@ namespace LearnCsStuf.Basic
 
         public int Prio
         {
-            get
-            {
-                return 1;
-            }
+            get;
         }
 
         public List<IParseTreeNode> GetAllChilds
@@ -46,47 +43,72 @@ namespace LearnCsStuf.Basic
             }
         }
 
+        public List<string> ValidOperators
+        {
+            get;
+        }
+
         #endregion get/set
 
-        public IParseTreeNode SwapChild ( IParseTreeNode node )
+        #region ctor
+
+        public Operator2Childs ( int prio )
+        {
+            this.Prio = prio;
+        }
+
+        public Operator2Childs ( List<string> validOperators, int prio )
+            : this ( prio )
+        {
+            this.ValidOperators = validOperators;
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        public IParseTreeNode SwapChild ( IPriority node )
         {
             IParseTreeNode result = this.RightNode;
 
-            this.RightNode = node;
-            node.Token.ParentNode = node;
+            if ( result is IPriority t && t.Prio < node.Prio ) return t.SwapChild ( node );
+
+            this.RightNode = (IParseTreeNode)node;
+            this.RightNode.Token.ParentNode = this;
 
             return result;
+        }
+
+        private bool CheckHashValidOperator ( SyntaxToken token )
+        {
+            foreach ( string op in this.ValidOperators )
+            {
+                if ( op == token.Text ) return true;
+            }
+
+            return false;
         }
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
             if ( token.Kind != SyntaxKind.Operator ) return null;
+            if ( !this.CheckHashValidOperator ( token ) ) return null;
 
-            Operator2ChildsLevel1 node = new Operator2ChildsLevel1 (  );
+            Operator2Childs node = new Operator2Childs ( this.Prio );
             node.Token = token;
             token.Node = node;
 
             node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
             node.RightNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
 
-            if ( node.LeftNode is IPriority t && t.Prio > this.Prio ) node.LeftNode = t.SwapChild ( node );
+            if ( node.LeftNode is IPriority t && t.Prio < this.Prio ) node.LeftNode = t.SwapChild ( node );
 
             node.LeftNode.Token.ParentNode = node;
             node.RightNode.Token.ParentNode = node;
 
             return node;
-/*
-            Operator2Childs node = new Operator2Childs (  );
-            node.Token = token;
-            token.Node = node;
-
-            node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
-            node.RightNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
-
-            node.LeftNode.Token.ParentNode = node;
-            node.RightNode.Token.ParentNode = node;
-
-            return node;*/
         }
+
+        #endregion methods
     }
 }

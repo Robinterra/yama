@@ -26,7 +26,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        IParseTreeNode SwapChild ( IParseTreeNode node );
+        IParseTreeNode SwapChild ( IPriority node );
 
         // -----------------------------------------------
 

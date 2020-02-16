@@ -148,7 +148,15 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new Number (  ) );
-            this.ParserMembers.Add ( new Operator2ChildsLevel1 (  ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "|" }, 1 ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "^" }, 2 ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "&" }, 3 ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "==", "!=", "<", ">", "<=", ">=" }, 4 ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "&&", "||" }, 5 ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "<<", ">>" }, 6 ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "+", "-" }, 7 ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "*", "/", "%" }, 8 ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 ( new List<string> { "=" }, 0 ) );
             this.ErrorNode = new ParserError (  );
 
             return true;
