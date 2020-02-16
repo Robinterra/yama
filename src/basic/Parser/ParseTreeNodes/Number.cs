@@ -15,11 +15,15 @@ namespace LearnCsStuf.Basic
 
         #endregion get/set
 
-        public IParseTreeNode Parse ( Parser parser )
+        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( parser.Current.Kind != SyntaxKind.NumberToken ) return null;
+            if ( token.Kind != SyntaxKind.NumberToken ) return null;
 
-            return null;
+            Number node = new Number { Token = token };
+
+            token.Node = node;
+
+            return node;
         }
     }
 }

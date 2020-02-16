@@ -33,10 +33,10 @@ namespace LearnCsStuf.Basic
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser )
+        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( parser.Current.Kind != SyntaxKind.If ) return null;
-            if ( parser.Peek ( 1 ).Kind != SyntaxKind.OpenKlammer ) return null;
+            if ( token.Kind != SyntaxKind.If ) return null;
+            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenKlammer ) return null;
 
 
             return null;

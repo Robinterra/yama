@@ -21,9 +21,9 @@ namespace LearnCsStuf.Basic
 
         #endregion get/set
 
-        public IParseTreeNode Parse ( Parser parser )
+        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( parser.Current.Kind != SyntaxKind.BeginContainer ) return null;
+            if ( token.Kind != SyntaxKind.BeginContainer ) return null;
 
             return null;
         }

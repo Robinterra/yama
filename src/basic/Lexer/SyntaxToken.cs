@@ -20,6 +20,7 @@ namespace LearnCsStuf.Basic
         public int Position
         {
             get;
+            set;
         }
 
         // -----------------------------------------------
@@ -48,6 +49,22 @@ namespace LearnCsStuf.Basic
         public object Value
         {
             get;
+        }
+
+        // -----------------------------------------------
+
+        public IParseTreeNode ParentNode
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public IParseTreeNode Node
+        {
+            get;
+            set;
         }
 
         // -----------------------------------------------

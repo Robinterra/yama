@@ -73,7 +73,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public IParseTreeNode ParentOfTree
+        public Container ParentContainer
         {
             get;
             private set;
@@ -94,7 +94,10 @@ namespace LearnCsStuf.Basic
             {
                 if (this.CleanTokens.Count <= this.Position) return null;
 
-                return this.CleanTokens[this.Position];
+                SyntaxToken result = this.CleanTokens[this.Position];
+                result.Position = this.Position;
+
+                return result;
             }
         }
 
@@ -111,6 +114,7 @@ namespace LearnCsStuf.Basic
         private Parser (  )
         {
             this.InitLexer (  );
+            this.InitParser (  );
         }
 
         // -----------------------------------------------
@@ -128,6 +132,16 @@ namespace LearnCsStuf.Basic
         // -----------------------------------------------
 
         #region methods
+
+        // -----------------------------------------------
+
+        private bool InitParser (  )
+        {
+            this.ParserMembers.Add ( new Number (  ) );
+            this.ParserMembers.Add ( new Operator2Childs (  ) );
+
+            return true;
+        }
 
         // -----------------------------------------------
 
@@ -246,18 +260,74 @@ namespace LearnCsStuf.Basic
         {
             if (this.CleanTokens.Count == 0) return false;
 
-            this.ParentOfTree = this.ParseCleanToken ( this.Current );
+            this.ParentContainer = new Container (  );
+            this.ParentContainer.Statements = new List<IParseTreeNode> (  );
+            List<IParseTreeNode> possibleParents = new List<IParseTreeNode>();
+
+            bool isok = true;
+            while ( isok )
+            {
+                IParseTreeNode node = this.ParsePrimary (  );
+
+                isok = node != null;
+
+                possibleParents.Add ( node );
+
+                this.NextToken (  );
+            }
+
+            foreach ( IParseTreeNode node in possibleParents )
+            {
+                if ( node == null ) continue;
+                if ( node.Token.ParentNode != null ) continue;
+                Console.WriteLine ( node.Token.Value );
+                node.Token.ParentNode = this.ParentContainer;
+                this.ParentContainer.Statements.Add ( node );
+            }
+
+            //this.ParentOfTree = this.ParseCleanToken ( this.Current );
 
             return true;
+        }
+
+        private IParseTreeNode ParsePrimary (  )
+        {
+            while ( this.Position < this.CleanTokens.Count )
+            {
+                if ( this.Current.Node == null ) return this.ParseCleanToken ( this.Current );
+
+                this.NextToken (  );
+            }
+
+            return null;
+        }
+
+        // -----------------------------------------------
+
+        public bool NextToken (  )
+        {
+            this.Position++;
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private IParseTreeNode GetNodeFromToken ( SyntaxToken token )
+        {
+            if ( token.ParentNode != null ) return this.GetNodeFromToken ( token.ParentNode.Token );
+
+            return token.Node;
         }
 
         // -----------------------------------------------
 
         public IParseTreeNode ParseCleanToken ( SyntaxToken token )
         {
+            if ( token.Node != null ) return this.GetNodeFromToken ( token );
+
             foreach ( IParseTreeNode member in this.ParserMembers )
             {
-                IParseTreeNode result = member.Parse ( this );
+                IParseTreeNode result = member.Parse ( this, token );
 
                 if ( result != null ) return result;
             }
@@ -275,7 +345,7 @@ namespace LearnCsStuf.Basic
         {
             int pos = this.Position;
 
-            IParseTreeNode result = member.Parse ( this );
+            IParseTreeNode result = member.Parse ( this, token );
 
             if ( result != null ) return result;
 
@@ -312,10 +382,21 @@ namespace LearnCsStuf.Basic
 
         public SyntaxToken Peek ( int offset )
         {
-            if (this.CleanTokens.Count <= offset + this.Position) return null;
-            if (0 > offset + this.Position) return null;
+            return this.Peek ( this.Current, offset );
+        }
 
-            return this.CleanTokens[offset + this.Position];
+        // -----------------------------------------------
+
+        public SyntaxToken Peek ( SyntaxToken token, int offset )
+        {
+            if (this.CleanTokens.Count <= offset + token.Position) return null;
+            if (0 > offset + token.Position) return null;
+
+            SyntaxToken result = this.CleanTokens[offset + token.Position];
+
+            result.Position = offset + token.Position;
+
+            return result;
         }
 
         // -----------------------------------------------

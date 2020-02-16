@@ -27,12 +27,21 @@ namespace LearnCsStuf.Basic
 
         #endregion get/set
 
-        public IParseTreeNode Parse ( Parser parser )
+        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( parser.Current.Kind != SyntaxKind.Operator ) return null;
+            if ( token.Kind != SyntaxKind.Operator ) return null;
 
+            Operator2Childs node = new Operator2Childs (  );
+            node.Token = token;
+            token.Node = node;
 
-            return null;
+            node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
+            node.RightNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
+
+            node.LeftNode.Token.ParentNode = node;
+            node.RightNode.Token.ParentNode = node;
+
+            return node;
         }
     }
 }

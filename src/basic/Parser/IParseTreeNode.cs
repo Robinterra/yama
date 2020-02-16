@@ -25,7 +25,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        IParseTreeNode Parse ( Parser parser );
+        IParseTreeNode Parse ( Parser parser, SyntaxToken token );
 
         // -----------------------------------------------
 
