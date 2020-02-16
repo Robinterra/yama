@@ -2,12 +2,18 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class Container : IParseTreeNode
+    public class Operator2Childs : IParseTreeNode
     {
 
         #region get/set
 
-        public List<IParseTreeNode> Statements
+        public IParseTreeNode LeftNode
+        {
+            get;
+            set;
+        }
+
+        public IParseTreeNode RightNode
         {
             get;
             set;
@@ -23,7 +29,8 @@ namespace LearnCsStuf.Basic
 
         public IParseTreeNode Parse ( Parser parser )
         {
-            if ( parser.Current.Kind != SyntaxKind.BeginContainer ) return null;
+            if ( parser.Current.Kind != SyntaxKind.Operator ) return null;
+
 
             return null;
         }

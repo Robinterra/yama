@@ -23,6 +23,12 @@ namespace LearnCsStuf.Basic
             set;
         }
 
+        public SyntaxToken Token
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods

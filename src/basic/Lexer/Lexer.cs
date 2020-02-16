@@ -16,7 +16,7 @@ namespace LearnCsStuf.Basic
 
         private int line = 1;
 
-        private int column = 1;
+        private int column = 0;
 
         // -----------------------------------------------
 

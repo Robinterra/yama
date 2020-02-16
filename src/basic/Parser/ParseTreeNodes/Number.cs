@@ -2,16 +2,10 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class Container : IParseTreeNode
+    public class Number : IParseTreeNode
     {
 
         #region get/set
-
-        public List<IParseTreeNode> Statements
-        {
-            get;
-            set;
-        }
 
         public SyntaxToken Token
         {
@@ -23,7 +17,7 @@ namespace LearnCsStuf.Basic
 
         public IParseTreeNode Parse ( Parser parser )
         {
-            if ( parser.Current.Kind != SyntaxKind.BeginContainer ) return null;
+            if ( parser.Current.Kind != SyntaxKind.NumberToken ) return null;
 
             return null;
         }
