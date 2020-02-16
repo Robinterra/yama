@@ -145,8 +145,10 @@ namespace LearnCsStuf.Basic
 
         private bool InitParser (  )
         {
+            this.ParserMembers.Add ( new ReturnKey (  ) );
+            this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new Number (  ) );
-            this.ParserMembers.Add ( new Operator2Childs (  ) );
+            this.ParserMembers.Add ( new Operator2ChildsLevel1 (  ) );
             this.ErrorNode = new ParserError (  );
 
             return true;
@@ -235,7 +237,7 @@ namespace LearnCsStuf.Basic
             ConsoleColor colr = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
 
-            Console.Error.WriteLine ( "({0},{1}) Syntax error - {3} \"{2}\"", token.Line, token.Column, token.Text, msg );
+            Console.Error.WriteLine ( "{4}({0},{1}): Syntax error - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, this.Fileinfo.FullName );
 
             Console.ForegroundColor = colr;
 
@@ -268,6 +270,7 @@ namespace LearnCsStuf.Basic
         public List<IParseTreeNode> ParseCleanTokens ( int von, int bis )
         {
             if (this.CleanTokens.Count == 0) return null;
+            if ( von == bis ) return null;
 
             int currentpos = this.Position;
             this.Position = von;
