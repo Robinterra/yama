@@ -55,6 +55,18 @@ namespace LearnCsStuf.Basic
             node.RightNode.Token.ParentNode = node;
 
             return node;
+/*
+            Operator2Childs node = new Operator2Childs (  );
+            node.Token = token;
+            token.Node = node;
+
+            node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
+            node.RightNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
+
+            node.LeftNode.Token.ParentNode = node;
+            node.RightNode.Token.ParentNode = node;
+
+            return node;*/
         }
     }
 }

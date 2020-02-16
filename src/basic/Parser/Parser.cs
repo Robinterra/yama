@@ -81,6 +81,14 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public IParseTreeNode ErrorNode
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public List<IParseTreeNode> ParserMembers
         {
             get;
@@ -139,6 +147,7 @@ namespace LearnCsStuf.Basic
         {
             this.ParserMembers.Add ( new Number (  ) );
             this.ParserMembers.Add ( new Operator2Childs (  ) );
+            this.ErrorNode = new ParserError (  );
 
             return true;
         }
@@ -256,19 +265,19 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private bool ParseCleanTokens (  )
+        public List<IParseTreeNode> ParseCleanTokens ( int von, int bis )
         {
-            if (this.CleanTokens.Count == 0) return false;
+            if (this.CleanTokens.Count == 0) return null;
 
-            this.ParentContainer = new Container (  );
-            this.ParentContainer.Statements = new List<IParseTreeNode> (  );
-            this.ParentContainer.Token = new SyntaxToken ( SyntaxKind.BeginContainer, 0, 0, 0, "File", "File" );
+            int currentpos = this.Position;
+            this.Position = von;
             List<IParseTreeNode> possibleParents = new List<IParseTreeNode>();
+            List<IParseTreeNode> nodeParents = new List<IParseTreeNode>();
 
             bool isok = true;
             while ( isok )
             {
-                IParseTreeNode node = this.ParsePrimary (  );
+                IParseTreeNode node = this.ParsePrimary ( bis );
 
                 isok = node != null;
 
@@ -282,19 +291,17 @@ namespace LearnCsStuf.Basic
                 if ( node == null ) continue;
                 if ( node.Token.ParentNode != null ) continue;
 
-                node.Token.ParentNode = this.ParentContainer;
-
-                this.ParentContainer.Statements.Add ( node );
+                nodeParents.Add ( node );
             }
 
-            //this.ParentOfTree = this.ParseCleanToken ( this.Current );
+            this.Position = currentpos;
 
-            return true;
+            return nodeParents;
         }
 
-        private IParseTreeNode ParsePrimary (  )
+        private IParseTreeNode ParsePrimary ( int max )
         {
-            while ( this.Position < this.CleanTokens.Count )
+            while ( this.Position < max )
             {
                 if ( this.Current.Node == null ) return this.ParseCleanToken ( this.Current );
 
@@ -338,7 +345,7 @@ namespace LearnCsStuf.Basic
 
             this.PrintSyntaxError ( token, "Parser fehler" );
 
-            return null;
+            return this.ErrorNode.Parse ( this, token );
         }
 
         // -----------------------------------------------
@@ -366,7 +373,17 @@ namespace LearnCsStuf.Basic
 
             if (!this.CheckTokens (  )) return false;
 
-            if (!this.ParseCleanTokens (  )) return false;
+            List<IParseTreeNode> parentNodes = this.ParseCleanTokens ( 0, this.CleanTokens.Count );
+            if ( parentNodes == null ) return false;
+
+            this.ParentContainer = new Container (  );
+            this.ParentContainer.Statements = parentNodes;
+            this.ParentContainer.Token = new SyntaxToken ( SyntaxKind.BeginContainer, 0, 0, 0, "File", "File" );
+
+            foreach ( IParseTreeNode node in parentNodes )
+            {
+                node.Token.ParentNode = this.ParentContainer;
+            }
 
             this.PrintPretty ( this.ParentContainer );
 
@@ -377,9 +394,6 @@ namespace LearnCsStuf.Basic
 
         private bool PrintPretty ( IParseTreeNode node, string lebchilds = "" )
         {
-            //└──
-            //├──
-            //
             if (node == null) return true;
 
             Console.Write ( node.Token.Value );
@@ -407,15 +421,6 @@ namespace LearnCsStuf.Basic
 
                 counter++;
             }
-
-            return true;
-        }
-
-        // -----------------------------------------------
-
-        public bool SetPos ( int pos )
-        {
-            this.Position = pos;
 
             return true;
         }
