@@ -138,7 +138,7 @@ namespace LearnCsStuf.Basic
 
             if ( node.ChildNode == null ) return null;
 
-            if ( node.ChildNode is IPriority t && t.Prio < this.Prio ) node.ChildNode = t.SwapChild ( node );
+            //if ( node.ChildNode is IPriority t && t.Prio < this.Prio ) node.ChildNode = t.SwapChild ( node );
 
             node.ChildNode.Token.ParentNode = node;
 

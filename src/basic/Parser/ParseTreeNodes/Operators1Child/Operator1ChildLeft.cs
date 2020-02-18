@@ -117,12 +117,17 @@ namespace LearnCsStuf.Basic
             node.Token = token;
             token.Node = node;
 
-            node.ChildNode = parser.ParseCleanToken ( lexerLeft );
+            node.ChildNode = lexerLeft.Node;
 
             if ( node.ChildNode == null ) return null;
 
             if ( node.ChildNode is IPriority t && t.Prio < this.Prio ) node.ChildNode = t.SwapChild ( node );
 
+            if ( node.ChildNode.Token.ParentNode != null )
+            {
+                node.Token.ParentNode = node.ChildNode.Token.ParentNode;
+                //node.Token.ParentNode swap child from parent with this
+            }
             node.ChildNode.Token.ParentNode = node;
 
             return node;
