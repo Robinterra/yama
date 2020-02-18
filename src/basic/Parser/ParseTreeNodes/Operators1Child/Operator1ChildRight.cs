@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class Operator1Child : IParseTreeNode, IPriority
+    public class Operator1ChildRight : IParseTreeNode, IPriority
     {
 
         #region get/set
@@ -41,19 +41,31 @@ namespace LearnCsStuf.Basic
             get;
         }
 
+        public List<SyntaxKind> ValidChilds
+        {
+            get;
+        }
+
+        public List<SyntaxKind> Ausnahmen
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public Operator1Child ( int prio )
+        public Operator1ChildRight ( int prio )
         {
             this.Prio = prio;
         }
 
-        public Operator1Child ( List<string> validOperators, int prio )
+        public Operator1ChildRight ( List<string> validOperators, int prio, List<SyntaxKind> validChilds, List<SyntaxKind> ausnahmen )
             : this ( prio )
         {
             this.ValidOperators = validOperators;
+            this.ValidChilds = validChilds;
+            this.Ausnahmen = ausnahmen;
         }
 
         #endregion ctor
@@ -72,6 +84,29 @@ namespace LearnCsStuf.Basic
             return result;
         }
 
+        private bool CheckHashValidChild ( SyntaxToken token )
+        {
+            if (token == null) return false;
+
+            foreach ( SyntaxKind op in this.ValidChilds )
+            {
+                if ( op == token.Kind ) return true;
+            }
+
+            return false;
+        }
+
+        private bool CheckAusnahmen ( SyntaxToken token )
+        {
+            if (token == null) return false;
+
+            foreach ( SyntaxKind op in this.Ausnahmen )
+            {
+                if ( op == token.Kind ) return true;
+            }
+
+            return false;
+        }
         private bool CheckHashValidOperator ( SyntaxToken token )
         {
             foreach ( string op in this.ValidOperators )
@@ -88,14 +123,19 @@ namespace LearnCsStuf.Basic
             if ( !this.CheckHashValidOperator ( token ) ) return null;
 
             SyntaxToken lexerLeft = parser.Peek ( token, -1 );
+
+            if ( this.CheckHashValidChild ( lexerLeft ) && !this.CheckAusnahmen ( lexerLeft ) ) return null;
+
             SyntaxToken lexerRight = parser.Peek ( token, 1 );
 
-            Operator1Child node = new Operator1Child ( this.Prio );
+            if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
+
+            Operator1ChildRight node = new Operator1ChildRight ( this.Prio );
             node.Token = token;
             token.Node = node;
 
-            if ( lexerLeft.Kind == SyntaxKind.OpenKlammer ) node.ChildNode = parser.ParseCleanToken ( lexerRight );
-            if ( lexerRight.Kind == SyntaxKind.OpenKlammer ) node.ChildNode = parser.ParseCleanToken ( lexerLeft );
+            node.ChildNode = parser.ParseCleanToken ( lexerRight );
+
             if ( node.ChildNode == null ) return null;
 
             if ( node.ChildNode is IPriority t && t.Prio < this.Prio ) node.ChildNode = t.SwapChild ( node );

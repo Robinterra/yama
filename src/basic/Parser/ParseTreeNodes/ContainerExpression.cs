@@ -71,9 +71,10 @@ namespace LearnCsStuf.Basic
 
             token.Node = expression;
             kind.Node = expression;
-            parser.Repleace ( token, kind.Position );
 
             List<IParseTreeNode> nodes = parser.ParseCleanTokens ( token.Position + 1, kind.Position );
+
+            parser.Repleace ( token, kind.Position );
 
             if ( nodes == null ) return null;
             if ( nodes.Count != 1 ) return null;
