@@ -148,8 +148,8 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new Number (  ) );
-            this.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 100, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
-            this.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 100, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
+            this.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, -1, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
+            this.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, -1, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 1 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 2 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 3 ) );
