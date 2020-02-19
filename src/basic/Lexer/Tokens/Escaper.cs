@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace LearnCsStuf.Basic
 {
-    public class Text : ILexerToken
+    public class Escaper : ILexerToken
     {
 
         // -----------------------------------------------
@@ -27,13 +29,37 @@ namespace LearnCsStuf.Basic
         {
             get
             {
-                return SyntaxKind.Text;
+                return SyntaxKind.Escape;
             }
         }
 
         // -----------------------------------------------
 
+        public ZeichenKette EscapeZeichen
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public List<Replacer> Replacers
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
+
+        // -----------------------------------------------
+
+        public Escaper ( ZeichenKette escapeZeichen, List<Replacer> replaces )
+        {
+            this.EscapeZeichen = escapeZeichen;
+            this.Replacers = replaces;
+        }
 
         // -----------------------------------------------
 
@@ -43,24 +69,14 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
-            bool actuallyOnZeichenkette = true;
-            isonEscape = false;
+            if ( this.EscapeZeichen.CheckChar ( lexer ) != TokenStatus.Complete ) return TokenStatus.Cancel;
 
-            if (lexer.CurrentChar != '"') return TokenStatus.Cancel;
-
-            while (actuallyOnZeichenkette)
+            foreach ( Replacer replacer in this.Replacers )
             {
-                lexer.NextChar();
-
-                if (lexer.CurrentChar == '\0') return TokenStatus.SyntaxError;
-                if (lexer.CurrentChar == '"' && !isonEscape) actuallyOnZeichenkette = false;
-
-                isonEscape = lexer.CurrentChar == '\\';
+                if ( replacer.CheckChar ( lexer ) == TokenStatus.Complete ) return TokenStatus.Complete;
             }
 
-            lexer.NextChar();
-
-            return TokenStatus.Complete;
+            return TokenStatus.SyntaxError;
         }
 
         // -----------------------------------------------
@@ -97,20 +113,17 @@ namespace LearnCsStuf.Basic
 
         public object GetValue ( string text )
         {
-            string result = string.Empty;
+            Lexer lexer = new Lexer ( text );
+            lexer.LexerTokens.AddRange ( this.Replacers );
 
-            isonEscape = false;
-
-            foreach (char zeichen in text)
+            StringBuilder builder = new StringBuilder();
+            foreach ( SyntaxToken token in lexer )
             {
-                if ( zeichen == '"' && !isonEscape ) continue;
-
-                if (this.CheckEscapeChar ( zeichen, ref result )) continue;
-
-                result += zeichen;
+                if (token.Kind == SyntaxKind.Unknown) continue;
+                builder.Append ( token.Value );
             }
 
-            return result;
+            return builder.ToString (  );
         }
 
         // -----------------------------------------------

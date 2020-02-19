@@ -105,7 +105,7 @@ namespace LearnCsStuf.Basic
                 return result;
             }
 
-            SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, this.CurrentChar.ToString(), null );
+            SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, this.CurrentChar.ToString(), this.CurrentChar.ToString() );
 
             this.NextChar (  );
 

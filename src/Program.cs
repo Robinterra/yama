@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using LearnCsStuf.CommandLines;
 using LearnCsStuf.Basic;
 using LearnCsStuf.CommandLines.Commands;
+using System.IO;
 
 namespace LearnCsStuf
 {
@@ -50,6 +51,7 @@ namespace LearnCsStuf
         private static bool Execute ( List<ICommandLine> commands )
         {
             List<string> parseFiles = new List<string>();
+            List<string> parsecsvFiles = new List<string>();
 
             foreach ( ICommandLine command in commands )
             {
@@ -57,12 +59,24 @@ namespace LearnCsStuf
                 if (command.Key == "print") Console.WriteLine ( command.Value );
                 if (command.Key == "printn") Console.WriteLine ( command.Value );
                 if (command.Key == "basic") parseFiles.Add ( command.Value );
+                if (command.Key == "csv") parsecsvFiles.Add ( command.Value );
             }
 
             foreach (string value in parseFiles)
             {
                 Parser p = new Parser ( new System.IO.FileInfo ( value ) );
                 p.Parse (  );
+            }
+
+            foreach (string value in parsecsvFiles)
+            {
+                Console.WriteLine ( value );
+                Lexer l = new Lexer(File.ReadAllText ( value ));
+                l.LexerTokens.Add(new Splitter ( new List<ZeichenKette> { new ZeichenKette(";"), new ZeichenKette("\n") }, new Escaper(new ZeichenKette("\\"), new List<Replacer> { new Replacer(new ZeichenKette(";"), ";") }) ));
+                foreach ( SyntaxToken token in l )
+                {
+                    Console.WriteLine ( token.Value );
+                }
             }
 
             return true;
@@ -97,6 +111,7 @@ namespace LearnCsStuf
             Program.EnabledCommandLines.Add ( new Print (  ) );
             Program.EnabledCommandLines.Add ( new PrintN (  ) );
             Program.EnabledCommandLines.Add ( new BasicExpression (  ) );
+            Program.EnabledCommandLines.Add ( new CsvExpression (  ) );
             Program.EnabledCommandLines.Add ( new Help (  ) );
 
             return true;

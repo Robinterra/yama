@@ -164,6 +164,9 @@ namespace LearnCsStuf.Basic
         Get,
         Else,
         If,
+        Escape,
+        Splitter,
+        Replacer,
     }
 }
 
