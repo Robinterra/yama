@@ -37,9 +37,9 @@ namespace LearnCsStuf.Basic
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.Condition );
-                result.Add ( this.IfStatement );
-                result.Add ( this.ElseStatement );
+                if (this.Condition != null) result.Add ( this.Condition );
+                if (this.IfStatement != null) result.Add ( this.IfStatement );
+                if (this.ElseStatement != null) result.Add ( this.ElseStatement );
 
                 return result;
             }
@@ -54,8 +54,21 @@ namespace LearnCsStuf.Basic
             if ( token.Kind != SyntaxKind.If ) return null;
             if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenKlammer ) return null;
 
+            IfKey key = new IfKey (  );
+            key.Token = token;
+            token.Node = key;
 
-            return null;
+            SyntaxToken conditionkind = parser.Peek ( token, 1 );
+
+            IParseTreeNode rule = parser.GetRule<ContainerExpression>();
+
+            key.Condition = rule.Parse(parser, conditionkind);
+
+            if (key.Condition == null) return null;
+
+            key.Condition.Token.ParentNode = key;
+
+            return key;
         }
 
         #endregion methods

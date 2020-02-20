@@ -71,12 +71,18 @@ namespace LearnCsStuf.Basic
             set;
         }
 
-        // -----------------------------------------------
-
         public Container ParentContainer
         {
             get;
             private set;
+        }
+
+        // -----------------------------------------------
+
+        public int Max
+        {
+            get;
+            set;
         }
 
         // -----------------------------------------------
@@ -143,9 +149,22 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public IParseTreeNode GetRule<T>() where T : IParseTreeNode
+        {
+            foreach ( IParseTreeNode rule in this.ParserMembers )
+            {
+                if ( rule is T ) return rule;
+            }
+
+            return null;
+        }
+
+        // -----------------------------------------------
+
         private bool InitParser (  )
         {
             this.ParserMembers.Add ( new ReturnKey (  ) );
+            this.ParserMembers.Add ( new IfKey (  ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new Number (  ) );
             this.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, -1, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
@@ -283,16 +302,20 @@ namespace LearnCsStuf.Basic
         {
             if (this.CleanTokens.Count == 0) return null;
             if ( von >= bis ) return null;
+            if (bis > this.Max) return null;
 
             int currentpos = this.Position;
             this.Position = von;
+            int tempmax = this.Max;
+            this.Max = bis;
+
             List<IParseTreeNode> possibleParents = new List<IParseTreeNode>();
             List<IParseTreeNode> nodeParents = new List<IParseTreeNode>();
 
             bool isok = true;
             while ( isok )
             {
-                IParseTreeNode node = this.ParsePrimary ( bis );
+                IParseTreeNode node = this.ParsePrimary ( this.Max );
 
                 isok = node != null;
 
@@ -310,6 +333,7 @@ namespace LearnCsStuf.Basic
             }
 
             this.Position = currentpos;
+            this.Max = tempmax;
 
             return nodeParents;
         }
@@ -353,7 +377,8 @@ namespace LearnCsStuf.Basic
             {
                 IParseTreeNode result = member.Parse ( this, token );
 
-                if ( result != null ) return result;
+                if ( result != null )
+                 return result;
             }
 
             token.Kind = SyntaxKind.Unknown;
@@ -388,6 +413,7 @@ namespace LearnCsStuf.Basic
 
             if (!this.CheckTokens (  )) return false;
 
+            this.Max = this.CleanTokens.Count;
             List<IParseTreeNode> parentNodes = this.ParseCleanTokens ( 0, this.CleanTokens.Count );
             if ( parentNodes == null ) return false;
 
@@ -460,7 +486,7 @@ namespace LearnCsStuf.Basic
 
         public SyntaxToken Peek ( SyntaxToken token, int offset )
         {
-            if (this.CleanTokens.Count <= offset + token.Position) return null;
+            if (this.Max <= offset + token.Position) return null;
             if (0 > offset + token.Position) return null;
 
             SyntaxToken result = this.CleanTokens[offset + token.Position];
