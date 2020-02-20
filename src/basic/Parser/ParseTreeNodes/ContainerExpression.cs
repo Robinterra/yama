@@ -19,6 +19,12 @@ namespace LearnCsStuf.Basic
             set;
         }
 
+        public SyntaxToken Ende
+        {
+            get;
+            set;
+        }
+
         public List<IParseTreeNode> GetAllChilds
         {
             get
@@ -68,6 +74,7 @@ namespace LearnCsStuf.Basic
             ContainerExpression expression = new ContainerExpression (  );
 
             expression.Token = token;
+            expression.Ende = kind;
 
             token.Node = expression;
             kind.Node = expression;

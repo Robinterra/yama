@@ -68,6 +68,14 @@ namespace LearnCsStuf.Basic
 
             key.Condition.Token.ParentNode = key;
 
+            SyntaxToken ifStatementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
+
+            key.IfStatement = parser.ParseCleanToken(ifStatementchild);
+
+            if (key.IfStatement == null) return null;
+
+            key.IfStatement.Token.ParentNode = key;
+
             return key;
         }
 
