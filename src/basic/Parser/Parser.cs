@@ -179,6 +179,7 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 8 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 9 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=", "+=", "-=" }, 0 ) );
+            this.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, SyntaxKind.DoublePoint, 0 ) );
             this.ParserMembers.Add ( new ContainerExpression (  ) );
             this.ErrorNode = new ParserError (  );
 
@@ -476,6 +477,22 @@ namespace LearnCsStuf.Basic
             }
 
             return true;
+        }
+
+        // -----------------------------------------------
+
+        public SyntaxToken FindAToken ( SyntaxToken von, SyntaxKind zufinden )
+        {
+            SyntaxToken kind = von;
+
+            for ( int i = 1; kind.Kind != zufinden; i++ )
+            {
+                kind = this.Peek ( von, i );
+
+                if ( kind == null ) return null;
+            }
+
+            return kind;
         }
 
         // -----------------------------------------------

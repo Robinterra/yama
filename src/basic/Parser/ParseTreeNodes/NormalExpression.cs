@@ -31,15 +31,9 @@ namespace LearnCsStuf.Basic
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            SyntaxToken kind = token;
+            SyntaxToken kind = parser.FindAToken ( token, SyntaxKind.EndOfCommand );
 
-            for ( int i = 1; kind.Kind != SyntaxKind.EndOfCommand; i++ )
-            {
-                kind = parser.Peek ( token, i );
-
-                if ( kind == null ) return null;
-            }
-
+            if ( kind == null ) return null;
             if ( kind.Node != null ) return null;
 
             NormalExpression expression = new NormalExpression (  );
