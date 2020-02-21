@@ -5,8 +5,6 @@ namespace LearnCsStuf.Basic
     public class ReturnKey : IParseTreeNode
     {
 
-        private NormalExpression normal;
-
         #region get/set
 
         public IParseTreeNode Statement
@@ -19,18 +17,6 @@ namespace LearnCsStuf.Basic
         {
             get;
             set;
-        }
-
-        public NormalExpression Normal
-        {
-            get
-            {
-                if (this.normal != null) return this.normal;
-
-                this.normal = new NormalExpression();
-
-                return this.normal;
-            }
         }
 
         public List<IParseTreeNode> GetAllChilds
@@ -53,16 +39,19 @@ namespace LearnCsStuf.Basic
         {
             if ( token.Kind != SyntaxKind.Return ) return null;
 
-            IParseTreeNode node = this.Normal.Parse ( parser, parser.Peek ( token, 1 ) );
+            List<IParseTreeNode> nodes = parser.ParseCleanTokens(token.Position + 1, parser.Max);
+            IParseTreeNode node = null;
 
-            if ( node == null ) return null;
+            if ( nodes == null ) return null;
+            if ( nodes.Count > 1 ) return null;
+            if ( nodes.Count == 1 ) node = nodes[0];
 
             ReturnKey result = new ReturnKey();
 
             result.Statement = node;
             result.Token = token;
             token.Node = result;
-            node.Token.ParentNode = result;
+            if ( node != null ) node.Token.ParentNode = result;
 
             return result;
         }

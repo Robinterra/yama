@@ -163,9 +163,9 @@ namespace LearnCsStuf.Basic
 
         private bool InitParser (  )
         {
-            this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new IfKey (  ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
+            this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new Number (  ) );
             this.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, -1, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
             this.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, -1, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
@@ -301,6 +301,7 @@ namespace LearnCsStuf.Basic
         public List<IParseTreeNode> ParseCleanTokens ( int von, int bis )
         {
             if (this.CleanTokens.Count == 0) return null;
+            if ( von == bis ) return new List<IParseTreeNode>();
             if ( von >= bis ) return null;
             if (bis > this.Max) return null;
 
@@ -458,6 +459,8 @@ namespace LearnCsStuf.Basic
             string normalChildPrint = "├── ";
             foreach (IParseTreeNode child in childs)
             {
+                if (child == null) continue;
+
                 if (counter >= childs.Count - 1)
                 {
                     normalChildPrint = "└── ";

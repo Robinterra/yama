@@ -49,12 +49,15 @@ namespace LearnCsStuf.Basic
             kind.Node = expression;
 
             List<IParseTreeNode> nodes = parser.ParseCleanTokens ( token.Position, kind.Position );
+            IParseTreeNode node = null;
 
+            if ( nodes == null ) return null;
             if ( nodes.Count > 1 ) return null;
+            if ( nodes.Count == 1 ) node = nodes[0];
 
-            expression.ExpressionParent = nodes[0];
+            expression.ExpressionParent = node;
 
-            nodes[0].Token.ParentNode = expression;
+            if ( node != null ) node.Token.ParentNode = expression;
 
             return expression;
         }
