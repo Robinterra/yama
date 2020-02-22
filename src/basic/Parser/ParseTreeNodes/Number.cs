@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class Number : IParseTreeNode
+    public class Number : IParseTreeNode, IPriority
     {
 
         #region get/set
@@ -21,7 +21,27 @@ namespace LearnCsStuf.Basic
             }
         }
 
+        public int Prio
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
+
+        #region ctor
+
+        public Number (  )
+        {
+
+        }
+
+        public Number ( int prio )
+        {
+            this.Prio = prio;
+        }
+
+        #endregion ctor
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {

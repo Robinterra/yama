@@ -72,18 +72,6 @@ namespace LearnCsStuf.Basic
 
         #region methods
 
-        public IParseTreeNode SwapChild ( IPriority node )
-        {
-            IParseTreeNode result = this.ChildNode;
-
-            if ( result is IPriority t && t.Prio < node.Prio ) return t.SwapChild ( node );
-
-            this.ChildNode = (IParseTreeNode)node;
-            this.ChildNode.Token.ParentNode = this;
-
-            return result;
-        }
-
         private bool CheckHashValidChild ( SyntaxToken token )
         {
             if (token == null) return false;
@@ -137,8 +125,6 @@ namespace LearnCsStuf.Basic
             node.ChildNode = parser.ParseCleanToken ( lexerRight );
 
             if ( node.ChildNode == null ) return null;
-
-            //if ( node.ChildNode is IPriority t && t.Prio < this.Prio ) node.ChildNode = t.SwapChild ( node );
 
             node.ChildNode.Token.ParentNode = node;
 

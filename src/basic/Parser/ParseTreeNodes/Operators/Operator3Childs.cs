@@ -81,18 +81,6 @@ namespace LearnCsStuf.Basic
 
         #region methods
 
-        public IParseTreeNode SwapChild ( IPriority node )
-        {
-            IParseTreeNode result = this.RightNode;
-
-            if ( result is IPriority t && t.Prio < node.Prio ) return t.SwapChild ( node );
-
-            this.RightNode = (IParseTreeNode)node;
-            this.RightNode.Token.ParentNode = this;
-
-            return result;
-        }
-
         private bool CheckHashValidOperator ( SyntaxToken token )
         {
             foreach ( string op in this.ValidOperators )
@@ -121,8 +109,6 @@ namespace LearnCsStuf.Basic
             node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
             node.MiddleNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
             node.RightNode = parser.ParseCleanToken ( parser.Peek ( steuerzeichen.Token, 1 ) );
-
-            if ( node.LeftNode is IPriority t && t.Prio < this.Prio ) node.LeftNode = t.SwapChild ( node );
 
             node.LeftNode.Token.ParentNode = node;
             node.MiddleNode.Token.ParentNode = node;

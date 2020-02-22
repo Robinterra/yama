@@ -13,7 +13,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        
+        private int grosstePrio = -1;
 
         // -----------------------------------------------
 
@@ -166,7 +166,7 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new IfKey (  ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new ReturnKey (  ) );
-            this.ParserMembers.Add ( new Number (  ) );
+            this.ParserMembers.Add ( new Number ( 0 ) );
             this.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, -1, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
             this.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, -1, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 1 ) );
@@ -342,9 +342,56 @@ namespace LearnCsStuf.Basic
 
         private IParseTreeNode ParsePrimary ( int max )
         {
+            int pos = this.Position;
+
             while ( this.Position < max )
             {
-                if ( this.Current.Node == null ) return this.ParseCleanToken ( this.Current );
+                if ( this.Current.Node == null )
+                {
+                    IParseTreeNode node = this.ParseSteuerTokens ( this.Current );
+                    if ( node != null ) return node;
+                }
+
+                this.NextToken (  );
+            }
+
+            this.Position = pos;
+
+            for ( int i = this.GetGrosstePrio (  ); i > -1; i-- )
+            {
+                pos = this.Position;
+
+                IParseTreeNode node = this.ParsePrimaryPrioSystem ( max, i );
+
+                this.Position = pos;
+
+                if ( node != null ) return node;
+            }
+
+            while ( this.Position < max )
+            {
+                if ( this.Current.Node == null )
+                {
+                    return this.SyntaxToken ( this.Current );
+                }
+
+                this.NextToken (  );
+            }
+
+            return null;
+        }
+
+        // -----------------------------------------------
+
+        private IParseTreeNode ParsePrimaryPrioSystem ( int max, int prio )
+        {
+            while ( this.Position < max )
+            {
+                if ( this.Current.Node == null )
+                {
+                    IParseTreeNode node = this.ParsePrioSystem ( this.Current, prio );
+                    if ( node != null ) return node;
+                }
 
                 this.NextToken (  );
             }
@@ -375,19 +422,80 @@ namespace LearnCsStuf.Basic
         {
             if ( token.Node != null ) return this.GetNodeFromToken ( token );
 
-            foreach ( IParseTreeNode member in this.ParserMembers )
-            {
-                IParseTreeNode result = member.Parse ( this, token );
+            IParseTreeNode result = this.ParsePrioSystem ( token, this.GetGrosstePrio (  ), true );
 
-                if ( result != null )
-                 return result;
-            }
+            if ( result != null ) return result;
 
+            result = this.ParseSteuerTokens ( token );
+
+            if ( result != null ) return result;
+
+            return this.SyntaxToken ( token );
+        }
+
+        // -----------------------------------------------
+
+        private IParseTreeNode SyntaxToken ( SyntaxToken token )
+        {
             token.Kind = SyntaxKind.Unknown;
 
             this.PrintSyntaxError ( token, "Parser fehler" );
 
             return this.ErrorNode.Parse ( this, token );
+        }
+
+        // -----------------------------------------------
+
+        private IParseTreeNode ParseSteuerTokens ( SyntaxToken token )
+        {
+            foreach ( IParseTreeNode member in this.ParserMembers )
+            {
+                if ( member is IPriority ) continue;
+
+                IParseTreeNode result = member.Parse ( this, token );
+
+                if ( result != null ) return result;
+            }
+
+            return null;
+        }
+
+        // -----------------------------------------------
+
+        private int GetGrosstePrio()
+        {
+            if ( this.grosstePrio != -1 ) return this.grosstePrio;
+
+            foreach ( IParseTreeNode member in this.ParserMembers )
+            {
+                if ( !(member is IPriority t) ) continue;
+                if ( t.Prio < this.grosstePrio ) continue;
+
+                this.grosstePrio = t.Prio;
+            }
+
+            return this.grosstePrio;
+        }
+
+        // -----------------------------------------------
+
+        private IParseTreeNode ParsePrioSystem ( SyntaxToken token, int prio, bool isrekursiv = false )
+        {
+            if ( prio < 0 ) return null;
+
+            foreach ( IParseTreeNode member in this.ParserMembers )
+            {
+                if ( !(member is IPriority t) ) continue;
+                if ( t.Prio != prio ) continue;
+
+                IParseTreeNode result = member.Parse ( this, token );
+
+                if ( result != null ) return result;
+            }
+
+            if (isrekursiv) return this.ParsePrioSystem ( token, prio - 1, isrekursiv );
+
+            return null;
         }
 
         // -----------------------------------------------

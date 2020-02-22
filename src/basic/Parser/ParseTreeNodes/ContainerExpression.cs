@@ -43,15 +43,6 @@ namespace LearnCsStuf.Basic
 
         #endregion get/set
 
-        public IParseTreeNode SwapChild ( IPriority node )
-        {
-            IParseTreeNode result = this.Token.ParentNode;
-
-            if ( result is IPriority t && t.Prio < node.Prio ) return t.SwapChild ( node );
-
-            return result;
-        }
-
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
             if ( token.Kind != SyntaxKind.OpenKlammer ) return null;
@@ -87,8 +78,6 @@ namespace LearnCsStuf.Basic
             if ( nodes.Count != 1 ) return null;
 
             expression.ExpressionParent = nodes[0];
-
-            //if ( expression.ExpressionParent is IPriority t && t.Prio < this.Prio ) expression.ExpressionParent = t.SwapChild ( expression );
 
             nodes[0].Token.ParentNode = expression;
 
