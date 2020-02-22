@@ -316,15 +316,25 @@ namespace LearnCsStuf.Basic
             List<IParseTreeNode> nodeParents = new List<IParseTreeNode>();
 
             bool isok = true;
+            bool vorgangOhneNeueNodes = true;
             while ( isok )
             {
                 IParseTreeNode node = this.ParsePrimary ( this.Max );
+
+                if ( node != null ) vorgangOhneNeueNodes = false;
 
                 isok = node != null;
 
                 possibleParents.Add ( node );
 
                 this.NextToken (  );
+
+                if ( isok ) continue;
+                if ( vorgangOhneNeueNodes ) continue;
+
+                this.Position = von;
+                isok = true;
+                vorgangOhneNeueNodes = true;
             }
 
             foreach ( IParseTreeNode node in possibleParents )

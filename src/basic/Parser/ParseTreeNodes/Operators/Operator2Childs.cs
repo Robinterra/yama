@@ -87,6 +87,7 @@ namespace LearnCsStuf.Basic
             token.Node = node;
 
             node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
+
             node.RightNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
 
             node.LeftNode.Token.ParentNode = node;
