@@ -167,8 +167,8 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new Number ( 0 ) );
-            this.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, -1, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
-            this.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, -1, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
+            this.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 10, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
+            this.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 10, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 1 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 2 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 3 ) );
@@ -179,8 +179,9 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 8 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 9 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=", "+=", "-=" }, 0 ) );
-            this.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, SyntaxKind.DoublePoint, 0 ) );
-            this.ParserMembers.Add ( new ContainerExpression (  ) );
+            this.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, SyntaxKind.DoublePoint, 1 ) );
+            this.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, SyntaxKind.DoublePoint, 1 ) );
+            this.ParserMembers.Add ( new ContainerExpression ( 10 ) );
             this.ErrorNode = new ParserError (  );
 
             return true;
@@ -197,7 +198,7 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
             this.Tokenizer.LexerTokens.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
             this.Tokenizer.LexerTokens.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
-            this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~', '√', '?' ) );
+            this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~', '√', '?', '∑' ) );
             this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
             this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
             this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "(" ), SyntaxKind.OpenKlammer ) );

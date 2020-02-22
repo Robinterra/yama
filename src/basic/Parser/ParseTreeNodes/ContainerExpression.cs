@@ -35,13 +35,25 @@ namespace LearnCsStuf.Basic
 
         public int Prio
         {
-            get
-            {
-                return 10;
-            }
+            get;
+            set;
         }
 
         #endregion get/set
+
+        #region  ctor
+
+        public ContainerExpression (  )
+        {
+
+        }
+
+        public ContainerExpression ( int prio )
+        {
+            this.Prio = prio;
+        }
+
+        #endregion ctor
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
