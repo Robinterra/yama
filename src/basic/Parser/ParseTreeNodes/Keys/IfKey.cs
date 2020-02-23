@@ -76,6 +76,29 @@ namespace LearnCsStuf.Basic
 
             key.IfStatement.Token.ParentNode = key;
 
+            SyntaxToken elseStatementChild = null;
+            bool isok =  true;
+            int i = 1;
+
+            while ( isok )
+            {
+                elseStatementChild = parser.Peek ( key.IfStatement.Token, i );
+
+                if ( elseStatementChild == null ) return key;
+
+                isok = elseStatementChild.Node != null;
+
+                i++;
+            }
+
+            if ( elseStatementChild.Kind != SyntaxKind.Else ) return key;
+
+            key.ElseStatement = parser.ParseCleanToken ( elseStatementChild );
+
+            if (key.ElseStatement == null) return null;
+
+            key.ElseStatement.Token.ParentNode = key;
+
             return key;
         }
 

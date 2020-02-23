@@ -164,6 +164,7 @@ namespace LearnCsStuf.Basic
         private bool InitParser (  )
         {
             this.ParserMembers.Add ( new IfKey (  ) );
+            this.ParserMembers.Add ( new ElseKey (  ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new Number ( 0 ) );
