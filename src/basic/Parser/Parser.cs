@@ -165,6 +165,7 @@ namespace LearnCsStuf.Basic
         {
             this.ParserMembers.Add ( new IfKey (  ) );
             this.ParserMembers.Add ( new ElseKey (  ) );
+            this.ParserMembers.Add ( new ContainerExpression ( 10 ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new Number ( 0 ) );
@@ -182,7 +183,6 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=", "+=", "-=" }, 0 ) );
             this.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, SyntaxKind.DoublePoint, 1 ) );
             this.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, SyntaxKind.DoublePoint, 1 ) );
-            this.ParserMembers.Add ( new ContainerExpression ( 10 ) );
             this.ErrorNode = new ParserError (  );
 
             return true;
