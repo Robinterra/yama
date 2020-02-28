@@ -173,8 +173,8 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 1 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 2 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 3 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<", ">", "<=", ">=" }, 4 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 5 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 4 ) );
+            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<", ">", "<=", ">=" }, 5 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 6 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 7 ) );
             this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 8 ) );
