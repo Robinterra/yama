@@ -55,12 +55,14 @@ namespace LearnCsStuf.Basic
 
         #endregion ctor
 
+        /**
+         * @todo Ab in die Parser klasse damit!
+         */
         private SyntaxToken FindEndToken ( Parser parser, SyntaxToken begin)
         {
             SyntaxToken kind = begin;
 
-            int openKlammers = 0;
-            for ( int i = 1; kind.Kind != SyntaxKind.CloseKlammer || openKlammers >= 0; i++ )
+            for ( int i = 1; kind.Kind != SyntaxKind.CloseKlammer; i++ )
             {
                 kind = parser.Peek ( begin, i );
 
