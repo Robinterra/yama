@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class ContainerExpression : IParseTreeNode//, IPriority
+    public class ContainerExpression : IParseTreeNode, IPriority
     {
 
         #region get/set
@@ -55,22 +55,38 @@ namespace LearnCsStuf.Basic
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        private SyntaxToken FindEndToken ( Parser parser, SyntaxToken begin)
         {
-            if ( token.Kind != SyntaxKind.OpenKlammer ) return null;
-
-            SyntaxToken kind = token;
+            SyntaxToken kind = begin;
 
             int openKlammers = 0;
             for ( int i = 1; kind.Kind != SyntaxKind.CloseKlammer || openKlammers >= 0; i++ )
             {
-                kind = parser.Peek ( token, i );
+                kind = parser.Peek ( begin, i );
 
                 if ( kind == null ) return null;
 
-                if ( kind.Kind == SyntaxKind.OpenKlammer ) openKlammers++;
-                if ( kind.Kind == SyntaxKind.CloseKlammer ) openKlammers--;
+                if ( kind.Kind != SyntaxKind.OpenKlammer ) continue;
+
+                IParseTreeNode nodeCon = parser.ParseCleanToken ( kind );
+
+                if ( nodeCon == null ) return null;
+
+                if ( !(nodeCon is ContainerExpression c) ) return null;
+
+                i = c.Ende.Position;
             }
+
+            return kind;
+        }
+
+        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        {
+            if ( token.Kind != SyntaxKind.OpenKlammer ) return null;
+
+            SyntaxToken kind = this.FindEndToken ( parser, token );
+
+            if ( kind == null ) return null;
 
             if ( kind.Node != null ) return null;
 
