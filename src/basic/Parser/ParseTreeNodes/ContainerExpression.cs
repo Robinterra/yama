@@ -63,7 +63,7 @@ namespace LearnCsStuf.Basic
         {
             if ( token.Kind != SyntaxKind.OpenKlammer ) return null;
 
-            SyntaxToken kind = parser.FindEndToken ( token, SyntaxKind.CloseContainer, SyntaxKind.OpenKlammer );
+            SyntaxToken kind = parser.FindEndToken ( token, SyntaxKind.CloseKlammer, SyntaxKind.OpenKlammer );
 
             if ( kind == null ) return null;
 
