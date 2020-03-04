@@ -163,6 +163,7 @@ namespace LearnCsStuf.Basic
 
         private bool InitParser (  )
         {
+            //this.ParserMembers.Add ( new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ) );
             this.ParserMembers.Add ( new IfKey (  ) );
             this.ParserMembers.Add ( new ElseKey (  ) );
             this.ParserMembers.Add ( new ContainerExpression ( 10 ) );
@@ -301,8 +302,6 @@ namespace LearnCsStuf.Basic
                 if (token.Kind == SyntaxKind.Whitespaces) continue;
                 if (token.Kind == SyntaxKind.Comment) continue;
                 if (this.PrintSyntaxError ( token, "unkown char" )) continue;
-
-                Console.WriteLine ( token.Value );
 
                 this.CleanTokens.Add ( token );
                 //Console.Write ( token.Kind.ToString() + " : " );
@@ -564,6 +563,32 @@ namespace LearnCsStuf.Basic
             this.PrintPretty ( this.ParentContainer );
 
             return true;
+        }
+
+        // -----------------------------------------------
+
+        public SyntaxToken FindEndToken ( SyntaxToken begin, SyntaxKind endKind, SyntaxKind escapeKind )
+        {
+            SyntaxToken kind = begin;
+
+            for ( int i = 1; kind.Kind != endKind; i++ )
+            {
+                kind = this.Peek ( begin, i );
+
+                if ( kind == null ) return null;
+
+                if ( kind.Kind != escapeKind ) continue;
+
+                IParseTreeNode nodeCon = this.ParseCleanToken ( kind );
+
+                if ( nodeCon == null ) return null;
+
+                if ( !(nodeCon is ContainerExpression c) ) return null;
+
+                i = c.Ende.Position;
+            }
+
+            return kind;
         }
 
         // -----------------------------------------------

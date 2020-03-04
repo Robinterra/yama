@@ -19,6 +19,18 @@ namespace LearnCsStuf.Basic
             set;
         }
 
+        public SyntaxKind BeginKind
+        {
+            get;
+            set;
+        }
+
+        public SyntaxKind EndeKind
+        {
+            get;
+            set;
+        }
+
         public SyntaxToken Ende
         {
             get;
@@ -42,33 +54,27 @@ namespace LearnCsStuf.Basic
 
         }
 
-        public Container ( SyntaxKind begin, SyntaxKind ende, NormalExpression normalExpressionEnd )
+        public Container ( SyntaxKind begin, SyntaxKind ende )
         {
-
+            this.BeginKind = begin;
+            this.EndeKind = ende;
         }
 
         #endregion ctor
 
+        #region methods
+
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( token.Kind != SyntaxKind.OpenKlammer ) return null;
+            if ( token.Kind != this.BeginKind ) return null;
 
-            SyntaxToken kind = token;
+            SyntaxToken kind = parser.FindEndToken ( token, this.EndeKind, this.BeginKind );
 
-            int openKlammers = 0;
-            for ( int i = 1; kind.Kind != SyntaxKind.CloseKlammer || openKlammers >= 0; i++ )
-            {
-                kind = parser.Peek ( token, i );
-
-                if ( kind == null ) return null;
-
-                if ( kind.Kind == SyntaxKind.OpenKlammer ) openKlammers++;
-                if ( kind.Kind == SyntaxKind.CloseKlammer ) openKlammers--;
-            }
+            if ( kind == null ) return null;
 
             if ( kind.Node != null ) return null;
 
-            ContainerExpression expression = new ContainerExpression (  );
+            Container expression = new Container (  );
 
             expression.Token = token;
             expression.Ende = kind;
@@ -81,13 +87,13 @@ namespace LearnCsStuf.Basic
             parser.Repleace ( token, kind.Position );
 
             if ( nodes == null ) return null;
-            if ( nodes.Count != 1 ) return null;
 
-            expression.ExpressionParent = nodes[0];
-
-            nodes[0].Token.ParentNode = expression;
+            expression.Statements = nodes;
 
             return expression;
         }
+
+        #endregion methods
+
     }
 }

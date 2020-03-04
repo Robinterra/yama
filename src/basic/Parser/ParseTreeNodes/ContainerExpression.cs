@@ -58,35 +58,12 @@ namespace LearnCsStuf.Basic
         /**
          * @todo Ab in die Parser klasse damit!
          */
-        private SyntaxToken FindEndToken ( Parser parser, SyntaxToken begin)
-        {
-            SyntaxToken kind = begin;
-
-            for ( int i = 1; kind.Kind != SyntaxKind.CloseKlammer; i++ )
-            {
-                kind = parser.Peek ( begin, i );
-
-                if ( kind == null ) return null;
-
-                if ( kind.Kind != SyntaxKind.OpenKlammer ) continue;
-
-                IParseTreeNode nodeCon = parser.ParseCleanToken ( kind );
-
-                if ( nodeCon == null ) return null;
-
-                if ( !(nodeCon is ContainerExpression c) ) return null;
-
-                i = c.Ende.Position;
-            }
-
-            return kind;
-        }
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
             if ( token.Kind != SyntaxKind.OpenKlammer ) return null;
 
-            SyntaxToken kind = this.FindEndToken ( parser, token );
+            SyntaxToken kind = parser.FindEndToken ( token, SyntaxKind.CloseContainer, SyntaxKind.OpenKlammer );
 
             if ( kind == null ) return null;
 
