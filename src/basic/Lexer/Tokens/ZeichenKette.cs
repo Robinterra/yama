@@ -12,7 +12,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private string Word
+        public string Word
         {
             get;
         }

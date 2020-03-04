@@ -9,18 +9,6 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        #region vars
-
-        // -----------------------------------------------
-
-        private bool isonEscape = false;
-
-        // -----------------------------------------------
-
-        #endregion vars
-
-        // -----------------------------------------------
-
         #region get/set
 
         // -----------------------------------------------
@@ -81,38 +69,10 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private char TranslateEscapeChar ( char zeichen )
-        {
-            if (zeichen == '"') return zeichen;
-            if (zeichen == '0') return '\0';
-            if (zeichen == '\\') return zeichen;
-            if (zeichen == 'n') return '\n';
-            if (zeichen == 't') return '\t';
-            if (zeichen == 'r') return '\r';
-
-            return zeichen;
-        }
-
-        // -----------------------------------------------
-
-        private bool CheckEscapeChar(char zeichen, ref string result)
-        {
-            if (isonEscape)
-            {
-                result += this.TranslateEscapeChar ( zeichen );
-
-                isonEscape = false;
-
-                return true;
-            }
-
-            return isonEscape = zeichen == '\\';
-        }
-
-        // -----------------------------------------------
-
         public object GetValue ( string text )
         {
+            text = text.Substring ( this.EscapeZeichen.Word.Length );
+
             Lexer lexer = new Lexer ( text );
             lexer.LexerTokens.AddRange ( this.Replacers );
 

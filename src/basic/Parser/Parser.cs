@@ -195,6 +195,17 @@ namespace LearnCsStuf.Basic
             this.Tokenizer = new Lexer (  );
             this.SyntaxErrors = new List<SyntaxToken> (  );
 
+
+            Escaper escape = new Escaper ( new ZeichenKette ( "\\" ), new List<Replacer>
+            {
+                new Replacer ( new ZeichenKette ( "\\" ), "\\" ),
+                new Replacer ( new ZeichenKette ( "\0" ), "\0" ),
+                new Replacer ( new ZeichenKette ( "n" ), "\n" ),
+                new Replacer ( new ZeichenKette ( "r" ), "\r" ),
+                new Replacer ( new ZeichenKette ( "t" ), "\t" ),
+                new Replacer ( new ZeichenKette ( "\"" ), "\"" ),
+                new Replacer ( new ZeichenKette ( "\'" ), "\'" ),
+            } );
             this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
             this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
             this.Tokenizer.LexerTokens.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
@@ -212,8 +223,8 @@ namespace LearnCsStuf.Basic
             this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "," ), SyntaxKind.Comma ) );
             this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( ":" ), SyntaxKind.DoublePoint ) );
             this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( ";" ), SyntaxKind.EndOfCommand ) );
-            this.Tokenizer.LexerTokens.Add ( new Text (  ) );
-            this.Tokenizer.LexerTokens.Add ( new Zeichen (  ) );
+            this.Tokenizer.LexerTokens.Add ( new Text ( new ZeichenKette ( "\"" ), new ZeichenKette ( "\"" ), escape ) );
+            this.Tokenizer.LexerTokens.Add ( new Text ( new ZeichenKette ( "\'" ), new ZeichenKette ( "\'" ), escape ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "int", SyntaxKind.Int32Bit ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "char", SyntaxKind.Char ) );
             this.Tokenizer.LexerTokens.Add ( new KeyWord ( "byte", SyntaxKind.Byte ) );
@@ -290,6 +301,8 @@ namespace LearnCsStuf.Basic
                 if (token.Kind == SyntaxKind.Whitespaces) continue;
                 if (token.Kind == SyntaxKind.Comment) continue;
                 if (this.PrintSyntaxError ( token, "unkown char" )) continue;
+
+                Console.WriteLine ( token.Value );
 
                 this.CleanTokens.Add ( token );
                 //Console.Write ( token.Kind.ToString() + " : " );

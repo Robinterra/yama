@@ -79,11 +79,9 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
-            bool isonEscape = false;
-
             while ( !this.CheckSplit ( lexer ) )
             {
-                isonEscape = this.Escape.CheckChar ( lexer ) == TokenStatus.Complete;
+                this.Escape.CheckChar ( lexer );
 
                 lexer.NextChar (  );
 

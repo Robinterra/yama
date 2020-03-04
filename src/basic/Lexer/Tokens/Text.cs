@@ -1,21 +1,10 @@
 using System;
+using System.Text;
 
 namespace LearnCsStuf.Basic
 {
     public class Text : ILexerToken
     {
-
-        // -----------------------------------------------
-
-        #region vars
-
-        // -----------------------------------------------
-
-        private bool isonEscape = false;
-
-        // -----------------------------------------------
-
-        #endregion vars
 
         // -----------------------------------------------
 
@@ -33,7 +22,48 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public ZeichenKette Begin
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public ZeichenKette Ende
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public Escaper Escape
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public Text ( ZeichenKette begin, ZeichenKette ende, Escaper escape )
+        {
+            this.Begin = begin;
+            this.Ende = ende;
+            this.Escape = escape;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
 
         // -----------------------------------------------
 
@@ -43,74 +73,37 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
-            bool actuallyOnZeichenkette = true;
-            isonEscape = false;
+            if ( this.Begin.CheckChar ( lexer ) != TokenStatus.Complete ) return TokenStatus.Cancel;
 
-            if (lexer.CurrentChar != '"') return TokenStatus.Cancel;
-
-            while (actuallyOnZeichenkette)
+            while ( true )
             {
-                lexer.NextChar();
+                if ( this.Ende.CheckChar ( lexer ) == TokenStatus.Complete ) return TokenStatus.Complete;
 
-                if (lexer.CurrentChar == '\0') return TokenStatus.SyntaxError;
-                if (lexer.CurrentChar == '"' && !isonEscape) actuallyOnZeichenkette = false;
+                this.Escape.CheckChar ( lexer );
 
-                isonEscape = lexer.CurrentChar == '\\';
+                lexer.NextChar (  );
+
+                if ( lexer.CurrentChar == '\0' ) return TokenStatus.SyntaxError;
             }
 
-            lexer.NextChar();
-
-            return TokenStatus.Complete;
-        }
-
-        // -----------------------------------------------
-
-        private char TranslateEscapeChar ( char zeichen )
-        {
-            if (zeichen == '"') return zeichen;
-            if (zeichen == '0') return '\0';
-            if (zeichen == '\\') return zeichen;
-            if (zeichen == 'n') return '\n';
-            if (zeichen == 't') return '\t';
-            if (zeichen == 'r') return '\r';
-
-            return zeichen;
-        }
-
-        // -----------------------------------------------
-
-        private bool CheckEscapeChar(char zeichen, ref string result)
-        {
-            if (isonEscape)
-            {
-                result += this.TranslateEscapeChar ( zeichen );
-
-                isonEscape = false;
-
-                return true;
-            }
-
-            return isonEscape = zeichen == '\\';
         }
 
         // -----------------------------------------------
 
         public object GetValue ( string text )
         {
-            string result = string.Empty;
+            Lexer lexer = new Lexer ( text );
+            lexer.LexerTokens.Add ( this.Escape );
+            lexer.LexerTokens.Add ( new Replacer ( this.Begin, string.Empty ) );
+            lexer.LexerTokens.Add ( new Replacer ( this.Ende, string.Empty ) );
 
-            isonEscape = false;
-
-            foreach (char zeichen in text)
+            StringBuilder builder = new StringBuilder();
+            foreach ( SyntaxToken token in lexer )
             {
-                if ( zeichen == '"' && !isonEscape ) continue;
-
-                if (this.CheckEscapeChar ( zeichen, ref result )) continue;
-
-                result += zeichen;
+                builder.Append ( token.Value );
             }
 
-            return result;
+            return builder.ToString (  );
         }
 
         // -----------------------------------------------
