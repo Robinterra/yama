@@ -61,6 +61,12 @@ namespace LearnCsStuf.Basic
             set;
         }
 
+        public SyntaxToken SteuerToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -100,19 +106,22 @@ namespace LearnCsStuf.Basic
             node.Token = token;
             token.Node = node;
 
-            SyntaxToken steuerToken = parser.FindAToken ( token, SyntaxKind.DoublePoint );
+            SyntaxToken steuerToken = parser.FindAToken ( token, this.Steuerzeichen );
 
             if ( steuerToken == null ) return null;
 
-            IParseTreeNode steuerzeichen = parser.ParseCleanToken ( steuerToken );
+            //IParseTreeNode steuerzeichen = parser.ParseCleanToken ( steuerToken );
+            steuerToken.ParentNode = node;
+            steuerToken.Node = node;
 
             node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
             node.MiddleNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
-            node.RightNode = parser.ParseCleanToken ( parser.Peek ( steuerzeichen.Token, 1 ) );
+            node.RightNode = parser.ParseCleanToken ( parser.Peek ( steuerToken, 1 ) );
 
             node.LeftNode.Token.ParentNode = node;
             node.MiddleNode.Token.ParentNode = node;
             node.RightNode.Token.ParentNode = node;
+            node.SteuerToken = steuerToken;
 
             return node;
         }
