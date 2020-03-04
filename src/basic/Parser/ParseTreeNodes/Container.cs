@@ -90,6 +90,11 @@ namespace LearnCsStuf.Basic
 
             expression.Statements = nodes;
 
+            foreach ( IParseTreeNode node in nodes )
+            {
+                node.Token.ParentNode = expression;
+            }
+
             return expression;
         }
 

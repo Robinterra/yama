@@ -163,12 +163,12 @@ namespace LearnCsStuf.Basic
 
         private bool InitParser (  )
         {
-            //this.ParserMembers.Add ( new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ) );
+            this.ParserMembers.Add ( new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ) );
             this.ParserMembers.Add ( new IfKey (  ) );
             this.ParserMembers.Add ( new ElseKey (  ) );
-            this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new ContainerExpression ( 10 ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
+            this.ParserMembers.Add ( new ReturnKey (  ) );
             this.ParserMembers.Add ( new Number ( 0 ) );
             this.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 10, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
             this.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 10, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
