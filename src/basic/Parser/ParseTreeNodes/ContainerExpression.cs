@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class ContainerExpression : IParseTreeNode, IPriority
+    public class ContainerExpression : IParseTreeNode, IPriority, IContainer
     {
 
         #region get/set
@@ -73,7 +73,7 @@ namespace LearnCsStuf.Basic
 
             expression.Token = token;
             expression.Ende = kind;
-
+            expression.Ende.Node = expression;
             token.Node = expression;
             kind.Node = expression;
 

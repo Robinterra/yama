@@ -583,9 +583,9 @@ namespace LearnCsStuf.Basic
 
                 if ( nodeCon == null ) return null;
 
-                if ( !(nodeCon is ContainerExpression c) ) return null;
+                if ( !(nodeCon is IContainer c) ) return null;
 
-                i = c.Ende.Position;
+                i = c.Ende.Position - begin.Position;
             }
 
             return kind;
