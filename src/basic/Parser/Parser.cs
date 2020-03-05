@@ -643,14 +643,14 @@ namespace LearnCsStuf.Basic
         {
             SyntaxToken kind = von;
 
-            for ( int i = 1; kind.Kind != zufinden; i++ )
+            for ( int i = 1; kind != null; i++ )
             {
-                kind = this.Peek ( von, i );
+                if ( kind.Kind == zufinden && kind.Node == null ) return kind;
 
-                if ( kind == null ) return null;
+                kind = this.Peek ( von, i );
             }
 
-            return kind;
+            return null;
         }
 
         // -----------------------------------------------

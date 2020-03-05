@@ -110,7 +110,6 @@ namespace LearnCsStuf.Basic
 
             if ( steuerToken == null ) return null;
 
-            //IParseTreeNode steuerzeichen = parser.ParseCleanToken ( steuerToken );
             steuerToken.ParentNode = node;
             steuerToken.Node = node;
 
