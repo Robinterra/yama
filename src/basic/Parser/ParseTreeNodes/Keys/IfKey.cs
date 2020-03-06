@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class IfKey : IParseTreeNode
+    public class IfKey : IParseTreeNode, IContainer
     {
 
         #region get/set
@@ -29,6 +29,20 @@ namespace LearnCsStuf.Basic
         {
             get;
             set;
+        }
+
+        public SyntaxToken Ende
+        {
+            get
+            {
+                if ( this.ElseStatement == null ) return (this.IfStatement is IContainer t) ? t.Ende : this.IfStatement.Token;
+
+                return (this.ElseStatement is IContainer a) ? a.Ende : this.ElseStatement.Token;
+            }
+            set
+            {
+
+            }
         }
 
         public List<IParseTreeNode> GetAllChilds
@@ -76,20 +90,13 @@ namespace LearnCsStuf.Basic
 
             key.IfStatement.Token.ParentNode = key;
 
-            SyntaxToken elseStatementChild = null;
-            bool isok =  true;
-            int i = 1;
+            SyntaxToken wlsePeekToken = (key.IfStatement is IContainer t) ? t.Ende : key.IfStatement.Token;
 
-            while ( isok )
-            {
-                elseStatementChild = parser.Peek ( key.IfStatement.Token, i );
+            SyntaxToken elseStatementChild = parser.Peek ( wlsePeekToken, 1 );
 
-                if ( elseStatementChild == null ) return key;
+            if ( elseStatementChild == null ) return key;
 
-                isok = elseStatementChild.Node != null;
-
-                i++;
-            }
+            if ( elseStatementChild.Node != null ) return key;
 
             if ( elseStatementChild.Kind != SyntaxKind.Else ) return key;
 

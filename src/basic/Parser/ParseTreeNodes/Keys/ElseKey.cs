@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class ElseKey : IParseTreeNode
+    public class ElseKey : IParseTreeNode, IContainer
     {
 
         #region get/set
@@ -17,6 +17,18 @@ namespace LearnCsStuf.Basic
         {
             get;
             set;
+        }
+
+        public SyntaxToken Ende
+        {
+            get
+            {
+                return (this.Statement is IContainer t) ? t.Ende : this.Statement.Token;
+            }
+            set
+            {
+
+            }
         }
 
         public List<IParseTreeNode> GetAllChilds
