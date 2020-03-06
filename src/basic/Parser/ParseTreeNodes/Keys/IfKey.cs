@@ -90,9 +90,9 @@ namespace LearnCsStuf.Basic
 
             key.IfStatement.Token.ParentNode = key;
 
-            SyntaxToken wlsePeekToken = (key.IfStatement is IContainer t) ? t.Ende : key.IfStatement.Token;
+            SyntaxToken elsePeekToken = (key.IfStatement is IContainer t) ? t.Ende : key.IfStatement.Token;
 
-            SyntaxToken elseStatementChild = parser.Peek ( wlsePeekToken, 1 );
+            SyntaxToken elseStatementChild = parser.Peek ( elsePeekToken, 1 );
 
             if ( elseStatementChild == null ) return key;
 

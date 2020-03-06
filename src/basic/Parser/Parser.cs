@@ -166,6 +166,7 @@ namespace LearnCsStuf.Basic
             this.ParserMembers.Add ( new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ) );
             this.ParserMembers.Add ( new IfKey (  ) );
             this.ParserMembers.Add ( new ElseKey (  ) );
+            this.ParserMembers.Add ( new WhileKey (  ) );
             this.ParserMembers.Add ( new ContainerExpression ( 10 ) );
             this.ParserMembers.Add ( new NormalExpression (  ) );
             this.ParserMembers.Add ( new ReturnKey (  ) );
