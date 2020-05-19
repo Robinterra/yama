@@ -125,16 +125,17 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private Parser (  )
+        private Parser ( List<IParseTreeNode> parserMembers, Lexer lexer )
         {
-            this.InitLexer (  );
-            this.InitParser (  );
+            this.SyntaxErrors = new List<SyntaxToken> (  );
+            this.ParserMembers = parserMembers;
+            this.Tokenizer = lexer;
         }
 
         // -----------------------------------------------
 
-        public Parser ( FileInfo file )
-            : this (  )
+        public Parser ( FileInfo file, List<IParseTreeNode> parserMembers, Lexer lexer )
+            : this ( parserMembers, lexer )
         {
             this.Fileinfo = file;
         }
@@ -157,120 +158,6 @@ namespace LearnCsStuf.Basic
             }
 
             return null;
-        }
-
-        // -----------------------------------------------
-
-        private bool InitParser (  )
-        {
-            this.ParserMembers.Add ( new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ) );
-            this.ParserMembers.Add ( new IfKey (  ) );
-            this.ParserMembers.Add ( new ElseKey (  ) );
-            this.ParserMembers.Add ( new WhileKey (  ) );
-            this.ParserMembers.Add ( new ContainerExpression ( 10 ) );
-            this.ParserMembers.Add ( new NormalExpression (  ) );
-            this.ParserMembers.Add ( new ReturnKey (  ) );
-            this.ParserMembers.Add ( new Number ( 0 ) );
-            this.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 10, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
-            this.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 10, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 1 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 2 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 3 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 4 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<", ">", "<=", ">=" }, 5 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 6 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 7 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 8 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 9 ) );
-            this.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=", "+=", "-=" }, 0 ) );
-            this.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, SyntaxKind.DoublePoint, 1 ) );
-            this.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, SyntaxKind.DoublePoint, 1 ) );
-            this.ErrorNode = new ParserError (  );
-
-            return true;
-        }
-
-        // -----------------------------------------------
-
-        private bool InitLexer (  )
-        {
-            this.Tokenizer = new Lexer (  );
-            this.SyntaxErrors = new List<SyntaxToken> (  );
-
-
-            Escaper escape = new Escaper ( new ZeichenKette ( "\\" ), new List<Replacer>
-            {
-                new Replacer ( new ZeichenKette ( "\\" ), "\\" ),
-                new Replacer ( new ZeichenKette ( "0" ), "\0" ),
-                new Replacer ( new ZeichenKette ( "n" ), "\n" ),
-                new Replacer ( new ZeichenKette ( "r" ), "\r" ),
-                new Replacer ( new ZeichenKette ( "t" ), "\t" ),
-                new Replacer ( new ZeichenKette ( "\"" ), "\"" ),
-                new Replacer ( new ZeichenKette ( "\'" ), "\'" ),
-            } );
-            this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
-            this.Tokenizer.LexerTokens.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
-            this.Tokenizer.LexerTokens.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
-            this.Tokenizer.LexerTokens.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
-            this.Tokenizer.LexerTokens.Add ( new Operator ( '+', '-', '*', '/', '%', '&', '|', '=', '<', '>', '!', '^', '~', '√', '?', '∑' ) );
-            this.Tokenizer.LexerTokens.Add ( new Digit (  ) );
-            this.Tokenizer.LexerTokens.Add ( new Whitespaces (  ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "(" ), SyntaxKind.OpenKlammer ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( ")" ), SyntaxKind.CloseKlammer ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "{" ), SyntaxKind.BeginContainer ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "}" ), SyntaxKind.CloseContainer ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "[" ), SyntaxKind.EckigeKlammerAuf ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "]" ), SyntaxKind.EckigeKlammerZu ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "." ), SyntaxKind.Point ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( "," ), SyntaxKind.Comma ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( ":" ), SyntaxKind.DoublePoint ) );
-            this.Tokenizer.LexerTokens.Add ( new Punctuation ( new ZeichenKette ( ";" ), SyntaxKind.EndOfCommand ) );
-            this.Tokenizer.LexerTokens.Add ( new Text ( new ZeichenKette ( "\"" ), new ZeichenKette ( "\"" ), escape ) );
-            this.Tokenizer.LexerTokens.Add ( new Text ( new ZeichenKette ( "\'" ), new ZeichenKette ( "\'" ), escape ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "int", SyntaxKind.Int32Bit ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "char", SyntaxKind.Char ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "byte", SyntaxKind.Byte ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "set", SyntaxKind.Set ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "get", SyntaxKind.Get ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "for", SyntaxKind.For ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "while", SyntaxKind.While ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "bool", SyntaxKind.Boolean ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "true", SyntaxKind.True ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "null", SyntaxKind.Null ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "enum", SyntaxKind.Enum ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "continue", SyntaxKind.Continue ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "break", SyntaxKind.Break ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "false", SyntaxKind.False ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "void", SyntaxKind.Void ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "return", SyntaxKind.Return ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "class", SyntaxKind.Class ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "static", SyntaxKind.Static ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "nonref", SyntaxKind.Nonref ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "public", SyntaxKind.Public ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "private", SyntaxKind.Private ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "uint", SyntaxKind.UInt32Bit ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "ushort", SyntaxKind.UInt16Bit ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "short", SyntaxKind.Int16Bit ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "long", SyntaxKind.Int64Bit ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "ulong", SyntaxKind.UInt64Bit ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "ref", SyntaxKind.Ref ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "is", SyntaxKind.Is ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "in", SyntaxKind.In ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "as", SyntaxKind.As ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "if", SyntaxKind.If ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "else", SyntaxKind.Else ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "foreach", SyntaxKind.Foreach ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "float", SyntaxKind.Float32Bit ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "new", SyntaxKind.New ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "delegate", SyntaxKind.Delegate ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "using", SyntaxKind.Using ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "this", SyntaxKind.This ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "base", SyntaxKind.Base ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "sizeof", SyntaxKind.Sizeof ) );
-            this.Tokenizer.LexerTokens.Add ( new KeyWord ( "namespace", SyntaxKind.Namespace ) );
-            this.Tokenizer.LexerTokens.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
-
-            return true;
         }
 
         // -----------------------------------------------

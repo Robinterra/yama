@@ -39,6 +39,7 @@ namespace LearnCsStuf.Basic
         public List<ILexerToken> LexerTokens
         {
             get;
+            set;
         } = new List<ILexerToken> ();
 
         // -----------------------------------------------

@@ -64,8 +64,11 @@ namespace LearnCsStuf
 
             foreach (string value in parseFiles)
             {
-                Parser p = new Parser ( new System.IO.FileInfo ( value ) );
-                p.Parse (  );
+                BasicExpressionEvaluator basic = new BasicExpressionEvaluator();
+
+                basic.File = value;
+
+                basic.Compile();
             }
 
             foreach (string value in parsecsvFiles)
