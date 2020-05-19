@@ -82,6 +82,7 @@ namespace LearnCsStuf.Basic
             parserRules.Add ( new NormalExpression (  ) );
             parserRules.Add ( new ReturnKey (  ) );
             parserRules.Add ( new TrueFalseKey ( 0 ) );
+            parserRules.Add ( new ReferenceCall ( 0 ) );
             parserRules.Add ( new Number ( 0 ) );
             parserRules.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 10, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
             parserRules.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 10, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
