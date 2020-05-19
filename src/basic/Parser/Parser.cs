@@ -201,7 +201,7 @@ namespace LearnCsStuf.Basic
             Escaper escape = new Escaper ( new ZeichenKette ( "\\" ), new List<Replacer>
             {
                 new Replacer ( new ZeichenKette ( "\\" ), "\\" ),
-                new Replacer ( new ZeichenKette ( "\0" ), "\0" ),
+                new Replacer ( new ZeichenKette ( "0" ), "\0" ),
                 new Replacer ( new ZeichenKette ( "n" ), "\n" ),
                 new Replacer ( new ZeichenKette ( "r" ), "\r" ),
                 new Replacer ( new ZeichenKette ( "t" ), "\t" ),

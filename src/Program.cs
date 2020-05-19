@@ -72,7 +72,21 @@ namespace LearnCsStuf
             {
                 Console.WriteLine ( value );
                 Lexer l = new Lexer(File.ReadAllText ( value ));
-                l.LexerTokens.Add(new Splitter ( new List<ZeichenKette> { new ZeichenKette(";"), new ZeichenKette("\n") }, new Escaper(new ZeichenKette("\\"), new List<Replacer> { new Replacer(new ZeichenKette(";"), ";"), new Replacer( new ZeichenKette (":)"), "😊") }) ));
+                l.LexerTokens.Add(
+                    new Splitter
+                    (
+                        new List<ZeichenKette> { new ZeichenKette(";"), new ZeichenKette("\n") },
+                        new Escaper
+                        (
+                            new ZeichenKette("\\"),
+                            new List<Replacer>
+                            {
+                                new Replacer(new ZeichenKette(";"), ";"),
+                                new Replacer( new ZeichenKette (":)"), "😊")
+                            }
+                        )
+                    )
+                );
                 foreach ( SyntaxToken token in l )
                 {
                     Console.WriteLine ( token.Value );
