@@ -74,7 +74,7 @@ namespace LearnCsStuf
             foreach (string value in parsecsvFiles)
             {
                 Console.WriteLine ( value );
-                Lexer l = new Lexer(File.ReadAllText ( value ));
+                Lexer l = new Lexer(File.OpenRead ( value ));
                 l.LexerTokens.Add(
                     new Splitter
                     (

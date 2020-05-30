@@ -90,9 +90,9 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public object GetValue ( string text )
+        public object GetValue ( byte[] data )
         {
-            Lexer lexer = new Lexer ( text );
+            Lexer lexer = new Lexer ( new System.IO.MemoryStream ( data ) );
             lexer.LexerTokens.Add ( this.Escape );
             lexer.LexerTokens.Add ( new Replacer ( this.Begin, string.Empty ) );
             lexer.LexerTokens.Add ( new Replacer ( this.Ende, string.Empty ) );

@@ -69,11 +69,16 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public object GetValue ( string text )
+        public object GetValue ( byte[] daten )
         {
-            text = text.Substring ( this.EscapeZeichen.Word.Length );
+            byte[] newData = new byte[daten.Length - this.EscapeZeichen.Length];
 
-            Lexer lexer = new Lexer ( text );
+            Buffer.BlockCopy(daten, this.EscapeZeichen.Length, newData, 0, daten.Length - this.EscapeZeichen.Length);
+
+            //text = text.Substring ( this.EscapeZeichen.Length );
+            System.IO.MemoryStream stream = new System.IO.MemoryStream ( newData );
+
+            Lexer lexer = new Lexer ( stream );
             lexer.LexerTokens.AddRange ( this.Replacers );
 
             StringBuilder builder = new StringBuilder();

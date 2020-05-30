@@ -28,7 +28,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        object GetValue ( string text );
+        object GetValue ( byte[] data );
 
         // -----------------------------------------------
 

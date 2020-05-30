@@ -41,8 +41,10 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public object GetValue ( string text )
+        public object GetValue ( byte[] daten )
         {
+            string text = System.Text.Encoding.UTF8.GetString ( daten );
+
             if (!int.TryParse ( text, out int result )) return 0;
 
             return result;

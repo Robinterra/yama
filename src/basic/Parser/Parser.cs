@@ -41,7 +41,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public string InputText
+        public Stream InputStream
         {
             get;
             set;
@@ -182,7 +182,7 @@ namespace LearnCsStuf.Basic
 
         private bool CheckTokens()
         {
-            this.Tokenizer.Text = this.InputText;
+            this.Tokenizer.Daten = this.InputStream;
             this.CleanTokens = new List<SyntaxToken>();
 
             foreach (SyntaxToken token in this.Tokenizer)
@@ -431,7 +431,7 @@ namespace LearnCsStuf.Basic
         {
             if (!this.Fileinfo.Exists) return false;
 
-            this.InputText = File.ReadAllText ( this.Fileinfo.FullName );
+            this.InputStream = File.OpenRead ( this.Fileinfo.FullName );
 
             if (!this.CheckTokens (  )) return false;
 

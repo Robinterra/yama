@@ -1,3 +1,4 @@
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -28,10 +29,24 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public string Text
+        private Stream daten;
+
+        // -----------------------------------------------
+
+        public Stream Daten
         {
-            get;
-            set;
+            get
+            {
+                return this.daten;
+            }
+            set
+            {
+                this.position = 0;
+                this.column = 0;
+                this.line = 1;
+                this.daten = value;
+                this.NextChar();
+            }
         }
 
         // -----------------------------------------------
@@ -44,12 +59,21 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public byte CurrentByte
+        {
+            get;
+            private set;
+        }
+
+        // -----------------------------------------------
+
         public char CurrentChar
         {
             get
             {
                 if (this.IsEnde (  )) return '\0';
-                return this.Text[position];
+
+                return System.Convert.ToChar ( this.CurrentByte );//this.Text[position];
             }
         }
 
@@ -78,9 +102,9 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public Lexer ( string text )
+        public Lexer ( Stream daten )
         {
-            this.Text = text;
+            this.Daten = daten;
         }
 
         // -----------------------------------------------
@@ -106,7 +130,7 @@ namespace LearnCsStuf.Basic
                 return result;
             }
 
-            SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, this.CurrentChar.ToString(), this.CurrentChar.ToString() );
+            SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, new byte[] { this.CurrentByte }, this.CurrentChar.ToString() );
 
             this.NextChar (  );
 
@@ -121,7 +145,9 @@ namespace LearnCsStuf.Basic
 
             this.column++;
 
-            if (this.position > this.Text.Length) return false;
+            this.CurrentByte = (byte) this.Daten.ReadByte();
+
+            if (this.position > this.Daten.Length) return false;
 
             if (this.CurrentChar != '\n') return true;
 
@@ -136,7 +162,7 @@ namespace LearnCsStuf.Basic
 
         private bool IsEnde (  )
         {
-            return this.position >= this.Text.Length;
+            return this.position >= this.Daten.Length;
         }
 
         // -----------------------------------------------
@@ -155,12 +181,18 @@ namespace LearnCsStuf.Basic
                 this.column = column;
                 this.line = line;
 
+                this.Daten.Seek ( this.position, SeekOrigin.Begin );
+
                 return null;
             }
 
-            string text = this.Text.Substring ( start, this.position - start );
+            byte[] daten = new byte[this.position - start];
 
-            return new SyntaxToken ( token.Kind, this.position, this.line, this.column, text, token.GetValue ( text ) );
+            this.Daten.Seek ( start - 1, SeekOrigin.Begin );
+
+            this.Daten.Read ( daten, 0, this.position - start );
+
+            return new SyntaxToken ( token.Kind, this.position, this.line, this.column, daten, token.GetValue ( daten ) );
         }
 
         // -----------------------------------------------
@@ -168,6 +200,7 @@ namespace LearnCsStuf.Basic
         public bool MoveNext()
         {
             this.Current = this.NextToken (  );
+
             return this.Current != null;
         }
 

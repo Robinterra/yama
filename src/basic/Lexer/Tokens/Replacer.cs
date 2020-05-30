@@ -60,7 +60,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public object GetValue ( string text )
+        public object GetValue ( byte[] data )
         {
             return this.ReplaceText;
         }

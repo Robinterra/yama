@@ -39,9 +39,24 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public string Text
+        public byte[] Data
         {
             get;
+            private set;
+        }
+
+        // -----------------------------------------------
+
+        public string Text
+        {
+            get
+            {
+                return System.Text.Encoding.UTF8.GetString ( this.Data );
+            }
+            private set
+            {
+                this.Data = System.Text.Encoding.UTF8.GetBytes ( value );
+            }
         }
 
         // -----------------------------------------------
@@ -84,6 +99,18 @@ namespace LearnCsStuf.Basic
             this.Line = line;
             this.Column = column;
             this.Text = text;
+            this.Value = value;
+        }
+
+        // -----------------------------------------------
+
+        public SyntaxToken ( SyntaxKind kind, int position, int line, int column, byte[] data, object value )
+        {
+            this.Kind = kind;
+            this.Position = position;
+            this.Line = line;
+            this.Column = column;
+            this.Data = data;
             this.Value = value;
         }
 
