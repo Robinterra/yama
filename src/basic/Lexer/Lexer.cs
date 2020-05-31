@@ -105,6 +105,19 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        /**
+         * Zum erstellen eines Sub Lexers
+         */
+        public Lexer ( Lexer lexer, List<ILexerToken> tokens )
+        {
+            this.daten = lexer.daten;
+            this.position = lexer.position;
+            this.CurrentByte = lexer.CurrentByte;
+            this.CurrentChar = lexer.CurrentChar;
+        }
+
+        // -----------------------------------------------
+
         #endregion ctor
 
         // -----------------------------------------------
@@ -135,17 +148,35 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public TokenStatus SubLexen ( List<ILexerToken> tokens )
+        {
+            foreach ( ILexerToken token in tokens )
+            {
+                if ( this.ExecuteLexerToken ( token, out _, out _, out _ ) == TokenStatus.Complete ) return TokenStatus.Complete;
+            }
+
+            return TokenStatus.Cancel;
+        }
+
+        // -----------------------------------------------
+
         public bool NextByte (  )
         {
             this.position++;
 
             this.column++;
 
+            if (this.position >= this.Daten.Length)
+            {
+                this.CurrentByte = 0;
+                this.CurrentChar = '\0';
+
+                return false;
+            }
+
             this.Daten.Seek ( this.position, SeekOrigin.Begin );
 
             this.CurrentByte = (byte) this.Daten.ReadByte();
-
-            if (this.position > this.Daten.Length) return false;
 
             if (System.Convert.ToChar(this.CurrentByte) != '\n') return true;
 
@@ -163,6 +194,7 @@ namespace LearnCsStuf.Basic
             if ( this.position >= this.Daten.Length )
             {
                 this.CurrentChar = '\0';
+                this.CurrentByte = 0;
 
                 return false;
             }
@@ -219,24 +251,34 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private SyntaxToken ExecuteLexerToken ( ILexerToken token )
+        private TokenStatus ExecuteLexerToken ( ILexerToken token, out int start, out int column, out int line )
         {
-            int start = this.position;
-            int column = this.column;
-            int line = this.line;
+            start = this.position;
+            column = this.column;
+            line = this.line;
+            byte current = this.CurrentByte;
 
             TokenStatus status = token.CheckChar ( this );
 
-            if (status != TokenStatus.Complete)
-            {
-                this.position = start;
-                this.column = column;
-                this.line = line;
+            if (status == TokenStatus.Complete) return status;
 
-                this.Daten.Seek ( this.position, SeekOrigin.Begin );
+            this.position = start;
+            this.column = column;
+            this.line = line;
+            this.CurrentByte = current;
 
-                return null;
-            }
+            this.Daten.Seek ( this.position, SeekOrigin.Begin );
+
+            return status;
+        }
+
+        // -----------------------------------------------
+
+        private SyntaxToken ExecuteLexerToken ( ILexerToken token )
+        {
+            TokenStatus status = this.ExecuteLexerToken ( token, out int start, out int column, out int line );
+
+            if (status != TokenStatus.Complete) return null;
 
             byte[] daten = new byte[this.position - start];
 

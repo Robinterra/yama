@@ -332,6 +332,7 @@ namespace LearnCsStuf.Basic
 
         public IParseTreeNode ParseCleanToken ( SyntaxToken token )
         {
+            if ( token == null ) return this.SyntaxToken ( null );
             if ( token.Node != null ) return this.GetNodeFromToken ( token );
 
             IParseTreeNode result = this.ParsePrioSystem ( token, this.GetGrosstePrio (  ), true );
@@ -349,6 +350,8 @@ namespace LearnCsStuf.Basic
 
         private IParseTreeNode SyntaxToken ( SyntaxToken token )
         {
+            if ( token == null ) token = new SyntaxToken ( SyntaxKind.Unknown, -1, -1, -1, "Unexpectet Error", "Unexpectet Error" );
+
             token.Kind = SyntaxKind.Unknown;
 
             this.PrintSyntaxError ( token, "Parser fehler" );

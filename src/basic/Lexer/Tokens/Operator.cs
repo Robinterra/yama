@@ -7,7 +7,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private List<ZeichenKette> operators;
+        private List<ILexerToken> operators;
 
         // -----------------------------------------------
 
@@ -25,13 +25,13 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public List<ZeichenKette> Operators
+        public List<ILexerToken> Operators
         {
             get
             {
                 if (this.operators != null) return this.operators;
 
-                this.operators = new List<ZeichenKette>();
+                this.operators = new List<ILexerToken>();
 
                 return this.operators;
             }
@@ -67,9 +67,7 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
-            if ( !this.ConatinsOperator ( lexer ) ) return TokenStatus.Cancel;
-
-            return TokenStatus.Complete;
+            return lexer.SubLexen ( this.Operators );
         }
 
         // -----------------------------------------------
