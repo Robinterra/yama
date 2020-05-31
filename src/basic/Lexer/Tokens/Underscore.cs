@@ -29,6 +29,8 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
+            lexer.CurrentCharMode (  );
+
             bool isok = '_' == lexer.CurrentChar;
 
             return isok ? TokenStatus.CompleteOne : TokenStatus.Cancel;

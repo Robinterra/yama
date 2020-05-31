@@ -7,7 +7,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private List<char> operators;
+        private List<ZeichenKette> operators;
 
         // -----------------------------------------------
 
@@ -25,13 +25,13 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public List<char> Operators
+        public List<ZeichenKette> Operators
         {
             get
             {
                 if (this.operators != null) return this.operators;
 
-                this.operators = new List<char>();
+                this.operators = new List<ZeichenKette>();
 
                 return this.operators;
             }
@@ -47,9 +47,9 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public Operator ( params char[] param )
+        public Operator ( params ZeichenKette[] param )
         {
-            foreach (char zeichen in param)
+            foreach (ZeichenKette zeichen in param)
             {
                 this.Operators.Add ( zeichen );
             }
@@ -67,23 +67,18 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
-            if ( !this.ConatinsOperator ( lexer.CurrentChar ) ) return TokenStatus.Cancel;
-
-            while ( this.ConatinsOperator ( lexer.CurrentChar ) )
-            {
-                lexer.NextChar (  );
-            }
+            if ( !this.ConatinsOperator ( lexer ) ) return TokenStatus.Cancel;
 
             return TokenStatus.Complete;
         }
 
         // -----------------------------------------------
 
-        private bool ConatinsOperator ( char zeichen )
+        private bool ConatinsOperator ( Lexer lexer )
         {
-            foreach (char vergleichswert in this.operators)
+            foreach ( ZeichenKette oper in this.Operators )
             {
-                if (zeichen == vergleichswert) return true;
+                if ( oper.CheckChar ( lexer ) == TokenStatus.Complete ) return true;
             }
 
             return false;

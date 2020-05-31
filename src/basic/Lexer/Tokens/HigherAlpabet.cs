@@ -31,6 +31,8 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
+            lexer.CurrentCharMode (  );
+
             if (!char.IsLetter ( lexer.CurrentChar )) return TokenStatus.Cancel;
 
             return char.IsUpper ( lexer.CurrentChar ) ? TokenStatus.CompleteOne : TokenStatus.Cancel;

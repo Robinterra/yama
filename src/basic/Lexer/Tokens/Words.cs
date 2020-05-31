@@ -67,7 +67,7 @@ namespace LearnCsStuf.Basic
 
                 if (status == TokenStatus.CompleteOne)
                 {
-                    lexer.NextChar (  );
+                    lexer.NextByte (  );
                     status = TokenStatus.Complete;
                 }
 

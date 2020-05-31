@@ -12,7 +12,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public string Word
+        public byte[] Data
         {
             get;
         }
@@ -37,7 +37,14 @@ namespace LearnCsStuf.Basic
 
         public ZeichenKette ( string keyword )
         {
-            this.Word = keyword;
+            this.Data = System.Text.Encoding.UTF8.GetBytes ( keyword );
+        }
+
+        // -----------------------------------------------
+
+        public ZeichenKette ( byte[] data )
+        {
+            this.Data = data;
         }
 
         // -----------------------------------------------
@@ -48,11 +55,11 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
-            foreach ( char zeichen in this.Word )
+            foreach ( byte zeichen in this.Data )
             {
-                if (lexer.CurrentChar != zeichen) return TokenStatus.Cancel;
+                if (lexer.CurrentByte != zeichen) return TokenStatus.Cancel;
 
-                lexer.NextChar();
+                lexer.NextByte (  );
             }
 
             return TokenStatus.Complete;

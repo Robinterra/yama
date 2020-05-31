@@ -29,6 +29,8 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
+            lexer.CurrentCharMode (  );
+
             if ( !char.IsDigit ( lexer.CurrentChar ) ) return TokenStatus.Cancel;
 
             while ( char.IsDigit ( lexer.CurrentChar ) )

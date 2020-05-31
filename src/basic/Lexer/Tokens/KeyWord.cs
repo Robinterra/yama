@@ -44,6 +44,8 @@ namespace LearnCsStuf.Basic
 
         public TokenStatus CheckChar ( Lexer lexer )
         {
+            lexer.CurrentCharMode (  );
+
             foreach ( char zeichen in this.Word )
             {
                 if (lexer.CurrentChar != zeichen) return TokenStatus.Cancel;

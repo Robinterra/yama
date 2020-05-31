@@ -81,9 +81,9 @@ namespace LearnCsStuf.Basic
 
                 this.Escape.CheckChar ( lexer );
 
-                lexer.NextChar (  );
+                lexer.NextByte (  );
 
-                if ( lexer.CurrentChar == '\0' ) return TokenStatus.SyntaxError;
+                if ( lexer.CurrentByte == 0 ) return TokenStatus.SyntaxError;
             }
 
         }

@@ -70,11 +70,11 @@ namespace LearnCsStuf.Basic
 
             while ( isOnBox )
             {
-                if ( lexer.CurrentChar == '\0' ) return TokenStatus.SyntaxError;
+                if ( lexer.CurrentByte == 0 ) return TokenStatus.SyntaxError;
 
                 isOnBox = this.End.CheckChar ( lexer ) != TokenStatus.Complete;
 
-                if ( isOnBox ) lexer.NextChar (  );
+                if ( isOnBox ) lexer.NextByte (  );
             }
 
             return TokenStatus.Complete;

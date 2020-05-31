@@ -83,7 +83,7 @@ namespace LearnCsStuf.Basic
             {
                 this.Escape.CheckChar ( lexer );
 
-                lexer.NextChar (  );
+                lexer.NextByte (  );
 
                 if ( lexer.CurrentChar == '\0' ) return TokenStatus.Complete;
             }

@@ -41,11 +41,11 @@ namespace LearnCsStuf.Basic
             }
             set
             {
+                this.daten = value;
+                this.CurrentByte = (byte) this.Daten.ReadByte();
                 this.position = 0;
                 this.column = 0;
                 this.line = 1;
-                this.daten = value;
-                this.NextChar();
             }
         }
 
@@ -69,12 +69,8 @@ namespace LearnCsStuf.Basic
 
         public char CurrentChar
         {
-            get
-            {
-                if (this.IsEnde (  )) return '\0';
-
-                return System.Convert.ToChar ( this.CurrentByte );//this.Text[position];
-            }
+            get;
+            set;
         }
 
         // -----------------------------------------------
@@ -132,24 +128,80 @@ namespace LearnCsStuf.Basic
 
             SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, new byte[] { this.CurrentByte }, this.CurrentChar.ToString() );
 
-            this.NextChar (  );
+            this.NextByte (  );
 
             return UnknownToken;
         }
 
         // -----------------------------------------------
 
-        public bool NextChar (  )
+        public bool NextByte (  )
         {
             this.position++;
 
             this.column++;
 
+            this.Daten.Seek ( this.position, SeekOrigin.Begin );
+
             this.CurrentByte = (byte) this.Daten.ReadByte();
 
             if (this.position > this.Daten.Length) return false;
 
-            if (this.CurrentChar != '\n') return true;
+            if (System.Convert.ToChar(this.CurrentByte) != '\n') return true;
+
+            this.line++;
+
+            this.column = 0;
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public bool CurrentCharMode (  )
+        {
+            if ( this.position >= this.Daten.Length )
+            {
+                this.CurrentChar = '\0';
+
+                return false;
+            }
+
+            BinaryReader reader = new BinaryReader(this.Daten, System.Text.Encoding.UTF8);
+
+            this.Daten.Seek ( this.position, SeekOrigin.Begin );
+
+            this.CurrentChar = reader.ReadChar();
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public bool NextChar (  )
+        {
+
+            this.column++;
+
+            BinaryReader reader = new BinaryReader(this.Daten, System.Text.Encoding.UTF8);
+
+            this.position = (int)this.Daten.Position;
+
+            if (this.position >= this.Daten.Length)
+            {
+                this.CurrentByte = 0;
+                this.CurrentChar = '\0';
+
+                return false;
+            }
+
+            this.CurrentByte = (byte)this.Daten.ReadByte (  );
+
+            this.Daten.Seek ( this.position, SeekOrigin.Begin );
+
+            this.CurrentChar = reader.ReadChar();
+
+            if (System.Convert.ToChar(this.CurrentByte) != '\n') return true;
 
             this.line++;
 
@@ -188,7 +240,7 @@ namespace LearnCsStuf.Basic
 
             byte[] daten = new byte[this.position - start];
 
-            this.Daten.Seek ( start - 1, SeekOrigin.Begin );
+            this.Daten.Seek ( start, SeekOrigin.Begin );
 
             this.Daten.Read ( daten, 0, this.position - start );
 
