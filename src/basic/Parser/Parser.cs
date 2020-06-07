@@ -95,6 +95,13 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public List<IParseTreeNode> ParserErrors
+        {
+            get;
+        } = new List<IParseTreeNode> ();
+
+        // -----------------------------------------------
+
         public List<IParseTreeNode> ParserMembers
         {
             get;
@@ -162,9 +169,9 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private bool PrintSyntaxError(SyntaxToken token, string msg)
+        public bool PrintSyntaxError(SyntaxToken token, string msg)
         {
-            if (token.Kind != SyntaxKind.Unknown) return false;
+            //if (token.Kind != SyntaxKind.Unknown) return false;
 
             this.SyntaxErrors.Add ( token );
 
@@ -189,7 +196,7 @@ namespace LearnCsStuf.Basic
             {
                 if (token.Kind == SyntaxKind.Whitespaces) continue;
                 if (token.Kind == SyntaxKind.Comment) continue;
-                if (this.PrintSyntaxError ( token, "unkown char" )) continue;
+                if (token.Kind == SyntaxKind.Unknown && this.PrintSyntaxError ( token, "unkown char" )) continue;
 
                 this.CleanTokens.Add ( token );
                 Console.Write ( token.Kind.ToString() + " : " );
@@ -284,7 +291,7 @@ namespace LearnCsStuf.Basic
             {
                 if ( this.Current.Node == null )
                 {
-                    return this.SyntaxToken ( this.Current );
+                    return this.SyntaxErrorToken ( this.Current );
                 }
 
                 this.NextToken (  );
@@ -332,7 +339,7 @@ namespace LearnCsStuf.Basic
 
         public IParseTreeNode ParseCleanToken ( SyntaxToken token )
         {
-            if ( token == null ) return this.SyntaxToken ( null );
+            if ( token == null ) return this.SyntaxErrorToken ( null );
             if ( token.Node != null ) return this.GetNodeFromToken ( token );
 
             IParseTreeNode result = this.ParsePrioSystem ( token, this.GetGrosstePrio (  ), true );
@@ -343,20 +350,24 @@ namespace LearnCsStuf.Basic
 
             if ( result != null ) return result;
 
-            return this.SyntaxToken ( token );
+            return this.SyntaxErrorToken ( token );
         }
 
         // -----------------------------------------------
 
-        private IParseTreeNode SyntaxToken ( SyntaxToken token )
+        private IParseTreeNode SyntaxErrorToken ( SyntaxToken token )
         {
             if ( token == null ) token = new SyntaxToken ( SyntaxKind.Unknown, -1, -1, -1, "Unexpectet Error", "Unexpectet Error" );
 
-            token.Kind = SyntaxKind.Unknown;
+            //token.Kind = SyntaxKind.Unknown;
 
-            this.PrintSyntaxError ( token, "Parser fehler" );
+            IParseTreeNode error = this.ErrorNode.Parse ( this, token );
 
-            return this.ErrorNode.Parse ( this, token );
+            if (error == null) return null;
+
+            this.ParserErrors.Add ( error );
+
+            return error;
         }
 
         // -----------------------------------------------
