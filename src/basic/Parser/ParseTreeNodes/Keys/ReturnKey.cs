@@ -39,7 +39,9 @@ namespace LearnCsStuf.Basic
         {
             if ( token.Kind != SyntaxKind.Return ) return null;
 
-            List<IParseTreeNode> nodes = parser.ParseCleanTokens(token.Position + 1, parser.Max);
+            SyntaxToken ende = parser.FindAToken(token, SyntaxKind.EndOfCommand);
+
+            List<IParseTreeNode> nodes = parser.ParseCleanTokens(token.Position + 1, ende.Position);
             IParseTreeNode node = null;
 
             if ( nodes == null ) return null;

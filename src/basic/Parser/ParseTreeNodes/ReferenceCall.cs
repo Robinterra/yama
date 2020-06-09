@@ -14,26 +14,11 @@ namespace LearnCsStuf.Basic
             set;
         }
 
-        public List<IParseTreeNode> Parameters
-        {
-            get;
-            set;
-        }
-
-        public List<IParseTreeNode> Vectoren
-        {
-            get;
-            set;
-        }
-
         public List<IParseTreeNode> GetAllChilds
         {
             get
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
-
-                if ( this.Vectoren != null ) result.AddRange(this.Vectoren);
-                if ( this.Parameters != null ) result.AddRange(this.Parameters);
 
                 return result;
             }
@@ -61,7 +46,7 @@ namespace LearnCsStuf.Basic
 
         #region methods
 
-        private bool ParseVector ( Parser parser )
+        /*private bool ParseVector ( Parser parser )
         {
             SyntaxToken checkToken = parser.Peek ( this.Token, 1 );
 
@@ -94,7 +79,7 @@ namespace LearnCsStuf.Basic
             }
 
             return true;
-        }
+        }*/
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
@@ -106,41 +91,38 @@ namespace LearnCsStuf.Basic
 
             result.Token = token;
 
-            if ( !result.ParseVector ( parser ) ) return null;
+            //int counter = 1;
 
-            if ( !result.ParseParameters ( parser ) ) return null;
+            /*while ( this.ParseVector ( parser, result, ref counter ) )
+            {
+
+            }
+
+            this.ParseGenericType ( parser, result, ref counter );*/
+
+            //this.ParseParameters ( parser, result, counter );
 
             return result;
         }
 
-        private bool ParseParameters(Parser parser)
+        /*private bool ParseParameters(Parser parser, ReferenceCall parent, int count)
         {
-            SyntaxToken checkToken = parser.Peek ( this.Token, 1 );
+            SyntaxToken checkToken = parser.Peek ( this.Token, count );
 
             if ( checkToken == null ) return true;
-            if ( checkToken.Kind != SyntaxKind.OpenKlammer ) return true;
 
-            SyntaxToken endToken = parser.FindEndToken ( checkToken, SyntaxKind.CloseKlammer, SyntaxKind.OpenKlammer );
+            Container container = new Container(SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer);
 
-            if ( endToken == null ) return false;
+            IParseTreeNode node = container.Parse ( parser, checkToken );
 
-            List<IParseTreeNode> parametersData = parser.ParseCleanTokens ( checkToken.Position + 1, endToken.Position );//parser.ParseCleanTokens ( checkToken.Position + 1, endToken.Position );
+            if (node == null) return false;
 
-            if ( parametersData == null ) return false;
+            node.Token.ParentNode = parent;
 
-            checkToken.Node = this;
-
-            endToken.Node = this;
-
-            foreach (IParseTreeNode data in parametersData)
-            {
-                data.Token.ParentNode = this;
-            }
-
-            this.Parameters = parametersData;
+            parent.FunctionCall = node;
 
             return true;
-        }
+        }*/
 
         #endregion methods
 

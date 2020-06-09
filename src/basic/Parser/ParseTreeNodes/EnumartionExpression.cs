@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class NormalExpression : IParseTreeNode, IEndExpression
+    public class EnumartionExpression : IParseTreeNode, IEndExpression
     {
 
         #region get/set
@@ -43,7 +43,7 @@ namespace LearnCsStuf.Basic
             
             //if ( kind == null ) return null;
             //if ( kind.Node != null ) return null;
-            if ( token.Kind != SyntaxKind.EndOfCommand ) return null;
+            if ( token.Kind != SyntaxKind.Comma ) return null;
 
             SyntaxToken left = parser.Peek ( token, -1 );
 
@@ -55,14 +55,13 @@ namespace LearnCsStuf.Basic
 
             if (left == null) return expression;
 
-            List<IParseTreeNode> nodes = parser.ParseCleanTokens ( parser.Start, token.Position );
+            List<IParseTreeNode> nodes = parser.ParseCleanTokens (left, parser.Start, token.Position );
 
             IParseTreeNode node = null;
 
             if ( nodes == null ) return null;
-            //if ( nodes.Count > 1 ) return null;
-//            if ( nodes.Count == 1 ) node = nodes[0];
-            node = nodes[nodes.Count - 1];
+            if ( nodes.Count > 1 ) return null;
+            if ( nodes.Count == 1 ) node = nodes[0];
 
             expression.ExpressionParent = node;
 

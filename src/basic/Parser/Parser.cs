@@ -14,6 +14,7 @@ namespace LearnCsStuf.Basic
         // -----------------------------------------------
 
         private int grosstePrio = -1;
+        private List<IParseTreeNode> possibleParents;
 
         // -----------------------------------------------
 
@@ -30,6 +31,7 @@ namespace LearnCsStuf.Basic
             get;
             private set;
         }
+        public int Start { get; private set; }
 
         // -----------------------------------------------
 
@@ -157,6 +159,22 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public List<IParseTreeNode> ParseCleanTokens(SyntaxToken left, int start, int position)
+        {
+            if (left.Node == null) return this.ParseCleanTokens(start, position);
+
+            List<IParseTreeNode> result = new List<IParseTreeNode>();
+
+            SyntaxToken token = this.GetParent(left);
+
+            if (token != null) result.Add(token.Node);
+            else result.Add(left.Node);
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         public IParseTreeNode GetRule<T>() where T : IParseTreeNode
         {
             foreach ( IParseTreeNode rule in this.ParserMembers )
@@ -187,6 +205,15 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        public SyntaxToken GetParent ( SyntaxToken token )
+        {
+            if ( token.ParentNode == null ) return token;
+
+            return this.GetParent ( token.ParentNode.Token );
+        }
+
+        // -----------------------------------------------
+
         private bool CheckTokens()
         {
             this.Tokenizer.Daten = this.InputStream;
@@ -208,7 +235,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public List<IParseTreeNode> ParseCleanTokens ( int von, int bis )
+        public List<IParseTreeNode> ParseCleanTokens ( int von, int bis, bool withlostchilds = false )
         {
             if (this.CleanTokens.Count == 0) return null;
             if ( von == bis ) return new List<IParseTreeNode>();
@@ -217,10 +244,13 @@ namespace LearnCsStuf.Basic
 
             int currentpos = this.Position;
             this.Position = von;
+            int orgstart = this.Start;
+            this.Start = von;
             int tempmax = this.Max;
             this.Max = bis;
+            List<IParseTreeNode> possibleParentsTemp = this.possibleParents;
 
-            List<IParseTreeNode> possibleParents = new List<IParseTreeNode>();
+            this.possibleParents = new List<IParseTreeNode>();
             List<IParseTreeNode> nodeParents = new List<IParseTreeNode>();
 
             bool isok = true;
@@ -233,7 +263,7 @@ namespace LearnCsStuf.Basic
 
                 isok = node != null;
 
-                possibleParents.Add ( node );
+                this.possibleParents.Add ( node );
 
                 this.NextToken (  );
 
@@ -245,18 +275,49 @@ namespace LearnCsStuf.Basic
                 vorgangOhneNeueNodes = true;
             }
 
-            foreach ( IParseTreeNode node in possibleParents )
+            /*foreach ( IParseTreeNode node in this.possibleParents )
             {
                 if ( node == null ) continue;
                 if ( node.Token.ParentNode != null ) continue;
 
                 nodeParents.Add ( node );
-            }
+            }*/
+
+            nodeParents = this.GetCleanNodeParents();
 
             this.Position = currentpos;
             this.Max = tempmax;
+            this.Start = orgstart;
+            this.possibleParents = possibleParentsTemp;
 
             return nodeParents;
+        }
+
+        private List<IParseTreeNode> GetCleanNodeParents()
+        {
+            if (this.Max - this.Start < 0) return new List<IParseTreeNode>();
+
+            List<SyntaxToken> unclean = this.CleanTokens.GetRange(this.Start, this.Max - this.Start);
+            List<IParseTreeNode> result = new List<IParseTreeNode>();
+            List<IParseTreeNode> clean = new List<IParseTreeNode>();
+
+            foreach ( SyntaxToken token in unclean )
+            {
+                if (token == null) continue;
+                if (token.Node == null) continue;
+                if (clean.Contains(token.Node)) continue;
+
+                clean.Add(token.Node);
+            }
+
+            foreach ( IParseTreeNode node in clean )
+            {
+                if ( node.Token.ParentNode != null ) continue;
+
+                result.Add ( node );
+            }
+
+            return result;
         }
 
         private IParseTreeNode ParsePrimary ( int max )
@@ -342,7 +403,11 @@ namespace LearnCsStuf.Basic
             if ( token == null ) return this.SyntaxErrorToken ( null );
             if ( token.Node != null ) return this.GetNodeFromToken ( token );
 
-            IParseTreeNode result = this.ParsePrioSystem ( token, this.GetGrosstePrio (  ), true );
+            IParseTreeNode result = this.ParseEndExpression ( token );
+
+            if ( result != null ) return result;
+
+            result = this.ParsePrioSystem ( token, this.GetGrosstePrio (  ), true );
 
             if ( result != null ) return result;
 
@@ -351,6 +416,20 @@ namespace LearnCsStuf.Basic
             if ( result != null ) return result;
 
             return this.SyntaxErrorToken ( token );
+        }
+
+        private IParseTreeNode ParseEndExpression(SyntaxToken token)
+        {
+            foreach ( IParseTreeNode node in this.ParserMembers )
+            {
+                if (!(node is IEndExpression)) continue;
+
+                IParseTreeNode nodet = node.Parse(this, token);
+
+                if (nodet != null) return nodet;
+            }
+
+            return null;
         }
 
         // -----------------------------------------------
@@ -566,6 +645,7 @@ namespace LearnCsStuf.Basic
 
         public SyntaxToken Peek ( SyntaxToken token, int offset )
         {
+            if (token == null) return null;
             if (this.Max <= offset + token.Position) return null;
             if (0 > offset + token.Position) return null;
 
