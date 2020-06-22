@@ -84,8 +84,10 @@ namespace LearnCsStuf.Basic
             parserRules.Add ( new EnumartionExpression (  ) );
             parserRules.Add ( new ReturnKey (  ) );
             parserRules.Add ( new TrueFalseKey ( 1 ) );
+			parserRules.Add ( new VariabelDeklaration ( 11 ) );
             parserRules.Add ( new ReferenceCall ( 1 ) );
             parserRules.Add ( new Number ( 1 ) );
+			parserRules.Add ( new OperatorPoint ( 11 ) );
             parserRules.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
             parserRules.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 11, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
             parserRules.Add ( new Operator2Childs ( new List<string> { "|" }, 2 ) );
