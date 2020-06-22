@@ -43,10 +43,16 @@ namespace LearnCsStuf.Basic
             }
         }
 
+        public SyntaxKind ValidKind
+        {
+            get;
+        }
         public List<string> ValidOperators
         {
             get;
         }
+
+
 
         #endregion get/set
 
@@ -60,7 +66,14 @@ namespace LearnCsStuf.Basic
         public Operator2Childs ( List<string> validOperators, int prio )
             : this ( prio )
         {
+            this.ValidKind = SyntaxKind.Operator;
             this.ValidOperators = validOperators;
+        }
+
+        public Operator2Childs ( SyntaxKind kind, int prio )
+            : this ( prio )
+        {
+            this.ValidKind = kind;
         }
 
         #endregion ctor
@@ -69,6 +82,8 @@ namespace LearnCsStuf.Basic
 
         private bool CheckHashValidOperator ( SyntaxToken token )
         {
+            if (this.ValidKind != SyntaxKind.Operator) return true;
+
             foreach ( string op in this.ValidOperators )
             {
                 if ( op == token.Text ) return true;
@@ -79,7 +94,7 @@ namespace LearnCsStuf.Basic
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( token.Kind != SyntaxKind.Operator ) return null;
+            if ( token.Kind != this.ValidKind ) return null;
             if ( !this.CheckHashValidOperator ( token ) ) return null;
 
             Operator2Childs node = new Operator2Childs ( this.Prio );

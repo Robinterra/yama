@@ -194,6 +194,8 @@ namespace LearnCsStuf.Basic
         Escape,
         Splitter,
         Replacer,
+        KleinerAls,
+        GroesserAls,
     }
 }
 

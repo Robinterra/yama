@@ -87,6 +87,7 @@ namespace LearnCsStuf.Basic
             parserRules.Add ( new VariabelDeklaration ( 11 ) );
             parserRules.Add ( new ReferenceCall ( 1 ) );
             parserRules.Add ( new VektorCall ( SyntaxKind.EckigeKlammerAuf, SyntaxKind.EckigeKlammerZu, 1 ) );
+            parserRules.Add ( new GenericCall ( SyntaxKind.KleinerAls, SyntaxKind.GroesserAls, 1 ) );
             parserRules.Add ( new Number ( 1 ) );
             parserRules.Add ( new OperatorPoint ( 11 ) );
             parserRules.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
@@ -95,7 +96,9 @@ namespace LearnCsStuf.Basic
             parserRules.Add ( new Operator2Childs ( new List<string> { "^" }, 3 ) );
             parserRules.Add ( new Operator2Childs ( new List<string> { "&" }, 4 ) );
             parserRules.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 5 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<", ">", "<=", ">=" }, 6 ) );
+            parserRules.Add ( new Operator2Childs ( SyntaxKind.KleinerAls, 6 ) );
+            parserRules.Add ( new Operator2Childs ( SyntaxKind.GroesserAls, 6 ) );
+            parserRules.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=" }, 6 ) );
             parserRules.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 7 ) );
             parserRules.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8 ) );
             parserRules.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9 ) );
@@ -125,10 +128,12 @@ namespace LearnCsStuf.Basic
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
             rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
-            rules.Add ( new Operator ( new ZeichenKette ( "∑" ), new ZeichenKette ( "<=" ), new ZeichenKette ( "++" ), new ZeichenKette ( "<>" ), new ZeichenKette ( ">=" ), new ZeichenKette ( "^^" ), new ZeichenKette ( "+" ), new ZeichenKette ( "-" ), new ZeichenKette ( "*" ), new ZeichenKette ( "/"), new ZeichenKette ( "%" ), new ZeichenKette ( "&" ), new ZeichenKette ( "|" ), new ZeichenKette ( "==" ), new ZeichenKette ( "=" ), new ZeichenKette ( "<" ), new ZeichenKette ( ">" ), new ZeichenKette ( "!=" ), new ZeichenKette ( "!" ), new ZeichenKette ( "^"), new ZeichenKette ( "~" ), new ZeichenKette ( "√" ), new ZeichenKette ( "?" ) ) );
+            rules.Add ( new Operator ( new ZeichenKette ( "∑" ), new ZeichenKette ( "<=" ), new ZeichenKette ( "++" ), new ZeichenKette ( "<>" ), new ZeichenKette ( ">=" ), new ZeichenKette ( "^^" ), new ZeichenKette ( "+" ), new ZeichenKette ( "-" ), new ZeichenKette ( "*" ), new ZeichenKette ( "/"), new ZeichenKette ( "%" ), new ZeichenKette ( "&" ), new ZeichenKette ( "|" ), new ZeichenKette ( "==" ), new ZeichenKette ( "=" ), new ZeichenKette ( "!=" ), new ZeichenKette ( "!" ), new ZeichenKette ( "^"), new ZeichenKette ( "~" ), new ZeichenKette ( "√" ), new ZeichenKette ( "?" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Whitespaces (  ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), SyntaxKind.OpenKlammer ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "<" ), SyntaxKind.KleinerAls ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( ">" ), SyntaxKind.GroesserAls ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( ")" ), SyntaxKind.CloseKlammer ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "{" ), SyntaxKind.BeginContainer ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "}" ), SyntaxKind.CloseContainer ) );
