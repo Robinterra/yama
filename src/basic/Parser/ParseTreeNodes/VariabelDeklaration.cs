@@ -90,7 +90,7 @@ namespace LearnCsStuf.Basic
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( token.Kind != SyntaxKind.Operator ) return null;
+            if ( token.Kind != SyntaxKind.Word ) return null;
             if ( !this.CheckHashValidOperator ( token ) ) return null;
 
             SyntaxToken lexerLeft = parser.Peek ( token, -1 );

@@ -63,7 +63,7 @@ namespace LearnCsStuf.Basic
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( token.Kind != SyntaxKind.Operator ) return null;
+            if ( token.Kind != SyntaxKind.Point ) return null;
             if ( !this.CheckHashValidOperator ( token ) ) return null;
 
             OperatorPoint node = new OperatorPoint ( this.Prio );

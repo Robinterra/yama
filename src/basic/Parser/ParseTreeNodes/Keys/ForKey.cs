@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class WhileKey : IParseTreeNode, IContainer
+    public class ForKey : IParseTreeNode, IContainer
     {
 
         #region get/set
@@ -59,7 +59,7 @@ namespace LearnCsStuf.Basic
             if ( token.Kind != SyntaxKind.While ) return null;
             if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenKlammer ) return null;
 
-            WhileKey key = new WhileKey (  );
+            ForKey key = new ForKey (  );
             key.Token = token;
             token.Node = key;
 
