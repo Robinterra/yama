@@ -7,12 +7,22 @@ namespace LearnCsStuf.Basic
 
         #region get/set
 
-        public IParseTreeNode Condition
+        public IParseTreeNode Deklaration
         {
             get;
             set;
         }
 
+        public IParseTreeNode Condition
+        {
+            get;
+            set;
+        }
+        public IParseTreeNode Inkrementation
+        {
+            get;
+            set;
+        }
         public IParseTreeNode Statement
         {
             get;
@@ -56,7 +66,7 @@ namespace LearnCsStuf.Basic
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( token.Kind != SyntaxKind.While ) return null;
+            if ( token.Kind != SyntaxKind.For ) return null;
             if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenKlammer ) return null;
 
             ForKey key = new ForKey (  );

@@ -7,7 +7,19 @@ namespace LearnCsStuf.Basic
 
         #region get/set
 
-        public IParseTreeNode ChildNode
+        public IParseTreeNode AccessDefinition
+        {
+            get;
+            set;
+        }
+
+        public IParseTreeNode TypeDefinition
+        {
+            get;
+            set;
+        }
+
+        public IParseTreeNode GenericDefintion
         {
             get;
             set;
@@ -30,7 +42,7 @@ namespace LearnCsStuf.Basic
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.ChildNode );
+                //result.Add ( this.ChildNode );
 
                 return result;
             }
@@ -84,14 +96,15 @@ namespace LearnCsStuf.Basic
             if (token.Kind == SyntaxKind.Int16Bit) return true;
             if (token.Kind == SyntaxKind.Int64Bit) return true;
             if (token.Kind == SyntaxKind.Float32Bit) return true;
+            if (token.Kind == SyntaxKind.Void) return true;
 
             return false;
         }
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( token.Kind != SyntaxKind.Word ) return null;
-            if ( !this.CheckHashValidOperator ( token ) ) return null;
+            if ( token.Kind != SyntaxKind.Word )
+                if ( !this.CheckHashValidOperator ( token ) ) return null;
 
             SyntaxToken lexerLeft = parser.Peek ( token, -1 );
 

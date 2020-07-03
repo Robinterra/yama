@@ -5,6 +5,7 @@ using LearnCsStuf.CommandLines;
 using LearnCsStuf.Basic;
 using LearnCsStuf.CommandLines.Commands;
 using System.IO;
+using LearnCsStuf.Automaten;
 
 namespace LearnCsStuf
 {
@@ -60,6 +61,7 @@ namespace LearnCsStuf
                 if (command.Key == "printn") Console.WriteLine ( command.Value );
                 if (command.Key == "basic") parseFiles.Add ( command.Value );
                 if (command.Key == "csv") parsecsvFiles.Add ( command.Value );
+                if (command.Key == "auto") Program.RunAuto ( command );
             }
 
             foreach (string value in parseFiles)
@@ -99,6 +101,13 @@ namespace LearnCsStuf
             return true;
         }
 
+        private static void RunAuto(ICommandLine command)
+        {
+            AutomatenTest test = new AutomatenTest();
+
+            test.Run(command.Value);
+        }
+
         // -----------------------------------------------
 
         private static int HilfeP (  )
@@ -130,7 +139,7 @@ namespace LearnCsStuf
             Program.EnabledCommandLines.Add ( new BasicExpression (  ) );
             Program.EnabledCommandLines.Add ( new CsvExpression (  ) );
             Program.EnabledCommandLines.Add ( new Help (  ) );
-
+            Program.EnabledCommandLines.Add ( new AutoExpression (  ) );
             return true;
         }
 
