@@ -78,6 +78,9 @@ namespace LearnCsStuf.Basic
             parserRules.Add ( new IfKey (  ) );
             parserRules.Add ( new ElseKey (  ) );
             parserRules.Add ( new WhileKey (  ) );
+            parserRules.Add ( new ForKey (  ) );
+            parserRules.Add ( new FunktionsDeklaration (  ) );
+            parserRules.Add ( new KlassenDeklaration (  ) );
             parserRules.Add ( new FunktionsCall ( SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer, 12 ) );
             parserRules.Add ( new ContainerExpression ( 11 ) );
             parserRules.Add ( new NormalExpression (  ) );

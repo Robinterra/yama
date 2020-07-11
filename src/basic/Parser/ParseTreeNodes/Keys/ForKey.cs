@@ -53,7 +53,9 @@ namespace LearnCsStuf.Basic
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
+                if (this.Deklaration != null) result.Add ( this.Deklaration );
                 if (this.Condition != null) result.Add ( this.Condition );
+                if (this.Inkrementation != null) result.Add ( this.Inkrementation );
                 if (this.Statement != null) result.Add ( this.Statement );
 
                 return result;
@@ -75,15 +77,21 @@ namespace LearnCsStuf.Basic
 
             SyntaxToken conditionkind = parser.Peek ( token, 1 );
 
-            IParseTreeNode rule = parser.GetRule<ContainerExpression>();
+            IParseTreeNode rule = new Container(SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer);
 
-            key.Condition = rule.Parse(parser, conditionkind);
+            IParseTreeNode klammer = rule.Parse(parser, conditionkind);
 
-            if (key.Condition == null) return null;
+            if (klammer == null) return null;
+            if (!(klammer is Container t)) return null;
+            if (t.Statements.Count != 3) return null;
 
-            key.Condition.Token.ParentNode = key;
+            t.Token.ParentNode = key;
 
-            SyntaxToken Statementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
+            key.Deklaration = t.Statements[0];
+            key.Condition = t.Statements[1];
+            key.Inkrementation = t.Statements[2];
+
+            SyntaxToken Statementchild = parser.Peek ( t.Ende, 1);
 
             key.Statement = parser.ParseCleanToken(Statementchild);
 

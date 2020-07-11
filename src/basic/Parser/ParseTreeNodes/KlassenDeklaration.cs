@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class FunktionsDeklaration : IParseTreeNode//, IPriority
+    public class KlassenDeklaration : IParseTreeNode//, IPriority
     {
 
         #region get/set
@@ -19,7 +19,7 @@ namespace LearnCsStuf.Basic
             set;
         }
 
-        public SyntaxToken TypeDefinition
+        public SyntaxToken ClassDefinition
         {
             get;
             set;
@@ -31,7 +31,7 @@ namespace LearnCsStuf.Basic
             set;
         }
 
-        public List<IParseTreeNode> Parameters
+        public List<SyntaxToken> Vererbungs
         {
             get;
             set;
@@ -60,7 +60,6 @@ namespace LearnCsStuf.Basic
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.AddRange ( this.Parameters );
                 result.Add ( this.Statement );
 
                 return result;
@@ -76,12 +75,12 @@ namespace LearnCsStuf.Basic
 
         #region ctor
 
-        public FunktionsDeklaration()
+        public KlassenDeklaration()
         {
 
         }
 
-        public FunktionsDeklaration ( int prio )
+        public KlassenDeklaration ( int prio )
         {
             this.Prio = prio;
         }
@@ -132,6 +131,14 @@ namespace LearnCsStuf.Basic
             return false;
         }
 
+        private bool CheckHashValidClass ( SyntaxToken token )
+        {
+            if (token.Kind == SyntaxKind.Class) return true;
+            if (token.Kind == SyntaxKind.Enum) return true;
+
+            return false;
+        }
+
         private bool CheckHashValidAccessDefinition ( SyntaxToken token )
         {
             if (token.Kind == SyntaxKind.Public) return true;
@@ -147,7 +154,7 @@ namespace LearnCsStuf.Basic
             return false;
         }
 
-        private SyntaxToken MakeAccessValid( Parser parser, SyntaxToken token, FunktionsDeklaration deklaration)
+        private SyntaxToken MakeAccessValid( Parser parser, SyntaxToken token, KlassenDeklaration deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -156,7 +163,33 @@ namespace LearnCsStuf.Basic
             return parser.Peek(token, 1);
         }
 
-        private SyntaxToken MakeZusatzValid( Parser parser, SyntaxToken token, FunktionsDeklaration deklaration)
+        private SyntaxToken MakeVererbung( Parser parser, SyntaxToken token, KlassenDeklaration deklaration)
+        {
+            if (token.Kind != SyntaxKind.DoublePoint) return token;
+
+            token.Node = deklaration;
+
+            deklaration.Vererbungs = new List<SyntaxToken>();
+
+            token = parser.Peek(token, 1);
+
+            while (token.Kind == SyntaxKind.Comma)
+            {
+                token = parser.Peek(token, 1);
+
+                if (token.Kind != SyntaxKind.Word) continue;
+
+                token.Node = deklaration;
+
+                deklaration.Vererbungs.Add(token);
+
+                token = parser.Peek(token, 1);
+            }
+
+            return token;
+        }
+
+        private SyntaxToken MakeZusatzValid( Parser parser, SyntaxToken token, KlassenDeklaration deklaration)
         {
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
@@ -168,15 +201,15 @@ namespace LearnCsStuf.Basic
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
 
-            FunktionsDeklaration deklaration = new FunktionsDeklaration();
+            KlassenDeklaration deklaration = new KlassenDeklaration();
 
             token = this.MakeAccessValid(parser, token, deklaration);
 
             token = this.MakeZusatzValid ( parser, token, deklaration );
 
-            if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
+            if ( !this.CheckHashValidClass ( token ) ) return null;
 
-            deklaration.TypeDefinition = token;
+            deklaration.ClassDefinition = token;
 
             token = parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
@@ -185,28 +218,16 @@ namespace LearnCsStuf.Basic
 
             token = parser.Peek ( token, 1 );
 
-            IParseTreeNode rule = new Container(SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer);
+            token = this.MakeVererbung ( parser, token, deklaration );
 
-            if ( token == null ) return null;
-
-            IParseTreeNode klammer = rule.Parse(parser, token);
-
-            if (klammer == null) return null;
-            if (!(klammer is Container t)) return null;
-
-            t.Token.ParentNode = deklaration;
-            deklaration.Parameters = t.Statements;
-
-            SyntaxToken Statementchild = parser.Peek ( t.Ende, 1);
-
-            deklaration.Statement = parser.ParseCleanToken(Statementchild);
+            deklaration.Statement = parser.ParseCleanToken(token);
 
             if (deklaration.Statement == null) return null;
 
             return this.CleanUp(deklaration);
         }
 
-        private FunktionsDeklaration CleanUp(FunktionsDeklaration deklaration)
+        private KlassenDeklaration CleanUp(KlassenDeklaration deklaration)
         {
             deklaration.Statement.Token.ParentNode = deklaration;
 
@@ -220,8 +241,8 @@ namespace LearnCsStuf.Basic
                 deklaration.ZusatzDefinition.Node = deklaration;
                 deklaration.ZusatzDefinition.ParentNode = deklaration;
             }
-            deklaration.TypeDefinition.Node = deklaration;
-            deklaration.TypeDefinition.ParentNode = deklaration;
+            deklaration.ClassDefinition.Node = deklaration;
+            deklaration.ClassDefinition.ParentNode = deklaration;
             deklaration.Token.Node = deklaration;
 
             return deklaration;

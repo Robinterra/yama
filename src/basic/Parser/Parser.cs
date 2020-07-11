@@ -226,8 +226,8 @@ namespace LearnCsStuf.Basic
                 if (token.Kind == SyntaxKind.Unknown && this.PrintSyntaxError ( token, "unkown char" )) continue;
 
                 this.CleanTokens.Add ( token );
-                Console.Write ( token.Kind.ToString() + " : " );
-                Console.WriteLine ( token.Value );
+                //Console.Write ( token.Kind.ToString() + " : " );
+                //Console.WriteLine ( token.Value );
             }
 
             return this.SyntaxErrors.Count == 0;
@@ -459,7 +459,8 @@ namespace LearnCsStuf.Basic
 
                 IParseTreeNode result = member.Parse ( this, token );
 
-                if ( result != null ) return result;
+                if ( result != null )
+                    return result;
             }
 
             return null;
