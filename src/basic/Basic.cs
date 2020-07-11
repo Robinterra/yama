@@ -79,8 +79,11 @@ namespace LearnCsStuf.Basic
             parserRules.Add ( new ElseKey (  ) );
             parserRules.Add ( new WhileKey (  ) );
             parserRules.Add ( new ForKey (  ) );
+            parserRules.Add ( new NewKey (  ) );
             parserRules.Add ( new FunktionsDeklaration (  ) );
             parserRules.Add ( new KlassenDeklaration (  ) );
+            parserRules.Add ( new BedingtesCompilierenParser (  ) );
+            parserRules.Add ( new ExplicitConverting ( 12 ) );
             parserRules.Add ( new FunktionsCall ( SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer, 12 ) );
             parserRules.Add ( new ContainerExpression ( 11 ) );
             parserRules.Add ( new NormalExpression (  ) );
@@ -92,6 +95,7 @@ namespace LearnCsStuf.Basic
             parserRules.Add ( new VektorCall ( SyntaxKind.EckigeKlammerAuf, SyntaxKind.EckigeKlammerZu, 1 ) );
             parserRules.Add ( new GenericCall ( SyntaxKind.KleinerAls, SyntaxKind.GroesserAls, 1 ) );
             parserRules.Add ( new Number ( 1 ) );
+            parserRules.Add ( new TextParser ( 1 ) );
             parserRules.Add ( new OperatorPoint ( 11 ) );
             parserRules.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
             parserRules.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 11, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
@@ -159,6 +163,9 @@ namespace LearnCsStuf.Basic
             rules.Add ( new KeyWord ( "true", SyntaxKind.True ) );
             rules.Add ( new KeyWord ( "null", SyntaxKind.Null ) );
             rules.Add ( new KeyWord ( "enum", SyntaxKind.Enum ) );
+            rules.Add ( new KeyWord ( "operator", SyntaxKind.OperatorKey ) );
+            rules.Add ( new KeyWord ( "implicit", SyntaxKind.Implicit ) );
+            rules.Add ( new KeyWord ( "explicit", SyntaxKind.Explicit ) );
             rules.Add ( new KeyWord ( "continue", SyntaxKind.Continue ) );
             rules.Add ( new KeyWord ( "break", SyntaxKind.Break ) );
             rules.Add ( new KeyWord ( "false", SyntaxKind.False ) );

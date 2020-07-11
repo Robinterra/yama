@@ -141,6 +141,8 @@ namespace LearnCsStuf.Basic
 
             SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, new byte[] { this.CurrentByte }, this.CurrentChar.ToString() );
 
+            UnknownToken.CleanDaten = new byte[] { this.CurrentByte };
+
             this.NextByte (  );
 
             return UnknownToken;
@@ -286,7 +288,15 @@ namespace LearnCsStuf.Basic
 
             this.Daten.Read ( daten, 0, this.position - start );
 
-            return new SyntaxToken ( token.Kind, this.position, this.line, this.column, daten, token.GetValue ( daten ) );
+            object data = token.GetValue ( daten );
+
+            SyntaxToken result = new SyntaxToken ( token.Kind, this.position, this.line, this.column, daten, data );
+
+            if (!(data is string t)) return result;
+
+            result.CleanDaten = System.Text.Encoding.UTF8.GetBytes(t);
+
+            return result;
         }
 
         // -----------------------------------------------

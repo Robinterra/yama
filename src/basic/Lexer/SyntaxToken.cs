@@ -32,7 +32,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public int  Column
+        public int Column
         {
             get;
         }
@@ -43,6 +43,14 @@ namespace LearnCsStuf.Basic
         {
             get;
             private set;
+        }
+
+        // -----------------------------------------------
+
+        public byte[] CleanDaten
+        {
+            get;
+            set;
         }
 
         // -----------------------------------------------
@@ -196,6 +204,9 @@ namespace LearnCsStuf.Basic
         Replacer,
         KleinerAls,
         GroesserAls,
+        OperatorKey,
+        Explicit,
+        Implicit,
     }
 }
 

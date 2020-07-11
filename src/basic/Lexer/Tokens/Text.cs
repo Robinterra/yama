@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace LearnCsStuf.Basic
@@ -97,13 +98,13 @@ namespace LearnCsStuf.Basic
             lexer.LexerTokens.Add ( new Replacer ( this.Begin, string.Empty ) );
             lexer.LexerTokens.Add ( new Replacer ( this.Ende, string.Empty ) );
 
-            StringBuilder builder = new StringBuilder();
+            List<byte> daten = new List<byte>();
             foreach ( SyntaxToken token in lexer )
             {
-                builder.Append ( token.Value );
+                daten.AddRange(token.CleanDaten);
             }
 
-            return builder.ToString (  );
+            return Encoding.UTF8.GetString(daten.ToArray());
         }
 
         // -----------------------------------------------

@@ -103,6 +103,7 @@ namespace LearnCsStuf.Basic
             if (token.Kind == SyntaxKind.Int16Bit) return true;
             if (token.Kind == SyntaxKind.Int64Bit) return true;
             if (token.Kind == SyntaxKind.Float32Bit) return true;
+            if (token.Kind == SyntaxKind.New) return true;
 
             return false;
         }
@@ -120,6 +121,8 @@ namespace LearnCsStuf.Basic
         }*/
         private bool CheckHashValidTypeDefinition ( SyntaxToken token )
         {
+            if (token == null) return false;
+
             if (token.Kind == SyntaxKind.Word) return true;
             if (token.Kind == SyntaxKind.Int32Bit) return true;
             if (token.Kind == SyntaxKind.Boolean) return true;
@@ -128,6 +131,10 @@ namespace LearnCsStuf.Basic
             if (token.Kind == SyntaxKind.Int16Bit) return true;
             if (token.Kind == SyntaxKind.Int64Bit) return true;
             if (token.Kind == SyntaxKind.Float32Bit) return true;
+            if (token.Kind == SyntaxKind.This) return true;
+            if (token.Kind == SyntaxKind.Implicit) return true;
+            if (token.Kind == SyntaxKind.Explicit) return true;
+            if (token.Kind == SyntaxKind.Void) return true;
 
             return false;
         }
@@ -143,6 +150,7 @@ namespace LearnCsStuf.Basic
         private bool CheckHashValidZusatzDefinition ( SyntaxToken token )
         {
             if (token.Kind == SyntaxKind.Static) return true;
+            if (token.Kind == SyntaxKind.OperatorKey) return true;
 
             return false;
         }

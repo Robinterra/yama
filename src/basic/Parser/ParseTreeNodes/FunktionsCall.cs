@@ -107,6 +107,8 @@ namespace LearnCsStuf.Basic
             node.Token = token;
             token.Node = node;
 
+            if (node.LeftNode == null) return null;
+
             node.LeftNode.Token.ParentNode = node;
             node.Ende = steuerToken;
 

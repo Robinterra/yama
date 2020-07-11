@@ -1,0 +1,113 @@
+using System.Collections.Generic;
+
+namespace LearnCsStuf.Basic
+{
+    public class ExplicitConverting : IParseTreeNode, IPriority
+    {
+
+        #region get/set
+
+        public IParseTreeNode LeftNode
+        {
+            get;
+            set;
+        }
+
+        public SyntaxToken RightToken
+        {
+            get;
+            set;
+        }
+
+        public SyntaxToken Token
+        {
+            get;
+            set;
+        }
+
+        public int Prio
+        {
+            get;
+        }
+
+        public List<IParseTreeNode> GetAllChilds
+        {
+            get
+            {
+                List<IParseTreeNode> result = new List<IParseTreeNode> (  );
+
+                result.Add ( this.LeftNode );
+
+                return result;
+            }
+        }
+
+        public SyntaxKind ValidKind
+        {
+            get;
+        }
+        public List<string> ValidOperators
+        {
+            get;
+        }
+        public SyntaxToken ReferenceDeklaration
+        {
+            get;
+            set;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public ExplicitConverting ( int prio )
+        {
+            this.Prio = prio;
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        private bool CheckHashValidTypeDefinition ( SyntaxToken token )
+        {
+            if (token == null) return false;
+
+            if (token.Kind == SyntaxKind.Word) return true;
+            if (token.Kind == SyntaxKind.Int32Bit) return true;
+            if (token.Kind == SyntaxKind.Boolean) return true;
+            if (token.Kind == SyntaxKind.Char) return true;
+            if (token.Kind == SyntaxKind.Byte) return true;
+            if (token.Kind == SyntaxKind.Int16Bit) return true;
+            if (token.Kind == SyntaxKind.Int64Bit) return true;
+            if (token.Kind == SyntaxKind.Float32Bit) return true;
+
+            return false;
+        }
+
+        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        {
+            if ( token.Kind != SyntaxKind.Is ) return null;
+
+            ExplicitConverting node = new ExplicitConverting ( this.Prio );
+            node.Token = token;
+            token.Node = node;
+
+            node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
+
+            node.RightToken = parser.Peek ( token, 1 );
+            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return null;
+
+            node.ReferenceDeklaration = parser.Peek ( node.RightToken, 1 );
+            if (node.ReferenceDeklaration.Kind != SyntaxKind.Word) return null;
+
+            node.LeftNode.Token.ParentNode = node;
+            node.RightToken.Node = node;
+            node.ReferenceDeklaration.Node = node;
+
+            return node;
+        }
+
+        #endregion methods
+    }
+}
