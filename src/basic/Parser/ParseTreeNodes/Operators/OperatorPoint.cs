@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.Basic
 {
-    public class OperatorPoint : IParseTreeNode, IPriority
+    public class OperatorPoint : IParseTreeNode//, IPriority
     {
 
         #region get/set
