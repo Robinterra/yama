@@ -24,6 +24,8 @@ namespace LearnCsStuf
 
         public static int Main ( string[] args )
         {
+            System.Console.WriteLine("Erinnerst du dich an Yama, alter Freund?");
+
             Program.Init (  );
 
             return Program.NormalStart ( args );
@@ -59,7 +61,7 @@ namespace LearnCsStuf
                 if (command.Key == "help") return Program.HilfeP (  ) == 1;
                 if (command.Key == "print") Console.WriteLine ( command.Value );
                 if (command.Key == "printn") Console.WriteLine ( command.Value );
-                if (command.Key == "basic") parseFiles.Add ( command.Value );
+                if (command.Key == "yama") parseFiles.Add ( command.Value );
                 if (command.Key == "csv") parsecsvFiles.Add ( command.Value );
                 if (command.Key == "auto") Program.RunAuto ( command );
             }
@@ -136,7 +138,7 @@ namespace LearnCsStuf
 
             Program.EnabledCommandLines.Add ( new Print (  ) );
             Program.EnabledCommandLines.Add ( new PrintN (  ) );
-            Program.EnabledCommandLines.Add ( new BasicExpression (  ) );
+            Program.EnabledCommandLines.Add ( new YamaExpression (  ) );
             Program.EnabledCommandLines.Add ( new CsvExpression (  ) );
             Program.EnabledCommandLines.Add ( new Help (  ) );
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );

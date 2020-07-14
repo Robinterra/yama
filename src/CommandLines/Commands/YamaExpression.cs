@@ -1,6 +1,6 @@
 namespace LearnCsStuf.CommandLines.Commands
 {
-    public class BasicExpression : ICommandLine
+    public class YamaExpression : ICommandLine
     {
 
         // -----------------------------------------------
@@ -13,7 +13,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return "basic";
+                return "yama";
             }
         }
 
@@ -59,7 +59,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             if (string.Format ( "{0}", this.Key ) != command) return null;
 
-            return new BasicExpression (  );
+            return new YamaExpression (  );
         }
 
         // -----------------------------------------------
