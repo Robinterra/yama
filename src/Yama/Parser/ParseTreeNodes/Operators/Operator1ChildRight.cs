@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
@@ -7,6 +8,12 @@ namespace Yama.Parser
     {
 
         #region get/set
+
+        public IndexMethodReference Reference
+        {
+            get;
+            set;
+        }
 
         public IParseTreeNode ChildNode
         {

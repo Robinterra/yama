@@ -9,7 +9,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexVariabelnDeklaration IndexDek
+        public IndexVariabelnDeklaration Deklaration
         {
             get;
             set;
