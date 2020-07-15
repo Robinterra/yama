@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LearnCsStuf.Basic
+namespace Yama.Lexer
 {
     public class Escaper : ILexerToken
     {

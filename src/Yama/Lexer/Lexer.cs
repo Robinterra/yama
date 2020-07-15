@@ -2,7 +2,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace LearnCsStuf.Basic
+namespace Yama.Lexer
 {
     public class Lexer : IEnumerator, IEnumerable
     {

@@ -1,11 +1,19 @@
+using Yama.Index;
 using System.Collections.Generic;
+using Yama.Lexer;
 
-namespace LearnCsStuf.Basic
+namespace Yama.Parser
 {
     public class VariabelDeklaration : IParseTreeNode, IPriority
     {
 
         #region get/set
+
+        public IndexVariabelnDeklaration IndexDek
+        {
+            get;
+            set;
+        }
 
         public IParseTreeNode AccessDefinition
         {

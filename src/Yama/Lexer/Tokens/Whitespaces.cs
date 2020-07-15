@@ -1,4 +1,4 @@
-namespace LearnCsStuf.Basic
+namespace Yama.Lexer
 {
     public class Whitespaces : ILexerToken
     {

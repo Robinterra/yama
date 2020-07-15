@@ -1,6 +1,6 @@
 using System;
 
-namespace LearnCsStuf.Basic
+namespace Yama.Lexer
 {
     public class Replacer : ILexerToken
     {

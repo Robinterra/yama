@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LearnCsStuf.Basic
+namespace Yama.Lexer
 {
     public class Words : ILexerToken
     {

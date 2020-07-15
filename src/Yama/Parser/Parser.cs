@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Yama.Lexer;
 
-namespace LearnCsStuf.Basic
+namespace Yama.Parser
 {
     public class Parser
     {
@@ -51,7 +52,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private Lexer Tokenizer
+        private Lexer.Lexer Tokenizer
         {
             get;
             set;
@@ -134,7 +135,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private Parser ( List<IParseTreeNode> parserMembers, Lexer lexer )
+        private Parser ( List<IParseTreeNode> parserMembers, Lexer.Lexer lexer )
         {
             this.SyntaxErrors = new List<SyntaxToken> (  );
             this.ParserMembers = parserMembers;
@@ -143,7 +144,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public Parser ( FileInfo file, List<IParseTreeNode> parserMembers, Lexer lexer )
+        public Parser ( FileInfo file, List<IParseTreeNode> parserMembers, Lexer.Lexer lexer )
             : this ( parserMembers, lexer )
         {
             this.Fileinfo = file;

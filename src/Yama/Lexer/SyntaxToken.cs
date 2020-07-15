@@ -1,4 +1,5 @@
-namespace LearnCsStuf.Basic
+using Yama.Parser;
+namespace Yama.Lexer
 {
     public class SyntaxToken
     {

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using Yama.Lexer;
 
-namespace LearnCsStuf.Basic
+namespace Yama.Parser
 {
     public class ParserError : IParseTreeNode
     {

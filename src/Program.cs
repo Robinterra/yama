@@ -6,6 +6,7 @@ using LearnCsStuf.Basic;
 using LearnCsStuf.CommandLines.Commands;
 using System.IO;
 using LearnCsStuf.Automaten;
+using Yama.Lexer;
 
 namespace LearnCsStuf
 {

@@ -1,4 +1,4 @@
-using LearnCsStuf.Basic;
+using Yama.Parser;
 
 namespace Yama.Index
 {

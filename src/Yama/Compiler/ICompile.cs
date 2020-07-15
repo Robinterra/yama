@@ -1,4 +1,6 @@
-namespace LearnCsStuf.Basic
+using Yama.Parser;
+
+namespace Yama.Compiler
 {
 
     public interface ICompile

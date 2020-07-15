@@ -1,12 +1,20 @@
 using System;
 using System.Collections.Generic;
+using Yama.Lexer;
+using Yama.Index;
 
-namespace LearnCsStuf.Basic
+namespace Yama.Parser
 {
     public class ReferenceCall : IParseTreeNode, IPriority
     {
 
         #region get/set
+
+        public IndexVariabelnReference Reference
+        {
+            get;
+            set;
+        }
 
         public SyntaxToken Token
         {

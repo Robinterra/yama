@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using LearnCsStuf.Basic;
+using Yama.Parser;
 
 namespace Yama.Index
 {

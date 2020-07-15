@@ -1,4 +1,4 @@
-namespace LearnCsStuf.Basic
+namespace Yama.Compiler
 {
     public interface ICompileAlgo
     {

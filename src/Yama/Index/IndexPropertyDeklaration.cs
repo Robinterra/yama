@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using LearnCsStuf.Basic;
+using Yama.Parser;
 
 namespace Yama.Index
 {
