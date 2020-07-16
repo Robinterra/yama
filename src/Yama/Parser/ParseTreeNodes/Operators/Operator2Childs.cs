@@ -9,7 +9,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexMethodReference Reference
+        public IndexMethodReference MethodReference
         {
             get;
             set;

@@ -26,6 +26,12 @@ namespace Yama.Index
             set;
         }
 
+        public List<IndexError> Errors
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor

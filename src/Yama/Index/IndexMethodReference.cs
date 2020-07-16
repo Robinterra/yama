@@ -2,7 +2,7 @@ using Yama.Parser;
 
 namespace Yama.Index
 {
-    public class IndexMethodReference
+    public class IndexMethodReference : IIndexReference
     {
 
         public IParseTreeNode Use

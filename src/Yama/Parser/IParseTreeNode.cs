@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
@@ -34,6 +35,10 @@ namespace Yama.Parser
         // -----------------------------------------------
 
         IParseTreeNode Parse ( Parser parser, SyntaxToken token );
+
+        // -----------------------------------------------
+
+        bool Indezieren(Index.Index index, IParent parent);
 
         // -----------------------------------------------
 
