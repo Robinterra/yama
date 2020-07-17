@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -86,6 +87,21 @@ namespace Yama.Parser
             node.RightNode.Token.ParentNode = node;
 
             return node;
+        }
+
+        public bool Indezieren(Index.Index index, IParent parent)
+        {
+            if (!(parent is IndexContainer container)) return index.CreateError(this);
+
+            if (!this.LeftNode.Indezieren(index, parent)) return false;
+
+            IndexVariabelnReference reference = container.VariabelnReferences.Last();
+
+            this.RightNode.Indezieren(index, reference);
+
+            container.VariabelnReferences.Add(reference);
+
+            return true;
         }
 
         #endregion methods

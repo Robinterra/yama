@@ -132,6 +132,31 @@ namespace Yama.Parser
             return true;
         }*/
 
+        public bool Indezieren(Index.Index index, IParent parent)
+        {
+            if (parent is IndexVariabelnReference varref) return this.RefComb(varref);
+            if (!(parent is IndexContainer container)) return index.CreateError(this);
+
+            IndexVariabelnReference reference = new IndexVariabelnReference();
+            reference.Use = this;
+            reference.Name = this.Token.Text;
+            container.VariabelnReferences.Add(reference);
+            this.Reference = reference;
+
+            return true;
+        }
+
+        private bool RefComb(IndexVariabelnReference varref)
+        {
+            IndexVariabelnReference reference = new IndexVariabelnReference();
+            reference.Use = this;
+            reference.Name = this.Token.Text;
+            varref.VariabelnReferences.Add(reference);
+            this.Reference = reference;
+
+            return true;
+        }
+
         #endregion methods
 
     }

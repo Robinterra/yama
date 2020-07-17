@@ -9,7 +9,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexMethodReference Reference
+        public IndexVariabelnReference Reference
         {
             get;
             set;
@@ -120,6 +120,20 @@ namespace Yama.Parser
             node.ChildNode.Token.ParentNode = node;
 
             return node;
+        }
+
+        public bool Indezieren(Index.Index index, IParent parent)
+        {
+            if (!(parent is IndexContainer container)) return index.CreateError(this);
+
+            IndexVariabelnReference reference = new IndexVariabelnReference();
+            reference.Use = this;
+            reference.Name = this.Token.Text;
+            this.ChildNode.Indezieren(index, parent);
+            this.Reference = reference;
+            container.VariabelnReferences.Add(reference);
+
+            return true;
         }
 
         #endregion methods

@@ -94,6 +94,19 @@ namespace Yama.Parser
             return newKey;
         }
 
+        public bool Indezieren(Index.Index index, IParent parent)
+        {
+            if (!(parent is IndexContainer container)) return index.CreateError(this);
+
+            this.Parameters.Indezieren(index, parent);
+            IndexVariabelnReference reference = new IndexVariabelnReference();
+            reference.Use = this;
+            reference.Name = this.Definition.Text;
+            container.VariabelnReferences.Add(reference);
+
+            return true;
+        }
+
         #endregion methods
 
     }

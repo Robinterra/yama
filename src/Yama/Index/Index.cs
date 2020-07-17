@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yama.Parser;
 
@@ -40,6 +41,18 @@ namespace Yama.Index
         {
             this.Roots = new List<IParseTreeNode>();
             this.Register = new List<IndexKlassenDeklaration>();
+            this.Errors = new List<IndexError>();
+        }
+
+        public bool CreateError(IParseTreeNode node)
+        {
+            if (node == null) return false;
+
+            IndexError error = new IndexError();
+            error.Use = node;
+            this.Errors.Add(error);
+
+            return false;
         }
 
         #endregion ctor

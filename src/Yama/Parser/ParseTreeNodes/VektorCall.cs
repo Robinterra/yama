@@ -129,6 +129,18 @@ namespace Yama.Parser
             return node;
         }
 
+        public bool Indezieren(Index.Index index, IParent parent)
+        {
+            if (!(parent is IndexContainer container)) return index.CreateError(this);
+
+            foreach (IParseTreeNode node in this.ParametersNodes)
+            {
+                node.Indezieren(index, container);
+            }
+
+            return true;
+        }
+
         #endregion methods
     }
 }

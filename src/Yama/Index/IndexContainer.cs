@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using Yama.Parser;
 
 namespace Yama.Index
 {
-    public class IndexContainer
+    public class IndexContainer : IParent
     {
 
         public List<IndexContainer> Containers
@@ -47,5 +48,15 @@ namespace Yama.Index
 
         public ValidUses ParentUsesSet { get;
         set; }
+        public string Name
+        {
+            get;
+            set;
+        }
+        public IParseTreeNode Use
+        {
+            get;
+            set;
+        }
     }
 }

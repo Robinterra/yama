@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
+using System.Linq;
+using System;
 
 namespace Yama.Parser
 {
@@ -241,6 +243,75 @@ namespace Yama.Parser
             deklaration.Token.Node = deklaration;
 
             return deklaration;
+        }
+
+        public MethodeType GetMethodeType()
+        {
+            MethodeType type = MethodeType.Methode;
+
+            if (this.ZusatzDefinition != null)
+            {
+                if (this.ZusatzDefinition.Kind == SyntaxKind.Static) type = MethodeType.Static;
+                if (this.ZusatzDefinition.Kind == SyntaxKind.Operator)
+                {
+                    type = MethodeType.Operator;
+                    if (this.TypeDefinition.Kind == SyntaxKind.Explicit) type = MethodeType.Explicit;
+                    if (this.TypeDefinition.Kind == SyntaxKind.Implicit) type = MethodeType.Implicit;
+                    if (this.TypeDefinition.Kind == SyntaxKind.This)
+                    {
+                        if (this.Token.Kind == SyntaxKind.New) type = MethodeType.Ctor;
+                        if (this.Token.Text == "~") type = MethodeType.DeCtor;
+                    }
+                }
+            }
+
+            return type;
+        }
+
+        public bool Indezieren(Index.Index index, IParent parent)
+        {
+            if (!(parent is IndexKlassenDeklaration klasse)) return index.CreateError(this);
+
+            IndexMethodDeklaration deklaration = new IndexMethodDeklaration();
+            deklaration.Use = this;
+            deklaration.Name = this.Token.Text;
+            deklaration.ReturnValue = new IndexKlassenReference { Name = this.TypeDefinition.Text, Use = this };
+            this.Deklaration = deklaration;
+
+            AccessModify access = AccessModify.Private;
+            if (this.AccessDefinition != null) if (this.AccessDefinition.Kind == SyntaxKind.Public) access = AccessModify.Public;
+            deklaration.AccessModify = access;
+
+            deklaration.Type = this.GetMethodeType();
+
+            IndexContainer container = new IndexContainer();
+            deklaration.Container = container;
+
+            foreach (VariabelDeklaration par in this.Parameters)
+            {
+                if (!par.Indezieren(index, container)) continue;
+
+                deklaration.Parameters.Add(container.VariabelnDeklarations.Last());
+            }
+
+            this.AddMethode(klasse, deklaration);
+
+            this.Statement.Indezieren(index, container);
+
+            return true;
+        }
+
+        private bool AddMethode(IndexKlassenDeklaration klasse, IndexMethodDeklaration deklaration)
+        {
+            if (deklaration.Type == MethodeType.Ctor) klasse.Ctors.Add(deklaration);
+            if (deklaration.Type == MethodeType.DeCtor) klasse.DeCtors.Add(deklaration);
+            if (deklaration.Type == MethodeType.Operator) klasse.Operators.Add(deklaration);
+            if (deklaration.Type == MethodeType.Methode) klasse.Methods.Add(deklaration);
+            if (deklaration.Type == MethodeType.Static) klasse.Methods.Add(deklaration);
+            if (deklaration.Type == MethodeType.Implicit) klasse.Operators.Add(deklaration);
+            if (deklaration.Type == MethodeType.Explicit) klasse.Operators.Add(deklaration);
+
+            return true;
         }
 
         #endregion methods

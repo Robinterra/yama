@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
@@ -33,6 +34,11 @@ namespace Yama.Parser
             token.Node = result;
 
             return result;
+        }
+
+        public bool Indezieren(Index.Index index, IParent parent)
+        {
+            return index.CreateError(this);
         }
     }
 }

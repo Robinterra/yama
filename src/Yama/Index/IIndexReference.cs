@@ -16,6 +16,5 @@ namespace Yama.Index
             get;
             set;
         }
-
     }
 }

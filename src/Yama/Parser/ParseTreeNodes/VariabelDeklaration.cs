@@ -1,6 +1,7 @@
 using Yama.Index;
 using System.Collections.Generic;
 using Yama.Lexer;
+using System.Linq;
 
 namespace Yama.Parser
 {
@@ -122,17 +123,34 @@ namespace Yama.Parser
 
             if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
 
-            Operator1ChildRight node = new Operator1ChildRight ( this.Prio );
-            node.Token = token;
-            token.Node = node;
+            VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
+            node.Token = lexerRight;
+            lexerRight.Node = node;
 
-            node.ChildNode = parser.ParseCleanToken ( lexerRight );
+            node.TypeDefinition = parser.ParseCleanToken ( token );
 
-            if ( node.ChildNode == null ) return null;
+            if ( node.TypeDefinition == null ) return null;
 
-            node.ChildNode.Token.ParentNode = node;
+            node.TypeDefinition.Token.ParentNode = node;
 
             return node;
+        }
+
+        public bool Indezieren(Index.Index index, IParent parent)
+        {
+            if (!(parent is IndexContainer container)) return index.CreateError(this);
+
+            IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration();
+            reference.Use = this;
+            reference.Name = this.Token.Text;
+            container.VariabelnDeklarations.Add(reference);
+            this.TypeDefinition.Indezieren(index, parent);
+            IndexVariabelnReference type = container.VariabelnReferences.Last();
+            reference.Type = type;
+
+            this.Deklaration = reference;
+
+            return true;
         }
 
         #endregion methods

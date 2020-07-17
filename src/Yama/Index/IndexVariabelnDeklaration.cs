@@ -23,7 +23,7 @@ namespace Yama.Index
             set;
         }
 
-        public IndexKlassenReference Type
+        public IndexVariabelnReference Type
         {
             get;
             set;

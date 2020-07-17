@@ -256,6 +256,21 @@ namespace Yama.Parser
             return deklaration;
         }
 
+        public bool Indezieren(Index.Index index, IParent parent)
+        {
+            IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration();
+            deklaration.Name = this.Token.Text;
+            deklaration.Use = this;
+
+            index.Register.Add(deklaration);
+            foreach (IParseTreeNode node in this.Statement.GetAllChilds)
+            {
+                node.Indezieren(index, deklaration);
+            }
+
+            return true;
+        }
+
         #endregion methods
     }
 }
