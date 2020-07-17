@@ -32,5 +32,11 @@ namespace Yama.Index
         public ValidUses ThisUses => throw new System.NotImplementedException();
 
         public ValidUses ParentUsesSet { get; set; }
+
+        public IndexVariabelnDeklaration (  )
+        {
+            this.References = new List<IndexVariabelnReference>();
+            
+        }
     }
 }

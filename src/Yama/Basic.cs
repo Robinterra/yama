@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Yama.Index;
 using Yama.Lexer;
 using Yama.Parser;
 
@@ -220,8 +221,32 @@ namespace LearnCsStuf.Basic
 
             p.ErrorNode = new ParserError (  );
 
-            p.Parse (  );
+            if (!p.Parse()) return this.PrintingErrors(p);
 
+            IParseTreeNode node = p.ParentContainer;
+
+            Yama.Index.Index index = new Yama.Index.Index();
+            index.Roots = node.GetAllChilds;
+
+            if (!index.CreateIndex()) return this.PrintingIndexErrors(index, p);
+
+            return true;
+        }
+
+        private bool PrintingIndexErrors(Yama.Index.Index index, Parser p)
+        {
+            foreach ( IndexError error in index.Errors )
+            {
+                SyntaxToken token = error.Use.Token;
+
+                p.PrintSyntaxError ( token, "Der Aufruf ist hier nicht erlaubt", "Index error" );
+            }
+
+            return false;
+        }
+
+        private bool PrintingErrors(Parser p)
+        {
             foreach ( IParseTreeNode error in p.ParserErrors )
             {
                 SyntaxToken token = error.Token;
@@ -231,7 +256,7 @@ namespace LearnCsStuf.Basic
                 p.PrintSyntaxError ( token, token.Text );
             }
 
-            return true;
+            return false;
         }
 
         // -----------------------------------------------

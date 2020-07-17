@@ -127,7 +127,9 @@ namespace Yama.Parser
             node.Token = lexerRight;
             lexerRight.Node = node;
 
-            node.TypeDefinition = parser.ParseCleanToken ( token );
+            IParseTreeNode callRule = parser.GetRule<ReferenceCall>();
+
+            node.TypeDefinition = callRule.Parse(parser, token);
 
             if ( node.TypeDefinition == null ) return null;
 

@@ -42,5 +42,10 @@ namespace Yama.Index
             get;
             set;
         }
+
+        public IndexVariabelnReference (  )
+        {
+            this.VariabelnReferences = new List<IndexVariabelnReference>();
+        }
     }
 }

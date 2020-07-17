@@ -287,7 +287,7 @@ namespace Yama.Parser
             IndexContainer container = new IndexContainer();
             deklaration.Container = container;
 
-            foreach (VariabelDeklaration par in this.Parameters)
+            foreach (IParseTreeNode par in this.Parameters)
             {
                 if (!par.Indezieren(index, container)) continue;
 

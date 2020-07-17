@@ -68,6 +68,11 @@ namespace Yama.Index
         public ValidUses ParentUsesSet { get;
         set; }
 
+        public IndexPropertyDeklaration (  )
+        {
+            this.References = new List<IndexPropertyReference>();
+        }
+
         #endregion get/set
     }
 }

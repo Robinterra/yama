@@ -95,7 +95,12 @@ namespace Yama.Index
 
         public IndexKlassenDeklaration (  )
         {
-            
+            this.References = new List<IndexKlassenReference>();
+            this.Ctors = new List<IndexMethodDeklaration>();
+            this.DeCtors = new List<IndexMethodDeklaration>();
+            this.Methods = new List<IndexMethodDeklaration>();
+            this.Operators = new List<IndexMethodDeklaration>();
+            this.IndexProperties = new List<IndexPropertyDeklaration>();
         }
 
         #endregion ctor

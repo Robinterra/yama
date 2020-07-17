@@ -188,7 +188,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public bool PrintSyntaxError(SyntaxToken token, string msg)
+        public bool PrintSyntaxError(SyntaxToken token, string msg, string nexterrormsg = "Syntax error")
         {
             //if (token.Kind != SyntaxKind.Unknown) return false;
 
@@ -197,7 +197,7 @@ namespace Yama.Parser
             ConsoleColor colr = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
 
-            Console.Error.WriteLine ( "{4}({0},{1}): Syntax error - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, this.Fileinfo.FullName );
+            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, this.Fileinfo.FullName, nexterrormsg );
 
             Console.ForegroundColor = colr;
 
@@ -543,9 +543,9 @@ namespace Yama.Parser
                 node.Token.ParentNode = this.ParentContainer;
             }
 
-            this.PrintPretty ( this.ParentContainer );
+            //this.PrintPretty ( this.ParentContainer );
 
-            return true;
+            return this.ParserErrors.Count == 0;
         }
 
         // -----------------------------------------------

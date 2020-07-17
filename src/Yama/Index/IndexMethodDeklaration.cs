@@ -73,6 +73,12 @@ namespace Yama.Index
         public ValidUses ParentUsesSet { get;
         set; }
 
+        public IndexMethodDeklaration (  )
+        {
+            this.References = new List<IndexMethodReference>();
+            this.Parameters = new List<IndexVariabelnDeklaration>();
+        }
+
     }
 
     public enum MethodeType

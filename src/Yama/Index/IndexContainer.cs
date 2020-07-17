@@ -58,5 +58,13 @@ namespace Yama.Index
             get;
             set;
         }
+
+        public IndexContainer()
+        {
+            this.VariabelnReferences = new List<IndexVariabelnReference>();
+            this.VariabelnDeklarations = new List<IndexVariabelnDeklaration>();
+            this.MethodReferences = new List<IndexMethodReference>();
+            this.Containers = new List<IndexContainer>();
+        }
     }
 }

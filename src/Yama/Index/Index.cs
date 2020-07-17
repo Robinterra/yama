@@ -44,6 +44,16 @@ namespace Yama.Index
             this.Errors = new List<IndexError>();
         }
 
+        public bool CreateIndex()
+        {
+            foreach (IParseTreeNode node in this.Roots)
+            {
+                node.Indezieren(this, null);
+            }
+
+            return this.Errors.Count == 0;
+        }
+
         public bool CreateError(IParseTreeNode node)
         {
             if (node == null) return false;

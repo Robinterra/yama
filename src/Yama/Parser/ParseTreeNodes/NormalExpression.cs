@@ -75,7 +75,7 @@ namespace Yama.Parser
 
         public bool Indezieren(Index.Index index, IParent parent)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            //if (!(parent is IndexContainer container)) return index.CreateError(this);
 
             if (this.ExpressionParent == null) return true;
 
