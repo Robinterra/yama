@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Yama.Parser;
@@ -65,6 +66,28 @@ namespace Yama.Index
             this.VariabelnDeklarations = new List<IndexVariabelnDeklaration>();
             this.MethodReferences = new List<IndexMethodReference>();
             this.Containers = new List<IndexContainer>();
+        }
+
+        public bool Mappen(ValidUses thisUses)
+        {
+            this.ParentUsesSet = thisUses;
+
+            foreach (IndexVariabelnDeklaration deklaration in this.VariabelnDeklarations)
+            {
+                deklaration.Mappen(this.ThisUses);
+            }
+
+            foreach (IndexVariabelnReference reference in this.VariabelnReferences)
+            {
+                reference.Mappen(this.ThisUses);
+            }
+
+            foreach (IndexContainer container in this.Containers)
+            {
+                container.Mappen(this.ThisUses);
+            }
+
+            return true;
         }
     }
 }

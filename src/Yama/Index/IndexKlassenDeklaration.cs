@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Yama.Parser;
@@ -21,7 +22,7 @@ namespace Yama.Index
             set;
         }
 
-        public List<IndexKlassenReference> References
+        public List<IndexVariabelnReference> References
         {
             get;
             set;
@@ -57,6 +58,12 @@ namespace Yama.Index
             set;
         }
 
+        public List<IndexMethodDeklaration> StaticMethods
+        {
+            get;
+            set;
+        }
+
         private ValidUses thisUses;
 
         public ValidUses ThisUses
@@ -72,6 +79,8 @@ namespace Yama.Index
                 dekThisVar.Type = new IndexVariabelnReference { Deklaration = this, Name = this.Name, Use = this.Use };
                 dekThisVar.Use = this.Use;
                 dekThisVar.ParentUsesSet = new ValidUses() { Deklarationen = new List<IParent> { this } };
+
+                this.References.Add(dekThisVar.Type);
 
                 /*List<IParent> parents = new List<IParent>();
                 parents.AddRange(this.Methods.OfType<IParent>());
@@ -95,12 +104,48 @@ namespace Yama.Index
 
         public IndexKlassenDeklaration (  )
         {
-            this.References = new List<IndexKlassenReference>();
+            this.References = new List<IndexVariabelnReference>();
             this.Ctors = new List<IndexMethodDeklaration>();
             this.DeCtors = new List<IndexMethodDeklaration>();
             this.Methods = new List<IndexMethodDeklaration>();
             this.Operators = new List<IndexMethodDeklaration>();
             this.IndexProperties = new List<IndexPropertyDeklaration>();
+            this.StaticMethods = new List<IndexMethodDeklaration>();
+        }
+
+        public bool Mappen(ValidUses rootValidUses)
+        {
+            this.ParentUsesSet = rootValidUses;
+
+            this.MethodeMappen(this.Methods, this.ThisUses);
+            this.MethodeMappen(this.StaticMethods, this.ParentUsesSet);
+            this.MethodeMappen(this.Operators, this.ParentUsesSet);
+            this.MethodeMappen(this.Ctors, this.ThisUses);
+            this.MethodeMappen(this.DeCtors, this.ThisUses);
+
+            this.PropertyMappen(this.IndexProperties, this.ThisUses);
+
+            return true;
+        }
+
+        private bool PropertyMappen(List<IndexPropertyDeklaration> indexProperties, ValidUses thisUses)
+        {
+            foreach (IndexPropertyDeklaration deklaration in indexProperties)
+            {
+                deklaration.Mappen(thisUses);
+            }
+
+            return true;
+        }
+
+        private bool MethodeMappen(List<IndexMethodDeklaration> methods, ValidUses uses)
+        {
+            foreach (IndexMethodDeklaration deklaration in methods)
+            {
+                deklaration.Mappen(uses);
+            }
+
+            return true;
         }
 
         #endregion ctor

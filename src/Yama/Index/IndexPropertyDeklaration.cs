@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yama.Parser;
 
@@ -44,7 +45,13 @@ namespace Yama.Index
         }
         public IParseTreeNode Use { get; set; }
 
-        private IndexVariabelnDeklaration Value
+        private IndexVariabelnReference Value
+        {
+            get;
+            set;
+        }
+
+        private IndexVariabelnDeklaration InValue
         {
             get;
             set;
@@ -60,6 +67,7 @@ namespace Yama.Index
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
                 this.thisUses.Deklarationen = new List<IParent> { this, this.Value };
+                this.thisUses.Deklarationen = new List<IParent> { this, this.InValue };
 
                 return this.thisUses;
             }
@@ -71,6 +79,19 @@ namespace Yama.Index
         public IndexPropertyDeklaration (  )
         {
             this.References = new List<IndexPropertyReference>();
+        }
+
+        public bool Mappen(ValidUses uses)
+        {
+            this.ParentUsesSet = uses;
+
+            this.InValue.Mappen(uses);
+            this.Value.Mappen(uses);
+
+            this.SetContainer.Mappen(this.ThisUses);
+            this.GetContainer.Mappen(this.ThisUses);
+
+            return true;
         }
 
         #endregion get/set

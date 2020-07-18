@@ -44,14 +44,40 @@ namespace Yama.Index
             this.Errors = new List<IndexError>();
         }
 
-        public bool CreateIndex()
+        private bool Indezieren()
         {
             foreach (IParseTreeNode node in this.Roots)
             {
                 node.Indezieren(this, null);
             }
 
-            return this.Errors.Count == 0;
+            if (this.Errors.Count != 0) return false;
+
+            this.RootValidUses = new ValidUses();
+
+            foreach (IndexKlassenDeklaration klasse in this.Register)
+            {
+                this.RootValidUses.Deklarationen.Add(klasse);
+            }
+
+            return true;
+        }
+
+        public bool CreateIndex()
+        {
+            if (!this.Indezieren()) return false;
+
+            return this.Mappen();
+        }
+
+        private bool Mappen()
+        {
+            foreach (IndexKlassenDeklaration klasse in this.Register)
+            {
+                klasse.Mappen(this.RootValidUses);
+            }
+
+            return true;
         }
 
         public bool CreateError(IParseTreeNode node)

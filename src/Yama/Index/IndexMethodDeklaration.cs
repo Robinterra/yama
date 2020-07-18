@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Yama.Parser;
@@ -37,7 +38,7 @@ namespace Yama.Index
             set;
         }
 
-        public IndexKlassenReference ReturnValue
+        public IndexVariabelnReference ReturnValue
         {
             get;
             set;
@@ -79,6 +80,20 @@ namespace Yama.Index
             this.Parameters = new List<IndexVariabelnDeklaration>();
         }
 
+        public bool Mappen(ValidUses uses)
+        {
+            this.ParentUsesSet = uses;
+            foreach (IndexVariabelnDeklaration dek in this.Parameters)
+            {
+                dek.Mappen(uses);
+            }
+
+            this.ReturnValue.Mappen(uses);
+
+            this.Container.Mappen(this.ThisUses);
+
+            return true;
+        }
     }
 
     public enum MethodeType

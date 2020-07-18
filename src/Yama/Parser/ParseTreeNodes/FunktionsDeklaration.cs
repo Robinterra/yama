@@ -307,7 +307,7 @@ namespace Yama.Parser
             if (deklaration.Type == MethodeType.DeCtor) klasse.DeCtors.Add(deklaration);
             if (deklaration.Type == MethodeType.Operator) klasse.Operators.Add(deklaration);
             if (deklaration.Type == MethodeType.Methode) klasse.Methods.Add(deklaration);
-            if (deklaration.Type == MethodeType.Static) klasse.Methods.Add(deklaration);
+            if (deklaration.Type == MethodeType.Static) klasse.StaticMethods.Add(deklaration);
             if (deklaration.Type == MethodeType.Implicit) klasse.Operators.Add(deklaration);
             if (deklaration.Type == MethodeType.Explicit) klasse.Operators.Add(deklaration);
 
