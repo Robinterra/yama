@@ -239,7 +239,7 @@ namespace LearnCsStuf.Basic
             {
                 SyntaxToken token = error.Use.Token;
 
-                p.PrintSyntaxError ( token, "Der Aufruf ist hier nicht erlaubt", "Index error" );
+                p.PrintSyntaxError ( token, error.Msg, "Index error" );
             }
 
             return false;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -27,6 +28,5 @@ namespace Yama.Index
             get;
             set;
         }
-
     }
 }

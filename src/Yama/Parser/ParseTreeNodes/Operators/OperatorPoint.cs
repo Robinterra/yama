@@ -99,7 +99,7 @@ namespace Yama.Parser
 
             this.RightNode.Indezieren(index, reference);
 
-            container.VariabelnReferences.Add(reference);
+            //container.VariabelnReferences.Add(reference);
 
             return true;
         }

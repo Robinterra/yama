@@ -14,7 +14,7 @@ namespace Yama.Index
             set;
         }
 
-        public List<IndexMethodReference> References
+        public List<IndexVariabelnReference> References
         {
             get;
             set;
@@ -76,7 +76,7 @@ namespace Yama.Index
 
         public IndexMethodDeklaration (  )
         {
-            this.References = new List<IndexMethodReference>();
+            this.References = new List<IndexVariabelnReference>();
             this.Parameters = new List<IndexVariabelnDeklaration>();
         }
 

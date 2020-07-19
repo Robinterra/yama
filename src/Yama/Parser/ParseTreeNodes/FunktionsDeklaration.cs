@@ -275,7 +275,7 @@ namespace Yama.Parser
             IndexMethodDeklaration deklaration = new IndexMethodDeklaration();
             deklaration.Use = this;
             deklaration.Name = this.Token.Text;
-            deklaration.ReturnValue = new IndexKlassenReference { Name = this.TypeDefinition.Text, Use = this };
+            deklaration.ReturnValue = new IndexVariabelnReference { Name = this.TypeDefinition.Text, Use = this };
             this.Deklaration = deklaration;
 
             AccessModify access = AccessModify.Private;

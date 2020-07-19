@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yama.Parser;
 
@@ -37,6 +38,15 @@ namespace Yama.Index
         {
             this.References = new List<IndexVariabelnReference>();
             
+        }
+
+        public bool Mappen(ValidUses uses)
+        {
+            this.ParentUsesSet = uses;
+
+            this.Type.Mappen(uses);
+
+            return true;
         }
     }
 }

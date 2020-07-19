@@ -140,6 +140,8 @@ namespace Yama.Parser
                 node.Indezieren(index, container);
             }
 
+            this.LeftNode.Indezieren(index, parent);
+
             return true;
         }
 

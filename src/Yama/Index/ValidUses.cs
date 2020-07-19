@@ -88,7 +88,7 @@ namespace Yama.Index
                 List<IParent> result = new List<IParent>();
 
                 result.AddRange(this.deklarationen);
-                if (this.Parent != null) result.AddRange(this.Parent.deklarationen);
+                if (this.Parent != null) result.AddRange(this.Parent.Deklarationen);
 
                 return result;
             }
@@ -99,14 +99,31 @@ namespace Yama.Index
         }
 
         public ValidUses Parent { get; }
+        private Index index;
+        public Index GetIndex
+        {
+            get
+            {
+                if (this.index != null) return this.index;
+
+                if (this.Parent == null) return null;
+
+                return this.Parent.GetIndex;
+            }
+        }
 
         public ValidUses()
         {
+            this.deklarationen = new List<IParent>();
+        }
+
+        public ValidUses(Index index) : this()
+        {
+            this.index = index;
             /*this.klassen = new List<IndexKlassenDeklaration>();
             this.variabeln = new List<IndexVariabelnDeklaration>();
             this.properties = new List<IndexPropertyDeklaration>();
             this.methods = new List<IndexMethodDeklaration>();*/
-            this.deklarationen = new List<IParent>();
         }
 
         public ValidUses(ValidUses parent) : this()
@@ -114,6 +131,11 @@ namespace Yama.Index
             this.Parent = parent;
         }
 
+        public bool Add(IParent parent)
+        {
+            this.deklarationen.Add(parent);
 
+            return true;
+        }
     }
 }

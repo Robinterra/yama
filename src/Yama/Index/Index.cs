@@ -53,11 +53,11 @@ namespace Yama.Index
 
             if (this.Errors.Count != 0) return false;
 
-            this.RootValidUses = new ValidUses();
+            this.RootValidUses = new ValidUses(this);
 
             foreach (IndexKlassenDeklaration klasse in this.Register)
             {
-                this.RootValidUses.Deklarationen.Add(klasse);
+                this.RootValidUses.Add(klasse);
             }
 
             return true;
@@ -77,15 +77,16 @@ namespace Yama.Index
                 klasse.Mappen(this.RootValidUses);
             }
 
-            return true;
+            return this.Errors.Count == 0;
         }
 
-        public bool CreateError(IParseTreeNode node)
+        public bool CreateError(IParseTreeNode node, string msg = "Der Aufruf ist hier nicht erlaubt")
         {
             if (node == null) return false;
 
             IndexError error = new IndexError();
             error.Use = node;
+            error.Msg = msg;
             this.Errors.Add(error);
 
             return false;

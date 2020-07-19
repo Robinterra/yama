@@ -14,13 +14,19 @@ namespace Yama.Index
             set;
         }
 
-        public List<IndexPropertyReference> References
+        public List<IndexVariabelnReference> References
         {
             get;
             set;
         }
 
         public string Name
+        {
+            get;
+            set;
+        }
+
+        public MethodeType Type
         {
             get;
             set;
@@ -78,7 +84,7 @@ namespace Yama.Index
 
         public IndexPropertyDeklaration (  )
         {
-            this.References = new List<IndexPropertyReference>();
+            this.References = new List<IndexVariabelnReference>();
         }
 
         public bool Mappen(ValidUses uses)

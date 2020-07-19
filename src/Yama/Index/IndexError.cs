@@ -10,6 +10,6 @@ namespace Yama.Index
             get;
             set;
         }
-
+        public string Msg { get; internal set; }
     }
 }

@@ -78,7 +78,7 @@ namespace Yama.Index
                 dekThisVar.Name = "this";
                 dekThisVar.Type = new IndexVariabelnReference { Deklaration = this, Name = this.Name, Use = this.Use };
                 dekThisVar.Use = this.Use;
-                dekThisVar.ParentUsesSet = new ValidUses() { Deklarationen = new List<IParent> { this } };
+                dekThisVar.ParentUsesSet = this.thisUses;
 
                 this.References.Add(dekThisVar.Type);
 
