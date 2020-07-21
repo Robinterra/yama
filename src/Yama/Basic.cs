@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Yama.Index;
 using Yama.Lexer;
 using Yama.Parser;
@@ -73,49 +74,91 @@ namespace LearnCsStuf.Basic
         
         // -----------------------------------------------
 
-        private List<IParseTreeNode> GetParserRules (  )
+        private ParserLayer KlassenLayer(ParserLayer inclassLayer)
         {
-            List<IParseTreeNode> parserRules = new List<IParseTreeNode>();
+            ParserLayer layer = new ParserLayer("class");
 
-            parserRules.Add ( new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ) );
-            parserRules.Add ( new IfKey (  ) );
-            parserRules.Add ( new ElseKey (  ) );
-            parserRules.Add ( new WhileKey (  ) );
-            parserRules.Add ( new ForKey (  ) );
-            parserRules.Add ( new NewKey (  ) );
-            parserRules.Add ( new FunktionsDeklaration (  ) );
-            parserRules.Add ( new KlassenDeklaration (  ) );
-            parserRules.Add ( new BedingtesCompilierenParser (  ) );
-            parserRules.Add ( new ExplicitConverting ( 12 ) );
-            parserRules.Add ( new FunktionsCall ( SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer, 12 ) );
-            parserRules.Add ( new ContainerExpression ( 11 ) );
-            parserRules.Add ( new NormalExpression (  ) );
-            parserRules.Add ( new EnumartionExpression (  ) );
-            parserRules.Add ( new ReturnKey (  ) );
-            parserRules.Add ( new TrueFalseKey ( 1 ) );
-            parserRules.Add ( new VariabelDeklaration ( 11 ) );
-            parserRules.Add ( new ReferenceCall ( 1 ) );
-            parserRules.Add ( new VektorCall ( SyntaxKind.EckigeKlammerAuf, SyntaxKind.EckigeKlammerZu, 1 ) );
-            parserRules.Add ( new GenericCall ( SyntaxKind.KleinerAls, SyntaxKind.GroesserAls, 1 ) );
-            parserRules.Add ( new Number ( 1 ) );
-            parserRules.Add ( new TextParser ( 1 ) );
-            parserRules.Add ( new OperatorPoint ( 11 ) );
-            parserRules.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
-            parserRules.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 11, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "|" }, 2 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "^" }, 3 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "&" }, 4 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 5 ) );
-            parserRules.Add ( new Operator2Childs ( SyntaxKind.KleinerAls, 6 ) );
-            parserRules.Add ( new Operator2Childs ( SyntaxKind.GroesserAls, 6 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=" }, 6 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 7 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 10 ) );
-            parserRules.Add ( new Operator2Childs ( new List<string> { "=", "+=", "-=" }, 1 ) );
-            parserRules.Add ( new Operator3Childs ( new List<string> { "?" }, SyntaxKind.DoublePoint, 2 ) );
-            parserRules.Add ( new Operator3Childs ( new List<string> { "∑" }, SyntaxKind.DoublePoint, 2 ) );
+            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new KlassenDeklaration ( inclassLayer ));
+            layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer InKlassenLayer(ParserLayer execlayer)
+        {
+            ParserLayer layer = new ParserLayer("inclass");
+
+            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new FunktionsDeklaration ( execlayer ));
+            layer.ParserMembers.Add ( new EnumartionExpression (  ) );
+            layer.ParserMembers.Add ( new VariabelDeklaration ( 11 ) );
+            layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer ExecutionLayer()
+        {
+            ParserLayer layer = new ParserLayer("execute");
+
+            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
+            layer.ParserMembers.Add ( new IfKey (  ) );
+            layer.ParserMembers.Add ( new ElseKey (  ) );
+            layer.ParserMembers.Add ( new WhileKey (  ) );
+            layer.ParserMembers.Add ( new ForKey (  ) );
+            layer.ParserMembers.Add ( new NewKey (  ) );
+            layer.ParserMembers.Add ( new ExplicitConverting ( 10 ) );
+            layer.ParserMembers.Add ( new FunktionsCall ( SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer, 12 ) );
+            layer.ParserMembers.Add ( new ContainerExpression ( 11 ) );
+            layer.ParserMembers.Add ( new NormalExpression (  ) );
+            layer.ParserMembers.Add ( new EnumartionExpression (  ) );
+            layer.ParserMembers.Add ( new ReturnKey (  ) );
+            layer.ParserMembers.Add ( new TrueFalseKey ( 1 ) );
+            layer.ParserMembers.Add ( new VariabelDeklaration ( 11 ) );
+            layer.ParserMembers.Add ( new ReferenceCall ( 1 ) );
+            layer.ParserMembers.Add ( new VektorCall ( SyntaxKind.EckigeKlammerAuf, SyntaxKind.EckigeKlammerZu, 1 ) );
+            layer.ParserMembers.Add ( new GenericCall ( SyntaxKind.KleinerAls, SyntaxKind.GroesserAls, 1 ) );
+            layer.ParserMembers.Add ( new Number ( 1 ) );
+            layer.ParserMembers.Add ( new TextParser ( 1 ) );
+            layer.ParserMembers.Add ( new OperatorPoint ( 11 ) );
+            layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
+            layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 11, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 2 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 3 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 4 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 5 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( SyntaxKind.KleinerAls, 6 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( SyntaxKind.GroesserAls, 6 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=" }, 6 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 7 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 10 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=", "+=", "-=" }, 1 ) );
+            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, SyntaxKind.DoublePoint, 2 ) );
+            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, SyntaxKind.DoublePoint, 2 ) );
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private List<ParserLayer> GetParserRules (  )
+        {
+            List<ParserLayer> parserRules = new List<ParserLayer>();
+
+            ParserLayer executionlayer = this.ExecutionLayer();
+            ParserLayer inclassLayer = this.InKlassenLayer(executionlayer);
+            ParserLayer classLayer = this.KlassenLayer(inclassLayer);
+            parserRules.Add(classLayer);
+            parserRules.Add(inclassLayer);
+            parserRules.Add(executionlayer);
 
             return parserRules;
         }
@@ -218,10 +261,11 @@ namespace LearnCsStuf.Basic
             System.IO.FileInfo file = new System.IO.FileInfo ( this.File );
 
             Parser p = new Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
+            ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "class");
 
             p.ErrorNode = new ParserError (  );
 
-            if (!p.Parse()) return this.PrintingErrors(p);
+            if (!p.Parse(startlayer)) return this.PrintingErrors(p);
 
             IParseTreeNode node = p.ParentContainer;
 

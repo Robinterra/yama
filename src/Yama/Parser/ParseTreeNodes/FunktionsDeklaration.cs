@@ -8,6 +8,7 @@ namespace Yama.Parser
 {
     public class FunktionsDeklaration : IParseTreeNode//, IPriority
     {
+        private ParserLayer layer;
 
         #region get/set
 
@@ -89,6 +90,11 @@ namespace Yama.Parser
         public FunktionsDeklaration()
         {
 
+        }
+
+        public FunktionsDeklaration(ParserLayer layer)
+        {
+            this.layer = layer;
         }
 
         public FunktionsDeklaration ( int prio )
@@ -217,7 +223,7 @@ namespace Yama.Parser
 
             SyntaxToken Statementchild = parser.Peek ( t.Ende, 1);
 
-            deklaration.Statement = parser.ParseCleanToken(Statementchild);
+            deklaration.Statement = parser.ParseCleanToken(Statementchild, this.layer);
 
             if (deklaration.Statement == null) return null;
 

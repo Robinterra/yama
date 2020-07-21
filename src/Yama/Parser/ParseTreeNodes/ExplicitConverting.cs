@@ -63,6 +63,7 @@ namespace Yama.Parser
             get;
             set;
         }
+        public IndexVariabelnDeklaration Deklaration { get; private set; }
 
         #endregion get/set
 
@@ -120,7 +121,14 @@ namespace Yama.Parser
         {
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
-            
+            IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration();
+            reference.Use = this;
+            reference.Name = this.ReferenceDeklaration.Text;
+            container.VariabelnDeklarations.Add(reference);
+            IndexVariabelnReference type = new IndexVariabelnReference { Name = this.RightToken.Text, Use = this };
+            reference.Type = type;
+
+            this.Deklaration = reference;
 
             return true;
         }

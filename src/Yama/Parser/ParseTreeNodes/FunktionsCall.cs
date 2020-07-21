@@ -92,12 +92,6 @@ namespace Yama.Parser
         {
             if ( token.Kind != this.BeginZeichen ) return null;
 
-            FunktionsCall node = new FunktionsCall ( this.Prio );
-
-            SyntaxToken steuerToken = parser.FindEndToken ( token, this.EndeZeichen, this.BeginZeichen );
-
-            if ( steuerToken == null ) return null;
-
             SyntaxToken left = parser.Peek ( token, -1 );
 
             if ( left.Kind == SyntaxKind.Operator ) return null;
@@ -107,6 +101,12 @@ namespace Yama.Parser
             if ( left.Kind == SyntaxKind.EckigeKlammerAuf ) return null;
             if ( left.Kind == SyntaxKind.EndOfCommand ) return null;
             if ( left.Kind == SyntaxKind.Comma ) return null;
+
+            SyntaxToken steuerToken = parser.FindEndToken ( token, this.EndeZeichen, this.BeginZeichen );
+
+            if ( steuerToken == null ) return null;
+
+            FunktionsCall node = new FunktionsCall ( this.Prio );
 
             node.LeftNode = parser.ParseCleanToken ( left );
 

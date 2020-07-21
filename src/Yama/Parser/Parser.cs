@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using Yama.Lexer;
+using System.Linq;
 
 namespace Yama.Parser
 {
@@ -105,10 +106,45 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public List<IParseTreeNode> ParserMembers
+        public List<ParserLayer> ParserLayers
         {
             get;
-        } = new List<IParseTreeNode> ();
+        } = new List<ParserLayer>();
+
+        // -----------------------------------------------
+
+        public Stack<ParserLayer> ParserStack
+        {
+            get;
+            set;
+        } = new Stack<ParserLayer>();
+
+        // -----------------------------------------------
+
+        public ParserLayer CurrentLayer
+        {
+            get
+            {
+                try
+                {
+                    return this.ParserStack.Peek();
+                }
+                catch
+                {
+                    return this.ParserLayers.FirstOrDefault();
+                }
+            }
+        }
+
+        // -----------------------------------------------
+
+        public List<IParseTreeNode> CurrentParserMembers
+        {
+            get
+            {
+                return this.CurrentLayer.ParserMembers;
+            }
+        }
 
         // -----------------------------------------------
 
@@ -135,17 +171,17 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private Parser ( List<IParseTreeNode> parserMembers, Lexer.Lexer lexer )
+        private Parser ( List<ParserLayer> layers, Lexer.Lexer lexer )
         {
             this.SyntaxErrors = new List<SyntaxToken> (  );
-            this.ParserMembers = parserMembers;
+            this.ParserLayers = layers;
             this.Tokenizer = lexer;
         }
 
         // -----------------------------------------------
 
-        public Parser ( FileInfo file, List<IParseTreeNode> parserMembers, Lexer.Lexer lexer )
-            : this ( parserMembers, lexer )
+        public Parser ( FileInfo file, List<ParserLayer> layers, Lexer.Lexer lexer )
+            : this ( layers, lexer )
         {
             this.Fileinfo = file;
         }
@@ -178,9 +214,12 @@ namespace Yama.Parser
 
         public IParseTreeNode GetRule<T>() where T : IParseTreeNode
         {
-            foreach ( IParseTreeNode rule in this.ParserMembers )
+            foreach (ParserLayer layer in this.ParserLayers)
             {
-                if ( rule is T ) return rule;
+                foreach ( IParseTreeNode rule in layer.ParserMembers )
+                {
+                    if ( rule is T ) return rule;
+                }
             }
 
             return null;
@@ -399,29 +438,38 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public IParseTreeNode ParseCleanToken ( SyntaxToken token )
+        public IParseTreeNode ParseCleanToken ( SyntaxToken token, ParserLayer neuerLayer )
         {
             if ( token == null ) return this.SyntaxErrorToken ( null );
             if ( token.Node != null ) return this.GetNodeFromToken ( token );
 
+            this.ActivateLayer(neuerLayer);
+
             IParseTreeNode result = this.ParseEndExpression ( token );
 
-            if ( result != null ) return result;
+            if ( result != null ) { this.VorherigesLayer(); return result; }
 
             result = this.ParsePrioSystem ( token, this.GetGrosstePrio (  ), true );
 
-            if ( result != null ) return result;
+            if ( result != null ) { this.VorherigesLayer(); return result; }
 
             result = this.ParseSteuerTokens ( token );
+
+            this.VorherigesLayer();
 
             if ( result != null ) return result;
 
             return this.SyntaxErrorToken ( token );
         }
 
+        public IParseTreeNode ParseCleanToken ( SyntaxToken token )
+        {
+            return this.ParseCleanToken(token, this.CurrentLayer);
+        }
+
         private IParseTreeNode ParseEndExpression(SyntaxToken token)
         {
-            foreach ( IParseTreeNode node in this.ParserMembers )
+            foreach ( IParseTreeNode node in this.CurrentParserMembers )
             {
                 if (!(node is IEndExpression)) continue;
 
@@ -454,7 +502,7 @@ namespace Yama.Parser
 
         private IParseTreeNode ParseSteuerTokens ( SyntaxToken token )
         {
-            foreach ( IParseTreeNode member in this.ParserMembers )
+            foreach ( IParseTreeNode member in this.CurrentParserMembers )
             {
                 if ( member is IPriority ) continue;
 
@@ -473,7 +521,7 @@ namespace Yama.Parser
         {
             if ( this.grosstePrio != -1 ) return this.grosstePrio;
 
-            foreach ( IParseTreeNode member in this.ParserMembers )
+            foreach ( IParseTreeNode member in this.CurrentParserMembers )
             {
                 if ( !(member is IPriority t) ) continue;
                 if ( t.Prio < this.grosstePrio ) continue;
@@ -490,7 +538,7 @@ namespace Yama.Parser
         {
             if ( prio < 0 ) return null;
 
-            foreach ( IParseTreeNode member in this.ParserMembers )
+            foreach ( IParseTreeNode member in this.CurrentParserMembers )
             {
                 if ( !(member is IPriority t) ) continue;
                 if ( t.Prio != prio ) continue;
@@ -522,9 +570,12 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public bool Parse (  )
+        public bool Parse ( ParserLayer start )
         {
+            if (start == null) return false;
             if (!this.Fileinfo.Exists) return false;
+
+            this.ActivateLayer(start);
 
             this.InputStream = File.OpenRead ( this.Fileinfo.FullName );
 
@@ -543,9 +594,27 @@ namespace Yama.Parser
                 node.Token.ParentNode = this.ParentContainer;
             }
 
-            //this.PrintPretty ( this.ParentContainer );
+            this.PrintPretty ( this.ParentContainer );
 
             return this.ParserErrors.Count == 0;
+        }
+
+        // -----------------------------------------------
+
+        private bool VorherigesLayer()
+        {
+            this.ParserStack.Pop();
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public bool ActivateLayer(ParserLayer start)
+        {
+            this.ParserStack.Push(start);
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -569,6 +638,26 @@ namespace Yama.Parser
                 if ( !(nodeCon is IContainer c) ) return null;
 
                 i = c.Ende.Position - begin.Position;
+            }
+
+            return kind;
+        }
+
+        public SyntaxToken FindEndTokenWithoutParse ( SyntaxToken begin, SyntaxKind endKind, SyntaxKind escapeKind )
+        {
+            SyntaxToken kind = begin;
+
+            int counter = 0;
+
+            for ( int i = 1; kind.Kind != endKind || counter > 0; i++ )
+            {
+                if ( kind.Kind == endKind ) counter--;
+
+                kind = this.Peek ( begin, i );
+
+                if ( kind == null ) return null;
+
+                if ( kind.Kind == escapeKind ) counter++;
             }
 
             return kind;

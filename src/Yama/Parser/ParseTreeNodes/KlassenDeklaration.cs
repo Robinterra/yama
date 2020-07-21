@@ -78,6 +78,7 @@ namespace Yama.Parser
         {
             get;
         }
+        public ParserLayer NextLayer { get; }
 
         #endregion get/set
 
@@ -86,6 +87,11 @@ namespace Yama.Parser
         public KlassenDeklaration()
         {
 
+        }
+
+        public KlassenDeklaration(ParserLayer nextLayer)
+        {
+            this.NextLayer = nextLayer;
         }
 
         public KlassenDeklaration ( int prio )
@@ -228,7 +234,7 @@ namespace Yama.Parser
 
             token = this.MakeVererbung ( parser, token, deklaration );
 
-            deklaration.Statement = parser.ParseCleanToken(token);
+            deklaration.Statement = parser.ParseCleanToken(token, this.NextLayer);
 
             if (deklaration.Statement == null) return null;
 

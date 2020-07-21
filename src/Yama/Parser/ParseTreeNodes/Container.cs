@@ -70,7 +70,7 @@ namespace Yama.Parser
         {
             if ( token.Kind != this.BeginKind ) return null;
 
-            SyntaxToken kind = parser.FindEndToken ( token, this.EndeKind, this.BeginKind );
+            SyntaxToken kind = parser.FindEndTokenWithoutParse ( token, this.EndeKind, this.BeginKind );
 
             if ( kind == null ) return null;
 
