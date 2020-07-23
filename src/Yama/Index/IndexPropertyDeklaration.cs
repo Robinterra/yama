@@ -26,7 +26,13 @@ namespace Yama.Index
             set;
         }
 
-        public MethodeType Type
+        public MethodeType Zusatz
+        {
+            get;
+            set;
+        }
+
+        public IndexVariabelnReference Type
         {
             get;
             set;

@@ -104,6 +104,8 @@ namespace Yama.Index
         Methode,
         Static,
         Explicit,
-        Implicit
+        Implicit,
+        Property,
+        PropertyStatic
     }
 }

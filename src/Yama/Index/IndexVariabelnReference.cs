@@ -100,7 +100,7 @@ namespace Yama.Index
             if (md != null) { md.References.Add(this); return md; }
             IndexPropertyDeklaration pd = kd.IndexProperties.FirstOrDefault(t=>t.Name == this.Name);
             if (pd == null) return null;
-            if (pd.Type != MethodeType.Static) { pd.References.Add(this); return pd; }
+            if (pd.Zusatz != MethodeType.Static) { pd.References.Add(this); return pd; }
 
             return null;
         }
@@ -112,7 +112,7 @@ namespace Yama.Index
             IndexPropertyDeklaration pd = kd.IndexProperties.FirstOrDefault(t=>t.Name == this.Name);
             if (pd == null) return null;
 
-            if (pd.Type == MethodeType.Static) { pd.References.Add(this); return pd; }
+            if (pd.Zusatz == MethodeType.Static) { pd.References.Add(this); return pd; }
 
             return null;
         }

@@ -93,6 +93,7 @@ namespace LearnCsStuf.Basic
 
             layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
             layer.ParserMembers.Add(new FunktionsDeklaration ( execlayer ));
+            layer.ParserMembers.Add(new PropertyDeklaration ( execlayer ));
             layer.ParserMembers.Add ( new EnumartionExpression (  ) );
             layer.ParserMembers.Add ( new VariabelDeklaration ( 11 ) );
             layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
