@@ -601,7 +601,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private bool VorherigesLayer()
+        public bool VorherigesLayer()
         {
             this.ParserStack.Pop();
 

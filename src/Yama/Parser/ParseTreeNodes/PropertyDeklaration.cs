@@ -203,24 +203,26 @@ namespace Yama.Parser
 
             token = parser.Peek ( token, 1 );
 
-            IParseTreeNode rule = new Container(SyntaxKind.BeginContainer, SyntaxKind.CloseContainer);
+            //IParseTreeNode rule = new Container(SyntaxKind.BeginContainer, SyntaxKind.CloseContainer);
 
             if ( token == null ) return null;
 
-            IParseTreeNode klammer = rule.Parse(parser, token);
+            IParseTreeNode klammer = parser.ParseCleanToken(token, this.layer);
 
             if (klammer == null) return null;
             if (!(klammer is Container t)) return null;
-
             if (klammer.GetAllChilds.Count != 2) return null;
 
-            deklaration.SetStatement = klammer.GetAllChilds[0];
-            deklaration.GetStatement = klammer.GetAllChilds[1];
+            deklaration.GetStatement = klammer.GetAllChilds[0];
+            deklaration.SetStatement = klammer.GetAllChilds[1];
 
             t.Token.ParentNode = deklaration;
 
-            if (deklaration.SetStatement == null) return null;
             if (deklaration.GetStatement == null) return null;
+            if (deklaration.SetStatement == null) return null;
+
+            if (!(deklaration.GetStatement is GetKey)) return null;
+            if (!(deklaration.SetStatement is SetKey)) return null;
 
             return this.CleanUp(deklaration);
         }

@@ -49,7 +49,7 @@ namespace Yama.Parser
 
             SyntaxToken left = parser.Peek ( token, -1 );
 
-            NormalExpression expression = new NormalExpression (  );
+            EnumartionExpression expression = new EnumartionExpression (  );
 
             expression.Token = token;
 
@@ -74,11 +74,9 @@ namespace Yama.Parser
 
         public bool Indezieren(Index.Index index, IParent parent)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (this.ExpressionParent == null) return true;
 
-            
-
-            return true;
+            return this.ExpressionParent.Indezieren(index, parent);
         }
     }
 }

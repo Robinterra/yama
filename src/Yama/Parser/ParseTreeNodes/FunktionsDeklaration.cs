@@ -213,7 +213,11 @@ namespace Yama.Parser
 
             if ( token == null ) return null;
 
+            parser.ActivateLayer(this.layer);
+
             IParseTreeNode klammer = rule.Parse(parser, token);
+
+            parser.VorherigesLayer();
 
             if (klammer == null) return null;
             if (!(klammer is Container t)) return null;

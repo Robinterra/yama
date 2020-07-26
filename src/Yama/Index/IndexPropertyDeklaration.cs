@@ -57,7 +57,7 @@ namespace Yama.Index
         }
         public IParseTreeNode Use { get; set; }
 
-        private IndexVariabelnReference Value
+        private IndexVariabelnDeklaration Value
         {
             get;
             set;
@@ -77,9 +77,24 @@ namespace Yama.Index
             {
                 if (this.thisUses != null) return this.thisUses;
 
+                IndexVariabelnDeklaration dekValue = new IndexVariabelnDeklaration();
+                dekValue.Name = "value";
+                dekValue.Type = this.Type;
+                dekValue.Use = this.Use;
+                dekValue.ParentUsesSet = this.thisUses;
+
+                this.Value = dekValue;
+
+                IndexVariabelnDeklaration dekinValue = new IndexVariabelnDeklaration();
+                dekinValue.Name = "invalue";
+                dekinValue.Type = this.Type;
+                dekinValue.Use = this.Use;
+                dekinValue.ParentUsesSet = this.thisUses;
+
+                this.InValue = dekinValue;
+
                 this.thisUses = new ValidUses(this.ParentUsesSet);
-                this.thisUses.Deklarationen = new List<IParent> { this, this.Value };
-                this.thisUses.Deklarationen = new List<IParent> { this, this.InValue };
+                this.thisUses.Deklarationen = new List<IParent> { this, this.InValue, this.Value };
 
                 return this.thisUses;
             }
@@ -96,9 +111,6 @@ namespace Yama.Index
         public bool Mappen(ValidUses uses)
         {
             this.ParentUsesSet = uses;
-
-            this.InValue.Mappen(uses);
-            this.Value.Mappen(uses);
 
             this.SetContainer.Mappen(this.ThisUses);
             this.GetContainer.Mappen(this.ThisUses);

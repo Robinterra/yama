@@ -87,15 +87,26 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private ParserLayer InKlassenLayer(ParserLayer execlayer)
+        private ParserLayer InPropertyLayer(ParserLayer execlayer)
+        {
+            ParserLayer layer = new ParserLayer("inproperty");
+
+            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new GetKey(execlayer));
+            layer.ParserMembers.Add(new SetKey(execlayer));
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer InKlassenLayer(ParserLayer execlayer, ParserLayer inpropertyLayer)
         {
             ParserLayer layer = new ParserLayer("inclass");
 
             layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
             layer.ParserMembers.Add(new FunktionsDeklaration ( execlayer ));
-            layer.ParserMembers.Add(new PropertyDeklaration ( execlayer ));
-            layer.ParserMembers.Add ( new EnumartionExpression (  ) );
-            layer.ParserMembers.Add ( new VariabelDeklaration ( 11 ) );
+            layer.ParserMembers.Add(new PropertyDeklaration ( inpropertyLayer ));
             layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
 
             return layer;
@@ -155,10 +166,12 @@ namespace LearnCsStuf.Basic
             List<ParserLayer> parserRules = new List<ParserLayer>();
 
             ParserLayer executionlayer = this.ExecutionLayer();
-            ParserLayer inclassLayer = this.InKlassenLayer(executionlayer);
+            ParserLayer inpropertyLayer = this.InPropertyLayer(executionlayer);
+            ParserLayer inclassLayer = this.InKlassenLayer(executionlayer, inpropertyLayer);
             ParserLayer classLayer = this.KlassenLayer(inclassLayer);
             parserRules.Add(classLayer);
             parserRules.Add(inclassLayer);
+            parserRules.Add(inpropertyLayer);
             parserRules.Add(executionlayer);
 
             return parserRules;
