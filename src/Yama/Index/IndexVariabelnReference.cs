@@ -121,7 +121,7 @@ namespace Yama.Index
         {
             this.ParentUsesSet = uses;
 
-            this.Deklaration = this.ParentUsesSet.Deklarationen.FirstOrDefault(t=>t != null && t.Name == this.Name);
+            this.Deklaration = this.ParentUsesSet.Deklarationen.FirstOrDefault(t=>t.Name == this.Name);
 
             if (this.Deklaration == null) return uses.GetIndex.CreateError(this.Use, "no defintion in index found");
 
