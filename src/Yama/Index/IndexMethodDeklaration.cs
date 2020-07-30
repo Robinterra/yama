@@ -14,6 +14,12 @@ namespace Yama.Index
             set;
         }
 
+        public IndexKlassenDeklaration Parent
+        {
+            get;
+            set;
+        }
+
         public List<IndexVariabelnReference> References
         {
             get;
@@ -80,17 +86,23 @@ namespace Yama.Index
             this.Parameters = new List<IndexVariabelnDeklaration>();
         }
 
-        public bool Mappen(ValidUses uses)
+        public bool Mappen()
+        {
+            this.Container.Mappen(this.ThisUses);
+
+            return true;
+        }
+
+        public bool PreMappen(ValidUses uses)
         {
             this.ParentUsesSet = uses;
+
             foreach (IndexVariabelnDeklaration dek in this.Parameters)
             {
-                dek.Mappen(uses);
+                dek.Mappen(this.ParentUsesSet);
             }
 
-            this.ReturnValue.Mappen(uses);
-
-            this.Container.Mappen(this.ThisUses);
+            this.ReturnValue.Mappen(this.ParentUsesSet);
 
             return true;
         }

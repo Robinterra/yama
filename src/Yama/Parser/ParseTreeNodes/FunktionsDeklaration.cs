@@ -262,7 +262,7 @@ namespace Yama.Parser
             if (this.ZusatzDefinition != null)
             {
                 if (this.ZusatzDefinition.Kind == SyntaxKind.Static) type = MethodeType.Static;
-                if (this.ZusatzDefinition.Kind == SyntaxKind.Operator)
+                if (this.ZusatzDefinition.Kind == SyntaxKind.OperatorKey)
                 {
                     type = MethodeType.Operator;
                     if (this.TypeDefinition.Kind == SyntaxKind.Explicit) type = MethodeType.Explicit;

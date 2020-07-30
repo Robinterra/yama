@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -59,8 +60,7 @@ namespace Yama.Parser
         {
             get;
         }
-
-
+        public IndexVariabelnReference Reference { get; private set; }
 
         #endregion get/set
 
@@ -127,9 +127,18 @@ namespace Yama.Parser
             reference.Use = this;
             reference.Name = this.Token.Text;
             this.LeftNode.Indezieren(index, parent);
+            IndexVariabelnReference varref = container.VariabelnReferences.Last();
+
+
             this.RightNode.Indezieren(index, parent);
             this.VariabelReference = reference;
-            container.VariabelnReferences.Add(reference);
+            //container.VariabelnReferences.Add(reference);
+
+            if (this.Token.Text == "=") return true;
+
+            varref.ParentCall = reference;
+            varref.VariabelnReferences.Add(reference);
+            this.Reference = reference;
 
             return true;
         }

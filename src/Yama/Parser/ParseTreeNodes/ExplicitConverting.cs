@@ -15,6 +15,12 @@ namespace Yama.Parser
             set;
         }
 
+        public IndexVariabelnReference BooleascherReturn
+        {
+            get;
+            set;
+        }
+
         public IParseTreeNode LeftNode
         {
             get;
@@ -127,6 +133,10 @@ namespace Yama.Parser
             container.VariabelnDeklarations.Add(reference);
             IndexVariabelnReference type = new IndexVariabelnReference { Name = this.RightToken.Text, Use = this };
             reference.Type = type;
+
+            container.VariabelnReferences.Add(type);
+            this.BooleascherReturn = new IndexVariabelnReference { Name = "Bool", Use = this };
+            container.VariabelnReferences.Add(this.BooleascherReturn);
 
             this.Deklaration = reference;
 

@@ -113,9 +113,24 @@ namespace Yama.Index
             this.StaticMethods = new List<IndexMethodDeklaration>();
         }
 
+        private bool PreviusMappen()
+        {
+            this.PreviusMethodeMappen(this.Methods, this.ThisUses);
+            this.PreviusMethodeMappen(this.StaticMethods, this.ParentUsesSet);
+            this.PreviusMethodeMappen(this.Operators, this.ParentUsesSet);
+            this.PreviusMethodeMappen(this.Ctors, this.ThisUses);
+            this.PreviusMethodeMappen(this.DeCtors, this.ThisUses);
+
+            this.PreviusPropertyMappen(this.IndexProperties, this.ThisUses);
+
+            return true;
+        }
+
         public bool Mappen(ValidUses rootValidUses)
         {
             this.ParentUsesSet = rootValidUses;
+
+            this.PreviusMappen();
 
             this.MethodeMappen(this.Methods, this.ThisUses);
             this.MethodeMappen(this.StaticMethods, this.ParentUsesSet);
@@ -132,7 +147,27 @@ namespace Yama.Index
         {
             foreach (IndexPropertyDeklaration deklaration in indexProperties)
             {
-                deklaration.Mappen(thisUses);
+                deklaration.Mappen();
+            }
+
+            return true;
+        }
+
+        private bool PreviusPropertyMappen(List<IndexPropertyDeklaration> indexProperties, ValidUses thisUses)
+        {
+            foreach (IndexPropertyDeklaration deklaration in indexProperties)
+            {
+                deklaration.PreMappen(thisUses);
+            }
+
+            return true;
+        }
+
+        private bool PreviusMethodeMappen(List<IndexMethodDeklaration> methods, ValidUses uses)
+        {
+            foreach (IndexMethodDeklaration deklaration in methods)
+            {
+                deklaration.PreMappen(uses);
             }
 
             return true;
@@ -142,7 +177,7 @@ namespace Yama.Index
         {
             foreach (IndexMethodDeklaration deklaration in methods)
             {
-                deklaration.Mappen(uses);
+                deklaration.Mappen();
             }
 
             return true;

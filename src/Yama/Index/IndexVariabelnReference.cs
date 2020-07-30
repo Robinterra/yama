@@ -44,7 +44,21 @@ namespace Yama.Index
             get;
             set;
         }
-        public IndexVariabelnReference ParentCall { get; internal set; }
+
+        private IndexVariabelnReference parentCall;
+
+        public IndexVariabelnReference ParentCall
+        {
+            get
+            {
+                return parentCall;
+            }
+            set
+            {
+                if (parentCall != null) parentCall.ParentCall = value;
+                else this.parentCall = value;
+            }
+        }
 
         public IndexVariabelnReference (  )
         {
@@ -64,6 +78,8 @@ namespace Yama.Index
                 if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found");
                 this.Deklaration = dek;
 
+                if (this.ParentCall != null) this.ParentCall.Mappen(this);
+
                 return true;
             }
 
@@ -74,20 +90,40 @@ namespace Yama.Index
                 if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found");
                 this.Deklaration = dek;
 
+                if (this.ParentCall != null) this.ParentCall.Mappen(this);
+
                 return true;
             }
 
             if (parentCall.Deklaration is IndexPropertyDeklaration pd)
             {
                 IParent dek = null;
-                if (parentCall.Name == parentCall.Deklaration.Name) dek = this.GetStaticFound(pd.Parent);
-                else dek = this.GetKlassenFound(pd.Parent);
+                //if (parentCall.Name == parentCall.Deklaration.Name) dek = this.GetStaticFound(pd.Type.Deklaration as IndexKlassenDeklaration);
+                //else 
+
+                dek = this.GetKlassenFound(pd.Type.Deklaration as IndexKlassenDeklaration);
 
                 if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found");
                 this.Deklaration = dek;
 
+                if (this.ParentCall != null) this.ParentCall.Mappen(this);
+
                 return true;
             }
+
+            /*if (parentCall.Deklaration is IndexMethodDeklaration md)
+            {
+                IParent dek = null;
+                if (parentCall.Name == parentCall.Deklaration.Name) dek = this.GetStaticFound(md.Parent);
+                else dek = this.GetKlassenFound(md.Parent);
+
+                if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found");
+                this.Deklaration = dek;
+
+                if (this.ParentCall != null) this.ParentCall.Mappen(this);
+
+                return true;
+            }*/
 
             return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found");
         }
@@ -98,6 +134,8 @@ namespace Yama.Index
             if (md != null) { md.References.Add(this); return md; }
             md = kd.Methods.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
+            md = kd.Operators.FirstOrDefault(t=>t.Name == this.Name);
+            if (md != null) { md.References.Add(this); return md; }
             IndexPropertyDeklaration pd = kd.IndexProperties.FirstOrDefault(t=>t.Name == this.Name);
             if (pd == null) return null;
             if (pd.Zusatz != MethodeType.Static) { pd.References.Add(this); return pd; }
@@ -107,7 +145,11 @@ namespace Yama.Index
 
         private IParent GetStaticFound(IndexKlassenDeklaration kd)
         {
+            if (kd == null) return null;
+
             IndexMethodDeklaration md = kd.StaticMethods.FirstOrDefault(t=>t.Name == this.Name);
+            if (md != null) { md.References.Add(this); return md; }
+            md = kd.Operators.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
             IndexPropertyDeklaration pd = kd.IndexProperties.FirstOrDefault(t=>t.Name == this.Name);
             if (pd == null) return null;

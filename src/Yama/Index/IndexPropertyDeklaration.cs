@@ -108,10 +108,17 @@ namespace Yama.Index
             this.References = new List<IndexVariabelnReference>();
         }
 
-        public bool Mappen(ValidUses uses)
+        public bool PreMappen(ValidUses uses)
         {
             this.ParentUsesSet = uses;
 
+            this.Type.Mappen(uses);
+
+            return true;
+        }
+
+        public bool Mappen()
+        {
             this.SetContainer.Mappen(this.ThisUses);
             this.GetContainer.Mappen(this.ThisUses);
 
