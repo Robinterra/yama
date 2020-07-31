@@ -265,6 +265,8 @@ namespace Yama.Parser
                 if (token.Kind == SyntaxKind.Comment) continue;
                 if (token.Kind == SyntaxKind.Unknown && this.PrintSyntaxError ( token, "unkown char" )) continue;
 
+                token.FileInfo = this.Fileinfo;
+
                 this.CleanTokens.Add ( token );
                 //Console.Write ( token.Kind.ToString() + " : " );
                 //Console.WriteLine ( token.Value );
@@ -594,7 +596,7 @@ namespace Yama.Parser
                 node.Token.ParentNode = this.ParentContainer;
             }
 
-            this.PrintPretty ( this.ParentContainer );
+            //this.PrintPretty ( this.ParentContainer );
 
             return this.ParserErrors.Count == 0;
         }

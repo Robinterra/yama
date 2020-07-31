@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Yama.Index;
 using Yama.Lexer;
@@ -7,7 +8,7 @@ using Yama.Parser;
 
 namespace LearnCsStuf.Basic
 {
-    public class BasicExpressionEvaluator
+    public class LanguageDefinition
     {
 
         // -----------------------------------------------
@@ -16,7 +17,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public string File
+        public List<string> Files
         {
             get;
             set;
@@ -25,6 +26,14 @@ namespace LearnCsStuf.Basic
         // -----------------------------------------------
 
         public string ExpressionLine
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public string Framework
         {
             get;
             set;
@@ -269,36 +278,74 @@ namespace LearnCsStuf.Basic
 
         public bool Compile()
         {
-            System.IO.FileInfo file = new System.IO.FileInfo ( this.File );
+            List<IParseTreeNode> nodes = new List<IParseTreeNode>();
+            List<string> files = this.GetFiles();
 
-            Parser p = new Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
-            ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "class");
+            foreach (string File in files)
+            {
+                System.IO.FileInfo file = new System.IO.FileInfo ( File );
 
-            p.ErrorNode = new ParserError (  );
+                Parser p = new Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
+                ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "class");
 
-            if (!p.Parse(startlayer)) return this.PrintingErrors(p);
+                p.ErrorNode = new ParserError (  );
 
-            IParseTreeNode node = p.ParentContainer;
+                if (!p.Parse(startlayer)) return this.PrintingErrors(p);
+
+                IParseTreeNode node = p.ParentContainer;
+
+                nodes.AddRange(node.GetAllChilds);
+            }
 
             Yama.Index.Index index = new Yama.Index.Index();
-            index.Roots = node.GetAllChilds;
+            index.Roots = nodes;
 
-            if (!index.CreateIndex()) return this.PrintingIndexErrors(index, p);
+            if (!index.CreateIndex()) return this.PrintingIndexErrors(index);
 
             return true;
         }
 
-        private bool PrintingIndexErrors(Yama.Index.Index index, Parser p)
+        private List<string> GetFiles()
+        {
+            List<string> result = new List<string>();
+            result.AddRange(this.Files);
+
+            string path = Path.Combine( AppDomain.CurrentDomain.BaseDirectory, this.Framework);
+
+            string[] files = Directory.GetFiles(path);
+
+            result.AddRange(files);
+
+            return result;
+        }
+
+        private bool PrintingIndexErrors(Yama.Index.Index index)
         {
             foreach ( IndexError error in index.Errors )
             {
                 SyntaxToken token = error.Use.Token;
 
-                p.PrintSyntaxError ( token, error.Msg, "Index error" );
+                this.PrintSyntaxError ( token, error.Msg, "Index error" );
             }
 
             return false;
         }
+        
+        public bool PrintSyntaxError(SyntaxToken token, string msg, string nexterrormsg = "Syntax error")
+        {
+            //if (token.Kind != SyntaxKind.Unknown) return false;
+
+            ConsoleColor colr = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+
+            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, token.FileInfo.FullName, nexterrormsg );
+
+            Console.ForegroundColor = colr;
+
+            return true;
+        }
+
+        // -----------------------------------------------
 
         private bool PrintingErrors(Parser p)
         {

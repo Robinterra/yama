@@ -1,3 +1,4 @@
+using System.IO;
 using Yama.Parser;
 namespace Yama.Lexer
 {
@@ -36,6 +37,14 @@ namespace Yama.Lexer
         public int Column
         {
             get;
+        }
+
+        // -----------------------------------------------
+
+        public FileInfo FileInfo
+        {
+            get;
+            set;
         }
 
         // -----------------------------------------------

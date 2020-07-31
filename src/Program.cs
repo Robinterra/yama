@@ -56,6 +56,7 @@ namespace LearnCsStuf
         {
             List<string> parseFiles = new List<string>();
             List<string> parsecsvFiles = new List<string>();
+            string framework = "atmega328p";
 
             foreach ( ICommandLine command in commands )
             {
@@ -65,16 +66,16 @@ namespace LearnCsStuf
                 if (command.Key == "yama") parseFiles.Add ( command.Value );
                 if (command.Key == "csv") parsecsvFiles.Add ( command.Value );
                 if (command.Key == "auto") Program.RunAuto ( command );
+                if (command.Key == "framework") framework = command.Value;
             }
 
-            foreach (string value in parseFiles)
-            {
-                BasicExpressionEvaluator basic = new BasicExpressionEvaluator();
+            LanguageDefinition basic = new LanguageDefinition();
 
-                basic.File = value;
+            basic.Framework = framework;
 
-                basic.Compile();
-            }
+            basic.Files = parseFiles;
+
+            basic.Compile();
 
             foreach (string value in parsecsvFiles)
             {

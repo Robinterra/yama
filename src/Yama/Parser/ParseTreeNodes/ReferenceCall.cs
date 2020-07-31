@@ -10,6 +10,9 @@ namespace Yama.Parser
 
         #region get/set
 
+        //ldi r24,lo8(gs({0}}))
+        //ldi r25,hi8(gs({0}}))
+
         public IndexVariabelnReference Reference
         {
             get;
