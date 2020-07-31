@@ -130,6 +130,8 @@ namespace Yama.Index
 
         private IParent GetKlassenFound(IndexKlassenDeklaration kd)
         {
+            if (kd == null) return null;
+
             IndexMethodDeklaration md = kd.DeCtors.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
             md = kd.Methods.FirstOrDefault(t=>t.Name == this.Name);
