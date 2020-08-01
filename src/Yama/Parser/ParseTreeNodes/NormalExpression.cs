@@ -84,6 +84,8 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            this.ExpressionParent.Compile(compiler, mode);
+
             return true;
         }
     }

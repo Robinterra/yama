@@ -268,6 +268,8 @@ namespace Yama.Parser
             deklaration.Name = this.Token.Text;
             deklaration.Use = this;
 
+            this.Deklaration = deklaration;
+
             index.Register.Add(deklaration);
             foreach (IParseTreeNode node in this.Statement.GetAllChilds)
             {
@@ -279,6 +281,11 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            foreach(IndexMethodDeklaration m in this.Deklaration.StaticMethods)
+            {
+                m.Use.Compile(compiler, mode);
+            }
+
             return true;
         }
 

@@ -52,7 +52,7 @@ namespace Yama.Compiler.Atmega328p
 
         private List<string> RegisterQuery(IRegisterQuery query)
         {
-            string resultPattern = "R{0}";
+            string resultPattern = "r{0}";
             List<string> result = new List<string>();
             int registerStart = 2;
 

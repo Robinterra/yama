@@ -13,7 +13,7 @@ namespace Yama.Compiler
             set;
         } = "ReferenceCall";
 
-        public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
+        public bool Compile(Compiler compiler, IndexVariabelnReference node, string mode = "default")
         {
             CompileAlgo algo = compiler.GetAlgo(this.AlgoName, mode);
 
@@ -24,8 +24,8 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
                 query.Kategorie = mode;
-                query.Uses = node.Reference.ThisUses;
-                query.Value = key == "[REG]" ? (object)1 : (object)node.Reference.Name;
+                query.Uses = node.ThisUses;
+                query.Value = key == "[REG]" ? (object)1 : (object)node.Name;
 
                 List<string> result = compiler.Definition.ZielRegister(query);
                 if (result == null) return false; //TODO: Create Error Entry
@@ -44,6 +44,11 @@ namespace Yama.Compiler
             }
 
             return true;
+        }
+
+        public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
+        {
+            return this.Compile(compiler, node.Reference, mode);
         }
     }
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -27,6 +28,18 @@ namespace Yama.Parser
             get;
             set;
         }
+
+        public CompileReferenceCall OperatorCall
+        {
+            get;
+            set;
+        } = new CompileReferenceCall();
+
+        public CompileMovResult MovResultCompilen
+        {
+            get;
+            set;
+        } = new CompileMovResult();
 
         public SyntaxToken Token
         {
@@ -145,6 +158,23 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            this.RightNode.Compile(compiler, mode);
+
+            if (this.Token.Text == "=")
+            {
+                mode = "set";
+
+                this.LeftNode.Compile(compiler, mode);
+
+                return true;
+            }
+
+            this.MovResultCompilen.Compile(compiler, null, mode);
+
+            this.LeftNode.Compile(compiler, mode);
+
+            this.OperatorCall.Compile(compiler, this.Reference, "methode");
+
             return true;
         }
 

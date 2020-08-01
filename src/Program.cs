@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using LearnCsStuf.CommandLines;
-using LearnCsStuf.Basic;
+using Yama;
 using LearnCsStuf.CommandLines.Commands;
 using System.IO;
 using LearnCsStuf.Automaten;

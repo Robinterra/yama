@@ -37,7 +37,7 @@ namespace Yama.Parser
         {
             get;
             set;
-        }
+        } = new CompileReferenceCall();
 
         public int Prio
         {

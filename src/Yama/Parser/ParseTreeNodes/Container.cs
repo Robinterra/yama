@@ -118,6 +118,11 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            foreach (IParseTreeNode nodes in this.Statements)
+            {
+                nodes.Compile(compiler, mode);
+            }
+
             return true;
         }
 

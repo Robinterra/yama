@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Yama.Parser;
 
 namespace Yama.Compiler
 {
@@ -47,6 +48,20 @@ namespace Yama.Compiler
             }
 
             this.Writer.WriteLine(assemblyCode);
+
+            return true;
+        }
+
+        public bool Compilen(List<IParseTreeNode> nodes)
+        {
+            this.Writer = new StreamWriter(this.OutputFile.OpenWrite());
+
+            foreach (IParseTreeNode node in nodes)
+            {
+                node.Compile(this);
+            }
+
+            this.Writer.Close();
 
             return true;
         }

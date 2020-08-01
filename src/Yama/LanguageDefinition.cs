@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Yama.Compiler;
+using Yama.Compiler.Atmega328p;
 using Yama.Index;
 using Yama.Lexer;
 using Yama.Parser;
 
-namespace LearnCsStuf.Basic
+namespace Yama
 {
     public class LanguageDefinition
     {
@@ -42,7 +43,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private Lexer Tokenizer
+        private Lexer.Lexer Tokenizer
         {
             get;
             set;
@@ -258,9 +259,9 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public Lexer GetBasicLexer()
+        public Lexer.Lexer GetBasicLexer()
         {
-            Lexer lexer = new Lexer();
+            Lexer.Lexer lexer = new Lexer.Lexer();
 
             lexer.LexerTokens = this.GetLexerRules();
 
@@ -311,6 +312,21 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
+        private CompileAlgo CreateAlgoMoveResult()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "MovResult";
+            result.Mode = "default";
+            result.Description = "Das verschieben eines Ergebnisses";
+            result.Keys.Add("[REG]");
+            result.AssemblyCommands.Add("movw [REG], r2");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         private CompileAlgo CreateAlgoReferenceCallMethode()
         {
             CompileAlgo result = new CompileAlgo();
@@ -322,6 +338,20 @@ namespace LearnCsStuf.Basic
             result.Keys.Add("[REG]");
             result.AssemblyCommands.Add("ldi [REG],[METHODEREFCALL]");
             result.AssemblyCommands.Add("ldi [REG],[METHODEREFCALL]");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        private List<CompileAlgo> CompileAlgos()
+        {
+            List<CompileAlgo> result = new List<CompileAlgo>();
+
+            result.Add(this.CreateAlgoReferenceCallGet());
+            result.Add(this.CreateAlgoReferenceCallMethode());
+            result.Add(this.CreateAlgoReferenceCallSet());
+            result.Add(this.CreateAlgoMoveResult());
 
             return result;
         }
@@ -340,7 +370,7 @@ namespace LearnCsStuf.Basic
             {
                 System.IO.FileInfo file = new System.IO.FileInfo ( File );
 
-                Parser p = new Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
+                Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
                 ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "class");
 
                 p.ErrorNode = new ParserError (  );
@@ -377,7 +407,21 @@ namespace LearnCsStuf.Basic
 
             if (!this.Indezieren(nodes)) return false;
 
+            if (!this.Compilen(nodes)) return false;
+
             return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool Compilen(List<IParseTreeNode> nodes)
+        {
+            Compiler.Compiler compiler = new Compiler.Compiler();
+            compiler.OutputFile = new FileInfo("out.S");
+            compiler.Definition = new Atmega328pDefinition();
+            compiler.Algos = this.CompileAlgos();
+
+            return compiler.Compilen(nodes);
         }
 
         // -----------------------------------------------
@@ -432,7 +476,7 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        private bool PrintingErrors(Parser p)
+        private bool PrintingErrors(Parser.Parser p)
         {
             foreach ( IParseTreeNode error in p.ParserErrors )
             {
