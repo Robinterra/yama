@@ -312,6 +312,85 @@ namespace Yama
 
         // -----------------------------------------------
 
+        private CompileAlgo CreateAlgoExecutionCall()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "ExecuteCall";
+            result.Mode = "default";
+            result.Description = "Aufruf einer Funktion";
+            result.AssemblyCommands.Add("movw r30, r2");
+            result.AssemblyCommands.Add("icall");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        private CompileAlgo CreateAlgoFunktionsDeklaration()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "FunktionsDeklaration";
+            result.Mode = "default";
+            result.Description = "Die Deklaration einer Funktion";
+            result.Keys.Add("[NAME]");
+            result.AssemblyCommands.Add("[NAME]:");
+            result.AssemblyCommands.Add("push r2");
+            result.AssemblyCommands.Add("push r3");
+            result.AssemblyCommands.Add("push r4");
+            result.AssemblyCommands.Add("push r5");
+            result.AssemblyCommands.Add("push r6");
+            result.AssemblyCommands.Add("push r7");
+            result.AssemblyCommands.Add("push r16");
+            result.AssemblyCommands.Add("push r17");
+            result.AssemblyCommands.Add("push r18");
+            result.AssemblyCommands.Add("push r19");
+            result.AssemblyCommands.Add("push r20");
+            result.AssemblyCommands.Add("push r21");
+            result.AssemblyCommands.Add("push r28");
+            result.AssemblyCommands.Add("push r29");
+            result.AssemblyCommands.Add("in r28,__SP_L__");
+            result.AssemblyCommands.Add("in r29,__SP_H__");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        private CompileAlgo CreateAlgoFunktionsEnde()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "FunktionsEnde";
+            result.Mode = "default";
+            result.Description = "Das ende einer Funktion";
+            result.AssemblyCommands.Add("adiw r28, 6");
+            result.AssemblyCommands.Add("in __tmp__reg__,__SREG__");
+            result.AssemblyCommands.Add("cli");
+            result.AssemblyCommands.Add("out __SP_H__,r29");
+            result.AssemblyCommands.Add("out __SREG__,__tmp_reg__");
+            result.AssemblyCommands.Add("out __SP_L__,r28");
+            result.AssemblyCommands.Add("pop r29");
+            result.AssemblyCommands.Add("pop r28");
+            result.AssemblyCommands.Add("pop r21");
+            result.AssemblyCommands.Add("pop r20");
+            result.AssemblyCommands.Add("pop r19");
+            result.AssemblyCommands.Add("pop r18");
+            result.AssemblyCommands.Add("pop r17");
+            result.AssemblyCommands.Add("pop r16");
+            result.AssemblyCommands.Add("pop r7");
+            result.AssemblyCommands.Add("pop r6");
+            result.AssemblyCommands.Add("pop r5");
+            result.AssemblyCommands.Add("pop r4");
+            result.AssemblyCommands.Add("pop r3");
+            result.AssemblyCommands.Add("pop r2");
+            result.AssemblyCommands.Add("ret");
+
+            return result;
+        }
+
+        // -----------------------------------------------
         private CompileAlgo CreateAlgoMoveResult()
         {
             CompileAlgo result = new CompileAlgo();
@@ -352,6 +431,9 @@ namespace Yama
             result.Add(this.CreateAlgoReferenceCallMethode());
             result.Add(this.CreateAlgoReferenceCallSet());
             result.Add(this.CreateAlgoMoveResult());
+            result.Add(this.CreateAlgoExecutionCall());
+            result.Add(this.CreateAlgoFunktionsDeklaration());
+            result.Add(this.CreateAlgoFunktionsEnde());
 
             return result;
         }

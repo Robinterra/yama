@@ -60,6 +60,16 @@ namespace Yama.Index
             }
         }
 
+        public string AssemblyName
+        {
+            get
+            {
+                if (this.Deklaration is IndexMethodDeklaration t) return t.AssemblyName;
+
+                return this.Deklaration.Name;
+            }
+        }
+
         public IndexVariabelnReference (  )
         {
             this.VariabelnReferences = new List<IndexVariabelnReference>();

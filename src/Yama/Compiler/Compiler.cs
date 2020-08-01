@@ -42,9 +42,12 @@ namespace Yama.Compiler
 
         public bool AddLine(string assemblyCode, Dictionary<string, string> dictionaries)
         {
-            foreach(KeyValuePair<string, string> pair in dictionaries)
+            if (dictionaries != null)
             {
-                assemblyCode = assemblyCode.Replace(pair.Key, pair.Value);
+                foreach(KeyValuePair<string, string> pair in dictionaries)
+                {
+                    assemblyCode = assemblyCode.Replace(pair.Key, pair.Value);
+                }
             }
 
             this.Writer.WriteLine(assemblyCode);

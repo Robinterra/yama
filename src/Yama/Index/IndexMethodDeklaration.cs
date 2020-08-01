@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Yama.Lexer;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -21,6 +22,12 @@ namespace Yama.Index
         }
 
         public List<IndexVariabelnReference> References
+        {
+            get;
+            set;
+        }
+
+        public IndexKlassenDeklaration Klasse
         {
             get;
             set;
@@ -79,6 +86,36 @@ namespace Yama.Index
 
         public ValidUses ParentUsesSet { get;
         set; }
+        public string AssemblyName
+        {
+            get
+            {
+                string pattern = "{0}_{1}_{2}";
+
+                return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count);
+            }
+        }
+
+        public string NameInText
+        {
+            get
+            {
+                if (this.Use.Token.Kind != SyntaxKind.Operator) return this.Name;
+
+
+                if ("!" == this.Name) return "Achtung";
+                if ("==" == this.Name) return "Equal";
+                if ("+" == this.Name) return "Addition";
+                if ("++" == this.Name) return "Incrementation";
+                if ("<" == this.Name) return "KleinAls";
+                if (">" == this.Name) return "GrosserAls";
+                if ("-" == this.Name) return "Subtraktion";
+                if ("--" == this.Name) return "Decrementation";
+                if ("~" == this.Name) return "DeCtor";
+
+                return "UnknownSonderzeichen";
+            }
+        }
 
         public IndexMethodDeklaration (  )
         {

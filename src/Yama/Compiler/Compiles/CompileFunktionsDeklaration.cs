@@ -5,15 +5,21 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileReferenceCall : ICompile<ReferenceCall>
+    public class CompileFunktionsDeklaration : ICompile<FunktionsDeklaration>
     {
         public string AlgoName
         {
             get;
             set;
-        } = "ReferenceCall";
+        } = "FunktionsDeklaration";
 
-        public bool Compile(Compiler compiler, IndexVariabelnReference node, string mode = "default")
+        public int Counter
+        {
+            get;
+            set;
+        } = 2;
+
+        public bool Compile(Compiler compiler, FunktionsDeklaration node, string mode = "default")
         {
             CompileAlgo algo = compiler.GetAlgo(this.AlgoName, mode);
 
@@ -24,13 +30,13 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
                 query.Kategorie = mode;
-                query.Uses = node.ThisUses;
-                query.Value = key == "[REG]" ? (object)1 : (object)node.AssemblyName;
+                query.Uses = node.Deklaration.ThisUses;
+                query.Value = (object)node.Deklaration.AssemblyName;
 
                 List<string> result = compiler.Definition.ZielRegister(query);
                 if (result == null) return false; //TODO: Create Error Entry
 
-                for (int i = 0; i < primaryKeys.Length; i++)
+                for (int i = 0; i < result.Count; i++)
                 {
                     if (primaryKeys[i] == null) primaryKeys[i] = new Dictionary<string, string>();
 
@@ -38,17 +44,12 @@ namespace Yama.Compiler
                 }
             }
 
-            for (int i = 0; i < primaryKeys.Length; i++)
+            for (int i = 0; i < algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(algo.AssemblyCommands[i], primaryKeys[i]);
             }
 
             return true;
-        }
-
-        public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
-        {
-            return this.Compile(compiler, node.Reference, mode);
         }
     }
 

@@ -147,6 +147,7 @@ namespace Yama.Index
         {
             foreach (IndexPropertyDeklaration deklaration in indexProperties)
             {
+                deklaration.Klasse = this;
                 deklaration.Mappen();
             }
 
@@ -157,6 +158,7 @@ namespace Yama.Index
         {
             foreach (IndexPropertyDeklaration deklaration in indexProperties)
             {
+                deklaration.Klasse = this;
                 deklaration.PreMappen(thisUses);
             }
 
@@ -167,6 +169,7 @@ namespace Yama.Index
         {
             foreach (IndexMethodDeklaration deklaration in methods)
             {
+                deklaration.Klasse = this;
                 deklaration.PreMappen(uses);
             }
 
@@ -177,6 +180,7 @@ namespace Yama.Index
         {
             foreach (IndexMethodDeklaration deklaration in methods)
             {
+                deklaration.Klasse = this;
                 deklaration.Mappen();
             }
 

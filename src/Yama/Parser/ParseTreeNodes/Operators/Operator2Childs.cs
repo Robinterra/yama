@@ -35,6 +35,12 @@ namespace Yama.Parser
             set;
         } = new CompileReferenceCall();
 
+        public CompileExecuteCall FunctionExecute
+        {
+            get;
+            set;
+        } = new CompileExecuteCall();
+
         public CompileMovResult MovResultCompilen
         {
             get;
@@ -173,7 +179,13 @@ namespace Yama.Parser
 
             this.LeftNode.Compile(compiler, mode);
 
+            this.MovResultCompilen.Compile(compiler, null, mode);
+
             this.OperatorCall.Compile(compiler, this.Reference, "methode");
+
+            this.FunctionExecute.Compile(compiler, null, mode);
+
+
 
             return true;
         }

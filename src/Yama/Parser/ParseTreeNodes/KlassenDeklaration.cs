@@ -286,6 +286,21 @@ namespace Yama.Parser
                 m.Use.Compile(compiler, mode);
             }
 
+            foreach(IndexMethodDeklaration m in this.Deklaration.Operators)
+            {
+                m.Use.Compile(compiler, mode);
+            }
+
+            foreach(IndexMethodDeklaration m in this.Deklaration.Methods)
+            {
+                m.Use.Compile(compiler, mode);
+            }
+
+            foreach(IndexPropertyDeklaration m in this.Deklaration.IndexProperties)
+            {
+                m.Use.Compile(compiler, mode);
+            }
+
             return true;
         }
 

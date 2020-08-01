@@ -29,13 +29,52 @@ namespace Yama.Compiler.Atmega328p
             set;
         } = 2;
 
+        public int ZeroRegister
+        {
+            get;
+            set;
+        } = 0;
+
+        public int ArbeitsRegister
+        {
+            get;
+            set;
+        } = 2;
+
+        public int AblageRegister
+        {
+            get;
+            set;
+        } = 16;
+
+        public int CurrentArbeitsRegister
+        {
+            get;
+            set;
+        } = 0;
+
+        public int CurrentAblageRegister
+        {
+            get;
+            set;
+        } = 0;
+
         #endregion get/set
+
+        public bool BeginNeuRegister()
+        {
+            this.CurrentArbeitsRegister = this.ArbeitsRegister;
+            this.CurrentAblageRegister = this.AblageRegister;
+
+            return true;
+        }
 
         public List<string> ZielRegister(IRegisterQuery query)
         {
             if (query.Key == "[VAR]") return this.VarQuery(query);
             if (query.Key == "[REG]") return this.RegisterQuery(query);
             if (query.Key == "[METHODEREFCALL]") return this.MethodeRefCallQuery(query);
+            if (query.Key == "[NAME]") return new List<string> { query.Value.ToString() };
 
             return null;
         }
@@ -54,10 +93,9 @@ namespace Yama.Compiler.Atmega328p
         {
             string resultPattern = "r{0}";
             List<string> result = new List<string>();
-            int registerStart = 2;
 
-            int value = (int)query.Value;
-            registerStart = registerStart * value;
+            int registerStart = this.CurrentArbeitsRegister;
+            this.CurrentArbeitsRegister += this.AdressBytes;
 
             if (registerStart >= 26) return null;
 

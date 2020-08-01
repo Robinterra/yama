@@ -3,6 +3,7 @@ using Yama.Lexer;
 using Yama.Index;
 using System.Linq;
 using System;
+using Yama.Compiler;
 
 namespace Yama.Parser
 {
@@ -47,6 +48,18 @@ namespace Yama.Parser
             get;
             set;
         }
+
+        public CompileFunktionsDeklaration FunktionsDeklarationCompile
+        {
+            get;
+            set;
+        } = new CompileFunktionsDeklaration();
+
+        public CompileFunktionsEnde FunktionsEndeCompile
+        {
+            get;
+            set;
+        } = new CompileFunktionsEnde();
 
         public IParseTreeNode Statement
         {
@@ -326,7 +339,11 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
+
             this.Statement.Compile(compiler, mode);
+
+            this.FunktionsEndeCompile.Compile(compiler, this, mode);
 
             return true;
         }
