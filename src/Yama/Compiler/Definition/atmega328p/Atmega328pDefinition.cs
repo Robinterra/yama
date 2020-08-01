@@ -94,8 +94,8 @@ namespace Yama.Compiler.Atmega328p
             string resultPattern = "r{0}";
             List<string> result = new List<string>();
 
-            int registerStart = this.CurrentArbeitsRegister;
-            this.CurrentArbeitsRegister += this.AdressBytes;
+            int registerStart = this.AblageRegister;
+            this.AblageRegister += this.AdressBytes;
 
             if (registerStart >= 26) return null;
 

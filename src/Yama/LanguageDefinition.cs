@@ -286,9 +286,8 @@ namespace Yama
             result.Mode = "default";
             result.Description = "Der aufruf einer ganz normalen Variabel";
             result.Keys.Add("[VAR]");
-            result.Keys.Add("[REG]");
-            result.AssemblyCommands.Add("ldd [REG],[VAR]");
-            result.AssemblyCommands.Add("ldd [REG],[VAR]");
+            result.AssemblyCommands.Add("ldd r24,[VAR]");
+            result.AssemblyCommands.Add("ldd r25,[VAR]");
 
             return result;
         }
@@ -303,9 +302,8 @@ namespace Yama
             result.Mode = "set";
             result.Description = "Das setzen einer ganz normalen Variabel";
             result.Keys.Add("[VAR]");
-            result.Keys.Add("[REG]");
-            result.AssemblyCommands.Add("std [VAR],[REG]");
-            result.AssemblyCommands.Add("std [VAR],[REG]");
+            result.AssemblyCommands.Add("std [VAR],r24");
+            result.AssemblyCommands.Add("std [VAR],r25");
 
             return result;
         }
@@ -319,7 +317,7 @@ namespace Yama
             result.Name = "ExecuteCall";
             result.Mode = "default";
             result.Description = "Aufruf einer Funktion";
-            result.AssemblyCommands.Add("movw r30, r2");
+            result.AssemblyCommands.Add("movw r30, r24");
             result.AssemblyCommands.Add("icall");
 
             return result;
@@ -336,12 +334,6 @@ namespace Yama
             result.Description = "Die Deklaration einer Funktion";
             result.Keys.Add("[NAME]");
             result.AssemblyCommands.Add("[NAME]:");
-            result.AssemblyCommands.Add("push r2");
-            result.AssemblyCommands.Add("push r3");
-            result.AssemblyCommands.Add("push r4");
-            result.AssemblyCommands.Add("push r5");
-            result.AssemblyCommands.Add("push r6");
-            result.AssemblyCommands.Add("push r7");
             result.AssemblyCommands.Add("push r16");
             result.AssemblyCommands.Add("push r17");
             result.AssemblyCommands.Add("push r18");
@@ -366,7 +358,7 @@ namespace Yama
             result.Mode = "default";
             result.Description = "Das ende einer Funktion";
             result.AssemblyCommands.Add("adiw r28, 6");
-            result.AssemblyCommands.Add("in __tmp__reg__,__SREG__");
+            result.AssemblyCommands.Add("in __tmp_reg__,__SREG__");
             result.AssemblyCommands.Add("cli");
             result.AssemblyCommands.Add("out __SP_H__,r29");
             result.AssemblyCommands.Add("out __SREG__,__tmp_reg__");
@@ -379,12 +371,6 @@ namespace Yama
             result.AssemblyCommands.Add("pop r18");
             result.AssemblyCommands.Add("pop r17");
             result.AssemblyCommands.Add("pop r16");
-            result.AssemblyCommands.Add("pop r7");
-            result.AssemblyCommands.Add("pop r6");
-            result.AssemblyCommands.Add("pop r5");
-            result.AssemblyCommands.Add("pop r4");
-            result.AssemblyCommands.Add("pop r3");
-            result.AssemblyCommands.Add("pop r2");
             result.AssemblyCommands.Add("ret");
 
             return result;
@@ -399,7 +385,7 @@ namespace Yama
             result.Mode = "default";
             result.Description = "Das verschieben eines Ergebnisses";
             result.Keys.Add("[REG]");
-            result.AssemblyCommands.Add("movw [REG], r2");
+            result.AssemblyCommands.Add("movw [REG], r24");
 
             return result;
         }
@@ -414,9 +400,8 @@ namespace Yama
             result.Mode = "methode";
             result.Description = "Der aufruf einer ganz normalen Methode";
             result.Keys.Add("[METHODEREFCALL]");
-            result.Keys.Add("[REG]");
-            result.AssemblyCommands.Add("ldi [REG],[METHODEREFCALL]");
-            result.AssemblyCommands.Add("ldi [REG],[METHODEREFCALL]");
+            result.AssemblyCommands.Add("ldi r24,[METHODEREFCALL]");
+            result.AssemblyCommands.Add("ldi r25,[METHODEREFCALL]");
 
             return result;
         }

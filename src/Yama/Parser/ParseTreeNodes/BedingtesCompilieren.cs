@@ -53,6 +53,10 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            if (!this.Token.Text.Contains("#region asm")) return true;
+
+            compiler.Writer.WriteLine(this.Token.Value.ToString());
+
             return true;
         }
     }

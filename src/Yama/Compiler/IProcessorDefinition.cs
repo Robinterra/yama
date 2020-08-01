@@ -30,6 +30,8 @@ namespace Yama.Compiler
 
         #endregion get/set
 
+        bool BeginNeuRegister();
+
         List<string> ZielRegister(IRegisterQuery query);
     }
 

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Yama.Lexer
 {
@@ -82,9 +84,19 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public object GetValue ( byte[] daten )
+        public object GetValue ( byte[] data )
         {
-            return System.Text.Encoding.UTF8.GetString ( daten );
+            Lexer lexer = new Lexer ( new System.IO.MemoryStream ( data ) );
+            lexer.LexerTokens.Add ( new Replacer ( this.Begin, string.Empty ) );
+            lexer.LexerTokens.Add ( new Replacer ( this.End, string.Empty ) );
+
+            List<byte> daten = new List<byte>();
+            foreach ( SyntaxToken token in lexer )
+            {
+                daten.AddRange(token.CleanDaten);
+            }
+
+            return Encoding.UTF8.GetString(daten.ToArray());
         }
 
         // -----------------------------------------------

@@ -339,6 +339,8 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            compiler.Definition.BeginNeuRegister();
+
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
 
             this.Statement.Compile(compiler, mode);

@@ -59,6 +59,12 @@ namespace Yama.Compiler
         {
             this.Writer = new StreamWriter(this.OutputFile.OpenWrite());
 
+            this.AddLine("__SP_H__ = 0x3e",null);
+            this.AddLine( "__SP_L__ = 0x3d", null);
+            this.AddLine("__SREG__ = 0x3f", null);
+            this.AddLine("__tmp_reg__ = 0", null);
+            this.AddLine("__zero_reg__ = 1", null);
+
             foreach (IParseTreeNode node in nodes)
             {
                 node.Compile(this);
