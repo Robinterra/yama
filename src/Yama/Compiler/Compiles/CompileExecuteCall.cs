@@ -5,7 +5,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileExecuteCall : ICompile<ReferenceCall>
+    public class CompileExecuteCall : ICompile<FunktionsDeklaration>
     {
         public string AlgoName
         {
@@ -19,7 +19,7 @@ namespace Yama.Compiler
             set;
         } = 2;
 
-        public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
+        public bool Compile(Compiler compiler, FunktionsDeklaration node, string mode = "default")
         {
             CompileAlgo algo = compiler.GetAlgo(this.AlgoName, mode);
 
@@ -27,6 +27,8 @@ namespace Yama.Compiler
             {
                 compiler.AddLine(algo.AssemblyCommands[i], null);
             }
+
+            compiler.Definition.ParaClean();
 
             return true;
         }

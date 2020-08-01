@@ -392,6 +392,22 @@ namespace Yama
 
         // -----------------------------------------------
 
+        private CompileAlgo CreateAlgoUsePara()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "UsePara";
+            result.Mode = "default";
+            result.Description = "Ein Registry Cache Entry als Parameter nutzen";
+            result.Keys.Add("[REGPOP]");
+            result.Keys.Add("[PARA]");
+            result.AssemblyCommands.Add("movw [PARA],[REGPOP]");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         private CompileAlgo CreateAlgoReferenceCallMethode()
         {
             CompileAlgo result = new CompileAlgo();
@@ -419,6 +435,7 @@ namespace Yama
             result.Add(this.CreateAlgoExecutionCall());
             result.Add(this.CreateAlgoFunktionsDeklaration());
             result.Add(this.CreateAlgoFunktionsEnde());
+            result.Add(this.CreateAlgoUsePara());
 
             return result;
         }

@@ -33,6 +33,7 @@ namespace Yama.Compiler
         bool BeginNeuRegister();
 
         List<string> ZielRegister(IRegisterQuery query);
+        bool ParaClean();
     }
 
 }

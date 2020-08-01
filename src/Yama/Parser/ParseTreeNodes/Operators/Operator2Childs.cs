@@ -47,6 +47,12 @@ namespace Yama.Parser
             set;
         } = new CompileMovResult();
 
+        public CompileUsePara UsePara
+        {
+            get;
+            set;
+        } = new CompileUsePara();
+
         public SyntaxToken Token
         {
             get;
@@ -183,9 +189,11 @@ namespace Yama.Parser
 
             this.OperatorCall.Compile(compiler, this.Reference, "methode");
 
+            this.UsePara.Compile(compiler, null);
+
+            this.UsePara.Compile(compiler, null);
+
             this.FunctionExecute.Compile(compiler, null, mode);
-
-
 
             return true;
         }

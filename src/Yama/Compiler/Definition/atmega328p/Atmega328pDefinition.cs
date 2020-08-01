@@ -69,14 +69,53 @@ namespace Yama.Compiler.Atmega328p
             return true;
         }
 
+        public bool ParaClean()
+        {
+            this.CurrentArbeitsRegister = this.ArbeitsRegister;
+
+            return true;
+        }
+
         public List<string> ZielRegister(IRegisterQuery query)
         {
             if (query.Key == "[VAR]") return this.VarQuery(query);
             if (query.Key == "[REG]") return this.RegisterQuery(query);
             if (query.Key == "[METHODEREFCALL]") return this.MethodeRefCallQuery(query);
             if (query.Key == "[NAME]") return new List<string> { query.Value.ToString() };
+            if (query.Key == "[REGPOP]") return this.MethodeRegPop(query);
+            if (query.Key == "[PARA]") return this.MethodePara(query);
 
             return null;
+        }
+
+        private List<string> MethodePara(IRegisterQuery query)
+        {
+            string resultPattern = "r{0}";
+            List<string> result = new List<string>();
+
+            int registerStart = this.ArbeitsRegister;
+            this.ArbeitsRegister += this.AdressBytes;
+
+            if (registerStart >= 26) return null;
+
+            result.Add(string.Format(resultPattern, registerStart));
+
+            return result;
+        }
+
+        private List<string> MethodeRegPop(IRegisterQuery query)
+        {
+            string resultPattern = "r{0}";
+            List<string> result = new List<string>();
+
+            this.AblageRegister -= this.AdressBytes;
+            int registerStart = this.AblageRegister;
+
+            if (registerStart >= 26) return null;
+
+            result.Add(string.Format(resultPattern, registerStart));
+
+            return result;
         }
 
         private List<string> MethodeRefCallQuery(IRegisterQuery query)

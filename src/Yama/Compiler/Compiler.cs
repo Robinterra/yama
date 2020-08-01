@@ -57,6 +57,7 @@ namespace Yama.Compiler
 
         public bool Compilen(List<IParseTreeNode> nodes)
         {
+            if (this.OutputFile.Exists) this.OutputFile.Delete();
             this.Writer = new StreamWriter(this.OutputFile.OpenWrite());
 
             this.AddLine("__SP_H__ = 0x3e",null);
