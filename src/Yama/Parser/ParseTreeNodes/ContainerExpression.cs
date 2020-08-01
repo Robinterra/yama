@@ -99,5 +99,10 @@ namespace Yama.Parser
 
             return this.ExpressionParent.Indezieren(index, parent);
         }
+
+        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        {
+            return true;
+        }
     }
 }

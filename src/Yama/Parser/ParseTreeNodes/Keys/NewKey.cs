@@ -107,6 +107,11 @@ namespace Yama.Parser
             return true;
         }
 
+        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        {
+            return true;
+        }
+
         #endregion methods
 
     }

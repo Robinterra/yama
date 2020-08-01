@@ -40,5 +40,10 @@ namespace Yama.Parser
         {
             return index.CreateError(this);
         }
+
+        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        {
+            return true;
+        }
     }
 }

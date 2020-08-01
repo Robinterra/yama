@@ -42,6 +42,10 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
+        bool Compile ( Compiler.Compiler compiler, string mode = "default" );
+
+        // -----------------------------------------------
+
         #endregion methods
 
         // -----------------------------------------------

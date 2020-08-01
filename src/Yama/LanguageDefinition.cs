@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 using Yama.Parser;
@@ -57,30 +58,8 @@ namespace LearnCsStuf.Basic
 
         // -----------------------------------------------
 
-        public bool PrintSyntaxError(SyntaxToken token)
-        {
-            if (token.Kind != SyntaxKind.Unknown) return false;
+        #region ParserDefinition
 
-            ConsoleColor colr = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            Console.Error.WriteLine ( "({0},{1}) Syntax error - unknown char \"{2}\"", token.Line, token.Column, token.Text );
-
-            Console.ForegroundColor = colr;
-
-            return true;
-        }
-
-        // -----------------------------------------------
-
-        public bool DoStuff()
-        {
-            
-
-            return true;
-        }
-
-        
         // -----------------------------------------------
 
         private ParserLayer KlassenLayer(ParserLayer inclassLayer)
@@ -185,6 +164,16 @@ namespace LearnCsStuf.Basic
             return parserRules;
         }
 
+        // -----------------------------------------------
+
+        #endregion ParserDefinition
+
+        // -----------------------------------------------
+
+        #region LexerDefinition
+
+        // -----------------------------------------------
+
         public List<ILexerToken> GetLexerRules()
         {
             List<ILexerToken> rules = new List<ILexerToken>();
@@ -267,6 +256,8 @@ namespace LearnCsStuf.Basic
             return rules;
         }
 
+        // -----------------------------------------------
+
         public Lexer GetBasicLexer()
         {
             Lexer lexer = new Lexer();
@@ -276,9 +267,73 @@ namespace LearnCsStuf.Basic
             return lexer;
         }
 
-        public bool Compile()
+        // -----------------------------------------------
+
+        #endregion LexerDefinition
+
+        // -----------------------------------------------
+
+        #region CompilerDefinition
+
+        // -----------------------------------------------
+
+        private CompileAlgo CreateAlgoReferenceCallGet()
         {
-            List<IParseTreeNode> nodes = new List<IParseTreeNode>();
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "ReferenceCall";
+            result.Mode = "default";
+            result.Description = "Der aufruf einer ganz normalen Variabel";
+            result.Keys.Add("[VAR]");
+            result.Keys.Add("[REG]");
+            result.AssemblyCommands.Add("ldd [REG],[VAR]");
+            result.AssemblyCommands.Add("ldd [REG],[VAR]");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        private CompileAlgo CreateAlgoReferenceCallSet()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "ReferenceCall";
+            result.Mode = "set";
+            result.Description = "Das setzen einer ganz normalen Variabel";
+            result.Keys.Add("[VAR]");
+            result.Keys.Add("[REG]");
+            result.AssemblyCommands.Add("std [VAR],[REG]");
+            result.AssemblyCommands.Add("std [VAR],[REG]");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        private CompileAlgo CreateAlgoReferenceCallMethode()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "ReferenceCall";
+            result.Mode = "methode";
+            result.Description = "Der aufruf einer ganz normalen Methode";
+            result.Keys.Add("[METHODEREFCALL]");
+            result.Keys.Add("[REG]");
+            result.AssemblyCommands.Add("ldi [REG],[METHODEREFCALL]");
+            result.AssemblyCommands.Add("ldi [REG],[METHODEREFCALL]");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        #endregion CompilerDefinition
+
+        // -----------------------------------------------
+
+        private bool Parse(List<IParseTreeNode> nodes)
+        {
             List<string> files = this.GetFiles();
 
             foreach (string File in files)
@@ -297,6 +352,13 @@ namespace LearnCsStuf.Basic
                 nodes.AddRange(node.GetAllChilds);
             }
 
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool Indezieren(List<IParseTreeNode> nodes)
+        {
             Yama.Index.Index index = new Yama.Index.Index();
             index.Roots = nodes;
 
@@ -304,6 +366,21 @@ namespace LearnCsStuf.Basic
 
             return true;
         }
+
+        // -----------------------------------------------
+
+        public bool Compile()
+        {
+            List<IParseTreeNode> nodes = new List<IParseTreeNode>();
+
+            if (!this.Parse(nodes)) return false;
+
+            if (!this.Indezieren(nodes)) return false;
+
+            return true;
+        }
+
+        // -----------------------------------------------
 
         private List<string> GetFiles()
         {
@@ -319,6 +396,12 @@ namespace LearnCsStuf.Basic
             return result;
         }
 
+        // -----------------------------------------------
+
+        #region PrintErrors
+
+        // -----------------------------------------------
+
         private bool PrintingIndexErrors(Yama.Index.Index index)
         {
             foreach ( IndexError error in index.Errors )
@@ -330,7 +413,9 @@ namespace LearnCsStuf.Basic
 
             return false;
         }
-        
+
+        // -----------------------------------------------
+
         public bool PrintSyntaxError(SyntaxToken token, string msg, string nexterrormsg = "Syntax error")
         {
             //if (token.Kind != SyntaxKind.Unknown) return false;
@@ -360,6 +445,10 @@ namespace LearnCsStuf.Basic
 
             return false;
         }
+
+        // -----------------------------------------------
+
+        #endregion PrintErrors
 
         // -----------------------------------------------
 

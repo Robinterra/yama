@@ -575,7 +575,7 @@ namespace Yama.Parser
         public bool Parse ( ParserLayer start )
         {
             if (start == null) return false;
-            if (!this.Fileinfo.Exists) return false;
+            if (!this.Fileinfo.Exists) return this.FileNotFoundError();
 
             this.ActivateLayer(start);
 
@@ -599,6 +599,17 @@ namespace Yama.Parser
             //this.PrintPretty ( this.ParentContainer );
 
             return this.ParserErrors.Count == 0;
+        }
+
+        // -----------------------------------------------
+
+        private bool FileNotFoundError()
+        {
+            SyntaxToken token = new SyntaxToken ( SyntaxKind.Unknown, -1, -1, -1, this.Fileinfo.Name, "File not Found" );
+
+            this.PrintSyntaxError(token, "File not Found");
+
+            return false;
         }
 
         // -----------------------------------------------

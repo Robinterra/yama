@@ -1,14 +1,19 @@
+using Yama.Index;
 using Yama.Parser;
 
 namespace Yama.Compiler
 {
 
-    public interface ICompile
+    public interface ICompile<T> where T : IParseTreeNode
     {
 
-        A GetAlgo<A> (  ) where A : ICompileAlgo;
+        string AlgoName
+        {
+            get;
+            set;
+        }
 
-        bool Compile<T> ( Compiler compiler, IParseTreeNode node, T datenCache ) where T : IDatenCache;
+        bool Compile ( Compiler compiler, T node, string mode = "default" );
     }
 
 }
