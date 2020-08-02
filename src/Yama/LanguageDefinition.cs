@@ -408,6 +408,22 @@ namespace Yama
 
         // -----------------------------------------------
 
+        private CompileAlgo CreateAlgoNumberConst()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "NumConst";
+            result.Mode = "default";
+            result.Description = "Die Konstante in das Register laden";
+            result.Keys.Add("[NUMCONST]");
+            result.AssemblyCommands.Add("ldi 24,[NUMCONST]");
+            result.AssemblyCommands.Add("ldi 25,[NUMCONST]");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         private CompileAlgo CreateAlgoReferenceCallMethode()
         {
             CompileAlgo result = new CompileAlgo();
@@ -436,6 +452,7 @@ namespace Yama
             result.Add(this.CreateAlgoFunktionsDeklaration());
             result.Add(this.CreateAlgoFunktionsEnde());
             result.Add(this.CreateAlgoUsePara());
+            result.Add(this.CreateAlgoNumberConst());
 
             return result;
         }

@@ -84,8 +84,34 @@ namespace Yama.Compiler.Atmega328p
             if (query.Key == "[NAME]") return new List<string> { query.Value.ToString() };
             if (query.Key == "[REGPOP]") return this.MethodeRegPop(query);
             if (query.Key == "[PARA]") return this.MethodePara(query);
+            if (query.Key == "[NUMCONST]") return this.MethodeNumConst(query);
 
             return null;
+        }
+
+        private List<string> MethodeNumConst(IRegisterQuery query)
+        {
+            List<string> result = new List<string>();
+            string string_pattern = "0x{0:X}";
+
+            int wert = (int)query.Value;
+            int pattern = 0xFF;
+            int bitcounter = 0;
+
+            for (int i = 0; i < this.AdressBytes; i++)
+            {
+                int resultInt = wert & pattern;
+
+                resultInt = resultInt >> bitcounter;
+
+                result.Add(string.Format(string_pattern, resultInt));
+
+                pattern = pattern << 8;
+
+                bitcounter += 8;
+            }
+
+            return result;
         }
 
         private List<string> MethodePara(IRegisterQuery query)

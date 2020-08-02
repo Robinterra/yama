@@ -2,6 +2,7 @@ using Yama.Index;
 using System.Collections.Generic;
 using Yama.Lexer;
 using System.Linq;
+using Yama.Compiler;
 
 namespace Yama.Parser
 {
@@ -56,6 +57,12 @@ namespace Yama.Parser
                 return result;
             }
         }
+
+        public CompileReferenceCall Compilen
+        {
+            get;
+            set;
+        } = new CompileReferenceCall();
 
         public List<SyntaxKind> Ausnahmen
         {
@@ -157,6 +164,15 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            if (mode == "set")
+            {
+                IndexVariabelnReference varref = new IndexVariabelnReference();
+                varref.Deklaration = this.Deklaration;
+                varref.ParentUsesSet = this.Deklaration.ParentUsesSet;
+
+                this.Compilen.Compile(compiler, varref, mode);
+            }
+
             return true;
         }
 

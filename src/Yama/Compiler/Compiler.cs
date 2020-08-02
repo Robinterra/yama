@@ -65,6 +65,9 @@ namespace Yama.Compiler
             this.AddLine("__SREG__ = 0x3f", null);
             this.AddLine("__tmp_reg__ = 0", null);
             this.AddLine("__zero_reg__ = 1", null);
+            this.AddLine("ldi r24, 0", null);
+            this.AddLine("ldi r25, 0", null);
+            this.AddLine("movw r0, r24", null);
 
             foreach (IParseTreeNode node in nodes)
             {

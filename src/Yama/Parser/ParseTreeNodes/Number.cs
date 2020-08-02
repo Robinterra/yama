@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -14,6 +15,12 @@ namespace Yama.Parser
             get;
             set;
         }
+
+        public CompileNumConst NumConst
+        {
+            get;
+            set;
+        } = new CompileNumConst();
 
         public List<IParseTreeNode> GetAllChilds
         {
@@ -65,6 +72,8 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            this.NumConst.Compile(compiler, this, mode);
+
             return true;
         }
     }
