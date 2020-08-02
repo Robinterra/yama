@@ -317,6 +317,10 @@ namespace Yama.Parser
                 deklaration.Parameters.Add(container.VariabelnDeklarations.Last());
             }
 
+            if (deklaration.Type == MethodeType.Static)
+            if (this.Token.Text == "main")
+                index.SetMainFunction(this);
+
             this.AddMethode(klasse, deklaration);
 
             this.Statement.Indezieren(index, container);

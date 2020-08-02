@@ -32,6 +32,7 @@ namespace Yama.Compiler
             get;
             set;
         }
+        public FunktionsDeklaration MainFunction { get; internal set; }
 
         public CompileAlgo GetAlgo(string algoName, string mode)
         {
@@ -65,9 +66,8 @@ namespace Yama.Compiler
             this.AddLine("__SREG__ = 0x3f", null);
             this.AddLine("__tmp_reg__ = 0", null);
             this.AddLine("__zero_reg__ = 1", null);
-            this.AddLine("ldi r24, 0", null);
-            this.AddLine("ldi r25, 0", null);
-            this.AddLine("movw r0, r24", null);
+            this.AddLine(".global    main", null);
+            this.AddLine(".type main, @function", null);
 
             foreach (IParseTreeNode node in nodes)
             {

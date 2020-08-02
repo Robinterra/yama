@@ -488,12 +488,14 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool Indezieren(List<IParseTreeNode> nodes)
+        private bool Indezieren(List<IParseTreeNode> nodes, ref FunktionsDeklaration main)
         {
             Yama.Index.Index index = new Yama.Index.Index();
             index.Roots = nodes;
 
             if (!index.CreateIndex()) return this.PrintingIndexErrors(index);
+
+            main = index.MainFunction;
 
             return true;
         }
@@ -503,24 +505,26 @@ namespace Yama
         public bool Compile()
         {
             List<IParseTreeNode> nodes = new List<IParseTreeNode>();
+            FunktionsDeklaration main = null;
 
             if (!this.Parse(nodes)) return false;
 
-            if (!this.Indezieren(nodes)) return false;
+            if (!this.Indezieren(nodes, ref main)) return false;
 
-            if (!this.Compilen(nodes)) return false;
+            if (!this.Compilen(nodes, main)) return false;
 
             return true;
         }
 
         // -----------------------------------------------
 
-        private bool Compilen(List<IParseTreeNode> nodes)
+        private bool Compilen(List<IParseTreeNode> nodes, FunktionsDeklaration main)
         {
             Compiler.Compiler compiler = new Compiler.Compiler();
             compiler.OutputFile = new FileInfo("out.S");
             compiler.Definition = new Atmega328pDefinition();
             compiler.Algos = this.CompileAlgos();
+            compiler.MainFunction = main;
 
             return compiler.Compilen(nodes);
         }

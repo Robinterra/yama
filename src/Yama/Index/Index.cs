@@ -33,6 +33,12 @@ namespace Yama.Index
             set;
         }
 
+        public FunktionsDeklaration MainFunction
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -50,6 +56,8 @@ namespace Yama.Index
             {
                 node.Indezieren(this, null);
             }
+
+            if (this.MainFunction == null) this.CreateError(this.Roots[0], "Keine main function gefunden!");
 
             if (this.Errors.Count != 0) return false;
 
@@ -90,6 +98,15 @@ namespace Yama.Index
             this.Errors.Add(error);
 
             return false;
+        }
+
+        public bool SetMainFunction(FunktionsDeklaration funktionsDeklaration)
+        {
+            if (this.MainFunction != null) return this.CreateError(funktionsDeklaration, "Eine Main Funktion existiert bereits");
+
+            this.MainFunction = funktionsDeklaration;
+
+            return true;
         }
 
         #endregion ctor

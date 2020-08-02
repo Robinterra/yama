@@ -90,6 +90,8 @@ namespace Yama.Index
         {
             get
             {
+                if (this.NameInText == "main") return "main";
+
                 string pattern = "{0}_{1}_{2}";
 
                 return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count);
