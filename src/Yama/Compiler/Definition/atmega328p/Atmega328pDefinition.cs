@@ -181,10 +181,10 @@ namespace Yama.Compiler.Atmega328p
             string resultPattern = "r{0}";
             List<string> result = new List<string>();
 
-            int registerStart = this.ArbeitsRegister;
-            this.ArbeitsRegister += this.AdressBytes;
+            int registerStart = this.CurrentArbeitsRegister;
+            this.CurrentArbeitsRegister += this.AdressBytes;
 
-            if (registerStart >= 26) return null;
+            if (registerStart >= this.AblageRegister) return null;
 
             result.Add(string.Format(resultPattern, registerStart));
 
@@ -198,10 +198,10 @@ namespace Yama.Compiler.Atmega328p
             string resultPattern = "r{0}";
             List<string> result = new List<string>();
 
-            this.AblageRegister -= this.AdressBytes;
-            int registerStart = this.AblageRegister;
+            this.CurrentAblageRegister -= this.AdressBytes;
+            int registerStart = this.CurrentAblageRegister;
 
-            if (registerStart >= 26) return null;
+            if (registerStart < this.ArbeitsRegister) return null;
 
             result.Add(string.Format(resultPattern, registerStart));
 
@@ -227,8 +227,8 @@ namespace Yama.Compiler.Atmega328p
             string resultPattern = "r{0}";
             List<string> result = new List<string>();
 
-            int registerStart = this.AblageRegister;
-            this.AblageRegister += this.AdressBytes;
+            int registerStart = this.CurrentAblageRegister;
+            this.CurrentAblageRegister += this.AdressBytes;
 
             if (registerStart >= 24) return null;
 
@@ -473,8 +473,8 @@ namespace Yama.Compiler.Atmega328p
             result.Mode = "default";
             result.Description = "Die Konstante in das Register laden";
             result.Keys.Add("[NUMCONST]");
-            result.AssemblyCommands.Add("ldi 24,[NUMCONST]");
-            result.AssemblyCommands.Add("ldi 25,[NUMCONST]");
+            result.AssemblyCommands.Add("ldi r24,[NUMCONST]");
+            result.AssemblyCommands.Add("ldi r25,[NUMCONST]");
 
             return result;
         }

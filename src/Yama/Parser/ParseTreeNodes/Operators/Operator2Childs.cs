@@ -41,18 +41,6 @@ namespace Yama.Parser
             set;
         } = new CompileExecuteCall();
 
-        public CompileMovResult MovResultCompilen
-        {
-            get;
-            set;
-        } = new CompileMovResult();
-
-        public CompileUsePara UsePara
-        {
-            get;
-            set;
-        } = new CompileUsePara();
-
         public SyntaxToken Token
         {
             get;
@@ -181,17 +169,25 @@ namespace Yama.Parser
                 return true;
             }
 
-            this.MovResultCompilen.Compile(compiler, null, mode);
+            CompileMovResult movResultRight = new CompileMovResult();
+
+            movResultRight.Compile(compiler, null, mode);
 
             this.LeftNode.Compile(compiler, mode);
 
-            this.MovResultCompilen.Compile(compiler, null, mode);
+            CompileMovResult movResultLeft = new CompileMovResult();
+
+            movResultLeft.Compile(compiler, null, mode);
 
             this.OperatorCall.Compile(compiler, this.Reference, "methode");
 
-            this.UsePara.Compile(compiler, null);
+            CompileUsePara usePara = new CompileUsePara();
 
-            this.UsePara.Compile(compiler, null);
+            usePara.Compile(compiler, null);
+
+            usePara = new CompileUsePara();
+
+            usePara.Compile(compiler, null);
 
             this.FunctionExecute.Compile(compiler, null, mode);
 
