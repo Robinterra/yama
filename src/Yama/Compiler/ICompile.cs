@@ -4,7 +4,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public interface ICompile<T> where T : IParseTreeNode
+    public interface ICompile<T> : ICompileRoot where T : IParseTreeNode
     {
 
         string AlgoName

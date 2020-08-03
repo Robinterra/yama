@@ -4,7 +4,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileVariabelDeklaration : ICompile<VariabelDeklaration>
+    /*public class CompileVariabelDeklaration : ICompile<VariabelDeklaration>
     {
         public string AlgoName
         {
@@ -22,6 +22,6 @@ namespace Yama.Compiler
         }
 
         //bool Compile ( Compiler compiler, T node );
-    }
+    }*/
 
 }

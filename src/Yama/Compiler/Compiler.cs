@@ -9,11 +9,11 @@ namespace Yama.Compiler
     public class Compiler
     {
 
-        public List<CompileAlgo> Algos
+        public CompileHeader Header
         {
             get;
             set;
-        }
+        } = new CompileHeader();
 
         public FileInfo OutputFile
         {
@@ -32,13 +32,24 @@ namespace Yama.Compiler
             get;
             set;
         }
+
+        public List<ICompileRoot> AssemblerSequence
+        {
+            get;
+            set;
+        }
         public FunktionsDeklaration MainFunction { get; internal set; }
+        public List<CompilerError> Errors { get; set; } = new List<CompilerError>();
 
         public CompileAlgo GetAlgo(string algoName, string mode)
         {
-            CompileAlgo result = this.Algos.FirstOrDefault(a=> a.Name == algoName && a.Mode == mode);
+            CompileAlgo result = this.Definition.Algos.FirstOrDefault(a=> a.Name == algoName && a.Mode == mode);
 
-            return result;
+            if (result != null) return result;
+
+            this.AddError(string.Format("Der Algorithmus {0} mit dem Modus {1} konnte nicht gefunden werden!", algoName, mode));
+
+            return null;
         }
 
         public bool AddLine(string assemblyCode, Dictionary<string, string> dictionaries)
@@ -58,25 +69,51 @@ namespace Yama.Compiler
 
         public bool Compilen(List<IParseTreeNode> nodes)
         {
-            if (this.OutputFile.Exists) this.OutputFile.Delete();
-            this.Writer = new StreamWriter(this.OutputFile.OpenWrite());
+            if (this.Definition == null) return this.AddError("Keine definition zur Übersetzung in Assembler gesetzt");
 
-            this.AddLine("__SP_H__ = 0x3e",null);
-            this.AddLine( "__SP_L__ = 0x3d", null);
-            this.AddLine("__SREG__ = 0x3f", null);
-            this.AddLine("__tmp_reg__ = 0", null);
-            this.AddLine("__zero_reg__ = 1", null);
-            this.AddLine(".global    main", null);
-            this.AddLine(".type main, @function", null);
+            this.Header.Compile(this, this.MainFunction);
 
             foreach (IParseTreeNode node in nodes)
             {
-                node.Compile(this);
+                if (!node.Compile(this)) this.AddError("Beim assembelieren ist in einer Klasse ein Fehler aufgetreten", node);
+            }
+
+            if (this.Errors.Count != 0) return false;
+
+            this.RunAssmblerSequence();
+
+            return this.Errors.Count == 0;
+        }
+
+        private bool RunAssmblerSequence()
+        {
+            if (this.OutputFile.Exists) this.OutputFile.Delete();
+
+            try
+            {
+                this.Writer = new StreamWriter(this.OutputFile.OpenWrite());
+            }
+            catch (Exception e) { return this.AddError(string.Format("Die Datei in der Assemblercode geschrieben werden sollte konnte nicht angelegt werden. {0}", e.Message)); }
+
+            foreach (ICompileRoot root in this.AssemblerSequence)
+            {
+                if (!root.InFileCompilen(this)) this.AddError("Beim Schreiben der Assemblersequence ist ein Fehler aufgetreten");
             }
 
             this.Writer.Close();
 
             return true;
+        }
+
+        public bool AddError(string msg, IParseTreeNode node = null)
+        {
+            CompilerError error = new CompilerError();
+            error.Msg = msg;
+            error.Use = node;
+
+            this.Errors.Add(error);
+
+            return false;
         }
     }
 }

@@ -5,21 +5,19 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileUsePara : ICompile<ReferenceCall>
+    public class CompileHeader : ICompile<FunktionsDeklaration>
     {
         public string AlgoName
         {
             get;
             set;
-        } = "UsePara";
+        } = "CompileHeader";
 
         public int Counter
         {
             get;
             set;
         } = 2;
-
-        
 
         public CompileAlgo Algo
         {
@@ -33,7 +31,7 @@ namespace Yama.Compiler
             set;
         }
 
-        public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
+        public bool Compile(Compiler compiler, FunktionsDeklaration node, string mode = "default")
         {
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
@@ -45,11 +43,13 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
                 query.Kategorie = mode;
+                query.Uses = node.Deklaration.ThisUses;
+                query.Value = (object)node.Deklaration.Name;
 
                 List<string> result = compiler.Definition.ZielRegister(query);
-                if (result == null) return false; //TODO: Create Error Entry
+                if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", node);
 
-                for (int i = 0; i < this.PrimaryKeys.Length; i++)
+                for (int i = 0; i < result.Count; i++)
                 {
                     if (this.PrimaryKeys[i] == null) this.PrimaryKeys[i] = new Dictionary<string, string>();
 

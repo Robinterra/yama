@@ -43,7 +43,7 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            return true;
+            return false;
         }
     }
 }

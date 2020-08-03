@@ -5,19 +5,13 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileExecuteCall : ICompile<FunktionsDeklaration>
+    public class CompileRegionAsm : ICompile<BedingtesCompilierenParser>
     {
         public string AlgoName
         {
             get;
             set;
-        } = "ExecuteCall";
-
-        public int Counter
-        {
-            get;
-            set;
-        } = 2;
+        } = "RegionAsm";
 
         public CompileAlgo Algo
         {
@@ -25,13 +19,13 @@ namespace Yama.Compiler
             set;
         }
 
-        public bool Compile(Compiler compiler, FunktionsDeklaration node, string mode = "default")
+        public bool Compile(Compiler compiler, BedingtesCompilierenParser node, string mode = "default")
         {
-            this.Algo = compiler.GetAlgo(this.AlgoName, mode);
+            this.Algo = new CompileAlgo();
 
-            if (this.Algo == null) return false;
+            this.Algo.AssemblyCommands.Add(node.Token.Value.ToString());
 
-            return compiler.Definition.ParaClean();
+            return true;
         }
 
         public bool InFileCompilen(Compiler compiler)

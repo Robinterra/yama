@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -22,6 +23,12 @@ namespace Yama.Parser
                 return new List<IParseTreeNode> (  );
             }
         }
+
+        public CompileRegionAsm RegionAsm
+        {
+            get;
+            set;
+        } = new CompileRegionAsm();
 
         #endregion get/set
 
@@ -55,7 +62,7 @@ namespace Yama.Parser
         {
             if (!this.Token.Text.Contains("#region asm")) return true;
 
-            compiler.Writer.WriteLine(this.Token.Value.ToString());
+            this.RegionAsm.Compile(compiler, this, mode);
 
             return true;
         }

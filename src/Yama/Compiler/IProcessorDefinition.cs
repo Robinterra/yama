@@ -28,12 +28,24 @@ namespace Yama.Compiler
             set;
         }
 
+        List<CompileAlgo> Algos
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
+
+        #region methods
 
         bool BeginNeuRegister();
 
         List<string> ZielRegister(IRegisterQuery query);
+
         bool ParaClean();
+
+        #endregion methods
+
     }
 
 }
