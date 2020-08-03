@@ -28,6 +28,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public List<string> PostKeys
+        {
+            get;
+            set;
+        }
+
         public List<string> AssemblyCommands
         {
             get;
@@ -38,6 +44,7 @@ namespace Yama.Compiler
         {
             this.Keys = new List<string>();
             this.AssemblyCommands = new List<string>();
+            this.PostKeys = new List<string>();
         }
     }
 }

@@ -21,6 +21,8 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, BedingtesCompilierenParser node, string mode = "default")
         {
+            compiler.AssemblerSequence.Add(this);
+
             this.Algo = new CompileAlgo();
 
             this.Algo.AssemblyCommands.Add(node.Token.Value.ToString());

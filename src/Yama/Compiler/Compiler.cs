@@ -9,6 +9,8 @@ namespace Yama.Compiler
     public class Compiler
     {
 
+        #region get/set
+
         public CompileHeader Header
         {
             get;
@@ -37,9 +39,13 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new List<ICompileRoot>();
         public FunktionsDeklaration MainFunction { get; internal set; }
         public List<CompilerError> Errors { get; set; } = new List<CompilerError>();
+
+        #endregion get/set
+
+        #region methods
 
         public CompileAlgo GetAlgo(string algoName, string mode)
         {
@@ -52,11 +58,19 @@ namespace Yama.Compiler
             return null;
         }
 
-        public bool AddLine(string assemblyCode, Dictionary<string, string> dictionaries)
+        public bool AddLine(string assemblyCode, Dictionary<string, string> dictionaries, Dictionary<string, string> postreplaces = null)
         {
             if (dictionaries != null)
             {
                 foreach(KeyValuePair<string, string> pair in dictionaries)
+                {
+                    assemblyCode = assemblyCode.Replace(pair.Key, pair.Value);
+                }
+            }
+
+            if (postreplaces != null)
+            {
+                foreach(KeyValuePair<string, string> pair in postreplaces)
                 {
                     assemblyCode = assemblyCode.Replace(pair.Key, pair.Value);
                 }
@@ -115,5 +129,7 @@ namespace Yama.Compiler
 
             return false;
         }
+
+        #endregion methods
     }
 }

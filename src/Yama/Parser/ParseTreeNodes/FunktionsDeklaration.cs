@@ -96,6 +96,12 @@ namespace Yama.Parser
             get;
         }
 
+        public List<string> RegisterInUse
+        {
+            get;
+            set;
+        } = new List<string>();
+
         #endregion get/set
 
         #region ctor
@@ -343,7 +349,7 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            compiler.Definition.BeginNeuRegister();
+            compiler.Definition.BeginNeuRegister(this.RegisterInUse);
 
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
 

@@ -27,6 +27,8 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, FunktionsDeklaration node, string mode = "default")
         {
+            compiler.AssemblerSequence.Add(this);
+
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
 
             if (this.Algo == null) return false;

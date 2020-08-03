@@ -34,11 +34,19 @@ namespace Yama.Compiler
             set;
         }
 
+        List<string> RegisterUses
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
 
-        bool BeginNeuRegister();
+        bool BeginNeuRegister(List<string> registersUses);
+
+        string PostKeyReplace(IRegisterQuery key);
 
         List<string> ZielRegister(IRegisterQuery query);
 

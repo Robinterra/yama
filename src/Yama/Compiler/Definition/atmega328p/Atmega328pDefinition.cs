@@ -79,6 +79,14 @@ namespace Yama.Compiler.Atmega328p
 
         // -----------------------------------------------
 
+        public List<string> RegisterUses
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -94,10 +102,11 @@ namespace Yama.Compiler.Atmega328p
 
         // -----------------------------------------------
 
-        public bool BeginNeuRegister()
+        public bool BeginNeuRegister(List<string> registersUses)
         {
             this.CurrentArbeitsRegister = this.ArbeitsRegister;
             this.CurrentAblageRegister = this.AblageRegister;
+            this.RegisterUses = registersUses;
 
             return true;
         }
@@ -109,6 +118,16 @@ namespace Yama.Compiler.Atmega328p
             this.CurrentArbeitsRegister = this.ArbeitsRegister;
 
             return true;
+        }
+
+        // -----------------------------------------------
+
+        public string PostKeyReplace(IRegisterQuery query)
+        {
+            if (query.Key == "[PUSHREG]") return this.PushReg(query);
+            if (query.Key == "[POPREG]") return this.PopReg(query);
+
+            return null;
         }
 
         // -----------------------------------------------
@@ -127,6 +146,8 @@ namespace Yama.Compiler.Atmega328p
         }
 
         // -----------------------------------------------
+
+        #region keymapping
 
         private List<string> MethodeNumConst(IRegisterQuery query)
         {
@@ -209,10 +230,16 @@ namespace Yama.Compiler.Atmega328p
             int registerStart = this.AblageRegister;
             this.AblageRegister += this.AdressBytes;
 
-            if (registerStart >= 26) return null;
+            if (registerStart >= 24) return null;
 
-            result.Add(string.Format(resultPattern, registerStart));
-            result.Add(string.Format(resultPattern, registerStart + 1));
+            string regOne = string.Format(resultPattern, registerStart);
+            string regTwo = string.Format(resultPattern, registerStart + 1);
+
+            result.Add(regOne);
+            result.Add(regTwo);
+
+            if (!this.RegisterUses.Contains(regOne)) this.RegisterUses.Add(regOne);
+            if (!this.RegisterUses.Contains(regTwo)) this.RegisterUses.Add(regTwo);
 
             return result;
         }
@@ -240,6 +267,51 @@ namespace Yama.Compiler.Atmega328p
 
             return result;
         }
+
+        #endregion keymapping
+
+        // -----------------------------------------------
+
+        #region postkeyreplace
+
+        // -----------------------------------------------
+
+
+        private string PopReg(IRegisterQuery query)
+        {
+            if (!(query.Value is List<string> t)) return null;
+
+            string pattern = "POP {0}\n{1}";
+            string result = string.Empty;
+
+            foreach(string reg in t)
+            {
+                result = string.Format(pattern, reg, result);
+            }
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        private string PushReg(IRegisterQuery query)
+        {
+            if (!(query.Value is List<string> t)) return null;
+
+            string pattern = "{1}PUSH {0}\n";
+            string result = string.Empty;
+
+            foreach(string reg in t)
+            {
+                result = string.Format(pattern, reg, result);
+            }
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        #endregion postkeyreplace
 
         // -----------------------------------------------
 
@@ -326,13 +398,9 @@ namespace Yama.Compiler.Atmega328p
             result.Mode = "default";
             result.Description = "Die Deklaration einer Funktion";
             result.Keys.Add("[NAME]");
+            result.PostKeys.Add("[PUSHREG]");
             result.AssemblyCommands.Add("[NAME]:");
-            result.AssemblyCommands.Add("push r16");
-            result.AssemblyCommands.Add("push r17");
-            result.AssemblyCommands.Add("push r18");
-            result.AssemblyCommands.Add("push r19");
-            result.AssemblyCommands.Add("push r20");
-            result.AssemblyCommands.Add("push r21");
+            result.AssemblyCommands.Add("[PUSHREG]");
             result.AssemblyCommands.Add("push r28");
             result.AssemblyCommands.Add("push r29");
             result.AssemblyCommands.Add("in r28,__SP_L__");
@@ -350,6 +418,7 @@ namespace Yama.Compiler.Atmega328p
             result.Name = "FunktionsEnde";
             result.Mode = "default";
             result.Description = "Das ende einer Funktion";
+            result.PostKeys.Add("[POPREG]");
             result.AssemblyCommands.Add("adiw r28, 6");
             result.AssemblyCommands.Add("in __tmp_reg__,__SREG__");
             result.AssemblyCommands.Add("cli");
@@ -358,12 +427,7 @@ namespace Yama.Compiler.Atmega328p
             result.AssemblyCommands.Add("out __SP_L__,r28");
             result.AssemblyCommands.Add("pop r29");
             result.AssemblyCommands.Add("pop r28");
-            result.AssemblyCommands.Add("pop r21");
-            result.AssemblyCommands.Add("pop r20");
-            result.AssemblyCommands.Add("pop r19");
-            result.AssemblyCommands.Add("pop r18");
-            result.AssemblyCommands.Add("pop r17");
-            result.AssemblyCommands.Add("pop r16");
+            result.AssemblyCommands.Add("[POPREG]");
             result.AssemblyCommands.Add("ret");
 
             return result;
@@ -446,6 +510,7 @@ namespace Yama.Compiler.Atmega328p
             result.Add(this.CreateAlgoFunktionsEnde());
             result.Add(this.CreateAlgoUsePara());
             result.Add(this.CreateAlgoNumberConst());
+            result.Add(this.CreateAlgoHeader());
 
             return result;
         }
