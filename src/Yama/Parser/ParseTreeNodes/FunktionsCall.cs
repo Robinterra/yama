@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
+using Yama.Compiler;
 
 namespace Yama.Parser
 {
@@ -20,6 +21,12 @@ namespace Yama.Parser
             get;
             set;
         }
+
+        public CompileExecuteCall FunctionExecute
+        {
+            get;
+            set;
+        } = new CompileExecuteCall();
 
         public List<IParseTreeNode> ParametersNodes
         {
@@ -147,6 +154,26 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            for (int i = this.ParametersNodes.Count; i > 0; i-- )
+            {
+                this.ParametersNodes[i - 1].Compile(compiler, mode);
+
+                CompileMovResult movResultRight = new CompileMovResult();
+
+                movResultRight.Compile(compiler, null, mode);
+            }
+
+            this.LeftNode.Compile(compiler, "methode");
+
+            for (int i = 0; i < this.ParametersNodes.Count; i++)
+            {
+                CompileUsePara usePara = new CompileUsePara();
+
+                usePara.Compile(compiler, null);
+            }
+
+            this.FunctionExecute.Compile(compiler, null, mode);
+
             return true;
         }
 

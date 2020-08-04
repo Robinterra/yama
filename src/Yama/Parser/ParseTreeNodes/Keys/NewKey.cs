@@ -1,21 +1,22 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class NewKey : IParseTreeNode
+    public class NewKey : IParseTreeNode, IEndExpression, IContainer
     {
 
         #region get/set
 
-        public IndexMethodReference Reference
+        public IndexVariabelnReference Reference
         {
             get;
             set;
         }
 
-        public IParseTreeNode Parameters
+        public List<IParseTreeNode> Parameters
         {
             get;
             set;
@@ -33,6 +34,18 @@ namespace Yama.Parser
             set;
         }
 
+        public CompileReferenceCall CtorCall
+        {
+            get;
+            set;
+        } = new CompileReferenceCall();
+
+        public CompileExecuteCall FunctionExecute
+        {
+            get;
+            set;
+        } = new CompileExecuteCall();
+
         public SyntaxToken Token
         {
             get;
@@ -45,12 +58,14 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                if (this.Parameters != null) result.Add ( this.Parameters );
+                if (this.Parameters != null) result.AddRange ( this.Parameters );
                 if (this.Zuweisung != null) result.Add ( this.Zuweisung );
 
                 return result;
             }
         }
+
+        public SyntaxToken Ende { get; set; }
 
         #endregion get/set
 
@@ -81,15 +96,26 @@ namespace Yama.Parser
 
             if ( !this.CheckHashValidOperator( newKey.Definition )) return null;
 
-            SyntaxToken conditionkind = parser.Peek ( newKey.Definition, 1 );
+            SyntaxToken beginkind = parser.Peek ( newKey.Definition, 1 );
 
-            newKey.Parameters = parser.ParseCleanToken(conditionkind);
+            SyntaxToken endToken = parser.FindEndToken ( beginkind, SyntaxKind.CloseKlammer, SyntaxKind.OpenKlammer );
 
-            if (newKey.Parameters == null) return null;
+            if ( endToken == null ) return null;
+
+            newKey.Parameters = parser.ParseCleanTokens ( beginkind.Position + 1, endToken.Position, true );
 
             newKey.Token.Node = newKey;
             newKey.Definition.Node = newKey;
-            newKey.Parameters.Token.ParentNode = newKey;
+            newKey.Ende = endToken;
+            endToken.ParentNode = newKey;
+            endToken.Node = newKey;
+            beginkind.ParentNode = newKey;
+            beginkind.Node = newKey;
+
+            foreach ( IParseTreeNode n in newKey.Parameters )
+            {
+                n.Token.ParentNode = newKey;
+            }
 
             return newKey;
         }
@@ -98,17 +124,42 @@ namespace Yama.Parser
         {
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
-            this.Parameters.Indezieren(index, parent);
+            foreach (IParseTreeNode node in this.Parameters)
+            {
+                node.Indezieren(index, container);
+            }
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
             reference.Name = this.Definition.Text;
             container.VariabelnReferences.Add(reference);
+
+            this.Reference = reference;
 
             return true;
         }
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            for (int i = this.Parameters.Count; i > 0; i-- )
+            {
+                this.Parameters[i - 1].Compile(compiler, mode);
+
+                CompileMovResult movResultRight = new CompileMovResult();
+
+                movResultRight.Compile(compiler, null, mode);
+            }
+
+            this.CtorCall.Compile(compiler, this.Reference, "methode");
+
+            for (int i = 0; i < this.Parameters.Count; i++)
+            {
+                CompileUsePara usePara = new CompileUsePara();
+
+                usePara.Compile(compiler, null);
+            }
+
+            this.FunctionExecute.Compile(compiler, null, mode);
+
             return true;
         }
 
