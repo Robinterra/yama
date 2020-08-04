@@ -78,7 +78,6 @@ namespace Yama.Index
                 if (this.thisUses != null) return this.thisUses;
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
-                this.thisUses.Deklarationen = this.Parameters.OfType<IParent>().ToList<IParent>();
 
                 return this.thisUses;
             }
@@ -138,10 +137,11 @@ namespace Yama.Index
 
             foreach (IndexVariabelnDeklaration dek in this.Parameters)
             {
-                dek.Mappen(this.ParentUsesSet);
+                dek.Mappen(this.ThisUses);
+                //this.ThisUses.Add(dek);
             }
 
-            this.ReturnValue.Mappen(this.ParentUsesSet);
+            this.ReturnValue.Mappen(this.ThisUses);
 
             return true;
         }

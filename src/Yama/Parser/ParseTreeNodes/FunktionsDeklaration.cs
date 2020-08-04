@@ -102,6 +102,12 @@ namespace Yama.Parser
             set;
         } = new List<string>();
 
+        public CompileContainer CompileContainer
+        {
+            get;
+            set;
+        } = new CompileContainer();
+
         #endregion get/set
 
         #region ctor
@@ -351,9 +357,17 @@ namespace Yama.Parser
         {
             compiler.Definition.BeginNeuRegister(this.RegisterInUse);
 
+            this.CompileContainer.Begin = new CompileSprungPunkt();
+            this.CompileContainer.Ende = new CompileSprungPunkt();
+            compiler.SetNewContainer(this.CompileContainer);
+
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
 
+            this.CompileContainer.Begin.Compile(compiler, this, mode);
+
             this.Statement.Compile(compiler, mode);
+
+            this.CompileContainer.Ende.Compile(compiler, this, mode);
 
             this.FunktionsEndeCompile.Compile(compiler, this, mode);
 

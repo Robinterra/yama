@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -32,6 +33,12 @@ namespace Yama.Parser
                 return result;
             }
         }
+
+        public CompileJumpTo JumpTo
+        {
+            get;
+            set;
+        } = new CompileJumpTo() { Point = PointMode.RootEnde };
 
         #endregion get/set
 
@@ -71,6 +78,10 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            this.Statement.Compile(compiler, mode);
+
+            this.JumpTo.Compile(compiler, null, mode);
+
             return true;
         }
 

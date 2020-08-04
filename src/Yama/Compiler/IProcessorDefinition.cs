@@ -40,6 +40,17 @@ namespace Yama.Compiler
             set;
         }
 
+        // -----------------------------------------------
+
+        Compiler Compiler
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+
         #endregion get/set
 
         #region methods
@@ -51,6 +62,7 @@ namespace Yama.Compiler
         List<string> ZielRegister(IRegisterQuery query);
 
         bool ParaClean();
+        string GenerateJumpPointName();
 
         #endregion methods
 

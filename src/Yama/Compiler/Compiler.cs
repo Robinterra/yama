@@ -17,6 +17,12 @@ namespace Yama.Compiler
             set;
         } = new CompileHeader();
 
+        public ContainerManagment CurrentContainer
+        {
+            get;
+            set;
+        }
+
         public FileInfo OutputFile
         {
             get;
@@ -84,6 +90,7 @@ namespace Yama.Compiler
         public bool Compilen(List<IParseTreeNode> nodes)
         {
             if (this.Definition == null) return this.AddError("Keine definition zur Übersetzung in Assembler gesetzt");
+            this.Definition.Compiler = this;
 
             this.Header.Compile(this, this.MainFunction);
 
@@ -128,6 +135,16 @@ namespace Yama.Compiler
             this.Errors.Add(error);
 
             return false;
+        }
+
+        public bool SetNewContainer(CompileContainer compileContainer)
+        {
+            this.CurrentContainer = new ContainerManagment();
+
+            this.CurrentContainer.RootContainer = compileContainer;
+            this.CurrentContainer.ContainerStack.Push(compileContainer);
+
+            return true;
         }
 
         #endregion methods

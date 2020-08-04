@@ -41,7 +41,13 @@ namespace Yama.Index
                 if (this.thisUses != null) return this.thisUses;
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
-                this.thisUses.Deklarationen = this.VariabelnDeklarations.OfType<IParent>().ToList<IParent>();
+
+                foreach (IndexVariabelnDeklaration dek in this.VariabelnDeklarations)
+                {
+                    if (this.thisUses.Deklarationen.Exists(t=>t.Name == dek.Name)) this.thisUses.GetIndex.CreateError(dek.Use, "Die Deklaration kann nicht vorgenommen werden, eine Deklaration mit diesen Namen existiert schon");
+
+                    this.thisUses.Add(dek);
+                }
 
                 return this.thisUses;
             }

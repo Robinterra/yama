@@ -51,6 +51,9 @@ namespace Yama.Compiler
                 List<string> result = compiler.Definition.ZielRegister(query);
                 if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden");
 
+                if (result.Count > this.PrimaryKeys.Length)
+                    return compiler.AddError("Fehlerhafte defintion");
+
                 for (int i = 0; i < result.Count; i++)
                 {
                     if (this.PrimaryKeys[i] == null) this.PrimaryKeys[i] = new Dictionary<string, string>();

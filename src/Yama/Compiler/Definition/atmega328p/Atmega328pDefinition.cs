@@ -47,6 +47,14 @@ namespace Yama.Compiler.Atmega328p
 
         // -----------------------------------------------
 
+        public int JumpCounter
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public int AblageRegister
         {
             get;
@@ -80,6 +88,14 @@ namespace Yama.Compiler.Atmega328p
         // -----------------------------------------------
 
         public List<string> RegisterUses
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public Compiler Compiler
         {
             get;
             set;
@@ -141,8 +157,18 @@ namespace Yama.Compiler.Atmega328p
             if (query.Key == "[REGPOP]") return this.MethodeRegPop(query);
             if (query.Key == "[PARA]") return this.MethodePara(query);
             if (query.Key == "[NUMCONST]") return this.MethodeNumConst(query);
+            if (query.Key == "[JUMPTO]") return this.JumpToQuery(query);
 
             return null;
+        }
+
+        private List<string> JumpToQuery(IRegisterQuery query)
+        {
+            if (!(query.Value is CompileSprungPunkt t)) return null;
+
+            t.Add(this.Compiler, t);
+
+            return new List<string> { t.JumpPointName };
         }
 
         // -----------------------------------------------
@@ -263,9 +289,11 @@ namespace Yama.Compiler.Atmega328p
 
                 result.Add(string.Format(resultPattern, counter * 2 - 1));
                 result.Add(string.Format(resultPattern, counter * 2));
+
+                return  result;
             }
 
-            return result;
+            return null;
         }
 
         #endregion keymapping
@@ -496,7 +524,35 @@ namespace Yama.Compiler.Atmega328p
         }
 
         // -----------------------------------------------
+        
+        private CompileAlgo CreateAlgoSprungPunkt()
+        {
+            CompileAlgo result = new CompileAlgo();
 
+            result.Name = "SprungPunkt";
+            result.Mode = "default";
+            result.Description = "Das setzen eines sprungounktes";
+            result.AssemblyCommands.Add("[NAME]:");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        private CompileAlgo CreateAlgoJumpToDefault()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "JumpTo";
+            result.Mode = "default";
+            result.Description = "Springt zum ziel punkt";
+            result.Keys.Add("[JUMPTO]");
+            result.AssemblyCommands.Add("rjmp [JUMPTO]");
+
+            return result;
+        }
+
+        // -----------------------------------------------
         private List<CompileAlgo> CompileAlgos()
         {
             List<CompileAlgo> result = new List<CompileAlgo>();
@@ -511,6 +567,17 @@ namespace Yama.Compiler.Atmega328p
             result.Add(this.CreateAlgoUsePara());
             result.Add(this.CreateAlgoNumberConst());
             result.Add(this.CreateAlgoHeader());
+            result.Add(this.CreateAlgoJumpToDefault());
+            result.Add(this.CreateAlgoSprungPunkt());
+
+            return result;
+        }
+
+        public string GenerateJumpPointName()
+        {
+            string result = string.Format("JUMPHELPER_{0}", this.JumpCounter);
+
+            this.JumpCounter++;
 
             return result;
         }
