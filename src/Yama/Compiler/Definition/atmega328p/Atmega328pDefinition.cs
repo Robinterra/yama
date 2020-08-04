@@ -213,6 +213,7 @@ namespace Yama.Compiler.Atmega328p
             if (registerStart >= this.AblageRegister) return null;
 
             result.Add(string.Format(resultPattern, registerStart));
+            result.Add(string.Format(resultPattern, registerStart + 1));
 
             return result;
         }
@@ -493,6 +494,24 @@ namespace Yama.Compiler.Atmega328p
 
         // -----------------------------------------------
 
+        
+        private CompileAlgo CreateAlgoUseParaGet()
+        {
+            CompileAlgo result = new CompileAlgo();
+
+            result.Name = "UsePara";
+            result.Mode = "get";
+            result.Description = "Ein Parameter in seine Variabel laden";
+            result.Keys.Add("[VAR]");
+            result.Keys.Add("[PARA]");
+            result.AssemblyCommands.Add("std [VAR],[PARA]");
+            result.AssemblyCommands.Add("std [VAR],[PARA]");
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         private CompileAlgo CreateAlgoNumberConst()
         {
             CompileAlgo result = new CompileAlgo();
@@ -565,6 +584,7 @@ namespace Yama.Compiler.Atmega328p
             result.Add(this.CreateAlgoFunktionsDeklaration());
             result.Add(this.CreateAlgoFunktionsEnde());
             result.Add(this.CreateAlgoUsePara());
+            result.Add(this.CreateAlgoUseParaGet());
             result.Add(this.CreateAlgoNumberConst());
             result.Add(this.CreateAlgoHeader());
             result.Add(this.CreateAlgoJumpToDefault());

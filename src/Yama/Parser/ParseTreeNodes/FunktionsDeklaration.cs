@@ -322,11 +322,19 @@ namespace Yama.Parser
             IndexContainer container = new IndexContainer();
             deklaration.Container = container;
 
+            VariabelDeklaration dek = null;
+
             foreach (IParseTreeNode par in this.Parameters)
             {
-                if (!par.Indezieren(index, container)) continue;
+                if (par is VariabelDeklaration t) dek = t;
+                if (par is EnumartionExpression b)
+                {
+                    dek = (VariabelDeklaration)b.ExpressionParent;
+                }
 
-                deklaration.Parameters.Add(container.VariabelnDeklarations.Last());
+                if (!dek.Indezieren(index, container)) continue;
+
+                deklaration.Parameters.Add(dek.Deklaration);
             }
 
             if (deklaration.Type == MethodeType.Static)
@@ -362,6 +370,15 @@ namespace Yama.Parser
             compiler.SetNewContainer(this.CompileContainer);
 
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
+
+            foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
+            {
+                CompileUsePara usePara = new CompileUsePara();
+
+                usePara.Compile(compiler, (VariabelDeklaration)node.Use, "get");
+            }
+
+            compiler.Definition.ParaClean();
 
             this.CompileContainer.Begin.Compile(compiler, this, mode);
 

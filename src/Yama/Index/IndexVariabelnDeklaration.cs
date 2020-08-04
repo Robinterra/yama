@@ -31,7 +31,13 @@ namespace Yama.Index
             set;
         }
 
-        public ValidUses ThisUses => throw new System.NotImplementedException();
+        public ValidUses ThisUses
+        {
+            get
+            {
+                return this.ParentUsesSet;
+            }
+        }
 
         public ValidUses ParentUsesSet { get; set; }
 

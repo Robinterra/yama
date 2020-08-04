@@ -5,7 +5,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileUsePara : ICompile<ReferenceCall>
+    public class CompileUsePara : ICompile<VariabelDeklaration>
     {
         public string AlgoName
         {
@@ -33,7 +33,7 @@ namespace Yama.Compiler
             set;
         }
 
-        public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
+        public bool Compile(Compiler compiler, VariabelDeklaration node, string mode = "default")
         {
             compiler.AssemblerSequence.Add(this);
 
@@ -47,6 +47,11 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
                 query.Kategorie = mode;
+                if (node != null)
+                {
+                    query.Uses = node.Deklaration.ThisUses;
+                    query.Value = node.Deklaration.Name;
+                }
 
                 List<string> result = compiler.Definition.ZielRegister(query);
                 if (result == null) return false; //TODO: Create Error Entry

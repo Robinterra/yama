@@ -87,8 +87,8 @@ namespace Yama.Index
             {
                 List<IParent> result = new List<IParent>();
 
-                result.AddRange(this.deklarationen);
                 if (this.Parent != null) result.AddRange(this.Parent.Deklarationen);
+                result.AddRange(this.deklarationen);
 
                 return result;
             }
