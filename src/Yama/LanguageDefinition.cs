@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Yama.Compiler;
-using Yama.Compiler.Atmega328p;
 using Yama.Index;
 using Yama.Lexer;
 using Yama.Parser;
@@ -23,11 +22,19 @@ namespace Yama
         {
             get;
             set;
-        }
+        } = new List<string>();
 
         // -----------------------------------------------
 
-        public string ExpressionLine
+        public string OutputFile
+        {
+            get;
+            set;
+        } = "out.S";
+
+        // -----------------------------------------------
+
+        public IProcessorDefinition Definition
         {
             get;
             set;
@@ -35,11 +42,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public string Framework
+        public List<string> Includes
         {
             get;
             set;
-        }
+        } = new List<string>();
 
         // -----------------------------------------------
 
@@ -193,6 +200,7 @@ namespace Yama
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
             rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
+            rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region defalgo " ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new Operator ( new ZeichenKette ( "∑" ), new ZeichenKette ( "<=" ), new ZeichenKette ( "++" ), new ZeichenKette ( "<>" ), new ZeichenKette ( ">=" ), new ZeichenKette ( "<" ), new ZeichenKette ( ">" ), new ZeichenKette ( "^^" ), new ZeichenKette ( "+" ), new ZeichenKette ( "-" ), new ZeichenKette ( "*" ), new ZeichenKette ( "/"), new ZeichenKette ( "%" ), new ZeichenKette ( "&" ), new ZeichenKette ( "|" ), new ZeichenKette ( "==" ), new ZeichenKette ( "=" ), new ZeichenKette ( "!=" ), new ZeichenKette ( "!" ), new ZeichenKette ( "^"), new ZeichenKette ( "~" ), new ZeichenKette ( "√" ), new ZeichenKette ( "?" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Whitespaces (  ) );
@@ -274,15 +282,6 @@ namespace Yama
 
         // -----------------------------------------------
 
-        #region CompilerDefinition
-
-        // -----------------------------------------------
-
-
-        #endregion CompilerDefinition
-
-        // -----------------------------------------------
-
         private bool Parse(List<IParseTreeNode> nodes)
         {
             List<string> files = this.GetFiles();
@@ -341,8 +340,8 @@ namespace Yama
         private bool Compilen(List<IParseTreeNode> nodes, FunktionsDeklaration main)
         {
             Compiler.Compiler compiler = new Compiler.Compiler();
-            compiler.OutputFile = new FileInfo("out.S");
-            compiler.Definition = new Atmega328pDefinition();
+            compiler.OutputFile = new FileInfo(this.OutputFile);
+            compiler.Definition = this.Definition;
             compiler.MainFunction = main;
 
             return compiler.Compilen(nodes);
@@ -353,20 +352,86 @@ namespace Yama
         private List<string> GetFiles()
         {
             List<string> result = new List<string>();
+
             result.AddRange(this.Files);
 
-            string path = Path.Combine( AppDomain.CurrentDomain.BaseDirectory, this.Framework);
+            foreach(string file in this.Files)
+            {
+                if (!File.Exists(file)) this.PrintSimpleError(string.Format("Cannot add {0} File, it is not exist", file));
+            }
 
-            string[] files = Directory.GetFiles(path);
+            List<DirectoryInfo> infos = new List<DirectoryInfo>();
 
-            result.AddRange(files);
+            foreach (string inc in this.Includes)
+            {
+                if (!Directory.Exists(inc)) this.PrintSimpleError(string.Format("Cannot inlcude {0} Directory, it is not exist", inc));
+
+                infos.Add ( new DirectoryInfo ( inc ) );
+            }
+
+            result.AddRange ( this.GetFilesIterativ ( infos ) );
 
             return result;
         }
 
         // -----------------------------------------------
 
+        private List<string> GetFilesIterativ(List<DirectoryInfo> infos)
+        {
+            List<DirectoryInfo> next = infos;
+            List<string> result = new List<string>();
+
+            while (infos.Count != 0)
+            {
+                infos = next;
+                next = new List<DirectoryInfo>();
+
+                foreach ( DirectoryInfo info in infos )
+                {
+                    this.GetAllFilesFromADirectory(result, next, info);
+                }
+
+                infos.Clear();
+            }
+
+            return result;
+        }
+
+        private bool GetAllFilesFromADirectory(List<string> result, List<DirectoryInfo> next, DirectoryInfo check)
+        {
+
+            foreach ( FileInfo file in check.GetFiles (  ) )
+            {
+                if ( file.Extension != ".y" ) continue;
+
+                result.Add ( file.FullName );
+            }
+
+            foreach ( DirectoryInfo dir in check.GetDirectories (  ) )
+            {
+                next.Add ( dir );
+            }
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
         #region PrintErrors
+
+        // -----------------------------------------------
+
+        public bool PrintSimpleError(string text)
+        {
+            ConsoleColor colr = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+
+            Console.Error.WriteLine ( text );
+
+            Console.ForegroundColor = colr;
+
+            return false;
+        }
 
         // -----------------------------------------------
 

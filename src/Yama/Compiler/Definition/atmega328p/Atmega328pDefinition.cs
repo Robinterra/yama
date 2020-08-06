@@ -118,7 +118,7 @@ namespace Yama.Compiler.Atmega328p
 
         // -----------------------------------------------
 
-        public bool BeginNeuRegister(List<string> registersUses)
+        public bool BeginNeueMethode(List<string> registersUses)
         {
             this.CurrentArbeitsRegister = this.ArbeitsRegister;
             this.CurrentAblageRegister = this.AblageRegister;
@@ -148,12 +148,11 @@ namespace Yama.Compiler.Atmega328p
 
         // -----------------------------------------------
 
-        public List<string> ZielRegister(IRegisterQuery query)
+        public Dictionary<string,string> KeyMapping(IRegisterQuery query)
         {
             if (query.Key == "[VAR]") return this.VarQuery(query);
             if (query.Key == "[REG]") return this.RegisterQuery(query);
-            if (query.Key == "[METHODEREFCALL]") return this.MethodeRefCallQuery(query);
-            if (query.Key == "[NAME]") return new List<string> { query.Value.ToString() };
+            if (query.Key == "[NAME]") return new Dictionary<string, string> { { query.Key, query.Value.ToString() }};
             if (query.Key == "[REGPOP]") return this.MethodeRegPop(query);
             if (query.Key == "[PARA]") return this.MethodePara(query);
             if (query.Key == "[NUMCONST]") return this.MethodeNumConst(query);
@@ -162,27 +161,44 @@ namespace Yama.Compiler.Atmega328p
             return null;
         }
 
-        private List<string> JumpToQuery(IRegisterQuery query)
+        // -----------------------------------------------
+
+        public string GenerateJumpPointName()
         {
-            if (!(query.Value is CompileSprungPunkt t)) return null;
+            string result = string.Format("JUMPHELPER_{0}", this.JumpCounter);
 
-            t.Add(this.Compiler, t);
+            this.JumpCounter++;
 
-            return new List<string> { t.JumpPointName };
+            return result;
         }
 
         // -----------------------------------------------
 
         #region keymapping
 
-        private List<string> MethodeNumConst(IRegisterQuery query)
+        // -----------------------------------------------
+
+        private Dictionary<string,string> JumpToQuery(IRegisterQuery query)
         {
-            List<string> result = new List<string>();
+            if (!(query.Value is CompileSprungPunkt t)) return null;
+
+            t.Add(this.Compiler, t);
+
+            return new Dictionary<string, string> { { query.Key, t.JumpPointName } };
+        }
+
+        // -----------------------------------------------
+
+        private Dictionary<string,string> MethodeNumConst(IRegisterQuery query)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
             string string_pattern = "0x{0:X}";
+            string keypattern = "[NUMCONST[{0}]]";
 
             int wert = (int)query.Value;
             int pattern = 0xFF;
             int bitcounter = 0;
+            int counter = 0;
 
             for (int i = 0; i < this.AdressBytes; i++)
             {
@@ -190,11 +206,12 @@ namespace Yama.Compiler.Atmega328p
 
                 resultInt = resultInt >> bitcounter;
 
-                result.Add(string.Format(string_pattern, resultInt));
+                result.Add(string.Format(keypattern, counter), string.Format(string_pattern, resultInt));
 
                 pattern = pattern << 8;
 
                 bitcounter += 8;
+                counter++;
             }
 
             return result;
@@ -202,57 +219,46 @@ namespace Yama.Compiler.Atmega328p
 
         // -----------------------------------------------
 
-        private List<string> MethodePara(IRegisterQuery query)
+        private Dictionary<string,string> MethodePara(IRegisterQuery query)
         {
             string resultPattern = "r{0}";
-            List<string> result = new List<string>();
+            string keypattern = "[PARA[{0}]]";
+            Dictionary<string, string> result = new Dictionary<string, string>();
 
             int registerStart = this.CurrentArbeitsRegister;
             this.CurrentArbeitsRegister += this.AdressBytes;
 
             if (registerStart >= this.AblageRegister) return null;
 
-            result.Add(string.Format(resultPattern, registerStart));
-            result.Add(string.Format(resultPattern, registerStart + 1));
+            result.Add(string.Format(keypattern, 0), string.Format(resultPattern, registerStart));
+            result.Add(string.Format(keypattern, 1), string.Format(resultPattern, registerStart + 1));
 
             return result;
         }
 
         // -----------------------------------------------
 
-        private List<string> MethodeRegPop(IRegisterQuery query)
+        private Dictionary<string,string> MethodeRegPop(IRegisterQuery query)
         {
             string resultPattern = "r{0}";
-            List<string> result = new List<string>();
+            Dictionary<string, string> result = new Dictionary<string, string>();
 
             this.CurrentAblageRegister -= this.AdressBytes;
             int registerStart = this.CurrentAblageRegister;
 
             if (registerStart < this.ArbeitsRegister) return null;
 
-            result.Add(string.Format(resultPattern, registerStart));
+            result.Add(query.Key ,string.Format(resultPattern, registerStart));
 
             return result;
         }
 
         // -----------------------------------------------
 
-        private List<string> MethodeRefCallQuery(IRegisterQuery query)
-        {
-            List<string> result = new List<string>();
-
-            result.Add(string.Format("lo8(gs({0}))", query.Value));
-            result.Add(string.Format("hi8(gs({0}))", query.Value));
-
-            return result;
-        }
-
-        // -----------------------------------------------
-
-        private List<string> RegisterQuery(IRegisterQuery query)
+        private Dictionary<string,string> RegisterQuery(IRegisterQuery query)
         {
             string resultPattern = "r{0}";
-            List<string> result = new List<string>();
+            Dictionary<string,string> result = new Dictionary<string,string>();
 
             int registerStart = this.CurrentAblageRegister;
             this.CurrentAblageRegister += this.AdressBytes;
@@ -262,8 +268,8 @@ namespace Yama.Compiler.Atmega328p
             string regOne = string.Format(resultPattern, registerStart);
             string regTwo = string.Format(resultPattern, registerStart + 1);
 
-            result.Add(regOne);
-            result.Add(regTwo);
+            result.Add( "[REG[0]]", regOne );
+            result.Add( "[REG[1]]", regTwo );
 
             if (!this.RegisterUses.Contains(regOne)) this.RegisterUses.Add(regOne);
             if (!this.RegisterUses.Contains(regTwo)) this.RegisterUses.Add(regTwo);
@@ -273,10 +279,10 @@ namespace Yama.Compiler.Atmega328p
 
         // -----------------------------------------------
 
-        private List<string> VarQuery(IRegisterQuery query)
+        private Dictionary<string,string> VarQuery(IRegisterQuery query)
         {
             string resultPattern = "Y+{0}";
-            List<string> result = new List<string>();
+            Dictionary<string,string> result = new Dictionary<string,string>();
 
             int counter = 0;
 
@@ -288,14 +294,16 @@ namespace Yama.Compiler.Atmega328p
 
                 if (a.Name != query.Value.ToString()) continue;
 
-                result.Add(string.Format(resultPattern, counter * 2 - 1));
-                result.Add(string.Format(resultPattern, counter * 2));
+                result.Add( "[VAR[0]]", string.Format(resultPattern, counter * 2 - 1) );
+                result.Add( "[VAR[1]]", string.Format(resultPattern, counter * 2) );
 
                 return  result;
             }
 
             return null;
         }
+
+        // -----------------------------------------------
 
         #endregion keymapping
 
@@ -360,8 +368,8 @@ namespace Yama.Compiler.Atmega328p
             result.Mode = "default";
             result.Description = "Der aufruf einer ganz normalen Variabel";
             result.Keys.Add("[VAR]");
-            result.AssemblyCommands.Add("ldd r24,[VAR]");
-            result.AssemblyCommands.Add("ldd r25,[VAR]");
+            result.AssemblyCommands.Add("ldd r24,[VAR[0]]");
+            result.AssemblyCommands.Add("ldd r25,[VAR[1]]");
 
             return result;
         }
@@ -396,8 +404,8 @@ namespace Yama.Compiler.Atmega328p
             result.Mode = "set";
             result.Description = "Das setzen einer ganz normalen Variabel";
             result.Keys.Add("[VAR]");
-            result.AssemblyCommands.Add("std [VAR],r24");
-            result.AssemblyCommands.Add("std [VAR],r25");
+            result.AssemblyCommands.Add("std [VAR[0]],r24");
+            result.AssemblyCommands.Add("std [VAR[1]],r25");
 
             return result;
         }
@@ -471,7 +479,7 @@ namespace Yama.Compiler.Atmega328p
             result.Mode = "default";
             result.Description = "Das verschieben eines Ergebnisses";
             result.Keys.Add("[REG]");
-            result.AssemblyCommands.Add("movw [REG], r24");
+            result.AssemblyCommands.Add("movw [REG[0]], r24");
 
             return result;
         }
@@ -487,7 +495,7 @@ namespace Yama.Compiler.Atmega328p
             result.Description = "Ein Registry Cache Entry als Parameter nutzen";
             result.Keys.Add("[REGPOP]");
             result.Keys.Add("[PARA]");
-            result.AssemblyCommands.Add("movw [PARA],[REGPOP]");
+            result.AssemblyCommands.Add("movw [PARA[0]],[REGPOP]");
 
             return result;
         }
@@ -504,8 +512,8 @@ namespace Yama.Compiler.Atmega328p
             result.Description = "Ein Parameter in seine Variabel laden";
             result.Keys.Add("[VAR]");
             result.Keys.Add("[PARA]");
-            result.AssemblyCommands.Add("std [VAR],[PARA]");
-            result.AssemblyCommands.Add("std [VAR],[PARA]");
+            result.AssemblyCommands.Add("std [VAR[0]],[PARA[0]]");
+            result.AssemblyCommands.Add("std [VAR[1]],[PARA[1]]");
 
             return result;
         }
@@ -520,8 +528,8 @@ namespace Yama.Compiler.Atmega328p
             result.Mode = "default";
             result.Description = "Die Konstante in das Register laden";
             result.Keys.Add("[NUMCONST]");
-            result.AssemblyCommands.Add("ldi r24,[NUMCONST]");
-            result.AssemblyCommands.Add("ldi r25,[NUMCONST]");
+            result.AssemblyCommands.Add("ldi r24,[NUMCONST[0]]");
+            result.AssemblyCommands.Add("ldi r25,[NUMCONST[1]]");
 
             return result;
         }
@@ -535,9 +543,9 @@ namespace Yama.Compiler.Atmega328p
             result.Name = "ReferenceCall";
             result.Mode = "methode";
             result.Description = "Der aufruf einer ganz normalen Methode";
-            result.Keys.Add("[METHODEREFCALL]");
-            result.AssemblyCommands.Add("ldi r24,[METHODEREFCALL]");
-            result.AssemblyCommands.Add("ldi r25,[METHODEREFCALL]");
+            result.Keys.Add("[NAME]");
+            result.AssemblyCommands.Add("ldi r24,hi8(gs([NAME]))");
+            result.AssemblyCommands.Add("ldi r25,lo8(gs([NAME]))");
 
             return result;
         }
@@ -589,15 +597,6 @@ namespace Yama.Compiler.Atmega328p
             result.Add(this.CreateAlgoHeader());
             result.Add(this.CreateAlgoJumpToDefault());
             result.Add(this.CreateAlgoSprungPunkt());
-
-            return result;
-        }
-
-        public string GenerateJumpPointName()
-        {
-            string result = string.Format("JUMPHELPER_{0}", this.JumpCounter);
-
-            this.JumpCounter++;
 
             return result;
         }

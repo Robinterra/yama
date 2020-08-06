@@ -36,7 +36,7 @@ namespace Yama.Compiler
             get;
             set;
         }
-        public Dictionary<string, string>[] PrimaryKeys { get; private set; }
+        public Dictionary<string, string> PrimaryKeys { get; private set; }
 
         public bool Compile(Compiler compiler, CompileSprungPunkt node, string mode = "default")
         {
@@ -52,21 +52,19 @@ namespace Yama.Compiler
             if (this.Point == PointMode.RootBegin) this.Punkt = compiler.CurrentContainer.RootContainer.Begin;
             if (this.Point == PointMode.RootEnde) this.Punkt = compiler.CurrentContainer.RootContainer.Ende;
 
-            this.PrimaryKeys = new Dictionary<string, string>[this.Algo.AssemblyCommands.Count];
+            this.PrimaryKeys = new Dictionary<string, string>();
 
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = this.Algo.Keys[0];
             query.Kategorie = mode;
             query.Value = this.Punkt;
 
-            List<string> result = compiler.Definition.ZielRegister(query);
-            if (result == null) return false; //TODO: Create Error Entry
+            Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+            if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", null);
 
-            for (int i = 0; i < this.PrimaryKeys.Length; i++)
+            foreach (KeyValuePair<string, string> pair in result)
             {
-                if (this.PrimaryKeys[i] == null) this.PrimaryKeys[i] = new Dictionary<string, string>();
-
-                this.PrimaryKeys[i].Add(query.Key, result[i]);
+                if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", null);
             }
 
             return true;
@@ -76,7 +74,7 @@ namespace Yama.Compiler
         {
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(this.Algo.AssemblyCommands[i], this.PrimaryKeys[i]);
+                compiler.AddLine(this.Algo.AssemblyCommands[i], this.PrimaryKeys);
             }
 
             return true;

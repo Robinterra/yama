@@ -122,17 +122,25 @@ namespace Yama.Parser
 
         public bool Indezieren(Index.Index index, IParent parent)
         {
+            //if (parent is IndexVariabelnReference varref) return this.RefComb(varref);
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
             foreach (IParseTreeNode node in this.Parameters)
             {
                 node.Indezieren(index, container);
             }
+
+            IndexVariabelnReference typeDeklaration = new IndexVariabelnReference();
+            typeDeklaration.Use = this;
+            typeDeklaration.Name = this.Definition.Text;
+            container.VariabelnReferences.Add(typeDeklaration);
+
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
-            reference.Name = this.Definition.Text;
-            container.VariabelnReferences.Add(reference);
-
+            reference.Name = this.Token.Text;
+            reference.Deklaration = typeDeklaration;
+            typeDeklaration.ParentCall = reference;
+            typeDeklaration.VariabelnReferences.Add(reference);
             this.Reference = reference;
 
             return true;

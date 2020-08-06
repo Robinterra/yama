@@ -27,6 +27,14 @@ namespace LearnCsStuf.CommandLines
 
         // -----------------------------------------------
 
+        public ICommandLine Default
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         private ICommandLine LastCommand
         {
             get;
@@ -91,9 +99,19 @@ namespace LearnCsStuf.CommandLines
                 this.Result.Add ( test );
 
                 if ( test.HasValue ) this.LastCommand = test;
+
+                return true;
             }
 
-            return false;
+            if (this.Default == null) return false;
+
+            ICommandLine result = this.Default.Check(this.Default.Key);
+
+            result.Value = arg;
+
+            this.Result.Add(result);
+
+            return true;
         }
 
         // -----------------------------------------------

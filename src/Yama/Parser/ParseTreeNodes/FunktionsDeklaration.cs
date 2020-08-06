@@ -172,7 +172,8 @@ namespace Yama.Parser
             if (token.Kind == SyntaxKind.Int16Bit) return true;
             if (token.Kind == SyntaxKind.Int64Bit) return true;
             if (token.Kind == SyntaxKind.Float32Bit) return true;
-            if (token.Kind == SyntaxKind.This) return true;
+            if (token.Kind == SyntaxKind.New) return true;
+            if (token.Kind == SyntaxKind.Operator && token.Text == "~") return true;
             if (token.Kind == SyntaxKind.Implicit) return true;
             if (token.Kind == SyntaxKind.Explicit) return true;
             if (token.Kind == SyntaxKind.Void) return true;
@@ -192,6 +193,7 @@ namespace Yama.Parser
         {
             if (token.Kind == SyntaxKind.Static) return true;
             if (token.Kind == SyntaxKind.OperatorKey) return true;
+            if (token.Kind == SyntaxKind.This) return true;
 
             return false;
         }
@@ -227,7 +229,8 @@ namespace Yama.Parser
 
             deklaration.TypeDefinition = token;
 
-            token = parser.Peek ( token, 1 );
+            if ( !this.CheckSonderRegleung ( deklaration.TypeDefinition ) ) token = parser.Peek ( token, 1 );
+
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
@@ -259,6 +262,16 @@ namespace Yama.Parser
             return this.CleanUp(deklaration);
         }
 
+        private bool CheckSonderRegleung(SyntaxToken typeDefinition)
+        {
+            if (typeDefinition == null) return false;
+
+            if ( typeDefinition.Kind == SyntaxKind.New) return true;
+            if ( typeDefinition.Kind == SyntaxKind.Operator && typeDefinition.Text == "~") return true;
+
+            return false;
+        }
+
         private FunktionsDeklaration CleanUp(FunktionsDeklaration deklaration)
         {
             deklaration.Statement.Token.ParentNode = deklaration;
@@ -273,8 +286,9 @@ namespace Yama.Parser
                 deklaration.ZusatzDefinition.Node = deklaration;
                 deklaration.ZusatzDefinition.ParentNode = deklaration;
             }
+            if (!this.CheckSonderRegleung(deklaration.TypeDefinition)) deklaration.TypeDefinition.ParentNode = deklaration;
+
             deklaration.TypeDefinition.Node = deklaration;
-            deklaration.TypeDefinition.ParentNode = deklaration;
             deklaration.Token.Node = deklaration;
 
             return deklaration;
@@ -292,11 +306,11 @@ namespace Yama.Parser
                     type = MethodeType.Operator;
                     if (this.TypeDefinition.Kind == SyntaxKind.Explicit) type = MethodeType.Explicit;
                     if (this.TypeDefinition.Kind == SyntaxKind.Implicit) type = MethodeType.Implicit;
-                    if (this.TypeDefinition.Kind == SyntaxKind.This)
-                    {
-                        if (this.Token.Kind == SyntaxKind.New) type = MethodeType.Ctor;
-                        if (this.Token.Text == "~") type = MethodeType.DeCtor;
-                    }
+                }
+                if (this.ZusatzDefinition.Kind == SyntaxKind.This)
+                {
+                    if (this.Token.Kind == SyntaxKind.New) type = MethodeType.Ctor;
+                    if (this.Token.Text == "~") type = MethodeType.DeCtor;
                 }
             }
 
@@ -310,7 +324,7 @@ namespace Yama.Parser
             IndexMethodDeklaration deklaration = new IndexMethodDeklaration();
             deklaration.Use = this;
             deklaration.Name = this.Token.Text;
-            deklaration.ReturnValue = new IndexVariabelnReference { Name = this.TypeDefinition.Text, Use = this };
+            deklaration.ReturnValue = this.GetReturnValueIndex(klasse);
             this.Deklaration = deklaration;
 
             AccessModify access = AccessModify.Private;
@@ -348,6 +362,13 @@ namespace Yama.Parser
             return true;
         }
 
+        private IndexVariabelnReference GetReturnValueIndex(IndexKlassenDeklaration klasse)
+        {
+            if (this.CheckSonderRegleung(this.TypeDefinition)) return new IndexVariabelnReference { Name = klasse.Name, Use = this };
+
+            return new IndexVariabelnReference { Name = this.TypeDefinition.Text, Use = this };
+        }
+
         private bool AddMethode(IndexKlassenDeklaration klasse, IndexMethodDeklaration deklaration)
         {
             if (deklaration.Type == MethodeType.Ctor) klasse.Ctors.Add(deklaration);
@@ -363,7 +384,7 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            compiler.Definition.BeginNeuRegister(this.RegisterInUse);
+            compiler.Definition.BeginNeueMethode(this.RegisterInUse);
 
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();

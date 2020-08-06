@@ -55,11 +55,11 @@ namespace Yama.Compiler
 
         #region methods
 
-        bool BeginNeuRegister(List<string> registersUses);
+        bool BeginNeueMethode(List<string> registersUses);
 
         string PostKeyReplace(IRegisterQuery key);
 
-        List<string> ZielRegister(IRegisterQuery query);
+        Dictionary<string,string> KeyMapping(IRegisterQuery query);
 
         bool ParaClean();
         string GenerateJumpPointName();

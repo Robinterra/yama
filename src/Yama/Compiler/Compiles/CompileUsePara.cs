@@ -27,7 +27,7 @@ namespace Yama.Compiler
             set;
         }
 
-        public Dictionary<string, string>[] PrimaryKeys
+        public Dictionary<string, string> PrimaryKeys
         {
             get;
             set;
@@ -40,7 +40,7 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
 
-            this.PrimaryKeys = new Dictionary<string, string>[this.Algo.AssemblyCommands.Count];
+            this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (string key in this.Algo.Keys)
             {
@@ -53,14 +53,12 @@ namespace Yama.Compiler
                     query.Value = node.Deklaration.Name;
                 }
 
-                List<string> result = compiler.Definition.ZielRegister(query);
-                if (result == null) return false; //TODO: Create Error Entry
+                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", node);
 
-                for (int i = 0; i < this.PrimaryKeys.Length; i++)
+                foreach (KeyValuePair<string, string> pair in result)
                 {
-                    if (this.PrimaryKeys[i] == null) this.PrimaryKeys[i] = new Dictionary<string, string>();
-
-                    this.PrimaryKeys[i].Add(key, result[i]);
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", node);
                 }
             }
 
@@ -71,7 +69,7 @@ namespace Yama.Compiler
         {
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(this.Algo.AssemblyCommands[i], this.PrimaryKeys[i]);
+                compiler.AddLine(this.Algo.AssemblyCommands[i], this.PrimaryKeys);
             }
 
             return true;

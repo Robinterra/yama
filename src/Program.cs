@@ -1,14 +1,15 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 
-using LearnCsStuf.CommandLines;
-using Yama;
-using LearnCsStuf.CommandLines.Commands;
-using System.IO;
-using LearnCsStuf.Automaten;
-using Yama.Lexer;
+using Yama.Compiler;
+using Yama.Compiler.Definition;
 
-namespace LearnCsStuf
+using LearnCsStuf.Automaten;
+using LearnCsStuf.CommandLines;
+using LearnCsStuf.CommandLines.Commands;
+
+namespace Yama
 {
     public static class Program
     {
@@ -36,16 +37,16 @@ namespace LearnCsStuf
 
         private static int NormalStart ( string[] args )
         {
-            if ( !ParseCommandLine.CheckArgs ( args ) ) return HilfeP (  );
+            if ( !ParseCommandLine.CheckArgs ( args ) ) return HilfePrinten (  );
 
-            ParseCommandLine pcl = new ParseCommandLine { CommandLines = EnabledCommandLines };
+            ParseCommandLine pcl = new ParseCommandLine { CommandLines = EnabledCommandLines, Default = new FileExpression() };
 
             foreach ( string arg in args )
             {
                 pcl.ArgumentAuswerten ( arg );
             }
 
-            Program.Execute ( pcl.Result );
+            if (!Program.Execute ( pcl.Result )) return 1;
 
             return 0;
         }
@@ -54,67 +55,35 @@ namespace LearnCsStuf
 
         private static bool Execute ( List<ICommandLine> commands )
         {
-            List<string> parseFiles = new List<string>();
-            List<string> parsecsvFiles = new List<string>();
-            string framework = "atmega328p";
+            LanguageDefinition yama = new LanguageDefinition();
+            DefinitionManager defs = new DefinitionManager();
 
             foreach ( ICommandLine command in commands )
             {
-                if (command.Key == "help") return Program.HilfeP (  ) == 1;
-                if (command.Key == "print") Console.WriteLine ( command.Value );
-                if (command.Key == "printn") Console.WriteLine ( command.Value );
-                if (command.Key == "yama") parseFiles.Add ( command.Value );
-                if (command.Key == "csv") parsecsvFiles.Add ( command.Value );
-                if (command.Key == "auto") Program.RunAuto ( command );
-                if (command.Key == "framework") framework = command.Value;
+                if (command is Help) return Program.HilfePrinten (  ) == 1;
+                if (command is FileExpression) yama.Files.Add ( command.Value );
+                if (command is AutoExpression) return Program.RunAuto ( command );
+                if (command is IncludeExpression) yama.Includes.Add ( command.Value );
+                if (command is OutputFileExpression) yama.OutputFile = command.Value;
+                if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
+                if (command is PrintDefinitionsExpression) return defs.PrintAllDefinitions (  );
             }
 
-            LanguageDefinition basic = new LanguageDefinition();
-
-            basic.Framework = framework;
-
-            basic.Files = parseFiles;
-
-            basic.Compile();
-
-            foreach (string value in parsecsvFiles)
-            {
-                Console.WriteLine ( value );
-                Lexer l = new Lexer(File.OpenRead ( value ));
-                l.LexerTokens.Add(
-                    new Splitter
-                    (
-                        new List<ZeichenKette> { new ZeichenKette(";"), new ZeichenKette("\n") },
-                        new Escaper
-                        (
-                            new ZeichenKette("\\"),
-                            new List<Replacer>
-                            {
-                                new Replacer(new ZeichenKette(";"), ";"),
-                                new Replacer( new ZeichenKette (":)"), "😊")
-                            }
-                        )
-                    )
-                );
-                foreach ( SyntaxToken token in l )
-                {
-                    Console.WriteLine ( token.Value );
-                }
-            }
-
-            return true;
-        }
-
-        private static void RunAuto(ICommandLine command)
-        {
-            AutomatenTest test = new AutomatenTest();
-
-            test.Run(command.Value);
+            return yama.Compile();
         }
 
         // -----------------------------------------------
 
-        private static int HilfeP (  )
+        private static bool RunAuto(ICommandLine command)
+        {
+            AutomatenTest test = new AutomatenTest();
+
+            return test.Run(command.Value);
+        }
+
+        // -----------------------------------------------
+
+        private static int HilfePrinten (  )
         {
             Hilfe hilfe = new Hilfe { CommandLines = Program.EnabledCommandLines };
 
@@ -138,12 +107,13 @@ namespace LearnCsStuf
         {
             Program.EnabledCommandLines = new List<ICommandLine> (  );
 
-            Program.EnabledCommandLines.Add ( new Print (  ) );
-            Program.EnabledCommandLines.Add ( new PrintN (  ) );
-            Program.EnabledCommandLines.Add ( new YamaExpression (  ) );
-            Program.EnabledCommandLines.Add ( new CsvExpression (  ) );
-            Program.EnabledCommandLines.Add ( new Help (  ) );
+            Program.EnabledCommandLines.Add ( new FileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );
+            Program.EnabledCommandLines.Add ( new IncludeExpression (  ) );
+            Program.EnabledCommandLines.Add ( new DefinitionExpression (  ) );
+            Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
+            Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
+            Program.EnabledCommandLines.Add ( new Help (  ) );
             return true;
         }
 

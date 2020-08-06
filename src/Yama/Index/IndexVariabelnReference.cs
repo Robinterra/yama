@@ -161,6 +161,8 @@ namespace Yama.Index
 
             IndexMethodDeklaration md = kd.StaticMethods.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
+            md = kd.Ctors.FirstOrDefault(t=>t.Name == this.Name);
+            if (md != null) { md.References.Add(this); return md; }
             md = kd.Operators.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
             IndexPropertyDeklaration pd = kd.IndexProperties.FirstOrDefault(t=>t.Name == this.Name);
