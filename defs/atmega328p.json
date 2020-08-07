@@ -45,9 +45,9 @@
         "ldi r24,[PROPERTY[0]]",
         "add r30,r24",
         "adc r31, r0",
-        "sram r24, r30",
-        "addiw r30, 1",
-        "sram r25, r30"
+        "sram r24, Z",
+        "adiw r30, 1",
+        "sram r25, Z"
       ]
     },
     {
@@ -75,9 +75,9 @@
         "ldi r24,[PROPERTY[0]]",
         "add r30,r24",
         "adc r31, r0",
-        "st r30,[REGPOP[1]]",
-        "addiw r30, 1",
-        "st r30,[REGPOP[0]]"
+        "st Z,[REGPOP[1]]",
+        "adiw r30, 1",
+        "st Z,[REGPOP[0]]"
       ]
     },
     {
