@@ -23,7 +23,7 @@ You can read it in the book Severed.
 
 ## Getting Started
 
-dotnet run
+dotnet build
 
 ### Prerequisites
 
@@ -38,9 +38,11 @@ dotnet run
 
 ## Built With
 
-* dotnet run
+* dotnet build
 
 ## Example
+
+ ./YamaCompile out out.S defintion atmega328p inc bin/Debug/netcoreapp3.1/atmega328p bin/Debug/netcoreapp3.1/iftest.y
 
 ## Authors
 
