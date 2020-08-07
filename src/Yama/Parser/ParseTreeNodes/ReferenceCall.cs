@@ -105,6 +105,8 @@ namespace Yama.Parser
         {
             string moderesult = "default";
             if (mode == "set") moderesult = mode;
+            if (mode == "point") moderesult = mode;
+            if (mode == "setpoint") moderesult = mode;
             if (this.Reference.Deklaration is IndexMethodDeklaration) moderesult = "methode";
 
             this.Compilen.Compile(compiler, this, moderesult);

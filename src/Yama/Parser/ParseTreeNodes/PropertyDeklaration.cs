@@ -3,6 +3,7 @@ using Yama.Lexer;
 using Yama.Index;
 using System.Linq;
 using System;
+using Yama.Compiler;
 
 namespace Yama.Parser
 {
@@ -48,6 +49,41 @@ namespace Yama.Parser
             set;
         }
 
+        public List<string> RegisterInUseGet
+        {
+            get;
+            set;
+        } = new List<string>();
+
+        public List<string> RegisterInUseSet
+        {
+            get;
+            set;
+        } = new List<string>();
+
+        public CompileFunktionsDeklaration FunktionsDeklarationCompileGet
+        {
+            get;
+            set;
+        } = new CompileFunktionsDeklaration();
+
+        public CompileFunktionsEnde FunktionsEndeCompileSet
+        {
+            get;
+            set;
+        } = new CompileFunktionsEnde();
+        public CompileFunktionsDeklaration FunktionsDeklarationCompileSet
+        {
+            get;
+            set;
+        } = new CompileFunktionsDeklaration();
+
+        public CompileFunktionsEnde FunktionsEndeCompileGet
+        {
+            get;
+            set;
+        } = new CompileFunktionsEnde();
+
         public SyntaxToken Token
         {
             get;
@@ -76,6 +112,17 @@ namespace Yama.Parser
         {
             get;
         }
+        public CompileContainer CompileContainerGet
+        {
+            get;
+            set;
+        } = new CompileContainer();
+
+        public CompileContainer CompileContainerSet
+        {
+            get;
+            set;
+        } = new CompileContainer();
 
         #endregion get/set
 
@@ -307,6 +354,36 @@ namespace Yama.Parser
         {
             return true;
         }
+
+        /*private bool CompileGetFunktion(Compiler.Compiler compiler, string mode)
+        {
+            compiler.Definition.BeginNeueMethode(this.RegisterInUseGet);
+
+            this.CompileContainerGet.Begin = new CompileSprungPunkt();
+            this.CompileContainerGet.Ende = new CompileSprungPunkt();
+            compiler.SetNewContainer(this.CompileContainerGet);
+
+            this.FunktionsDeklarationCompileGet.Compile(compiler, this, mode);
+
+            foreach(IndexVariabelnDeklaration node in this.Deklaration.ParametersGet)
+            {
+                CompileUsePara usePara = new CompileUsePara();
+
+                usePara.CompileIndexNode(compiler, node, "get");
+            }
+
+            compiler.Definition.ParaClean();
+
+            this.CompileContainer.Begin.Compile(compiler, this, mode);
+
+            this.Statement.Compile(compiler, mode);
+
+            this.CompileContainer.Ende.Compile(compiler, this, mode);
+
+            this.FunktionsEndeCompile.Compile(compiler, this, mode);
+
+            return true;
+        }*/
 
         #endregion methods
     }

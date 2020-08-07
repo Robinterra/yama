@@ -183,11 +183,11 @@ namespace Yama.Parser
 
             CompileUsePara usePara = new CompileUsePara();
 
-            usePara.Compile(compiler, null);
+            usePara.Compile(compiler);
 
             usePara = new CompileUsePara();
 
-            usePara.Compile(compiler, null);
+            usePara.Compile(compiler);
 
             this.FunctionExecute.Compile(compiler, null, mode);
 

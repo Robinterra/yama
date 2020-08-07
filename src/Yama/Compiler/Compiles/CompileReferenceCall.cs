@@ -39,7 +39,13 @@ namespace Yama.Compiler
             query.Key = key;
             query.Kategorie = mode;
             query.Uses = node.ThisUses;
-            query.Value = key.Name == "[REG]" ? (object)1 : (object)node.AssemblyName;
+
+            object queryValue = (object)node.AssemblyName;
+            if ("[REG]" == key.Name) queryValue = 1;
+            if ("[PROPERTY]" == key.Name) queryValue = node.Deklaration;
+            //if ("setpoint" == mode) queryValue = node.Deklaration;
+
+            query.Value = queryValue;
 
             return query;
         }

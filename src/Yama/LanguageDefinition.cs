@@ -89,6 +89,7 @@ namespace Yama
             layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
             layer.ParserMembers.Add(new KlassenDeklaration ( inclassLayer ));
             layer.ParserMembers.Add(new UsingKey (  ));
+            layer.ParserMembers.Add(new NormalExpression (  ) );
             layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
 
             return layer;

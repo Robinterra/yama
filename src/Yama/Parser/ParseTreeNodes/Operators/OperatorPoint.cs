@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -37,6 +38,17 @@ namespace Yama.Parser
         public int Prio
         {
             get;
+        }
+
+        public bool IsANonStatic
+        {
+            get
+            {
+                if (this.RightNode is ReferenceCall rc)
+                    if (rc.Reference.Deklaration is IndexMethodDeklaration dek) return true;
+
+                return false;
+            }
         }
 
         public List<IParseTreeNode> GetAllChilds
@@ -106,6 +118,35 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            if (mode == "set") { CompileMovResult movResultRight = new CompileMovResult(); movResultRight.Compile(compiler, null, "default"); }
+
+            this.LeftNode.Compile(compiler, "default");
+
+            string moderesult = "point";
+            if (mode == "set") moderesult = "setpoint";
+            if (mode == "methode")
+            {
+                moderesult = mode;
+                if (this.RightNode is ReferenceCall rc)
+                    if (rc.Reference.Deklaration is IndexMethodDeklaration dek)
+                        this.CompileNonStaticCall(compiler, "default", dek);
+            }
+
+            this.RightNode.Compile(compiler, moderesult);
+
+            return true;
+        }
+
+        private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexMethodDeklaration methdek)
+        {
+            bool isok = methdek.Type == MethodeType.Methode;
+            if (!isok) isok = methdek.Type == MethodeType.Property;
+            if (!isok) return false;
+
+            CompileMovResult movResultRight = new CompileMovResult();
+
+            movResultRight.Compile(compiler, null, mode);
+
             return true;
         }
 

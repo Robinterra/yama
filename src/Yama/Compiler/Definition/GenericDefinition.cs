@@ -217,6 +217,7 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[PARA]") return this.MethodePara(query);
             if (query.Key.Name == "[NUMCONST]") return this.MethodeNumConst(query);
             if (query.Key.Name == "[JUMPTO]") return this.JumpToQuery(query);
+            if (query.Key.Name == "[PROPERTY]") return this.PropertyQuery(query);
 
             return null;
         }
@@ -240,6 +241,43 @@ namespace Yama.Compiler.Definition
         private Dictionary<string, string> NameQuery(IRegisterQuery query)
         {
             return new Dictionary<string, string> { { query.Key.Name, query.Value.ToString() }};
+        }
+
+        // -----------------------------------------------
+
+        private Dictionary<string, string> PropertyQuery(IRegisterQuery query)
+        {
+            string keypattern = "[PROPERTY[{0}]]";
+            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            Dictionary<string,string> result = new Dictionary<string,string>();
+            int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
+            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
+
+            int counter = 0;
+
+            if (!(query.Value is IndexPropertyDeklaration dek)) return null;
+
+            foreach (IParent a in dek.Klasse.IndexProperties)
+            {
+                if (!(a is IndexPropertyDeklaration vardek)) continue;
+
+                counter++;
+
+                if (a.Name != dek.Name) continue;
+
+                counter = counter - 1;
+                counter = counter * bytes;
+
+                for (int i = 0; i < duration; i++ )
+                {
+                    result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i) );
+                }
+
+                return  result;
+            }
+
+            return null;
         }
 
         // -----------------------------------------------

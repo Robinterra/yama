@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
 using Yama.Compiler;
+using System;
 
 namespace Yama.Parser
 {
@@ -164,8 +165,12 @@ namespace Yama.Parser
             }
 
             this.LeftNode.Compile(compiler, "methode");
+            if (!(this.LeftNode is OperatorPoint op)) return false;
 
-            for (int i = 0; i < this.ParametersNodes.Count; i++)
+            int parasCount = this.ParametersNodes.Count;
+            if (op.IsANonStatic) parasCount++;
+
+            for (int i = 0; i < parasCount; i++)
             {
                 CompileUsePara usePara = new CompileUsePara();
 

@@ -338,6 +338,8 @@ namespace Yama.Parser
 
             VariabelDeklaration dek = null;
 
+            this.IndezierenNonStaticDek(deklaration);
+
             foreach (IParseTreeNode par in this.Parameters)
             {
                 if (par is VariabelDeklaration t) dek = t;
@@ -358,6 +360,19 @@ namespace Yama.Parser
             this.AddMethode(klasse, deklaration);
 
             this.Statement.Indezieren(index, container);
+
+            return true;
+        }
+
+        private bool IndezierenNonStaticDek(IndexMethodDeklaration deklaration)
+        {
+            bool isok = deklaration.Type == MethodeType.Methode;
+            if (!isok) isok = deklaration.Type == MethodeType.Property;
+            if (!isok) return false;
+
+            IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration();
+            thisdek.Name = "this";
+            deklaration.Parameters.Add(thisdek);
 
             return true;
         }
@@ -396,7 +411,7 @@ namespace Yama.Parser
             {
                 CompileUsePara usePara = new CompileUsePara();
 
-                usePara.Compile(compiler, (VariabelDeklaration)node.Use, "get");
+                usePara.CompileIndexNode(compiler, node, "get");
             }
 
             compiler.Definition.ParaClean();

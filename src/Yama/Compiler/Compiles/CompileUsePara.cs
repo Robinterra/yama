@@ -40,21 +40,33 @@ namespace Yama.Compiler
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(VariabelDeklaration node, AlgoKeyCall key, string mode)
+        private DefaultRegisterQuery BuildQuery(IndexVariabelnDeklaration node, AlgoKeyCall key, string mode)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
             query.Kategorie = mode;
             if (node != null)
             {
-                query.Uses = node.Deklaration.ThisUses;
-                query.Value = node.Deklaration.Name;
+                query.Uses = node.ThisUses;
+                query.Value = node.Name;
             }
 
             return query;
         }
+        public bool Compile(Compiler compiler)
+        {
+            return this.CompileIndexNode(compiler, null);
+        }
 
         public bool Compile(Compiler compiler, VariabelDeklaration node, string mode = "default")
+        {
+            IndexVariabelnDeklaration dek = null;
+            if (node != null) dek = node.Deklaration;
+
+            return this.CompileIndexNode(compiler, dek, mode);
+        }
+
+        public bool CompileIndexNode(Compiler compiler, IndexVariabelnDeklaration node, string mode = "default")
         {
             compiler.AssemblerSequence.Add(this);
 
@@ -68,11 +80,11 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", node);
+                if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", node.Use);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
-                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", node);
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", node.Use);
                 }
             }
 

@@ -4,8 +4,8 @@
   "AdressBytes": 2,
   "ZeroRegister": 0,
   "ArbeitsRegister": 2,
-  "AblageRegister": 16,
-  "MaxArbeitsRegister": 15,
+  "AblageRegister": 14,
+  "MaxArbeitsRegister": 13,
   "MaxAblageRegister": 23,
   "Algos": [
     {
@@ -17,7 +17,7 @@
           "Name": "[VAR]",
           "Values": [
             "2",
-            "1"
+            "2"
           ]
         }
       ],
@@ -25,6 +25,59 @@
       "AssemblyCommands": [
         "ldd r24,[VAR[0]]",
         "ldd r25,[VAR[1]]"
+      ]
+    },
+    {
+      "Name": "ReferenceCall",
+      "Mode": "point",
+      "Description": "Der aufruf eines Property einer Instance",
+      "Keys": [
+        {
+          "Name": "[PROPERTY]",
+          "Values": [
+          ]
+        }
+      ],
+      "PostKeys": [
+      ],
+      "AssemblyCommands": [
+        "movw r30, r24",
+        "ldi r24,[PROPERTY[0]]",
+        "add r30,r24",
+        "adc r31, r0",
+        "sram r24, r30",
+        "addiw r30, 1",
+        "sram r25, r30"
+      ]
+    },
+    {
+      "Name": "ReferenceCall",
+      "Mode": "setpoint",
+      "Description": "Der setzen eines Property einer Instance",
+      "Keys": [
+        {
+          "Name": "[PROPERTY]",
+          "Values": [
+          ]
+        },
+        {
+          "Name": "[REGPOP]",
+          "Values": [
+            "2",
+            "1"
+          ]
+        }
+      ],
+      "PostKeys": [
+      ],
+      "AssemblyCommands": [
+        "movw r30, r24",
+        "ldi r24,[PROPERTY[0]]",
+        "add r30,r24",
+        "adc r31, r0",
+        "st r30,[REGPOP[1]]",
+        "addiw r30, 1",
+        "st r30,[REGPOP[0]]"
       ]
     },
     {
@@ -52,7 +105,7 @@
           "Name": "[VAR]",
           "Values": [
             "2",
-            "1"
+            "2"
           ]
         }
       ],
@@ -169,7 +222,7 @@
           "Name": "[VAR]",
           "Values": [
             "2",
-            "1"
+            "2"
           ]
         },
         {
@@ -282,6 +335,10 @@
   "KeyPatterns": [
     {
       "Key": "[NUMCONST]",
+      "Pattern": "0x{0:X}"
+    },
+    {
+      "Key": "[PROPERTY]",
       "Pattern": "0x{0:X}"
     },
     {
