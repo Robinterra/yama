@@ -5,6 +5,7 @@
   "ZeroRegister": 0,
   "ArbeitsRegister": 2,
   "AblageRegister": 16,
+  "MaxArbeitsRegister": 15,
   "MaxAblageRegister": 23,
   "Algos": [
     {
@@ -68,7 +69,10 @@
       "Keys": [
         {
           "Name": "[REG]",
-          "Values": null
+          "Values": [
+            "2",
+            "1"
+          ]
         }
       ],
       "PostKeys": [],
@@ -95,13 +99,14 @@
         {
           "Name": "[NAME]",
           "Values": null
-        },
+        }
+      ],
+      "PostKeys": [
         {
           "Name": "[PUSHREG]",
           "Values": null
         }
       ],
-      "PostKeys": [],
       "AssemblyCommands": [
         "[NAME]:",
         "[PUSHREG]",
@@ -116,12 +121,13 @@
       "Mode": "default",
       "Description": "Das ende einer Funktion",
       "Keys": [
+      ],
+      "PostKeys": [
         {
           "Name": "[POPREG]",
           "Values": null
         }
       ],
-      "PostKeys": [],
       "AssemblyCommands": [
         "adiw r28, 6",
         "in __tmp_reg__,__SREG__",
@@ -151,7 +157,7 @@
       ],
       "PostKeys": [],
       "AssemblyCommands": [
-        "movw [PARA[0]],[REGPOP]"
+        "movw [PARA[0]],[REGPOP[0]]"
       ]
     },
     {
@@ -281,6 +287,18 @@
     {
       "Key": "[VAR]",
       "Pattern": "Y\u002B{0}"
+    },
+    {
+      "Key":"JUMPHELPER",
+      "Pattern":"JUMPHELPER_{0}"
+    },
+    {
+      "Key": "[POPREG]",
+      "Pattern": "POP {0}\n{1}"
+    },
+    {
+      "Key":"[PUSHREG]",
+      "Pattern":"{1}PUSH {0}\n"
     }
   ]
 }
