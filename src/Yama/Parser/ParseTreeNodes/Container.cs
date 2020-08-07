@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yama.Index;
 using Yama.Lexer;
@@ -102,6 +103,7 @@ namespace Yama.Parser
 
         public bool Indezieren(Index.Index index, IParent parent)
         {
+            if (parent is IndexNamespaceDeklaration dek) return this.NamespaceIndezi(index, dek);
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
             IndexContainer indexContainer = new IndexContainer();
@@ -111,6 +113,16 @@ namespace Yama.Parser
             foreach (IParseTreeNode node in this.Statements)
             {
                 node.Indezieren(index, indexContainer);
+            }
+
+            return true;
+        }
+
+        private bool NamespaceIndezi(Index.Index index, IndexNamespaceDeklaration dek)
+        {
+            foreach (IParseTreeNode node in this.Statements)
+            {
+                node.Indezieren(index, dek);
             }
 
             return true;

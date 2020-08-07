@@ -70,12 +70,25 @@ namespace Yama
 
         // -----------------------------------------------
 
+        private ParserLayer NamespaceLayer(ParserLayer inNamespaceLayer)
+        {
+            ParserLayer layer = new ParserLayer("namespace");
+
+            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new NamespaceKey ( inNamespaceLayer ) );
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
         private ParserLayer KlassenLayer(ParserLayer inclassLayer)
         {
             ParserLayer layer = new ParserLayer("class");
 
             layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
             layer.ParserMembers.Add(new KlassenDeklaration ( inclassLayer ));
+            layer.ParserMembers.Add(new UsingKey (  ));
             layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
 
             return layer;
@@ -164,6 +177,8 @@ namespace Yama
             ParserLayer inpropertyLayer = this.InPropertyLayer(executionlayer);
             ParserLayer inclassLayer = this.InKlassenLayer(executionlayer, inpropertyLayer);
             ParserLayer classLayer = this.KlassenLayer(inclassLayer);
+            ParserLayer namespaceLayer = this.NamespaceLayer(classLayer);
+            parserRules.Add(namespaceLayer);
             parserRules.Add(classLayer);
             parserRules.Add(inclassLayer);
             parserRules.Add(inpropertyLayer);
@@ -255,10 +270,10 @@ namespace Yama
             rules.Add ( new KeyWord ( "float", SyntaxKind.Float32Bit ) );
             rules.Add ( new KeyWord ( "new", SyntaxKind.New ) );
             rules.Add ( new KeyWord ( "delegate", SyntaxKind.Delegate ) );
-            rules.Add ( new KeyWord ( "using", SyntaxKind.Using ) );
             rules.Add ( new KeyWord ( "this", SyntaxKind.This ) );
             rules.Add ( new KeyWord ( "base", SyntaxKind.Base ) );
             rules.Add ( new KeyWord ( "sizeof", SyntaxKind.Sizeof ) );
+            rules.Add ( new KeyWord ( "using", SyntaxKind.Using ) );
             rules.Add ( new KeyWord ( "namespace", SyntaxKind.Namespace ) );
             rules.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
 
@@ -291,7 +306,7 @@ namespace Yama
                 System.IO.FileInfo file = new System.IO.FileInfo ( File );
 
                 Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
-                ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "class");
+                ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "namespace");
 
                 p.ErrorNode = new ParserError (  );
 
@@ -307,7 +322,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool Indezieren(List<IParseTreeNode> nodes, ref FunktionsDeklaration main)
+        private bool Indezieren(ref List<IParseTreeNode> nodes, ref FunktionsDeklaration main)
         {
             Yama.Index.Index index = new Yama.Index.Index();
             index.Roots = nodes;
@@ -315,6 +330,7 @@ namespace Yama
             if (!index.CreateIndex()) return this.PrintingIndexErrors(index);
 
             main = index.MainFunction;
+            nodes = index.ZuCompilenNodes;
 
             return true;
         }
@@ -328,7 +344,7 @@ namespace Yama
 
             if (!this.Parse(nodes)) return false;
 
-            if (!this.Indezieren(nodes, ref main)) return false;
+            if (!this.Indezieren(ref nodes, ref main)) return false;
 
             if (!this.Compilen(nodes, main)) return false;
 

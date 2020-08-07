@@ -21,7 +21,25 @@ namespace Yama.Index
             set;
         }
 
+        public Dictionary<string, IndexNamespaceDeklaration> Namespaces
+        {
+            get;
+            set;
+        }
+
+        public string StartNamespace
+        {
+            get;
+            set;
+        } = "Program";
+
         public List<IndexKlassenDeklaration> Register
+        {
+            get;
+            set;
+        }
+
+        public List<IParseTreeNode> ZuCompilenNodes
         {
             get;
             set;
@@ -48,6 +66,8 @@ namespace Yama.Index
             this.Roots = new List<IParseTreeNode>();
             this.Register = new List<IndexKlassenDeklaration>();
             this.Errors = new List<IndexError>();
+            this.Namespaces = new Dictionary<string, IndexNamespaceDeklaration>();
+            this.ZuCompilenNodes = new List<IParseTreeNode>();
         }
 
         private bool Indezieren()
@@ -63,11 +83,6 @@ namespace Yama.Index
 
             this.RootValidUses = new ValidUses(this);
 
-            foreach (IndexKlassenDeklaration klasse in this.Register)
-            {
-                this.RootValidUses.Add(klasse);
-            }
-
             return true;
         }
 
@@ -75,14 +90,64 @@ namespace Yama.Index
         {
             if (!this.Indezieren()) return false;
 
+            this.MakeAllNamespace();
+
             return this.Mappen();
+        }
+
+        public IndexNamespaceDeklaration NamespaceAdd(IndexNamespaceDeklaration dek)
+        {
+            if (this.Namespaces.ContainsKey(dek.Name)) return this.Namespaces[dek.Name];
+
+            this.Namespaces.Add(dek.Name, dek);
+
+            return dek;
+        }
+
+        private bool MakeAllNamespace()
+        {
+            Dictionary<string, IndexNamespaceDeklaration> aviableNamespaces = new Dictionary<string, IndexNamespaceDeklaration>();
+
+            this.MakeRegisterFromValidsNamespaces(this.Namespaces[this.StartNamespace], aviableNamespaces);
+
+            foreach (KeyValuePair<string, IndexNamespaceDeklaration> nameSpace in aviableNamespaces)
+            {
+                this.Register.AddRange(nameSpace.Value.KlassenDeklarationen);
+            }
+
+            return true;
+        }
+
+        private bool MakeRegisterFromValidsNamespaces(IndexNamespaceDeklaration indexNamespaceDeklaration, Dictionary<string, IndexNamespaceDeklaration> inUse)
+        {
+            if (inUse.ContainsKey(indexNamespaceDeklaration.Name)) return true;
+
+            inUse.Add(indexNamespaceDeklaration.Name, indexNamespaceDeklaration);
+
+            foreach (IndexNamespaceReference refer in indexNamespaceDeklaration.Usings)
+            {
+                if (!this.Namespaces.ContainsKey(refer.Name)) return this.CreateError(refer.Use, "Der Namespace konnte nicht gefunden werden!");
+
+                IndexNamespaceDeklaration dek = this.Namespaces[refer.Name];
+
+                this.MakeRegisterFromValidsNamespaces(dek, inUse);
+            }
+
+            return true;
         }
 
         private bool Mappen()
         {
+
+            foreach (IndexKlassenDeklaration klasse in this.Register)
+            {
+                this.RootValidUses.Add(klasse);
+            }
+
             foreach (IndexKlassenDeklaration klasse in this.Register)
             {
                 klasse.Mappen(this.RootValidUses);
+                this.ZuCompilenNodes.Add(klasse.Use);
             }
 
             return this.Errors.Count == 0;

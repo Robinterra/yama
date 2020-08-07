@@ -264,13 +264,15 @@ namespace Yama.Parser
 
         public bool Indezieren(Index.Index index, IParent parent)
         {
+            if (!(parent is IndexNamespaceDeklaration dek)) return index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
+
             IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration();
             deklaration.Name = this.Token.Text;
             deklaration.Use = this;
 
             this.Deklaration = deklaration;
 
-            index.Register.Add(deklaration);
+            dek.KlassenDeklarationen.Add(deklaration);
             foreach (IParseTreeNode node in this.Statement.GetAllChilds)
             {
                 node.Indezieren(index, deklaration);
