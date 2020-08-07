@@ -7,17 +7,14 @@ namespace Yama.Compiler
 
     public class CompileMovResult : ICompile<ReferenceCall>
     {
+
+        #region get/set
+
         public string AlgoName
         {
             get;
             set;
         } = "MovResult";
-
-        public int Counter
-        {
-            get;
-            set;
-        } = 2;
 
         public CompileAlgo Algo
         {
@@ -31,6 +28,20 @@ namespace Yama.Compiler
             set;
         }
 
+        #endregion get/set
+
+        #region methods
+
+        private DefaultRegisterQuery BuildQuery(ReferenceCall node, AlgoKeyCall key, string mode)
+        {
+            DefaultRegisterQuery query = new DefaultRegisterQuery();
+            query.Key = key;
+            query.Kategorie = mode;
+            query.Value = node;
+
+            return query;
+        }
+
         public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
         {
             compiler.AssemblerSequence.Add(this);
@@ -40,17 +51,17 @@ namespace Yama.Compiler
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
-            DefaultRegisterQuery query = new DefaultRegisterQuery();
-            query.Key = this.Algo.Keys[0];
-            query.Kategorie = mode;
-            query.Value = this.Counter;
-
-            Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-            if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", node);
-
-            foreach (KeyValuePair<string, string> pair in result)
+            foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", node);
+                DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
+
+                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", node);
+
+                foreach (KeyValuePair<string, string> pair in result)
+                {
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", node);
+                }
             }
 
             return true;
@@ -65,6 +76,9 @@ namespace Yama.Compiler
 
             return true;
         }
+
+        #endregion methods
+
     }
 
 }

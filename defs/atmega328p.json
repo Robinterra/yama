@@ -1,0 +1,286 @@
+{
+  "Name": "atmega328p",
+  "CalculationBytes": 1,
+  "AdressBytes": 2,
+  "ZeroRegister": 0,
+  "ArbeitsRegister": 2,
+  "AblageRegister": 16,
+  "MaxAblageRegister": 23,
+  "Algos": [
+    {
+      "Name": "ReferenceCall",
+      "Mode": "default",
+      "Description": "Der aufruf einer ganz normalen Variabel",
+      "Keys": [
+        {
+          "Name": "[VAR]",
+          "Values": [
+            "2",
+            "1"
+          ]
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "ldd r24,[VAR[0]]",
+        "ldd r25,[VAR[1]]"
+      ]
+    },
+    {
+      "Name": "ReferenceCall",
+      "Mode": "methode",
+      "Description": "Der aufruf einer ganz normalen Methode",
+      "Keys": [
+        {
+          "Name": "[NAME]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "ldi r24,hi8(gs([NAME]))",
+        "ldi r25,lo8(gs([NAME]))"
+      ]
+    },
+    {
+      "Name": "ReferenceCall",
+      "Mode": "set",
+      "Description": "Das setzen einer ganz normalen Variabel",
+      "Keys": [
+        {
+          "Name": "[VAR]",
+          "Values": [
+            "2",
+            "1"
+          ]
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "std [VAR[0]],r24",
+        "std [VAR[1]],r25"
+      ]
+    },
+    {
+      "Name": "MovResult",
+      "Mode": "default",
+      "Description": "Das verschieben eines Ergebnisses",
+      "Keys": [
+        {
+          "Name": "[REG]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "movw [REG[0]], r24"
+      ]
+    },
+    {
+      "Name": "ExecuteCall",
+      "Mode": "default",
+      "Description": "Aufruf einer Funktion",
+      "Keys": [],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "movw r30, r24",
+        "icall"
+      ]
+    },
+    {
+      "Name": "FunktionsDeklaration",
+      "Mode": "default",
+      "Description": "Die Deklaration einer Funktion",
+      "Keys": [
+        {
+          "Name": "[NAME]",
+          "Values": null
+        },
+        {
+          "Name": "[PUSHREG]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "[NAME]:",
+        "[PUSHREG]",
+        "push r28",
+        "push r29",
+        "in r28,__SP_L__",
+        "in r29,__SP_H__"
+      ]
+    },
+    {
+      "Name": "FunktionsEnde",
+      "Mode": "default",
+      "Description": "Das ende einer Funktion",
+      "Keys": [
+        {
+          "Name": "[POPREG]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "adiw r28, 6",
+        "in __tmp_reg__,__SREG__",
+        "cli",
+        "out __SP_H__,r29",
+        "out __SREG__,__tmp_reg__",
+        "out __SP_L__,r28",
+        "pop r29",
+        "pop r28",
+        "[POPREG]",
+        "ret"
+      ]
+    },
+    {
+      "Name": "UsePara",
+      "Mode": "default",
+      "Description": "Ein Registry Cache Entry als Parameter nutzen",
+      "Keys": [
+        {
+          "Name": "[REGPOP]",
+          "Values": null
+        },
+        {
+          "Name": "[PARA]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "movw [PARA[0]],[REGPOP]"
+      ]
+    },
+    {
+      "Name": "UsePara",
+      "Mode": "get",
+      "Description": "Ein Parameter in seine Variabel laden",
+      "Keys": [
+        {
+          "Name": "[VAR]",
+          "Values": [
+            "2",
+            "1"
+          ]
+        },
+        {
+          "Name": "[PARA]",
+          "Values": [
+            "2",
+            "1"
+          ]
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "std [VAR[0]],[PARA[0]]",
+        "std [VAR[1]],[PARA[1]]"
+      ]
+    },
+    {
+      "Name": "NumConst",
+      "Mode": "default",
+      "Description": "Die Konstante in das Register laden",
+      "Keys": [
+        {
+          "Name": "[NUMCONST]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "ldi r24,[NUMCONST[0]]",
+        "ldi r25,[NUMCONST[1]]"
+      ]
+    },
+    {
+      "Name": "CompileHeader",
+      "Mode": "default",
+      "Description": "Das setzen des Headers",
+      "Keys": [],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "__SP_H__ = 0x3e",
+        "__SP_L__ = 0x3d",
+        "__SREG__ = 0x3f",
+        "__tmp_reg__ = 0",
+        "__zero_reg__ = 1",
+        ".global    main",
+        ".type main, @function"
+      ]
+    },
+    {
+      "Name": "JumpTo",
+      "Mode": "default",
+      "Description": "Springt zum ziel punkt",
+      "Keys": [
+        {
+          "Name": "[JUMPTO]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "rjmp [JUMPTO]"
+      ]
+    },
+    {
+      "Name": "SprungPunkt",
+      "Mode": "default",
+      "Description": "Das setzen eines sprungounktes",
+      "Keys": [],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "[NAME]:"
+      ]
+    }
+  ],
+  "ZuweisungsRegister": 0,
+  "AviableRegisters": [
+    "r0",
+    "r1",
+    "r2",
+    "r3",
+    "r4",
+    "r5",
+    "r6",
+    "r7",
+    "r8",
+    "r9",
+    "r10",
+    "r11",
+    "r12",
+    "r13",
+    "r14",
+    "r15",
+    "r16",
+    "r17",
+    "r18",
+    "r19",
+    "r20",
+    "r21",
+    "r22",
+    "r23",
+    "r24",
+    "r25",
+    "r26",
+    "r27",
+    "r28",
+    "r29",
+    "r30",
+    "r31"
+  ],
+  "KeyPatterns": [
+    {
+      "Key": "[NUMCONST]",
+      "Pattern": "0x{0:X}"
+    },
+    {
+      "Key": "[VAR]",
+      "Pattern": "Y\u002B{0}"
+    }
+  ]
+}

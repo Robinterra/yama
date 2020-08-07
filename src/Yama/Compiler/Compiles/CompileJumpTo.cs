@@ -7,6 +7,9 @@ namespace Yama.Compiler
 
     public class CompileJumpTo : ICompileRoot
     {
+
+        #region get/set
+
         public string AlgoName
         {
             get;
@@ -18,12 +21,6 @@ namespace Yama.Compiler
             get;
             set;
         }
-
-        public int Counter
-        {
-            get;
-            set;
-        } = 2;
 
         public CompileAlgo Algo
         {
@@ -37,6 +34,20 @@ namespace Yama.Compiler
             set;
         }
         public Dictionary<string, string> PrimaryKeys { get; private set; }
+
+        #endregion get/set
+
+        #region methods
+
+        private DefaultRegisterQuery BuildQuery(CompileSprungPunkt node, AlgoKeyCall key, string mode)
+        {
+            DefaultRegisterQuery query = new DefaultRegisterQuery();
+            query.Key = key;
+            query.Kategorie = mode;
+            query.Value = node;
+
+            return query;
+        }
 
         public bool Compile(Compiler compiler, CompileSprungPunkt node, string mode = "default")
         {
@@ -54,17 +65,17 @@ namespace Yama.Compiler
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
-            DefaultRegisterQuery query = new DefaultRegisterQuery();
-            query.Key = this.Algo.Keys[0];
-            query.Kategorie = mode;
-            query.Value = this.Punkt;
-
-            Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-            if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", null);
-
-            foreach (KeyValuePair<string, string> pair in result)
+            foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", null);
+                DefaultRegisterQuery query = this.BuildQuery(this.Punkt, key, mode);
+
+                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", null);
+
+                foreach (KeyValuePair<string, string> pair in result)
+                {
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", null);
+                }
             }
 
             return true;
@@ -79,6 +90,9 @@ namespace Yama.Compiler
 
             return true;
         }
+
+        #endregion methods
+
     }
 
     public enum PointMode

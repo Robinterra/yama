@@ -5,7 +5,7 @@ namespace Yama.Compiler
     public interface IRegisterQuery
     {
 
-        string Key
+        AlgoKeyCall Key
         {
             get;
             set;

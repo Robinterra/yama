@@ -7,17 +7,15 @@ namespace Yama.Compiler
 
     public class CompileFunktionsEnde : ICompile<FunktionsDeklaration>
     {
+
+        #region get/set
+
         public string AlgoName
         {
             get;
             set;
         } = "FunktionsEnde";
 
-        public int Counter
-        {
-            get;
-            set;
-        } = 2;
         public FunktionsDeklaration Node { get; private set; }
         public CompileAlgo Algo
         {
@@ -31,6 +29,21 @@ namespace Yama.Compiler
             set;
         }
 
+        #endregion get/set
+
+        #region methods
+
+        private DefaultRegisterQuery BuildQuery(FunktionsDeklaration node, AlgoKeyCall key, string mode)
+        {
+            DefaultRegisterQuery query = new DefaultRegisterQuery();
+            query.Key = key;
+            query.Kategorie = mode;
+            query.Uses = node.Deklaration.ThisUses;
+            query.Value = (object)node.Deklaration.Name;
+
+            return query;
+        }
+
         public bool Compile(Compiler compiler, FunktionsDeklaration node, string mode = "default")
         {
             compiler.AssemblerSequence.Add(this);
@@ -41,20 +54,16 @@ namespace Yama.Compiler
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
-            foreach (string key in this.Algo.Keys)
+            foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = new DefaultRegisterQuery();
-                query.Key = key;
-                query.Kategorie = mode;
-                query.Uses = node.Deklaration.ThisUses;
-                query.Value = (object)node.Deklaration.Name;
+                DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", node);
+                if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", null);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
-                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", node);
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", null);
                 }
             }
 
@@ -65,7 +74,7 @@ namespace Yama.Compiler
         {
             Dictionary<string, string> postreplaces = new Dictionary<string, string>();
 
-            foreach (string key in this.Algo.PostKeys)
+            foreach (AlgoKeyCall key in this.Algo.PostKeys)
             {
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
@@ -73,7 +82,7 @@ namespace Yama.Compiler
 
                 string value = compiler.Definition.PostKeyReplace(query);
 
-                postreplaces.Add(key, value);
+                postreplaces.Add(key.Name, value);
             }
 
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
@@ -83,6 +92,9 @@ namespace Yama.Compiler
 
             return true;
         }
+
+        #endregion methods
+
     }
 
 }

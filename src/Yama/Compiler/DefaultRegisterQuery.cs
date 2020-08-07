@@ -5,7 +5,7 @@ namespace Yama.Compiler
     public class DefaultRegisterQuery : IRegisterQuery
     {
 
-        public string Key
+        public AlgoKeyCall Key
         {
             get;
             set;

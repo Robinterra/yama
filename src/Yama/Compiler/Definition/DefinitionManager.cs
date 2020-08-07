@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using Yama.Compiler.Atmega328p;
 
 namespace Yama.Compiler.Definition
 {
@@ -50,8 +49,6 @@ namespace Yama.Compiler.Definition
         private bool Init (  )
         {
             this.AviableDefinitions = new List<IProcessorDefinition>();
-
-            this.AviableDefinitions.Add ( new Atmega328pDefinition (  ) );
 
             this.GetAllDefinitions (  );
 

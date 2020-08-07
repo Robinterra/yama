@@ -7,6 +7,9 @@ namespace Yama.Compiler
 
     public class CompileReferenceCall : ICompile<ReferenceCall>
     {
+
+        #region get/set
+
         public string AlgoName
         {
             get;
@@ -26,6 +29,21 @@ namespace Yama.Compiler
             set;
         }
 
+        #endregion get/set
+
+        #region methods
+
+        private DefaultRegisterQuery BuildQuery(IndexVariabelnReference node, AlgoKeyCall key, string mode)
+        {
+            DefaultRegisterQuery query = new DefaultRegisterQuery();
+            query.Key = key;
+            query.Kategorie = mode;
+            query.Uses = node.ThisUses;
+            query.Value = key.Name == "[REG]" ? (object)1 : (object)node.AssemblyName;
+
+            return query;
+        }
+
         public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
         {
             return this.Compile(compiler, node.Reference, mode);
@@ -40,13 +58,9 @@ namespace Yama.Compiler
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
-            foreach (string key in this.Algo.Keys)
+            foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = new DefaultRegisterQuery();
-                query.Key = key;
-                query.Kategorie = mode;
-                query.Uses = node.ThisUses;
-                query.Value = key == "[REG]" ? (object)1 : (object)node.AssemblyName;
+                DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", null);
@@ -69,6 +83,9 @@ namespace Yama.Compiler
 
             return true;
         }
+
+        #endregion methods
+
     }
 
 }

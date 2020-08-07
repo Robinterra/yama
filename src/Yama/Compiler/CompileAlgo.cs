@@ -22,13 +22,13 @@ namespace Yama.Compiler
             set;
         }
 
-        public List<string> Keys
+        public List<AlgoKeyCall> Keys
         {
             get;
             set;
         }
 
-        public List<string> PostKeys
+        public List<AlgoKeyCall> PostKeys
         {
             get;
             set;
@@ -42,9 +42,9 @@ namespace Yama.Compiler
 
         public CompileAlgo()
         {
-            this.Keys = new List<string>();
+            this.Keys = new List<AlgoKeyCall>();
             this.AssemblyCommands = new List<string>();
-            this.PostKeys = new List<string>();
+            this.PostKeys = new List<AlgoKeyCall>();
         }
     }
 }

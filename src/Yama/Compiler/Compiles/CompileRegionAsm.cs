@@ -7,6 +7,9 @@ namespace Yama.Compiler
 
     public class CompileRegionAsm : ICompile<BedingtesCompilierenParser>
     {
+
+        #region get/set
+
         public string AlgoName
         {
             get;
@@ -18,6 +21,10 @@ namespace Yama.Compiler
             get;
             set;
         }
+
+        #endregion get/set
+
+        #region methods
 
         public bool Compile(Compiler compiler, BedingtesCompilierenParser node, string mode = "default")
         {
@@ -39,6 +46,9 @@ namespace Yama.Compiler
 
             return true;
         }
+
+        #endregion methods
+
     }
 
 }

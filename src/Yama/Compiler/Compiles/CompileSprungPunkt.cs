@@ -7,6 +7,9 @@ namespace Yama.Compiler
 
     public class CompileSprungPunkt : ICompileRoot
     {
+
+        #region get/set
+
         public string AlgoName
         {
             get;
@@ -25,6 +28,10 @@ namespace Yama.Compiler
             set;
         } = new List<ICompileRoot>();
         public string JumpPointName { get; set; }
+
+        #endregion get/set
+
+        #region methods
 
         public bool Add(Compiler compiler, ICompileRoot call)
         {
@@ -58,6 +65,9 @@ namespace Yama.Compiler
 
             return true;
         }
+
+        #endregion methods
+
     }
 
 }

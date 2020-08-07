@@ -344,7 +344,14 @@ namespace Yama
             compiler.Definition = this.Definition;
             compiler.MainFunction = main;
 
-            return compiler.Compilen(nodes);
+            if (compiler.Compilen(nodes)) return true;
+
+            foreach (CompilerError error in compiler.Errors)
+            {
+                this.PrintSimpleError(error.Msg);
+            }
+
+            return false;
         }
 
         // -----------------------------------------------
