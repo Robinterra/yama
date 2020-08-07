@@ -287,7 +287,7 @@ namespace Yama.Compiler.Definition
 
                 pattern = pattern << this.CalculationBytes * 8;
 
-                bitcounter += this.CalculationBytes;
+                bitcounter += this.CalculationBytes * 8;
                 counter++;
             }
 
