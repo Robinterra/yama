@@ -1,6 +1,6 @@
 namespace LearnCsStuf.CommandLines.Commands
 {
-    public class YamaExpression : ICommandLine
+    public class StartNamespace : ICommandLine
     {
 
         // -----------------------------------------------
@@ -13,7 +13,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return "yama";
+                return "start";
             }
         }
 
@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, "<file>", "Parse File und gibt das Ergebnis wieder" );
+                return string.Format ( Hilfe.HilfePattern, this.Key, "<namespace>", "The start namespace that is to compile (default:Program)" );
             }
         }
 
@@ -59,7 +59,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             if (string.Format ( "{0}", this.Key ) != command) return null;
 
-            return new YamaExpression (  );
+            return new StartNamespace (  );
         }
 
         // -----------------------------------------------

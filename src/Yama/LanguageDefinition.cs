@@ -58,6 +58,22 @@ namespace Yama
 
         // -----------------------------------------------
 
+        public List<string> Defines
+        {
+            get;
+            set;
+        } = new List<string>();
+
+        // -----------------------------------------------
+
+        public string StartNamespace
+        {
+            get;
+            set;
+        } = "Program";
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -328,6 +344,7 @@ namespace Yama
         {
             Yama.Index.Index index = new Yama.Index.Index();
             index.Roots = nodes;
+            index.StartNamespace = this.StartNamespace;
             index.AllUseFiles = this.AllFilesInUse;
 
             if (!index.CreateIndex()) return this.PrintingIndexErrors(index);
@@ -342,6 +359,8 @@ namespace Yama
 
         public bool Compile()
         {
+            if (this.Definition == null) return false;
+
             List<IParseTreeNode> nodes = new List<IParseTreeNode>();
             FunktionsDeklaration main = null;
 
@@ -362,6 +381,7 @@ namespace Yama
             compiler.OutputFile = new FileInfo(this.OutputFile);
             compiler.Definition = this.Definition;
             compiler.MainFunction = main;
+            compiler.Defines = this.Defines;
 
             if (!compiler.Definition.LoadExtensions(this.AllFilesInUse)) return false;
 

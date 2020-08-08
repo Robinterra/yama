@@ -105,6 +105,14 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
+        public List<AdvancedKeyReplaces> AdvancedKeyReplaces
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public List<GenericDefinitionKeyPattern> KeyPatterns
         {
             get;
@@ -221,7 +229,35 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[JUMPTO]") return this.JumpToQuery(query);
             if (query.Key.Name == "[PROPERTY]") return this.PropertyQuery(query);
 
+            return this.MakeAdvanedKeyReplaces(query);
+        }
+
+        // -----------------------------------------------
+
+        private Dictionary<string, string> MakeAdvanedKeyReplaces(IRegisterQuery query)
+        {
+            List<AdvancedKeyReplaces> foundedList = this.AdvancedKeyReplaces.Where(t=>t.Key == query.Key.Name).ToList();
+            if (foundedList.Count == 0) return null;
+
+            foreach (AdvancedKeyReplaces keymap in foundedList)
+            {
+                if (!this.AdvancedKeyReplacesIsOk(keymap)) continue;
+
+                return new Dictionary<string, string> { { keymap.Key, keymap.Value } };
+            }
+
             return null;
+        }
+
+        // -----------------------------------------------
+
+        private bool AdvancedKeyReplacesIsOk(AdvancedKeyReplaces keymap)
+        {
+            if (keymap.Defines == null) return true;
+            if (keymap.Defines.Count == 0) return true;
+            if (keymap.Defines.Any(t=>this.Compiler.Defines.Contains(t))) return true;
+
+            return false;
         }
 
         // -----------------------------------------------

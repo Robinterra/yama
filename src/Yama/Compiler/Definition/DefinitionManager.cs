@@ -107,7 +107,11 @@ namespace Yama.Compiler.Definition
 
         public IProcessorDefinition GetDefinition ( string name )
         {
-            return this.AviableDefinitions.FirstOrDefault ( t => t.Name == name );
+            IProcessorDefinition def = this.AviableDefinitions.FirstOrDefault ( t => t.Name == name );
+
+            if (def == null) this.PrintSimpleError(string.Format("The definition {0} can not be found!", name));
+
+            return def;
         }
 
         // -----------------------------------------------

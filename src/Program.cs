@@ -67,6 +67,8 @@ namespace Yama
                 if (command is OutputFileExpression) yama.OutputFile = command.Value;
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
                 if (command is PrintDefinitionsExpression) return defs.PrintAllDefinitions (  );
+                if (command is DefinesExpression) yama.Defines.Add(command.Value);
+                if (command is StartNamespace) yama.StartNamespace = command.Value;
             }
 
             return yama.Compile();
@@ -113,6 +115,8 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new DefinitionExpression (  ) );
             Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
             Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
+            Program.EnabledCommandLines.Add ( new StartNamespace (  ) );
+            Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
             Program.EnabledCommandLines.Add ( new Help (  ) );
             return true;
         }

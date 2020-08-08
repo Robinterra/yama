@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Yama.Compiler.Definition
 {
 
-    public class GenericDefinitionKeyPattern
+    public class AdvancedKeyReplaces
     {
 
         // -----------------------------------------------
@@ -23,7 +23,19 @@ namespace Yama.Compiler.Definition
         /**
          *
          */
-        public string Pattern
+        public string Value
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+        
+        /**
+         * Defines for conditional compilation
+         * if a define is contains in this list then this key can be used
+         */
+        public List<string> Defines
         {
             get;
             set;

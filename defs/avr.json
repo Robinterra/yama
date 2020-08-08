@@ -1,5 +1,5 @@
 {
-  "Name": "atmega328p",
+  "Name": "avr",
   "CalculationBytes": 1,
   "AdressBytes": 2,
   "ZeroRegister": 0,
@@ -152,6 +152,14 @@
         {
           "Name": "[NAME]",
           "Values": null
+        },
+        {
+          "Name": "[SPH]",
+          "Values": null
+        },
+        {
+          "Name": "[SPL]",
+          "Values": null
         }
       ],
       "PostKeys": [
@@ -165,8 +173,8 @@
         "[PUSHREG]",
         "push r28",
         "push r29",
-        "in r28,__SP_L__",
-        "in r29,__SP_H__"
+        "in r28,[SPL]",
+        "in r29,[SPH]"
       ]
     },
     {
@@ -174,6 +182,18 @@
       "Mode": "default",
       "Description": "Das ende einer Funktion",
       "Keys": [
+        {
+          "Name": "[SPH]",
+          "Values": null
+        },
+        {
+          "Name": "[SPL]",
+          "Values": null
+        },
+        {
+          "Name": "[SREG]",
+          "Values": null
+        }
       ],
       "PostKeys": [
         {
@@ -183,11 +203,11 @@
       ],
       "AssemblyCommands": [
         "adiw r28, 6",
-        "in __tmp_reg__,__SREG__",
+        "in __tmp_reg__,[SREG]",
         "cli",
-        "out __SP_H__,r29",
-        "out __SREG__,__tmp_reg__",
-        "out __SP_L__,r28",
+        "out [SPH],r29",
+        "out [SREG],__tmp_reg__",
+        "out [SPL],r28",
         "pop r29",
         "pop r28",
         "[POPREG]",
@@ -259,16 +279,32 @@
       "Name": "CompileHeader",
       "Mode": "default",
       "Description": "Das setzen des Headers",
-      "Keys": [],
+      "Keys": [
+        {
+          "Name": "[SPH]",
+          "Values": null
+        },
+        {
+          "Name": "[SPL]",
+          "Values": null
+        },
+        {
+          "Name": "[RAMENDE_LOW]",
+          "Values": null
+        },
+        {
+          "Name": "[RAMENDE_HIGH]",
+          "Values": null
+        }
+      ],
       "PostKeys": [],
       "AssemblyCommands": [
-        "__SP_H__ = 0x3e",
-        "__SP_L__ = 0x3d",
-        "__SREG__ = 0x3f",
         "__tmp_reg__ = 0",
-        "__zero_reg__ = 1",
-        ".global    main",
-        ".type main, @function"
+        "ldi r24, [RAMENDE_LOW]",
+        "out [SPL],__tmp_reg__",
+        "ldi r24, [RAMENDE_HIGH]",
+        "out [SPH],r24",
+        "rjmp main"
       ]
     },
     {
@@ -347,6 +383,43 @@
     "r29",
     "r30",
     "r31"
+  ],
+  "AdvancedKeyReplaces": [
+    {
+      "Key": "[SPL]",
+      "Value": "0x3d",
+      "Defines": [
+        "atmega328p"
+      ]
+    },
+    {
+      "Key": "[SPH]",
+      "Value": "0x3e",
+      "Defines": [
+        "atmega328p"
+      ]
+    },
+    {
+      "Key": "[SREG]",
+      "Value": "0x3f",
+      "Defines": [
+        "atmega328p"
+      ]
+    },
+    {
+      "Key": "[RAMENDE_LOW]",
+      "Value": "0xff",
+      "Defines": [
+        "atmega328p"
+      ]
+    },
+    {
+      "Key": "[RAMENDE_HIGH]",
+      "Value": "0x08",
+      "Defines": [
+        "atmega328p"
+      ]
+    }
   ],
   "KeyPatterns": [
     {

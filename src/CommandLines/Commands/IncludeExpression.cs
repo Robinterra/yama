@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, "<folder>", "Include all files from this folder" );
+                return string.Format ( Hilfe.HilfePattern, this.Key, "<folder>", "Include all files from this folder (recursive). Only classes which namespace is using will be compile" );
             }
         }
 

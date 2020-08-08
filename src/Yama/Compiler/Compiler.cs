@@ -49,6 +49,8 @@ namespace Yama.Compiler
         public FunktionsDeklaration MainFunction { get; internal set; }
         public List<CompilerError> Errors { get; set; } = new List<CompilerError>();
 
+        public List<string> Defines { get; set; }
+
         #endregion get/set
 
         #region methods

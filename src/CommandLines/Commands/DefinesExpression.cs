@@ -1,6 +1,6 @@
 namespace LearnCsStuf.CommandLines.Commands
 {
-    public class FrameworkExpression : ICommandLine
+    public class DefinesExpression : ICommandLine
     {
 
         // -----------------------------------------------
@@ -13,7 +13,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return "framework";
+                return "define";
             }
         }
 
@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, "<folder>", "You can set a framework to compile, it is the folder name, they must in same  folder with compiler" );
+                return string.Format ( Hilfe.HilfePattern, this.Key, "<define>", "One Define for conditional compilation" );
             }
         }
 
@@ -57,9 +57,9 @@ namespace LearnCsStuf.CommandLines.Commands
 
         public ICommandLine Check ( string command )
         {
-            if (string.Format ( "{0}", this.Key ) != command) return null;
+            if (string.Format ( "{0}", this.Key ) == command) return new DefinesExpression (  );
 
-            return new FrameworkExpression (  );
+            return null;
         }
 
         // -----------------------------------------------

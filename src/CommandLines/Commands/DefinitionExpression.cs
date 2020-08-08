@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, "<name>", "Set the Compiler definition" );
+                return string.Format ( Hilfe.HilfePattern, this.Key, "<name>", "Set the Compiler definition for translate in assembler" );
             }
         }
 
