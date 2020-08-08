@@ -158,6 +158,15 @@ namespace Yama.Compiler.Definition
         // -----------------------------------------------
 
         [System.Text.Json.Serialization.JsonIgnore]
+        public int VariabelCounter
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        [System.Text.Json.Serialization.JsonIgnore]
         public Compiler Compiler
         {
             get;
@@ -266,6 +275,7 @@ namespace Yama.Compiler.Definition
         {
             if (query.Key.Name == "[PUSHREG]") return this.PushReg(query);
             if (query.Key.Name == "[POPREG]") return this.PopReg(query);
+            if (query.Key.Name == "[VARCOUNT]") return this.VarCountQuery(query);
 
             return null;
         }
@@ -469,13 +479,37 @@ namespace Yama.Compiler.Definition
 
                 for (int i = 0; i < duration; i++ )
                 {
-                    result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i) );
+                    result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i + 1) );
+
+                    if (this.VariabelCounter < counter + i + 1) this.VariabelCounter = counter + i + 1;
                 }
 
                 return  result;
             }
 
             return null;
+        }
+
+        // -----------------------------------------------
+
+        
+        private string VarCountQuery(IRegisterQuery query)
+        {
+            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            /*Dictionary<string,string> result = new Dictionary<string,string>();
+            int bytes = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
+
+            int counter = 0;
+
+            foreach (IParent a in query.Uses.Deklarationen)
+            {
+                if (!(a is IndexVariabelnDeklaration vardek)) continue;
+
+                counter++;
+            }*/
+
+            return string.Format( keyPattern.Pattern, query.Value );
         }
 
         // -----------------------------------------------

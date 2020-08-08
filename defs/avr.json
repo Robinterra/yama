@@ -166,11 +166,20 @@
         {
           "Name": "[PUSHREG]",
           "Values": null
+        },
+        {
+          "Name": "[VARCOUNT]",
+          "Values": null
         }
       ],
       "AssemblyCommands": [
         "[NAME]:",
-        "[PUSHREG]"
+        "[PUSHREG]",
+        "in r28,[SPL]",
+        "in r29,[SPH]",
+        "sbiw r28,[VARCOUNT]",
+        "out [SPL],r28",
+        "out [SPH],r29"
       ]
     },
     {
@@ -195,10 +204,19 @@
         {
           "Name": "[POPREG]",
           "Values": null
+        },
+        {
+          "Name": "[VARCOUNT]",
+          "Values": null
         }
       ],
       "AssemblyCommands": [
+        "adiw r28,[VARCOUNT]",
+        "out [SPL],r28",
+        "out [SPH],r29",
         "[POPREG]",
+        "in r28,[SPL]",
+        "in r29,[SPH]",
         "ret"
       ]
     },
@@ -322,6 +340,7 @@
       "PostKeys": [],
       "AssemblyCommands": [
         "or r24,r25",
+        "tst r24",
         "breq [JUMPTO]"
       ]
     },
@@ -415,6 +434,10 @@
     },
     {
       "Key": "[PROPERTY]",
+      "Pattern": "0x{0:X}"
+    },
+    {
+      "Key": "[VARCOUNT]",
       "Pattern": "0x{0:X}"
     },
     {

@@ -51,6 +51,14 @@ namespace Yama.Compiler
 
         // -----------------------------------------------
 
+        int VariabelCounter
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
 
         #endregion get/set
 

@@ -79,6 +79,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
                 query.Value = this.Node.RegisterInUse;
+                if (key.Name == "[VARCOUNT]") query.Value = this.Node.VariabelCounter;
 
                 string value = compiler.Definition.PostKeyReplace(query);
 

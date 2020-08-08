@@ -108,6 +108,12 @@ namespace Yama.Parser
             set;
         } = new CompileContainer();
 
+        public int VariabelCounter
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -423,6 +429,8 @@ namespace Yama.Parser
             this.CompileContainer.Ende.Compile(compiler, this, mode);
 
             this.FunktionsEndeCompile.Compile(compiler, this, mode);
+
+            this.VariabelCounter = compiler.Definition.VariabelCounter;
 
             return true;
         }

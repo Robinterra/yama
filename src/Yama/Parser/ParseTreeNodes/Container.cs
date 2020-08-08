@@ -48,6 +48,8 @@ namespace Yama.Parser
             }
         }
 
+        public IndexContainer IndexContainer { get; private set; }
+
         #endregion get/set
 
         #region  ctor
@@ -109,6 +111,7 @@ namespace Yama.Parser
             IndexContainer indexContainer = new IndexContainer();
             indexContainer.Use = this;
             container.Containers.Add(indexContainer);
+            this.IndexContainer = indexContainer;
 
             foreach (IParseTreeNode node in this.Statements)
             {

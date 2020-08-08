@@ -146,6 +146,8 @@ namespace Yama.Compiler
             this.CurrentContainer.RootContainer = compileContainer;
             this.CurrentContainer.ContainerStack.Push(compileContainer);
 
+            this.Definition.VariabelCounter = 0;
+
             return true;
         }
 
