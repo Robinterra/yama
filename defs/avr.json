@@ -170,11 +170,7 @@
       ],
       "AssemblyCommands": [
         "[NAME]:",
-        "[PUSHREG]",
-        "push r28",
-        "push r29",
-        "in r28,[SPL]",
-        "in r29,[SPH]"
+        "[PUSHREG]"
       ]
     },
     {
@@ -202,14 +198,6 @@
         }
       ],
       "AssemblyCommands": [
-        "adiw r28, 6",
-        "in __tmp_reg__,[SREG]",
-        "cli",
-        "out [SPH],r29",
-        "out [SREG],__tmp_reg__",
-        "out [SPL],r28",
-        "pop r29",
-        "pop r28",
         "[POPREG]",
         "ret"
       ]
@@ -299,9 +287,8 @@
       ],
       "PostKeys": [],
       "AssemblyCommands": [
-        "__tmp_reg__ = 0",
         "ldi r24, [RAMENDE_LOW]",
-        "out [SPL],__tmp_reg__",
+        "out [SPL],r24",
         "ldi r24, [RAMENDE_HIGH]",
         "out [SPH],r24",
         "rjmp main"
