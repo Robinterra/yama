@@ -5,7 +5,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileReferenceCall : ICompile<ReferenceCall>
+    public class CompileJumpWithCondition : ICompileRoot
     {
 
         #region get/set
@@ -14,8 +14,13 @@ namespace Yama.Compiler
         {
             get;
             set;
-        } = "ReferenceCall";
+        } = "JumpWithCondition";
 
+        public PointMode Point
+        {
+            get;
+            set;
+        }
 
         public CompileAlgo Algo
         {
@@ -23,50 +28,46 @@ namespace Yama.Compiler
             set;
         }
 
-        public Dictionary<string, string> PrimaryKeys
+        public CompileSprungPunkt Punkt
         {
             get;
             set;
         }
+        public Dictionary<string, string> PrimaryKeys { get; private set; }
 
         #endregion get/set
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(IndexVariabelnReference node, AlgoKeyCall key, string mode)
+        private DefaultRegisterQuery BuildQuery(CompileSprungPunkt node, AlgoKeyCall key, string mode)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
             query.Kategorie = mode;
-            query.Uses = node.ThisUses;
-
-            object queryValue = (object)node.AssemblyName;
-            if ("[REG]" == key.Name) queryValue = 1;
-            if ("[PROPERTY]" == key.Name) queryValue = node.Deklaration;
-            //if ("setpoint" == mode) queryValue = node.Deklaration;
-
-            query.Value = queryValue;
+            query.Value = node;
 
             return query;
         }
 
-        public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
-        {
-            return this.Compile(compiler, node.Reference, mode);
-        }
-
-        public bool Compile(Compiler compiler, IndexVariabelnReference node, string mode = "default")
+        public bool Compile(Compiler compiler, CompileSprungPunkt node, string mode = "default")
         {
             compiler.AssemblerSequence.Add(this);
 
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
+
             if (this.Algo == null) return false;
+
+            if (this.Point == PointMode.Custom) this.Punkt = node;
+            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.CurrentContainer.CurrentContainer.Begin;
+            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.CurrentContainer.CurrentContainer.Ende;
+            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.CurrentContainer.RootContainer.Begin;
+            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.CurrentContainer.RootContainer.Ende;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
+                DefaultRegisterQuery query = this.BuildQuery(this.Punkt, key, mode);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);

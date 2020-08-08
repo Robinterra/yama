@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -124,6 +125,30 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            CompileSprungPunkt afterIfStatement = new CompileSprungPunkt();
+
+            CompileSprungPunkt afterElseStatement = new CompileSprungPunkt();
+
+            CompileJumpTo jumpafterelse = new CompileJumpTo();
+
+            CompileJumpWithCondition jumpWithCondition = new CompileJumpWithCondition();
+
+            this.Condition.Compile(compiler, mode);
+
+            jumpWithCondition.Compile(compiler, afterIfStatement, "notZero");
+
+            this.IfStatement.Compile(compiler, mode);
+
+            if (this.ElseStatement != null) jumpafterelse.Compile(compiler, afterElseStatement, mode);
+
+            afterIfStatement.Compile(compiler, this, mode);
+
+            if (this.ElseStatement == null) return true;
+
+            this.ElseStatement.Compile(compiler, mode);
+
+            afterIfStatement.Compile(compiler, this, mode);
+
             return true;
         }
 

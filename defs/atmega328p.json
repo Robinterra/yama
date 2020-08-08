@@ -287,6 +287,22 @@
       ]
     },
     {
+      "Name": "JumpWithCondition",
+      "Mode": "notZero",
+      "Description": "Springt zum ziel punkt wenn ist nicht 0",
+      "Keys": [
+        {
+          "Name": "[JUMPTO]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "or r24,r25",
+        "breq [JUMPTO]"
+      ]
+    },
+    {
       "Name": "SprungPunkt",
       "Mode": "default",
       "Description": "Das setzen eines sprungounktes",

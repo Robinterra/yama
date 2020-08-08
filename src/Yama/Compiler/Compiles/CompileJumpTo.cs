@@ -70,11 +70,11 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(this.Punkt, key, mode);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError("Es konnten keine daten zum Keyword geladen werden", null);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
-                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError("Es wurde bereits ein Keyword hinzugefügt", null);
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
                 }
             }
 
