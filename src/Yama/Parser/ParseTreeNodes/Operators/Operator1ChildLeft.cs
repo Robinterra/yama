@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
 using System.Linq;
+using Yama.Compiler;
 
 namespace Yama.Parser
 {
@@ -49,6 +50,18 @@ namespace Yama.Parser
         {
             get;
         }
+
+        public CompileReferenceCall OperatorCall
+        {
+            get;
+            set;
+        } = new CompileReferenceCall();
+
+        public CompileExecuteCall FunctionExecute
+        {
+            get;
+            set;
+        } = new CompileExecuteCall();
 
         public List<SyntaxKind> ValidChilds
         {
@@ -147,6 +160,18 @@ namespace Yama.Parser
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
             this.ChildNode.Compile(compiler, mode);
+
+            CompileMovResult movResultLeft = new CompileMovResult();
+
+            movResultLeft.Compile(compiler, null, mode);
+
+            this.OperatorCall.Compile(compiler, this.Reference, "methode");
+
+            CompileUsePara usePara = new CompileUsePara();
+
+            usePara.Compile(compiler);
+
+            this.FunctionExecute.Compile(compiler, null, mode);
 
             return true;
         }

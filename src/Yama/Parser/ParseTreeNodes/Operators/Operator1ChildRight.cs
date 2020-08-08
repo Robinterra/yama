@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -27,6 +28,18 @@ namespace Yama.Parser
             get;
             set;
         }
+
+        public CompileReferenceCall OperatorCall
+        {
+            get;
+            set;
+        } = new CompileReferenceCall();
+
+        public CompileExecuteCall FunctionExecute
+        {
+            get;
+            set;
+        } = new CompileExecuteCall();
 
         public int Prio
         {
@@ -163,6 +176,20 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            this.ChildNode.Compile(compiler, mode);
+
+            CompileMovResult movResultLeft = new CompileMovResult();
+
+            movResultLeft.Compile(compiler, null, mode);
+
+            this.OperatorCall.Compile(compiler, this.Reference, "methode");
+
+            CompileUsePara usePara = new CompileUsePara();
+
+            usePara.Compile(compiler);
+
+            this.FunctionExecute.Compile(compiler, null, mode);
+
             return true;
         }
 

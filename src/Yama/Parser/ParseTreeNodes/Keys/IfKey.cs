@@ -135,7 +135,7 @@ namespace Yama.Parser
 
             this.Condition.Compile(compiler, mode);
 
-            jumpWithCondition.Compile(compiler, afterIfStatement, "notZero");
+            jumpWithCondition.Compile(compiler, afterIfStatement, "isZero");
 
             this.IfStatement.Compile(compiler, mode);
 

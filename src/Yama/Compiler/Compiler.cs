@@ -147,6 +147,20 @@ namespace Yama.Compiler
             return true;
         }
 
+        public bool PushContainer(CompileContainer compileContainer)
+        {
+            this.CurrentContainer.ContainerStack.Push(compileContainer);
+
+            return true;
+        }
+
+        public bool PopContainer()
+        {
+            this.CurrentContainer.ContainerStack.Pop();
+
+            return true;
+        }
+
         #endregion methods
     }
 }

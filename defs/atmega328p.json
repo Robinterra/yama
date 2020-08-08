@@ -288,8 +288,8 @@
     },
     {
       "Name": "JumpWithCondition",
-      "Mode": "notZero",
-      "Description": "Springt zum ziel punkt wenn ist nicht 0",
+      "Mode": "isZero",
+      "Description": "Springt zum ziel punkt wenn ist 0",
       "Keys": [
         {
           "Name": "[JUMPTO]",
