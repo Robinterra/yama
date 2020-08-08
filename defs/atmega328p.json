@@ -45,9 +45,9 @@
         "ldi r24,[PROPERTY[0]]",
         "add r30,r24",
         "adc r31, r0",
-        "sram r24, Z",
+        "LD r24, Z",
         "adiw r30, 1",
-        "sram r25, Z"
+        "LD r25, Z"
       ]
     },
     {
