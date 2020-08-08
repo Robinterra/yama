@@ -332,11 +332,28 @@ namespace Yama.Compiler.Definition
 
         private Dictionary<string,string> JumpToQuery(IRegisterQuery query)
         {
+            if (query.Key.Values != null && query.Key.Values.Count > 0) return this.JumpToQueryWithValues(query);
             if (!(query.Value is CompileSprungPunkt t)) return null;
 
             t.Add(this.Compiler, t);
 
             return new Dictionary<string, string> { { query.Key.Name, t.JumpPointName } };
+        }
+
+        // -----------------------------------------------
+
+        private Dictionary<string, string> JumpToQueryWithValues(IRegisterQuery query)
+        {
+            string pattern = "[JUMPTO[{0}]]";
+            int duration = Convert.ToInt32(query.Key.Values[0]);
+            Dictionary<string, string> result = new Dictionary<string, string>();
+
+            for (int i=0; i < duration; i++)
+            {
+                result.Add(string.Format(pattern, i), this.GenerateJumpPointName());
+            }
+
+            return result;
         }
 
         // -----------------------------------------------

@@ -374,6 +374,7 @@ namespace Yama.Parser
         {
             bool isok = deklaration.Type == MethodeType.Methode;
             if (!isok) isok = deklaration.Type == MethodeType.Property;
+            if (!isok) isok = deklaration.Type == MethodeType.Ctor;
             if (!isok) return false;
 
             IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration();
@@ -413,6 +414,44 @@ namespace Yama.Parser
 
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
 
+            if (this.Deklaration.Type == MethodeType.Ctor) this.CompileCtor(compiler, mode);
+            if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(compiler, mode);
+
+            return this.CompileNormalFunktion(compiler, mode);
+        }
+
+        private bool CompileDeCtor(Compiler.Compiler compiler, string mode)
+        {
+            CompileNumConst num = new CompileNumConst();
+            num.Compile(compiler, new Number { Token = new SyntaxToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
+
+            CompileFree malloc = new CompileFree();
+            malloc.Compile(compiler, this, mode);
+
+            return true;
+        }
+
+        private bool CompileCtor(Compiler.Compiler compiler, string mode)
+        {
+            CompileNumConst num = new CompileNumConst();
+            num.Compile(compiler, new Number { Token = new SyntaxToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
+
+            CompileMalloc malloc = new CompileMalloc();
+            malloc.Compile(compiler, this, mode);
+
+            CompileMovResult movResultRight = new CompileMovResult();
+
+            movResultRight.Compile(compiler, null, mode);
+
+            CompileUsePara usePara = new CompileUsePara();
+
+            usePara.Compile(compiler, null);
+
+            return compiler.Definition.ParaClean();
+        }
+
+        private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode)
+        {
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
                 CompileUsePara usePara = new CompileUsePara();

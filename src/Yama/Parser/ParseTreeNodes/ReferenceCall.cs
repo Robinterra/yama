@@ -64,7 +64,7 @@ namespace Yama.Parser
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( token.Kind != SyntaxKind.Word ) return null;
+            if ( !this.CheckValidTokens ( token ) ) return null;
 
             ReferenceCall result = new ReferenceCall (  );
 
@@ -73,6 +73,14 @@ namespace Yama.Parser
             result.Token = token;
 
             return result;
+        }
+
+        private bool CheckValidTokens(SyntaxToken token)
+        {
+            if (token.Kind == SyntaxKind.Word) return true;
+            if (token.Kind == SyntaxKind.This) return true;
+
+            return false;
         }
 
         public bool Indezieren(Index.Index index, IParent parent)

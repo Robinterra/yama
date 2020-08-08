@@ -298,22 +298,11 @@ namespace Yama.Parser
 
         public MethodeType GetMethodeType()
         {
-            MethodeType type = MethodeType.Methode;
+            MethodeType type = MethodeType.Property;
 
             if (this.ZusatzDefinition != null)
             {
                 if (this.ZusatzDefinition.Kind == SyntaxKind.Static) type = MethodeType.Static;
-                if (this.ZusatzDefinition.Kind == SyntaxKind.Operator)
-                {
-                    type = MethodeType.Operator;
-                    if (this.TypeDefinition.Kind == SyntaxKind.Explicit) type = MethodeType.Explicit;
-                    if (this.TypeDefinition.Kind == SyntaxKind.Implicit) type = MethodeType.Implicit;
-                    if (this.TypeDefinition.Kind == SyntaxKind.This)
-                    {
-                        if (this.Token.Kind == SyntaxKind.New) type = MethodeType.Ctor;
-                        if (this.Token.Text == "~") type = MethodeType.DeCtor;
-                    }
-                }
             }
 
             return type;

@@ -303,6 +303,16 @@ namespace Yama.Parser
                 m.Use.Compile(compiler, mode);
             }
 
+            foreach(IndexMethodDeklaration m in this.Deklaration.Ctors)
+            {
+                m.Use.Compile(compiler, mode);
+            }
+
+            foreach(IndexMethodDeklaration m in this.Deklaration.DeCtors)
+            {
+                m.Use.Compile(compiler, mode);
+            }
+
             return true;
         }
 

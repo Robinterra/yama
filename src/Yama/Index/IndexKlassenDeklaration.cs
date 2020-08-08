@@ -97,6 +97,20 @@ namespace Yama.Index
 
         public ValidUses ParentUsesSet { get;
         set; }
+        public int GetNonStaticPropCount
+        {
+            get
+            {
+                int count = 0;
+
+                foreach (IndexPropertyDeklaration dek in this.IndexProperties)
+                {
+                    if (dek.Zusatz == MethodeType.Property) count++;
+                }
+
+                return count;
+            }
+        }
 
         #endregion get/set
 
