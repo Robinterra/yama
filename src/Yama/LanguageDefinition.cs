@@ -50,11 +50,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private Lexer.Lexer Tokenizer
+        public List<FileInfo> AllFilesInUse
         {
             get;
             set;
-        }
+        } = new List<FileInfo>();
 
         // -----------------------------------------------
 
@@ -328,6 +328,7 @@ namespace Yama
         {
             Yama.Index.Index index = new Yama.Index.Index();
             index.Roots = nodes;
+            index.AllUseFiles = this.AllFilesInUse;
 
             if (!index.CreateIndex()) return this.PrintingIndexErrors(index);
 
@@ -361,6 +362,8 @@ namespace Yama
             compiler.OutputFile = new FileInfo(this.OutputFile);
             compiler.Definition = this.Definition;
             compiler.MainFunction = main;
+
+            if (!compiler.Definition.LoadExtensions(this.AllFilesInUse)) return false;
 
             if (compiler.Compilen(nodes)) return true;
 

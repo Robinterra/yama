@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -56,6 +57,7 @@ namespace Yama.Index
             get;
             set;
         }
+        public List<FileInfo> AllUseFiles { get; set; }
 
         #endregion get/set
 
@@ -112,6 +114,8 @@ namespace Yama.Index
 
             foreach (KeyValuePair<string, IndexNamespaceDeklaration> nameSpace in aviableNamespaces)
             {
+                this.AllUseFiles.AddRange(nameSpace.Value.Files);
+
                 this.Register.AddRange(nameSpace.Value.KlassenDeklarationen);
             }
 

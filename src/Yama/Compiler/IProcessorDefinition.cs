@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using Yama.Index;
 using Yama.Parser;
 
@@ -63,6 +64,7 @@ namespace Yama.Compiler
 
         bool ParaClean();
         string GenerateJumpPointName();
+        bool LoadExtensions(List<FileInfo> allFilesinUse);
 
         #endregion methods
 

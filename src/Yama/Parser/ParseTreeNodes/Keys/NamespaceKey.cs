@@ -87,6 +87,8 @@ namespace Yama.Parser
             dek = index.NamespaceAdd(dek);
             this.Deklaration = dek;
 
+            dek.Files.Add(this.Token.FileInfo);
+
             this.Statement.Indezieren(index, dek);
 
             return true;

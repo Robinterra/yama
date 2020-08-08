@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Yama.Parser;
 
@@ -72,6 +73,12 @@ namespace Yama.Index
             }
         }
 
+        public List<FileInfo> Files
+        {
+            get;
+            set;
+        }
+
         public ValidUses ParentUsesSet { get;
         set; }
 
@@ -84,6 +91,7 @@ namespace Yama.Index
             this.References = new List<IndexNamespaceReference>();
             this.KlassenDeklarationen = new List<IndexKlassenDeklaration>();
             this.Usings = new List<IndexNamespaceReference>();
+            this.Files = new List<FileInfo>();
         }
 
         private bool PreviusMappen()

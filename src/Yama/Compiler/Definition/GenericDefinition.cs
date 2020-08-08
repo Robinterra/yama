@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Yama.Index;
+using System.IO;
+using System.Text.Json;
 
 namespace Yama.Compiler.Definition
 {
@@ -482,6 +484,46 @@ namespace Yama.Compiler.Definition
             }
 
             return result;
+        }
+
+        // -----------------------------------------------
+
+        public bool LoadExtensions(List<FileInfo> allFilesinUse)
+        {
+
+            foreach (FileInfo file in allFilesinUse)
+            {
+                FileInfo extFile = new FileInfo(Path.ChangeExtension(file.FullName, ".ext"));
+
+                if (!extFile.Exists) continue;
+
+                if (!this.LoadExtension(extFile)) return this.Compiler.AddError(string.Format("Extension {0} konnte nicht geladen werden" , extFile.FullName));
+            }
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool LoadExtension(FileInfo file)
+        {
+            if ( file.Extension != ".ext" ) return false;
+
+            List<GenericDefinition> definition = null;
+
+            using ( FileStream stream = file.OpenRead (  ) )
+
+            definition = JsonSerializer.DeserializeAsync<List<GenericDefinition>> ( stream ).Result;
+
+            GenericDefinition correctDefinition = definition.FirstOrDefault ( t=>t.Name == this.Name );
+
+            if (correctDefinition == null) return this.Compiler.AddError("Keine Extensionserweiterung für diese Definition verfügbar.");
+
+            this.KeyPatterns.AddRange(correctDefinition.KeyPatterns);
+
+            this.Algos.AddRange(correctDefinition.Algos);
+
+            return true;
         }
 
         // -----------------------------------------------
