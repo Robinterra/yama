@@ -151,6 +151,7 @@ namespace Yama
             layer.ParserMembers.Add ( new WhileKey (  ) );
             layer.ParserMembers.Add ( new ForKey (  ) );
             layer.ParserMembers.Add ( new NewKey (  ) );
+            layer.ParserMembers.Add ( new NullKey (  ) );
             layer.ParserMembers.Add ( new ContinueKey (  ) );
             layer.ParserMembers.Add ( new ExplicitConverting ( 10 ) );
             layer.ParserMembers.Add ( new FunktionsCall ( SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer, 12 ) );
