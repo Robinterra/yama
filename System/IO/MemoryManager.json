@@ -1,0 +1,162 @@
+[
+    {
+        "Name": "avr",
+        "Algos": [
+            {
+                "Name": "MallocFree",
+                "Mode": "default",
+                "Description": "Dynamic memory allocate free",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "push r30",
+                "push r31",
+                "movw r30, r24",
+                "sbiw r30, 3",
+                "ldi r27, 0x00",
+                "st Z, r27",
+                "pop r31",
+                "pop r30"
+                ]
+            },
+            {
+                "Name": "Malloc",
+                "Mode": "Init",
+                "Description": "Dynamic memory allocate Init",
+                "Keys": [
+                    {
+                        "Name": "[RAMBEGIN_LOW]",
+                        "Values": null
+                    },
+                    {
+                        "Name": "[RAMBEGIN_HIGH]",
+                        "Values": null
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "ldi r30, [RAMBEGIN_LOW]",
+                    "ldi r31, [RAMBEGIN_HIGH]"
+                ]
+            },
+            {
+                "Name": "Malloc",
+                "Mode": "CurrentAdress",
+                "Description": "Dynamic memory allocate Init",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "movw r24, r30"
+                ]
+            },
+            {
+                "Name":"MallocClean",
+                "Mode":"default",
+                "Description":"Clean",
+                "Keys":[
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys":[],
+                "AssemblyCommands":[
+                    "push r22",
+                    "push r23",
+                    "movw r30,r24",
+                    "ld r27,Z",
+                    "tst r27",
+                    "breq [JUMPTO[0]]",
+                    "ldd r26,Z+1",
+                    "ldd r27,Z+2",
+                    "add r30,r26",
+                    "adc r31,r27",
+                    "adiw r30,3",
+                    "ld r27,Z",
+                    "tst r27",
+                    "brne [JUMPTO[0]]",
+                    "ldd r26,Z+1",
+                    "ldd r27,Z+2",
+                    "adiw r26, 3",
+                    "movw r30,r24",
+                    "ldd r22,Z+1",
+                    "ldd r23,Z+2",
+                    "add r22, r26",
+                    "adc r23, r27",
+                    "std Z+1, r22",
+                    "std Z+2, r23",
+                    "[JUMPTO[0]]:",
+                    "movw r30,r24",
+                    "ldd r26,Z+1",
+                    "ldd r27,Z+2",
+                    "add r30,r26",
+                    "adc r31,r27",
+                    "adiw r30,3",
+                    "pop r23",
+                    "pop r22"
+                ]
+            },
+            {
+                "Name": "Malloc",
+                "Mode": "default",
+                "Description": "Dynamic memory allocate",
+                "Keys": [
+                {
+                    "Name": "[RAMBEGIN_LOW]",
+                    "Values": null
+                },
+                {
+                    "Name": "[RAMBEGIN_HIGH]",
+                    "Values": null
+                },
+                {
+                    "Name": "[JUMPTO]",
+                    "Values": [
+                    "3"
+                    ]
+                }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "push r30",
+                "push r31",
+                "ldi r30, [RAMBEGIN_LOW]",
+                "ldi r31, [RAMBEGIN_HIGH]",
+                "[JUMPTO[1]]:",
+                "ld r27,Z",
+                "tst r27",
+                "breq [JUMPTO[0]]",
+                "[JUMPTO[2]]:",
+                "ldd r26,Z+1",
+                "ldd r27,Z+2",
+                "add r30,r26",
+                "adc r31,r27",
+                "adiw r30,3",
+                "rjmp [JUMPTO[1]]",
+                "[JUMPTO[0]]:",
+                "ldd r26,Z+1",
+                "ldd r27,Z+2",
+                "cp r26,r24",
+                "cpc r27,r25",
+                "brlo [JUMPTO[2]]",
+                "ldi r27, 0xff",
+                "st Z, r27",
+                "std Z+1, r24",
+                "std Z+2, r25",
+                "adiw r30, 3",
+                "movw r24,r30",
+                "pop r31",
+                "pop r30"
+                ]
+            }
+       ],
+        "AdvancedKeyReplaces": [
+        ],
+        "KeyPatterns": [
+        ]
+    }
+]
