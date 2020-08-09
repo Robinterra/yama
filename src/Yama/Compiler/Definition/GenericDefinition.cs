@@ -430,7 +430,7 @@ namespace Yama.Compiler.Definition
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
-            this.CurrentAblageRegister += bytes * duration;
+            this.CurrentAblageRegister += (bytes * duration) + 1;
             for (int i = 0; i < duration; i++ )
             {
                 this.CurrentAblageRegister -= bytes;
@@ -440,7 +440,7 @@ namespace Yama.Compiler.Definition
 
                 result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
             }
-            this.CurrentAblageRegister += bytes * duration;
+            this.CurrentAblageRegister += (bytes * duration) - 1;
 
             return result;
         }
@@ -455,7 +455,7 @@ namespace Yama.Compiler.Definition
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
-            this.CurrentAblageRegister -= bytes * duration;
+            this.CurrentAblageRegister -= (bytes * duration)-1;
             for (int i = 0; i < duration; i++ )
             {
                 int registerStart = this.CurrentAblageRegister;
@@ -469,7 +469,7 @@ namespace Yama.Compiler.Definition
 
                 if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
             }
-            this.CurrentAblageRegister -= bytes * duration;
+            this.CurrentAblageRegister -= (bytes * duration) + 1;
 
             return result;
         }
