@@ -114,6 +114,30 @@ namespace Yama.Parser
             set;
         }
 
+        public IndexVariabelnReference Malloc
+        {
+            get;set;
+        } = new IndexVariabelnReference
+            {
+                Name = "MemoryManager",
+                ParentCall = new IndexVariabelnReference
+                {
+                    Name = "Malloc"
+                }
+            };
+
+        public IndexVariabelnReference MallocFree
+        {
+            get;set;
+        } = new IndexVariabelnReference
+            {
+                Name = "MemoryManager",
+                ParentCall = new IndexVariabelnReference
+                {
+                    Name = "Free"
+                }
+            };
+
         #endregion get/set
 
         #region ctor
@@ -363,6 +387,9 @@ namespace Yama.Parser
             if (this.Token.Text == "main")
                 index.SetMainFunction(this);
 
+            if (deklaration.Type == MethodeType.Ctor) container.VariabelnReferences.Add(this.Malloc);
+            if (deklaration.Type == MethodeType.DeCtor) container.VariabelnReferences.Add(this.MallocFree);
+
             this.AddMethode(klasse, deklaration);
 
             this.Statement.Indezieren(index, container);
@@ -429,8 +456,17 @@ namespace Yama.Parser
             CompileReferenceCall refCall = new CompileReferenceCall();
             refCall.CompileDek(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");
 
-            CompileFree malloc = new CompileFree();
-            malloc.Compile(compiler, this, mode);
+            CompileMovResult movResultRight = new CompileMovResult();
+            movResultRight.Compile(compiler, null, mode);
+
+            usePara = new CompileUsePara();
+            usePara.Compile(compiler, null);
+
+            refCall = new CompileReferenceCall();
+            refCall.Compile(compiler, this.MallocFree.ParentCall, "methode");
+
+            CompileExecuteCall executeCall = new CompileExecuteCall();
+            executeCall.Compile(compiler, (FunktionsDeklaration)this.MallocFree.ParentCall.Deklaration.Use);
 
             return compiler.Definition.ParaClean();
         }
@@ -440,15 +476,22 @@ namespace Yama.Parser
             CompileNumConst num = new CompileNumConst();
             num.Compile(compiler, new Number { Token = new SyntaxToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
 
-            CompileMalloc malloc = new CompileMalloc();
-            malloc.Compile(compiler, this, mode);
-
             CompileMovResult movResultRight = new CompileMovResult();
-
             movResultRight.Compile(compiler, null, mode);
 
             CompileUsePara usePara = new CompileUsePara();
+            usePara.Compile(compiler, null);
 
+            CompileReferenceCall refCall = new CompileReferenceCall();
+            refCall.Compile(compiler, this.Malloc.ParentCall, "methode");
+
+            CompileExecuteCall executeCall = new CompileExecuteCall();
+            executeCall.Compile(compiler, (FunktionsDeklaration)this.Malloc.ParentCall.Deklaration.Use);
+
+            movResultRight = new CompileMovResult();
+            movResultRight.Compile(compiler, null, mode);
+
+            usePara = new CompileUsePara();
             usePara.Compile(compiler, null);
 
             return compiler.Definition.ParaClean();

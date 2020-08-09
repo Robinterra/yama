@@ -140,7 +140,7 @@ namespace Yama.Parser
             reference.Use = this;
             reference.Name = this.Token.Text;
             this.LeftNode.Indezieren(index, parent);
-            IndexVariabelnReference varref = container.VariabelnReferences.Last();
+            IndexVariabelnReference varref = container.VariabelnReferences.LastOrDefault();
 
 
             this.RightNode.Indezieren(index, parent);

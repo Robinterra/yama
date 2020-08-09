@@ -53,7 +53,7 @@ namespace Yama.Lexer
 
         public BedingtesCompilieren ( ZeichenKette begin, ZeichenKette end )
         {
-            this.Begin =  begin;
+            this.Begin = begin;
 
             this.End = end;
         }

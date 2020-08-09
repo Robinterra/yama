@@ -436,7 +436,8 @@ namespace Yama.Compiler.Definition
                 this.CurrentAblageRegister -= bytes;
                 int registerStart = this.CurrentAblageRegister;
 
-                if (registerStart > this.MaxAblageRegister) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
+                if (registerStart > this.MaxAblageRegister)
+                    { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
 
                 result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
             }
@@ -584,7 +585,7 @@ namespace Yama.Compiler.Definition
 
             foreach (FileInfo file in allFilesinUse)
             {
-                FileInfo extFile = new FileInfo(Path.ChangeExtension(file.FullName, ".ext"));
+                FileInfo extFile = new FileInfo(Path.ChangeExtension(file.FullName, ".json"));
 
                 if (!extFile.Exists) continue;
 
@@ -598,7 +599,7 @@ namespace Yama.Compiler.Definition
 
         private bool LoadExtension(FileInfo file)
         {
-            if ( file.Extension != ".ext" ) return false;
+            if ( file.Extension != ".json" ) return false;
 
             List<GenericDefinition> definition = null;
 

@@ -232,9 +232,9 @@ namespace Yama
             } );
             rules.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
+            rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#defalgo" ), new ZeichenKette ( ":" ) ) );
             rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
             rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
-            rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region defalgo " ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new Operator ( new ZeichenKette ( "∑" ), new ZeichenKette ( "<=" ), new ZeichenKette ( "++" ), new ZeichenKette ( "<>" ), new ZeichenKette ( ">=" ), new ZeichenKette ( "<" ), new ZeichenKette ( ">" ), new ZeichenKette ( "^^" ), new ZeichenKette ( "+" ), new ZeichenKette ( "-" ), new ZeichenKette ( "*" ), new ZeichenKette ( "/"), new ZeichenKette ( "%" ), new ZeichenKette ( "&" ), new ZeichenKette ( "|" ), new ZeichenKette ( "==" ), new ZeichenKette ( "=" ), new ZeichenKette ( "!=" ), new ZeichenKette ( "!" ), new ZeichenKette ( "^"), new ZeichenKette ( "~" ), new ZeichenKette ( "√" ), new ZeichenKette ( "?" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Whitespaces (  ) );
@@ -432,7 +432,6 @@ namespace Yama
 
             while (infos.Count != 0)
             {
-                infos = next;
                 next = new List<DirectoryInfo>();
 
                 foreach ( DirectoryInfo info in infos )
@@ -441,6 +440,8 @@ namespace Yama
                 }
 
                 infos.Clear();
+
+                infos = next;
             }
 
             return result;
@@ -448,6 +449,7 @@ namespace Yama
 
         private bool GetAllFilesFromADirectory(List<string> result, List<DirectoryInfo> next, DirectoryInfo check)
         {
+            if (!check.Exists) return this.PrintSimpleError(string.Format("Inlcude path {0} can not be found", check.FullName));
 
             foreach ( FileInfo file in check.GetFiles (  ) )
             {

@@ -50,7 +50,15 @@ namespace Yama.Compiler
         {
             compiler.AssemblerSequence.Add(this);
 
-            this.Algo = compiler.GetAlgo ( node.Token.Value.ToString (  ), mode );
+            string algo = node.Token.Value.ToString (  ).Replace(" ", string.Empty);
+            if (algo.Contains(","))
+            {
+                string[] split = algo.Split(",");
+                algo = split[0];
+                mode = split[1];
+            }
+
+            this.Algo = compiler.GetAlgo (algo , mode );
 
             if (this.Algo == null) return false;
 

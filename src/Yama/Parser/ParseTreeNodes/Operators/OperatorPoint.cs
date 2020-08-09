@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Yama.Compiler;
@@ -45,7 +46,8 @@ namespace Yama.Parser
             get
             {
                 if (this.RightNode is ReferenceCall rc)
-                    if (rc.Reference.Deklaration is IndexMethodDeklaration dek) return true;
+                    if (rc.Reference.Deklaration is IndexMethodDeklaration dek)
+                        return dek.Type != MethodeType.Static;
 
                 return false;
             }
@@ -120,7 +122,7 @@ namespace Yama.Parser
         {
             if (mode == "set") { CompileMovResult movResultRight = new CompileMovResult(); movResultRight.Compile(compiler, null, "default"); }
 
-            this.LeftNode.Compile(compiler, "default");
+            this.CompileLeftNodeIfNotStaticClass(compiler, mode);
 
             string moderesult = "point";
             if (mode == "set") moderesult = "setpoint";
@@ -135,6 +137,15 @@ namespace Yama.Parser
             this.RightNode.Compile(compiler, moderesult);
 
             return true;
+        }
+
+        private bool CompileLeftNodeIfNotStaticClass(Compiler.Compiler compiler, string mode)
+        {
+            if (this.RightNode is ReferenceCall rct)
+                if (rct.Reference.Deklaration is IndexMethodDeklaration t)
+                    if (t.Type == MethodeType.Static) return true;
+
+            return this.LeftNode.Compile(compiler, "default");
         }
 
         private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexMethodDeklaration methdek)
