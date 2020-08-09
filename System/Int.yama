@@ -40,16 +40,16 @@ namespace "System"
         // -----------------------------------------------
 
         /**
-        * Vergleich 2 Werte miteinander auf gleich
+        * Compare 2 Values to Equal
         *
-        * @param[in] a (Int) Der Linke Child der vom Operator steht
-        * @param[in] b (Int) Der Rechte Child der vom Operator steht
+        * @param[in] a (Int) The left Child of the Operator
+        * @param[in] b (Int) The rigth Child of the Operator
         *
-        * @return (Bool) Wenn a und b gleich ist dann true ansonsten false
+        * @return (Bool) if equals then return true
         */
         public operator Bool ==(Int a, Int b)
         {
-
+            return #defalgo IntCompare,Equals:;
         }
 
         // -----------------------------------------------
@@ -72,29 +72,8 @@ namespace "System"
         */
         public operator Int -(Int a, Int b)
         {
-            Int result;
 
-            #region asm
-
-            // Lade b ins register
-            ldd 24,Y+3
-            ldd 25,Y+4
-            movw r2,r24
-            // Lade a ins register
-            ldd r24,Y+1
-            ldd r25,Y+2
-
-            // subtrahiere a und b
-            sub r24,r2
-            sbc r25,r3
-
-            //speichere in result
-            std Y+5,r24 ; // lege in result ab
-            std Y+6,r25 ; // lege in result ab
-
-            #endregion asm
-
-            return result;
+            return #defalgo IntArimetics,Subtraction:;
         }
 
         // -----------------------------------------------
@@ -108,23 +87,7 @@ namespace "System"
         */
         public operator Int ++(Int a)
         {
-            #region asm
-
-            // Lade a ins register
-            ldd r24,Y+1
-            ldd r25,Y+2
-
-            // increment a
-            inc r24
-            adc r25, r0
-
-            //speichere in a zurück
-            std Y+1,r24
-            std Y+2,r25
-
-            #endregion asm
-
-            return a;
+            return #defalgo IntArimetics,Incremtation:;
         }
 
         // -----------------------------------------------
@@ -139,30 +102,7 @@ namespace "System"
         */
         public operator Int +(Int a, Int b)
         {
-            Int result;
-
-            #region asm
-
-            // Lade a ins register
-            ldd r24,Y+1
-            ldd r25,Y+2
-            movw r2,r24
-
-            // Lade b ins register
-            ldd r24,Y+3
-            ldd r25,Y+4
-
-            // addiere a und b
-            add r24,r2
-            adc r25,r3
-
-            //speichere in result
-            std Y+5,r24
-            std Y+6,r25
-
-            #endregion asm
-
-            return result;
+            return #defalgo IntArimetics,Addition:;
         }
 
         // -----------------------------------------------

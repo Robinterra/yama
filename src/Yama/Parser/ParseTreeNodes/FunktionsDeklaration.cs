@@ -450,6 +450,8 @@ namespace Yama.Parser
 
         private bool CompileDeCtor(Compiler.Compiler compiler, string mode)
         {
+            if (this.Deklaration.Klasse.GetNonStaticPropCount == 0) return true;
+
             CompileUsePara usePara = new CompileUsePara();
             usePara.CompileIndexNode(compiler, this.Deklaration.Parameters.FirstOrDefault(), "get");
 
@@ -473,6 +475,8 @@ namespace Yama.Parser
 
         private bool CompileCtor(Compiler.Compiler compiler, string mode)
         {
+            if (this.Deklaration.Klasse.GetNonStaticPropCount == 0) return true;
+
             CompileNumConst num = new CompileNumConst();
             num.Compile(compiler, new Number { Token = new SyntaxToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
 

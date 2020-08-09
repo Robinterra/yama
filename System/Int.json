@@ -1,0 +1,72 @@
+[
+    {
+        "Name": "avr",
+        "Algos": [
+            {
+                "Name": "IntArimetics",
+                "Mode": "Subtraction",
+                "Description": "Subtraction",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "sub r2,r4",
+                "sbc r3,r4",
+                "movw r24, r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "Addition",
+                "Description": "Addition",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "add r2,r4",
+                "adc r3,r4",
+                "movw r24, r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "Incremtation",
+                "Description": "Incremtation",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "movw r24, r2",
+                    "adiw r24,0x1"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "Equals",
+                "Description": "Equals",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cp r2,r4",
+                "cpc r3,r5",
+                "ldi r24, 0xff",
+                "BREQ [JUMPTO[0]]",
+                "ldi r24, 0x00",
+                "ldi r25, 0x00",
+                "[JUMPTO[0]]:"
+                ]
+            }
+       ],
+        "AdvancedKeyReplaces": [
+        ],
+        "KeyPatterns": [
+        ]
+    }
+]

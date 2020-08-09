@@ -42,7 +42,7 @@ dotnet build
 
 ## Example
 
- ./YamaCompile out out.S defintion atmega328p inc bin/Debug/netcoreapp3.1/atmega328p bin/Debug/netcoreapp3.1/iftest.y
+./YamaCompile out out.S define atmega328p def avr inc bin/Debug/netcoreapp3.1/System bin/Debug/netcoreapp3.1/iftest.yama
 
 ## Authors
 
