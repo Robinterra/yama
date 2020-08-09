@@ -453,7 +453,7 @@ namespace Yama
 
             foreach ( FileInfo file in check.GetFiles (  ) )
             {
-                if ( file.Extension != ".y" ) continue;
+                if ( file.Extension != ".yama" ) continue;
 
                 result.Add ( file.FullName );
             }
