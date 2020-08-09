@@ -194,7 +194,7 @@ namespace Yama.Compiler.Definition
         public bool BeginNeueMethode(List<string> registersUses)
         {
             this.CurrentArbeitsRegister = this.ArbeitsRegister;
-            this.CurrentAblageRegister = this.AblageRegister;
+            this.CurrentAblageRegister = this.MaxAblageRegister;
             this.RegisterUses = registersUses;
 
             return true;
@@ -430,15 +430,17 @@ namespace Yama.Compiler.Definition
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
+            this.CurrentAblageRegister += bytes * duration;
             for (int i = 0; i < duration; i++ )
             {
                 this.CurrentAblageRegister -= bytes;
                 int registerStart = this.CurrentAblageRegister;
 
-                if (registerStart < this.AblageRegister) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
+                if (registerStart > this.MaxAblageRegister) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
 
                 result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
             }
+            this.CurrentAblageRegister += bytes * duration;
 
             return result;
         }
@@ -453,12 +455,13 @@ namespace Yama.Compiler.Definition
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
+            this.CurrentAblageRegister -= bytes * duration;
             for (int i = 0; i < duration; i++ )
             {
                 int registerStart = this.CurrentAblageRegister;
                 this.CurrentAblageRegister += bytes;
 
-                if (registerStart > this.MaxAblageRegister ) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
+                if (registerStart < this.AblageRegister ) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
 
                 string reg = this.AviableRegisters[registerStart];
 
@@ -466,6 +469,7 @@ namespace Yama.Compiler.Definition
 
                 if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
             }
+            this.CurrentAblageRegister -= bytes * duration;
 
             return result;
         }

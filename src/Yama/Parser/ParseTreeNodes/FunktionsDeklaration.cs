@@ -375,6 +375,7 @@ namespace Yama.Parser
             bool isok = deklaration.Type == MethodeType.Methode;
             if (!isok) isok = deklaration.Type == MethodeType.Property;
             if (!isok) isok = deklaration.Type == MethodeType.Ctor;
+            if (!isok) isok = deklaration.Type == MethodeType.DeCtor;
             if (!isok) return false;
 
             IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration();
@@ -422,13 +423,16 @@ namespace Yama.Parser
 
         private bool CompileDeCtor(Compiler.Compiler compiler, string mode)
         {
-            CompileNumConst num = new CompileNumConst();
-            num.Compile(compiler, new Number { Token = new SyntaxToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
+            CompileUsePara usePara = new CompileUsePara();
+            usePara.CompileIndexNode(compiler, this.Deklaration.Parameters.FirstOrDefault(), "get");
+
+            CompileReferenceCall refCall = new CompileReferenceCall();
+            refCall.CompileDek(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");
 
             CompileFree malloc = new CompileFree();
             malloc.Compile(compiler, this, mode);
 
-            return true;
+            return compiler.Definition.ParaClean();
         }
 
         private bool CompileCtor(Compiler.Compiler compiler, string mode)

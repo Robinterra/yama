@@ -4,8 +4,8 @@
   "AdressBytes": 2,
   "ZeroRegister": 0,
   "ArbeitsRegister": 2,
-  "AblageRegister": 14,
-  "MaxArbeitsRegister": 13,
+  "AblageRegister": 2,
+  "MaxArbeitsRegister": 23,
   "MaxAblageRegister": 23,
   "Algos": [
     {
