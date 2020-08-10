@@ -103,8 +103,8 @@
       ],
       "PostKeys": [],
       "AssemblyCommands": [
-        "ldi r24,[HIGH]([GS]([NAME]))",
-        "ldi r25,[LOW]([GS]([NAME]))"
+        "ldi r24,[LOW]([GS]([NAME]))",
+        "ldi r25,[HIGH]([GS]([NAME]))"
       ]
     },
     {
