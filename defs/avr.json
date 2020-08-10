@@ -2,11 +2,10 @@
   "Name": "avr",
   "CalculationBytes": 1,
   "AdressBytes": 2,
-  "ZeroRegister": 0,
-  "ArbeitsRegister": 2,
-  "AblageRegister": 2,
-  "MaxArbeitsRegister": 23,
-  "MaxAblageRegister": 23,
+  "WorkingRegisterStart": 2,
+  "PlaceToKeepRegisterStart": 2,
+  "WorkingRegisterLast": 23,
+  "PlaceToKeepRegisterLast": 23,
   "Algos": [
     {
       "Name": "ReferenceCall",

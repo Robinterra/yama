@@ -69,7 +69,7 @@ namespace Yama.Parser
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
             if ( token.Kind != SyntaxKind.If ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenKlammer ) return null;
+            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenBracket ) return null;
 
             IfKey key = new IfKey (  );
             key.Token = token;

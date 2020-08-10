@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, "<define>", "One Define for conditional compilation" );
+                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<define>", "One Define for conditional compilation" );
             }
         }
 

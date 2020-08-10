@@ -5,7 +5,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileExecuteCall : ICompile<FunktionsDeklaration>
+    public class CompileExecuteCall : ICompile<MethodeDeclarationNode>
     {
 
         #region get/set
@@ -32,7 +32,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(FunktionsDeklaration node, AlgoKeyCall key, string mode)
+        private DefaultRegisterQuery BuildQuery(MethodeDeclarationNode node, AlgoKeyCall key, string mode)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
@@ -42,7 +42,7 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, FunktionsDeklaration node, string mode = "default")
+        public bool Compile(Compiler compiler, MethodeDeclarationNode node, string mode = "default")
         {
             compiler.AssemblerSequence.Add(this);
 

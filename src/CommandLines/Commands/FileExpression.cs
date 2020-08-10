@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, "<file>", "One file which to Compile" );
+                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<file>", "One file which to Compile" );
             }
         }
 

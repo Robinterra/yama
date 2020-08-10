@@ -5,7 +5,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileRegionDefAlgo : ICompile<BedingtesCompilierenParser>
+    public class CompileRegionDefAlgo : ICompile<ConditionalCompilationNode>
     {
 
         #region get/set
@@ -32,7 +32,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(BedingtesCompilierenParser node, AlgoKeyCall key, string mode)
+        private DefaultRegisterQuery BuildQuery(ConditionalCompilationNode node, AlgoKeyCall key, string mode)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
@@ -46,7 +46,7 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, BedingtesCompilierenParser node, string mode = "default")
+        public bool Compile(Compiler compiler, ConditionalCompilationNode node, string mode = "default")
         {
             compiler.AssemblerSequence.Add(this);
 

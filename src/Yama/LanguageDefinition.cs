@@ -106,7 +106,7 @@ namespace Yama
             layer.ParserMembers.Add(new KlassenDeklaration ( inclassLayer ));
             layer.ParserMembers.Add(new UsingKey (  ));
             layer.ParserMembers.Add(new NormalExpression (  ) );
-            layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
+            layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
 
             return layer;
         }
@@ -131,9 +131,9 @@ namespace Yama
             ParserLayer layer = new ParserLayer("inclass");
 
             layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
-            layer.ParserMembers.Add(new FunktionsDeklaration ( execlayer ));
+            layer.ParserMembers.Add(new MethodeDeclarationNode ( execlayer ));
             layer.ParserMembers.Add(new PropertyDeklaration ( inpropertyLayer ));
-            layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
+            layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
 
             return layer;
         }
@@ -145,7 +145,7 @@ namespace Yama
             ParserLayer layer = new ParserLayer("execute");
 
             layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
-            layer.ParserMembers.Add(new BedingtesCompilierenParser (  ));
+            layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
             layer.ParserMembers.Add ( new IfKey (  ) );
             layer.ParserMembers.Add ( new ElseKey (  ) );
             layer.ParserMembers.Add ( new WhileKey (  ) );
@@ -154,7 +154,7 @@ namespace Yama
             layer.ParserMembers.Add ( new NullKey (  ) );
             layer.ParserMembers.Add ( new ContinueKey (  ) );
             layer.ParserMembers.Add ( new ExplicitConverting ( 10 ) );
-            layer.ParserMembers.Add ( new FunktionsCall ( SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer, 12 ) );
+            layer.ParserMembers.Add ( new MethodeCallNode ( SyntaxKind.OpenBracket, SyntaxKind.CloseBracket, 12 ) );
             layer.ParserMembers.Add ( new ContainerExpression ( 11 ) );
             layer.ParserMembers.Add ( new NormalExpression (  ) );
             layer.ParserMembers.Add ( new EnumartionExpression (  ) );
@@ -162,18 +162,18 @@ namespace Yama
             layer.ParserMembers.Add ( new TrueFalseKey ( 1 ) );
             layer.ParserMembers.Add ( new VariabelDeklaration ( 11 ) );
             layer.ParserMembers.Add ( new ReferenceCall ( 1 ) );
-            layer.ParserMembers.Add ( new VektorCall ( SyntaxKind.EckigeKlammerAuf, SyntaxKind.EckigeKlammerZu, 1 ) );
+            layer.ParserMembers.Add ( new VektorCall ( SyntaxKind.OpenSquareBracket, SyntaxKind.CloseSquareBracket, 1 ) );
             layer.ParserMembers.Add ( new Number ( 1 ) );
             layer.ParserMembers.Add ( new TextParser ( 1 ) );
             layer.ParserMembers.Add ( new OperatorPoint ( 11 ) );
-            layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenKlammer }, new List<SyntaxKind> { SyntaxKind.OpenKlammer } ) );
+            layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenBracket }, new List<SyntaxKind> { SyntaxKind.OpenBracket } ) );
             layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 11, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 2 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 3 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 4 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 5 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( SyntaxKind.KleinerAls, 6 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( SyntaxKind.GroesserAls, 6 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( SyntaxKind.LessThan, 6 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( SyntaxKind.GreaterThan, 6 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=", "<", ">" }, 6 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 7 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8 ) );
@@ -232,18 +232,18 @@ namespace Yama
             } );
             rules.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
-            rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#defalgo" ), new ZeichenKette ( ":" ) ) );
-            rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
-            rules.Add ( new BedingtesCompilieren ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
+            rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#defalgo" ), new ZeichenKette ( ":" ) ) );
+            rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
+            rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new Operator ( new ZeichenKette ( "∑" ), new ZeichenKette ( "<=" ), new ZeichenKette ( "++" ), new ZeichenKette ( "<>" ), new ZeichenKette ( ">=" ), new ZeichenKette ( "<" ), new ZeichenKette ( ">" ), new ZeichenKette ( "^^" ), new ZeichenKette ( "+" ), new ZeichenKette ( "-" ), new ZeichenKette ( "*" ), new ZeichenKette ( "/"), new ZeichenKette ( "%" ), new ZeichenKette ( "&" ), new ZeichenKette ( "|" ), new ZeichenKette ( "==" ), new ZeichenKette ( "=" ), new ZeichenKette ( "!=" ), new ZeichenKette ( "!" ), new ZeichenKette ( "^"), new ZeichenKette ( "~" ), new ZeichenKette ( "√" ), new ZeichenKette ( "?" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Whitespaces (  ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), SyntaxKind.OpenKlammer ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( ")" ), SyntaxKind.CloseKlammer ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), SyntaxKind.OpenBracket ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( ")" ), SyntaxKind.CloseBracket ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "{" ), SyntaxKind.BeginContainer ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "}" ), SyntaxKind.CloseContainer ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "[" ), SyntaxKind.EckigeKlammerAuf ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "]" ), SyntaxKind.EckigeKlammerZu ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "[" ), SyntaxKind.OpenSquareBracket ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "]" ), SyntaxKind.CloseSquareBracket ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "." ), SyntaxKind.Point ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "," ), SyntaxKind.Comma ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( ":" ), SyntaxKind.DoublePoint ) );
@@ -341,7 +341,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool Indezieren(ref List<IParseTreeNode> nodes, ref FunktionsDeklaration main)
+        private bool Indezieren(ref List<IParseTreeNode> nodes, ref MethodeDeclarationNode main)
         {
             Yama.Index.Index index = new Yama.Index.Index();
             index.Roots = nodes;
@@ -363,7 +363,7 @@ namespace Yama
             if (this.Definition == null) return false;
 
             List<IParseTreeNode> nodes = new List<IParseTreeNode>();
-            FunktionsDeklaration main = null;
+            MethodeDeclarationNode main = null;
 
             if (!this.Parse(nodes)) return false;
 
@@ -376,7 +376,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool Compilen(List<IParseTreeNode> nodes, FunktionsDeklaration main)
+        private bool Compilen(List<IParseTreeNode> nodes, MethodeDeclarationNode main)
         {
             Compiler.Compiler compiler = new Compiler.Compiler();
             compiler.OutputFile = new FileInfo(this.OutputFile);

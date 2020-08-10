@@ -13,7 +13,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return "PrintDefintions";
+                return "PrintDefinitions";
             }
         }
 
@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, string.Empty, "Print all Definitions" );
+                return string.Format (CommandLines.Help.HilfePattern, this.Key, string.Empty, "Print all Definitions" );
             }
         }
 
@@ -58,7 +58,7 @@ namespace LearnCsStuf.CommandLines.Commands
         public ICommandLine Check ( string command )
         {
             if (string.Format ( "{0}", this.Key ) == command) return new PrintDefinitionsExpression (  );
-            if (string.Format ( "Printdef", this.Key ) == command) return new PrintDefinitionsExpression (  );
+            if (string.Format ( "pdef", this.Key ) == command) return new PrintDefinitionsExpression (  );
 
             return null;
         }

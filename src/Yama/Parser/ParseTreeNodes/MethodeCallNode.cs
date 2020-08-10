@@ -6,7 +6,7 @@ using System;
 
 namespace Yama.Parser
 {
-    public class FunktionsCall : IParseTreeNode, IEndExpression, IContainer
+    public class MethodeCallNode : IParseTreeNode, IEndExpression, IContainer
     {
 
         #region get/set
@@ -80,12 +80,12 @@ namespace Yama.Parser
 
         #region ctor
 
-        public FunktionsCall ( int prio )
+        public MethodeCallNode ( int prio )
         {
             this.Prio = prio;
         }
 
-        public FunktionsCall ( SyntaxKind begin, SyntaxKind end, int prio )
+        public MethodeCallNode ( SyntaxKind begin, SyntaxKind end, int prio )
             : this ( prio )
         {
             this.BeginZeichen = begin;
@@ -104,9 +104,9 @@ namespace Yama.Parser
 
             if ( left.Kind == SyntaxKind.Operator ) return null;
             if ( left.Kind == SyntaxKind.NumberToken ) return null;
-            if ( left.Kind == SyntaxKind.OpenKlammer ) return null;
+            if ( left.Kind == SyntaxKind.OpenBracket ) return null;
             if ( left.Kind == SyntaxKind.BeginContainer ) return null;
-            if ( left.Kind == SyntaxKind.EckigeKlammerAuf ) return null;
+            if ( left.Kind == SyntaxKind.OpenSquareBracket ) return null;
             if ( left.Kind == SyntaxKind.EndOfCommand ) return null;
             if ( left.Kind == SyntaxKind.Comma ) return null;
 
@@ -114,7 +114,7 @@ namespace Yama.Parser
 
             if ( steuerToken == null ) return null;
 
-            FunktionsCall node = new FunktionsCall ( this.Prio );
+            MethodeCallNode node = new MethodeCallNode ( this.Prio );
 
             node.LeftNode = parser.ParseCleanToken ( left );
 

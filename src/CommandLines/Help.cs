@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.CommandLines
 {
-    public class Hilfe
+    public class Help
     {
 
         // -----------------------------------------------

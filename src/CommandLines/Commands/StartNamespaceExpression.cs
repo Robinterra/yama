@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, "<namespace>", "The start namespace that is to compile (default:Program)" );
+                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<namespace>", "The start namespace that is to compile (default:Program)" );
             }
         }
 

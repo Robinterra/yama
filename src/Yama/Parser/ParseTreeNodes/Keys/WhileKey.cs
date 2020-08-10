@@ -66,7 +66,7 @@ namespace Yama.Parser
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
             if ( token.Kind != SyntaxKind.While ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenKlammer ) return null;
+            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenBracket ) return null;
 
             WhileKey key = new WhileKey (  );
             key.Token = token;

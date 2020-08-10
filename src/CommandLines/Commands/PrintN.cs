@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, string.Format ( "--{0}:<Text>", this.Key ), string.Empty, "Gibt <text> in der Console aus" );
+                return string.Format (CommandLines.Help.HilfePattern, string.Format ( "--{0}:<Text>", this.Key ), string.Empty, "Gibt <text> in der Console aus" );
             }
         }
 

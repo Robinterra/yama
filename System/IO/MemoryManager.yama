@@ -52,6 +52,8 @@ namespace "System.IO"
 
             while ( currentadress < addresse )
             {
+                currentadress = #defalgo Malloc,CurrentAdress:;
+
                 #defalgo MallocClean, default: = currentadress;
             }
 

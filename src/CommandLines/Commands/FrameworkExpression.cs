@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, "<folder>", "You can set a framework to compile, it is the folder name, they must in same  folder with compiler" );
+                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<folder>", "You can set a framework to compile, it is the folder name, they must in same  folder with compiler" );
             }
         }
 

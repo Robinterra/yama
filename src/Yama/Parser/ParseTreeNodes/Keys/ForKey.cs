@@ -78,7 +78,7 @@ namespace Yama.Parser
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
             if ( token.Kind != SyntaxKind.For ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenKlammer ) return null;
+            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenBracket ) return null;
 
             ForKey key = new ForKey (  );
             key.Token = token;
@@ -86,7 +86,7 @@ namespace Yama.Parser
 
             SyntaxToken conditionkind = parser.Peek ( token, 1 );
 
-            IParseTreeNode rule = new Container(SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer);
+            IParseTreeNode rule = new Container(SyntaxKind.OpenBracket, SyntaxKind.CloseBracket);
 
             IParseTreeNode klammer = rule.Parse(parser, conditionkind);
 

@@ -63,9 +63,9 @@ namespace Yama.Parser
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( token.Kind != SyntaxKind.OpenKlammer ) return null;
+            if ( token.Kind != SyntaxKind.OpenBracket ) return null;
 
-            SyntaxToken kind = parser.FindEndToken ( token, SyntaxKind.CloseKlammer, SyntaxKind.OpenKlammer );
+            SyntaxToken kind = parser.FindEndToken ( token, SyntaxKind.CloseBracket, SyntaxKind.OpenBracket );
 
             if ( kind == null ) return null;
 

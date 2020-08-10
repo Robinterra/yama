@@ -7,7 +7,7 @@ using Yama.Compiler;
 
 namespace Yama.Parser
 {
-    public class FunktionsDeklaration : IParseTreeNode//, IPriority
+    public class MethodeDeclarationNode : IParseTreeNode//, IPriority
     {
         private ParserLayer layer;
 
@@ -142,17 +142,17 @@ namespace Yama.Parser
 
         #region ctor
 
-        public FunktionsDeklaration()
+        public MethodeDeclarationNode()
         {
 
         }
 
-        public FunktionsDeklaration(ParserLayer layer)
+        public MethodeDeclarationNode(ParserLayer layer)
         {
             this.layer = layer;
         }
 
-        public FunktionsDeklaration ( int prio )
+        public MethodeDeclarationNode ( int prio )
         {
             this.Prio = prio;
         }
@@ -228,7 +228,7 @@ namespace Yama.Parser
             return false;
         }
 
-        private SyntaxToken MakeAccessValid( Parser parser, SyntaxToken token, FunktionsDeklaration deklaration)
+        private SyntaxToken MakeAccessValid( Parser parser, SyntaxToken token, MethodeDeclarationNode deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -237,7 +237,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private SyntaxToken MakeZusatzValid( Parser parser, SyntaxToken token, FunktionsDeklaration deklaration)
+        private SyntaxToken MakeZusatzValid( Parser parser, SyntaxToken token, MethodeDeclarationNode deklaration)
         {
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
@@ -249,7 +249,7 @@ namespace Yama.Parser
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
 
-            FunktionsDeklaration deklaration = new FunktionsDeklaration();
+            MethodeDeclarationNode deklaration = new MethodeDeclarationNode();
 
             token = this.MakeAccessValid(parser, token, deklaration);
 
@@ -267,7 +267,7 @@ namespace Yama.Parser
 
             token = parser.Peek ( token, 1 );
 
-            IParseTreeNode rule = new Container(SyntaxKind.OpenKlammer, SyntaxKind.CloseKlammer);
+            IParseTreeNode rule = new Container(SyntaxKind.OpenBracket, SyntaxKind.CloseBracket);
 
             if ( token == null ) return null;
 
@@ -302,7 +302,7 @@ namespace Yama.Parser
             return false;
         }
 
-        private FunktionsDeklaration CleanUp(FunktionsDeklaration deklaration)
+        private MethodeDeclarationNode CleanUp(MethodeDeclarationNode deklaration)
         {
             deklaration.Statement.Token.ParentNode = deklaration;
 
@@ -434,7 +434,7 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            compiler.Definition.BeginNeueMethode(this.RegisterInUse);
+            compiler.Definition.BeginNewMethode(this.RegisterInUse);
 
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
@@ -468,7 +468,7 @@ namespace Yama.Parser
             refCall.Compile(compiler, this.MallocFree.ParentCall, "methode");
 
             CompileExecuteCall executeCall = new CompileExecuteCall();
-            executeCall.Compile(compiler, (FunktionsDeklaration)this.MallocFree.ParentCall.Deklaration.Use);
+            executeCall.Compile(compiler, (MethodeDeclarationNode)this.MallocFree.ParentCall.Deklaration.Use);
 
             return compiler.Definition.ParaClean();
         }
@@ -490,7 +490,7 @@ namespace Yama.Parser
             refCall.Compile(compiler, this.Malloc.ParentCall, "methode");
 
             CompileExecuteCall executeCall = new CompileExecuteCall();
-            executeCall.Compile(compiler, (FunktionsDeklaration)this.Malloc.ParentCall.Deklaration.Use);
+            executeCall.Compile(compiler, (MethodeDeclarationNode)this.Malloc.ParentCall.Deklaration.Use);
 
             movResultRight = new CompileMovResult();
             movResultRight.Compile(compiler, null, mode);

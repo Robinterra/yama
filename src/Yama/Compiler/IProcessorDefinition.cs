@@ -64,7 +64,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        bool BeginNeueMethode(List<string> registersUses);
+        bool BeginNewMethode(List<string> registersUses);
 
         string PostKeyReplace(IRegisterQuery key);
 

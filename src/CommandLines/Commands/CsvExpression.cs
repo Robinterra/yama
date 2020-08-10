@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format ( Hilfe.HilfePattern, this.Key, "<file>", "Parse eine csv File und gibt die key aus" );
+                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<file>", "Parse eine csv File und gibt die key aus" );
             }
         }
 

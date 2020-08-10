@@ -52,7 +52,7 @@ namespace Yama.Index
             set;
         }
 
-        public FunktionsDeklaration MainFunction
+        public MethodeDeclarationNode MainFunction
         {
             get;
             set;
@@ -169,7 +169,7 @@ namespace Yama.Index
             return false;
         }
 
-        public bool SetMainFunction(FunktionsDeklaration funktionsDeklaration)
+        public bool SetMainFunction(MethodeDeclarationNode funktionsDeklaration)
         {
             if (this.MainFunction != null) return this.CreateError(funktionsDeklaration, "Eine Main Funktion existiert bereits");
 

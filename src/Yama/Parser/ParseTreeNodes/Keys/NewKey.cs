@@ -98,7 +98,7 @@ namespace Yama.Parser
 
             SyntaxToken beginkind = parser.Peek ( newKey.Definition, 1 );
 
-            SyntaxToken endToken = parser.FindEndToken ( beginkind, SyntaxKind.CloseKlammer, SyntaxKind.OpenKlammer );
+            SyntaxToken endToken = parser.FindEndToken ( beginkind, SyntaxKind.CloseBracket, SyntaxKind.OpenBracket );
 
             if ( endToken == null ) return null;
 

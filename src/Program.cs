@@ -37,7 +37,7 @@ namespace Yama
 
         private static int NormalStart ( string[] args )
         {
-            if ( !ParseCommandLine.CheckArgs ( args ) ) return HilfePrinten (  );
+            if ( !ParseCommandLine.CheckArgs ( args ) ) return HelpPrinten (  );
 
             ParseCommandLine pcl = new ParseCommandLine { CommandLines = EnabledCommandLines, Default = new FileExpression() };
 
@@ -60,7 +60,7 @@ namespace Yama
 
             foreach ( ICommandLine command in commands )
             {
-                if (command is Help) return Program.HilfePrinten (  ) == 1;
+                if (command is LearnCsStuf.CommandLines.Commands.Help) return Program.HelpPrinten (  ) == 1;
                 if (command is FileExpression) yama.Files.Add ( command.Value );
                 if (command is AutoExpression) return Program.RunAuto ( command );
                 if (command is IncludeExpression) yama.Includes.Add ( command.Value );
@@ -85,9 +85,9 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static int HilfePrinten (  )
+        private static int HelpPrinten (  )
         {
-            Hilfe hilfe = new Hilfe { CommandLines = Program.EnabledCommandLines };
+            LearnCsStuf.CommandLines.Help hilfe = new LearnCsStuf.CommandLines.Help { CommandLines = Program.EnabledCommandLines };
 
             hilfe.Print (  );
 
@@ -117,7 +117,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new StartNamespace (  ) );
             Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
-            Program.EnabledCommandLines.Add ( new Help (  ) );
+            Program.EnabledCommandLines.Add ( new LearnCsStuf.CommandLines.Commands.Help (  ) );
             return true;
         }
 

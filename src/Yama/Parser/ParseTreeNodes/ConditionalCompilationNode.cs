@@ -5,7 +5,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class BedingtesCompilierenParser : IParseTreeNode
+    public class ConditionalCompilationNode : IParseTreeNode
     {
 
         #region get/set
@@ -40,7 +40,7 @@ namespace Yama.Parser
 
         #region ctor
 
-        public BedingtesCompilierenParser (  )
+        public ConditionalCompilationNode (  )
         {
 
         }
@@ -49,9 +49,9 @@ namespace Yama.Parser
 
         public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
         {
-            if ( token.Kind != SyntaxKind.BedingtesCompilieren ) return null;
+            if ( token.Kind != SyntaxKind.ConditionalCompilation ) return null;
 
-            BedingtesCompilierenParser node = new BedingtesCompilierenParser { Token = token };
+            ConditionalCompilationNode node = new ConditionalCompilationNode { Token = token };
 
             token.Node = node;
 

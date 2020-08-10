@@ -5,7 +5,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileRegionAsm : ICompile<BedingtesCompilierenParser>
+    public class CompileRegionAsm : ICompile<ConditionalCompilationNode>
     {
 
         #region get/set
@@ -26,7 +26,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        public bool Compile(Compiler compiler, BedingtesCompilierenParser node, string mode = "default")
+        public bool Compile(Compiler compiler, ConditionalCompilationNode node, string mode = "default")
         {
             compiler.AssemblerSequence.Add(this);
 

@@ -46,7 +46,7 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<ICompileRoot>();
-        public FunktionsDeklaration MainFunction { get; internal set; }
+        public MethodeDeclarationNode MainFunction { get; internal set; }
         public List<CompilerError> Errors { get; set; } = new List<CompilerError>();
 
         public List<string> Defines { get; set; }

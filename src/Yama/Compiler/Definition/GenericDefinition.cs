@@ -41,7 +41,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public int ZeroRegister
+        public int WorkingRegisterStart
         {
             get;
             set;
@@ -49,7 +49,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public int ArbeitsRegister
+        public int PlaceToKeepRegisterStart
         {
             get;
             set;
@@ -57,7 +57,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public int AblageRegister
+        public int PlaceToKeepRegisterLast
         {
             get;
             set;
@@ -65,15 +65,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public int MaxAblageRegister
-        {
-            get;
-            set;
-        }
-
-        // -----------------------------------------------
-
-        public int MaxArbeitsRegister
+        public int WorkingRegisterLast
         {
             get;
             set;
@@ -82,14 +74,6 @@ namespace Yama.Compiler.Definition
         // -----------------------------------------------
 
         public List<CompileAlgo> Algos
-        {
-            get;
-            set;
-        }
-
-        // -----------------------------------------------
-
-        public int ZuweisungsRegister
         {
             get;
             set;
@@ -122,7 +106,7 @@ namespace Yama.Compiler.Definition
         // -----------------------------------------------
 
         [System.Text.Json.Serialization.JsonIgnore]
-        public int CurrentArbeitsRegister
+        public int CurrentWorkingRegister
         {
             get;
             set;
@@ -131,7 +115,7 @@ namespace Yama.Compiler.Definition
         // -----------------------------------------------
 
         [System.Text.Json.Serialization.JsonIgnore]
-        public int CurrentAblageRegister
+        public int CurrentPlaceToKeepRegister
         {
             get;
             set;
@@ -191,10 +175,10 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public bool BeginNeueMethode(List<string> registersUses)
+        public bool BeginNewMethode(List<string> registersUses)
         {
-            this.CurrentArbeitsRegister = this.ArbeitsRegister;
-            this.CurrentAblageRegister = this.MaxAblageRegister;
+            this.CurrentWorkingRegister = this.WorkingRegisterStart;
+            this.CurrentPlaceToKeepRegister = this.PlaceToKeepRegisterLast;
             this.RegisterUses = registersUses;
 
             return true;
@@ -204,7 +188,7 @@ namespace Yama.Compiler.Definition
 
         public bool ParaClean()
         {
-            this.CurrentArbeitsRegister = this.ArbeitsRegister;
+            this.CurrentWorkingRegister = this.WorkingRegisterStart;
 
             return true;
         }
@@ -409,10 +393,10 @@ namespace Yama.Compiler.Definition
 
             for (int i = 0; i < duration; i++ )
             {
-                int registerStart = this.CurrentArbeitsRegister;
-                this.CurrentArbeitsRegister += bytes;
+                int registerStart = this.CurrentWorkingRegister;
+                this.CurrentWorkingRegister += bytes;
 
-                if (registerStart > this.MaxArbeitsRegister) { this.Compiler.AddError("Arbeitsregister voll Ausgelastet"); return null; }
+                if (registerStart > this.WorkingRegisterLast) { this.Compiler.AddError("Arbeitsregister voll Ausgelastet"); return null; }
 
                 result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
             }
@@ -430,18 +414,18 @@ namespace Yama.Compiler.Definition
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
-            this.CurrentAblageRegister += (bytes * duration) + 1;
+            this.CurrentPlaceToKeepRegister += (bytes * duration) + 1;
             for (int i = 0; i < duration; i++ )
             {
-                this.CurrentAblageRegister -= bytes;
-                int registerStart = this.CurrentAblageRegister;
+                this.CurrentPlaceToKeepRegister -= bytes;
+                int registerStart = this.CurrentPlaceToKeepRegister;
 
-                if (registerStart > this.MaxAblageRegister)
+                if (registerStart > this.PlaceToKeepRegisterLast)
                     { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
 
                 result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
             }
-            this.CurrentAblageRegister += (bytes * duration) - 1;
+            this.CurrentPlaceToKeepRegister += (bytes * duration) - 1;
 
             return result;
         }
@@ -456,13 +440,13 @@ namespace Yama.Compiler.Definition
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
-            this.CurrentAblageRegister -= (bytes * duration)-1;
+            this.CurrentPlaceToKeepRegister -= (bytes * duration)-1;
             for (int i = 0; i < duration; i++ )
             {
-                int registerStart = this.CurrentAblageRegister;
-                this.CurrentAblageRegister += bytes;
+                int registerStart = this.CurrentPlaceToKeepRegister;
+                this.CurrentPlaceToKeepRegister += bytes;
 
-                if (registerStart < this.AblageRegister ) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
+                if (registerStart < this.PlaceToKeepRegisterStart ) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
 
                 string reg = this.AviableRegisters[registerStart];
 
@@ -470,7 +454,7 @@ namespace Yama.Compiler.Definition
 
                 if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
             }
-            this.CurrentAblageRegister -= (bytes * duration) + 1;
+            this.CurrentPlaceToKeepRegister -= (bytes * duration) + 1;
 
             return result;
         }

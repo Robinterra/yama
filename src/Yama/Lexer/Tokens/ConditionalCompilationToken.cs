@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Yama.Lexer
 {
-    public class BedingtesCompilieren : ILexerToken
+    public class ConditionalCompilationToken : ILexerToken
     {
 
         // -----------------------------------------------
@@ -27,7 +27,7 @@ namespace Yama.Lexer
         {
             get
             {
-                return SyntaxKind.BedingtesCompilieren;
+                return SyntaxKind.ConditionalCompilation;
             }
         }
 
@@ -51,7 +51,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public BedingtesCompilieren ( ZeichenKette begin, ZeichenKette end )
+        public ConditionalCompilationToken ( ZeichenKette begin, ZeichenKette end )
         {
             this.Begin = begin;
 
