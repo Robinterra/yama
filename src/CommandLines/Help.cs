@@ -46,7 +46,7 @@ namespace LearnCsStuf.CommandLines
         public bool Print (  )
         {
             Console.WriteLine ( "Compiler for Yama, a Object-oriented Language for Microcontroller like ARM Cortex-M and AVR" );
-            Console.WriteLine ( "yama out out.S define atmega328p def avr inc bin/Debug/netcoreapp3.1/System bin/Debug/netcoreapp3.1/iftest.yama" );
+            Console.WriteLine ( "yama out out.S define atmega328p define avr-gcc def avr inc bin/Debug/netcoreapp3.1/System bin/Debug/netcoreapp3.1/iftest.yama" );
             Console.WriteLine (  );
 
             foreach ( ICommandLine line in this.CommandLines )

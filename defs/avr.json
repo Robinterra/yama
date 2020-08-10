@@ -87,12 +87,24 @@
         {
           "Name": "[NAME]",
           "Values": null
+        },
+        {
+          "Name": "[GS]",
+          "Values": null
+        },
+        {
+          "Name": "[HIGH]",
+          "Values": null
+        },
+        {
+          "Name": "[LOW]",
+          "Values": null
         }
       ],
       "PostKeys": [],
       "AssemblyCommands": [
-        "ldi r24,hi8(gs([NAME]))",
-        "ldi r25,lo8(gs([NAME]))"
+        "ldi r24,[HIGH]([GS]([NAME]))",
+        "ldi r25,[LOW]([GS]([NAME]))"
       ]
     },
     {
@@ -451,6 +463,48 @@
       "Value": "0x00",
       "Defines": [
         "atmega328p"
+      ]
+    },
+    {
+      "Key": "[HIGH]",
+      "Value": "hi8",
+      "Defines": [
+        "avr-gcc"
+      ]
+    },
+    {
+      "Key": "[LOW]",
+      "Value": "lo8",
+      "Defines": [
+        "avr-gcc"
+      ]
+    },
+    {
+      "Key": "[GS]",
+      "Value": "gs",
+      "Defines": [
+        "avr-gcc"
+      ]
+    },
+    {
+      "Key": "[HIGH]",
+      "Value": "high",
+      "Defines": [
+        "avrasm"
+      ]
+    },
+    {
+      "Key": "[LOW]",
+      "Value": "low",
+      "Defines": [
+        "avrasm"
+      ]
+    },
+    {
+      "Key": "[GS]",
+      "Value": "",
+      "Defines": [
+        "avrasm"
       ]
     }
   ],
