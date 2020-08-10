@@ -103,6 +103,7 @@ namespace Yama.Index
         public ValidUses ParentUsesSet { get;
         set; }
         public IndexKlassenDeklaration Klasse { get; set; }
+        public bool IsMapped { get; private set; }
 
         public IndexPropertyDeklaration (  )
         {
@@ -111,6 +112,8 @@ namespace Yama.Index
 
         public bool PreMappen(ValidUses uses)
         {
+            if (this.IsMapped) return false;
+
             this.ParentUsesSet = uses;
 
             this.Type.Mappen(uses);
@@ -120,10 +123,12 @@ namespace Yama.Index
 
         public bool Mappen()
         {
+            if (this.IsMapped) return false;
+
             this.SetContainer.Mappen(this.ThisUses);
             this.GetContainer.Mappen(this.ThisUses);
 
-            return true;
+            return this.IsMapped = true;
         }
 
         #endregion get/set

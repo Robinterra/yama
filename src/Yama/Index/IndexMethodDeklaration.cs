@@ -118,6 +118,8 @@ namespace Yama.Index
             }
         }
 
+        public bool IsMapped { get; private set; }
+
         public IndexMethodDeklaration (  )
         {
             this.References = new List<IndexVariabelnReference>();
@@ -126,13 +128,17 @@ namespace Yama.Index
 
         public bool Mappen()
         {
+            if (this.IsMapped) return false;
+
             this.Container.Mappen(this.ThisUses);
 
-            return true;
+            return this.IsMapped = true;
         }
 
         public bool PreMappen(ValidUses uses)
         {
+            if (this.IsMapped) return false;
+
             this.ParentUsesSet = uses;
 
             foreach (IndexVariabelnDeklaration dek in this.Parameters)

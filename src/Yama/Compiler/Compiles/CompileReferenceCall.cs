@@ -87,6 +87,7 @@ namespace Yama.Compiler
             query.Key = key;
             query.Kategorie = mode;
             query.Uses = node.ThisUses;
+            if ("base" == node.Name) query.Uses = node.BaseUsesSet;
 
             object queryValue = (object)node.Name;
             if ("[REG]" == key.Name) queryValue = 1;

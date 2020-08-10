@@ -150,8 +150,27 @@ namespace Yama.Index
 
             foreach (IndexKlassenDeklaration klasse in this.Register)
             {
-                klasse.Mappen(this.RootValidUses);
-                this.ZuCompilenNodes.Add(klasse.Use);
+                klasse.PreMappen(this.RootValidUses);
+            }
+
+            bool isnotallmapped = true;
+
+            while (isnotallmapped)
+            {
+                isnotallmapped = false;
+
+                foreach (IndexKlassenDeklaration klasse in this.Register)
+                {
+                    bool isok = klasse.Mappen(this.RootValidUses);
+
+                    if (!isok)
+                    {
+                        isnotallmapped = true;
+
+                        continue;
+                    }
+                    this.ZuCompilenNodes.Add(klasse.Use);
+                }
             }
 
             return this.Errors.Count == 0;

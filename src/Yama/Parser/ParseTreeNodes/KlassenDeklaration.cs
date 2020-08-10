@@ -39,7 +39,7 @@ namespace Yama.Parser
             set;
         }
 
-        public List<SyntaxToken> Vererbungs
+        public SyntaxToken InheritanceBase
         {
             get;
             set;
@@ -177,30 +177,21 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private SyntaxToken MakeVererbung( Parser parser, SyntaxToken token, KlassenDeklaration deklaration)
+        private SyntaxToken MakeInheritanceBase( Parser parser, SyntaxToken token, KlassenDeklaration deklaration)
         {
             if (token.Kind != SyntaxKind.DoublePoint) return token;
 
             token.Node = deklaration;
 
-            deklaration.Vererbungs = new List<SyntaxToken>();
-
             token = parser.Peek(token, 1);
 
-            while (token.Kind == SyntaxKind.Comma)
-            {
-                token = parser.Peek(token, 1);
+            if (token.Kind != SyntaxKind.Word) return token;
 
-                if (token.Kind != SyntaxKind.Word) continue;
+            token.Node = deklaration;
 
-                token.Node = deklaration;
+            deklaration.InheritanceBase = token;
 
-                deklaration.Vererbungs.Add(token);
-
-                token = parser.Peek(token, 1);
-            }
-
-            return token;
+            return parser.Peek(token, 1);
         }
 
         private SyntaxToken MakeZusatzValid( Parser parser, SyntaxToken token, KlassenDeklaration deklaration)
@@ -232,7 +223,7 @@ namespace Yama.Parser
 
             token = parser.Peek ( token, 1 );
 
-            token = this.MakeVererbung ( parser, token, deklaration );
+            token = this.MakeInheritanceBase ( parser, token, deklaration );
 
             deklaration.Statement = parser.ParseCleanToken(token, this.NextLayer);
 
@@ -269,6 +260,8 @@ namespace Yama.Parser
             IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration();
             deklaration.Name = this.Token.Text;
             deklaration.Use = this;
+
+            if (this.InheritanceBase != null) deklaration.InheritanceBase = new IndexVariabelnReference { Name = this.InheritanceBase.Text, Use = this };
 
             this.Deklaration = deklaration;
 

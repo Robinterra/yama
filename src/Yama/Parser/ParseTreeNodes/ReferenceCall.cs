@@ -73,6 +73,7 @@ namespace Yama.Parser
         {
             if (token.Kind == SyntaxKind.Word) return true;
             if (token.Kind == SyntaxKind.This) return true;
+            if (token.Kind == SyntaxKind.Base) return true;
 
             return false;
         }

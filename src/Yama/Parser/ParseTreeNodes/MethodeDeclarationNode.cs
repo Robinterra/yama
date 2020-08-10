@@ -511,6 +511,15 @@ namespace Yama.Parser
                 CompileUsePara usePara = new CompileUsePara();
 
                 usePara.CompileIndexNode(compiler, node, "get");
+
+                if (node.Name != "this") continue;
+                if (this.Deklaration.Klasse.InheritanceBase == null) continue;
+
+                CompileReferenceCall compileReference = new CompileReferenceCall();
+                compileReference.CompileDek(compiler, node, "default");
+
+                compileReference = new CompileReferenceCall();
+                compileReference.CompileDek(compiler, this.Deklaration.Klasse.BaseVar, "set");
             }
 
             compiler.Definition.ParaClean();
