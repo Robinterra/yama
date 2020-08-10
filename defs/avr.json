@@ -324,7 +324,7 @@
       ],
       "PostKeys": [],
       "AssemblyCommands": [
-        "ldi r24, 0x0",
+        "ldi r24, 0x1",
         "ldi r30, [RAMBEGIN_LOW]",
         "ldi r31, [RAMBEGIN_HIGH]",
         "ST Z,r24",

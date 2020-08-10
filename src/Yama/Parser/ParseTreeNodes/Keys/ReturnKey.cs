@@ -50,6 +50,8 @@ namespace Yama.Parser
 
             SyntaxToken ende = parser.FindAToken(token, SyntaxKind.EndOfCommand);
 
+            if (ende == null) return null;
+
             List<IParseTreeNode> nodes = parser.ParseCleanTokens(token.Position + 1, ende.Position);
             IParseTreeNode node = null;
 

@@ -3,16 +3,8 @@ namespace "System"
     /**
     * Integer current 16 Bit
     */
-    public class Int
+    public class int
     {
-
-        // -----------------------------------------------
-
-        #region get/set
-
-        // -----------------------------------------------
-
-        #endregion get/set
 
         // -----------------------------------------------
 
@@ -25,16 +17,65 @@ namespace "System"
         // -----------------------------------------------
 
         /**
-        * Vergleich 2 Werte miteinander auf kleiner als
+        * Compare 2 Values to  Less than
         *
         * @param[in] a (Int) Der Linke Child der vom Operator steht
         * @param[in] b (Int) Der Rechte Child der vom Operator steht
         *
-        * @return (Bool) Wenn a kleiner ist dann true ansonsten false
+        * @return (bool) Wenn a kleiner ist dann true ansonsten false
         */
-        public operator Bool <(Int a, Int b)
+        public operator bool <(int a, int b)
         {
+            return #defalgo IntCompare,LessThan:;
+        }
 
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to Greater than
+        *
+        * @param[in] a (Int) Der Linke Child der vom Operator steht
+        * @param[in] b (Int) Der Rechte Child der vom Operator steht
+        *
+        * @return (bool) Wenn a kleiner ist dann true ansonsten false
+        */
+        public operator bool >(int a, int b)
+        {
+            if ( a == b ) return false;
+
+            return a >= b;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to Greater than or equals
+        *
+        * @param[in] a (Int) Der Linke Child der vom Operator steht
+        * @param[in] b (Int) Der Rechte Child der vom Operator steht
+        *
+        * @return (bool) Wenn a kleiner ist dann true ansonsten false
+        */
+        public operator bool >=(int a, int b)
+        {
+            return #defalgo IntCompare,GreaterEqualsThan:;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to Equal or Less than
+        *
+        * @param[in] a (Int) The left Child of the Operator
+        * @param[in] b (Int) The rigth Child of the Operator
+        *
+        * @return (bool) if equals or Less than then return true
+        */
+        public operator bool <=(int a, int b)
+        {
+            if (a == b) return true;
+
+            return a < b;
         }
 
         // -----------------------------------------------
@@ -45,11 +86,28 @@ namespace "System"
         * @param[in] a (Int) The left Child of the Operator
         * @param[in] b (Int) The rigth Child of the Operator
         *
-        * @return (Bool) if equals then return true
+        * @return (bool) if equals then return true
         */
-        public operator Bool ==(Int a, Int b)
+        public operator bool ==(int a, int b)
         {
             return #defalgo IntCompare,Equals:;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to Not Equal
+        *
+        * @param[in] a (Int) The left Child of the Operator
+        * @param[in] b (Int) The rigth Child of the Operator
+        *
+        * @return (bool) if equals then return true
+        */
+        public operator bool !=(int a, int b)
+        {
+            bool result = #defalgo IntCompare,Equals:;
+
+            return !result;
         }
 
         // -----------------------------------------------
@@ -58,19 +116,91 @@ namespace "System"
 
         // -----------------------------------------------
 
+        #region BitOperations
+
+        // -----------------------------------------------
+
+        /**
+        * Binary And of 2 Values
+        *
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
+        *
+        * @return (int) Result
+        */
+        public operator int &(int a, int b)
+        {
+
+            return #defalgo IntArimetics,BinaryAnd:;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Binary Or of 2 Values
+        *
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
+        *
+        * @return (int) Result
+        */
+        public operator int |(int a, int b)
+        {
+
+            return #defalgo IntArimetics,BinaryOr:;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Binary Negation of 2 Values
+        *
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
+        *
+        * @return (int) Result
+        */
+        public operator int !(int a, int b)
+        {
+
+            return #defalgo IntArimetics,BinaryNegation:;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Binary Xor of 2 Values
+        *
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
+        *
+        * @return (int) Result
+        */
+        public operator int ^(int a, int b)
+        {
+
+            return #defalgo IntArimetics,BinaryXor:;
+        }
+
+        // -----------------------------------------------
+
+        #endregion BitOperations
+
+        // -----------------------------------------------
+
         #region arimetics
 
         // -----------------------------------------------
 
         /**
-        * Subtrariere
+        * Subtraction of 2 Values
         *
-        * @param[in] a (Int) Der Linke Child der vom Operator steht
-        * @param[in] b (Int) Der Rechte Child der vom Operator steht
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
         *
-        * @return (Int) Das Ergebenis der Rechnung
+        * @return (int) Result
         */
-        public operator Int -(Int a, Int b)
+        public operator int -(int a, int b)
         {
 
             return #defalgo IntArimetics,Subtraction:;
@@ -79,13 +209,13 @@ namespace "System"
         // -----------------------------------------------
 
         /**
-        * Incrementiere um 1
+        * Incrementation of one Operator
         *
-        * @param[in] a (Int) Der Linke oder Rechte Child der vom Operator steht
+        * @param[in] a (int) The Child of the Operator
         *
-        * @return (Int) Das Ergebenis der Rechnung
+        * @return (int) Result
         */
-        public operator Int ++(Int a)
+        public operator int ++(int a)
         {
             return #defalgo IntArimetics,Incremtation:;
         }
@@ -93,14 +223,14 @@ namespace "System"
         // -----------------------------------------------
 
         /**
-        * Addiere
+        * Addition of 2 Values
         *
-        * @param[in] a (Int) Der Linke Child der vom Operator steht
-        * @param[in] b (Int) Der Rechte Child der vom Operator steht
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
         *
-        * @return (Int) Das Ergebenis der Rechnung
+        * @return (int) Result
         */
-        public operator Int +(Int a, Int b)
+        public operator int +(int a, int b)
         {
             return #defalgo IntArimetics,Addition:;
         }

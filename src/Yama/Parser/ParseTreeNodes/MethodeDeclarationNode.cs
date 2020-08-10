@@ -375,8 +375,11 @@ namespace Yama.Parser
                 if (par is VariabelDeklaration t) dek = t;
                 if (par is EnumartionExpression b)
                 {
+                    if (b.ExpressionParent == null) continue;
                     dek = (VariabelDeklaration)b.ExpressionParent;
                 }
+
+                if (dek == null) { index.CreateError(this, "A Index error by the parameters of this method"); continue; }
 
                 if (!dek.Indezieren(index, container)) continue;
 

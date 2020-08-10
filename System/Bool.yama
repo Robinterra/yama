@@ -1,6 +1,6 @@
 namespace "System"
 {
-    public class Bool
+    public class bool
     {
 
         // -----------------------------------------------
@@ -9,9 +9,55 @@ namespace "System"
 
         // -----------------------------------------------
 
-        public operator Bool !(Bool a)
+        /**
+        * Negate a bool
+        *
+        * @param[in] a (bool) The Child of the Operator
+        *
+        * @return (bool) Negate result
+        */
+        public operator bool !( bool a )
         {
+            if ( a ) return false;
 
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Or 2 Values
+        *
+        * @param[in] a (Int) The left Child of the Operator
+        * @param[in] b (Int) The rigth Child of the Operator
+        *
+        * @return (bool) The result of Or
+        */
+        public operator bool ||( bool a, bool b )
+        {
+            if ( a ) return true;
+
+            return b;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * And 2 Values
+        *
+        * @param[in] a (Int) The left Child of the Operator
+        * @param[in] b (Int) The rigth Child of the Operator
+        *
+        * @return (bool) The result of And
+        */
+        public operator bool &&( bool a, bool b )
+        {
+            if ( a )
+            {
+                if ( b ) return true;
+            }
+
+            return false;
         }
 
         // -----------------------------------------------
@@ -22,3 +68,5 @@ namespace "System"
 
     }
 }
+
+// --[EOF]--

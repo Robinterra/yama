@@ -153,6 +153,7 @@ namespace Yama
             layer.ParserMembers.Add ( new NewKey (  ) );
             layer.ParserMembers.Add ( new NullKey (  ) );
             layer.ParserMembers.Add ( new ContinueKey (  ) );
+            layer.ParserMembers.Add ( new BreakKey (  ) );
             layer.ParserMembers.Add ( new ExplicitConverting ( 10 ) );
             layer.ParserMembers.Add ( new MethodeCallNode ( SyntaxKind.OpenBracket, SyntaxKind.CloseBracket, 12 ) );
             layer.ParserMembers.Add ( new ContainerExpression ( 11 ) );
@@ -167,7 +168,7 @@ namespace Yama
             layer.ParserMembers.Add ( new TextParser ( 1 ) );
             layer.ParserMembers.Add ( new OperatorPoint ( 11 ) );
             layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenBracket }, new List<SyntaxKind> { SyntaxKind.OpenBracket } ) );
-            layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++" }, 11, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
+            layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++", "!", "~" }, 11, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 2 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 3 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 4 ) );
@@ -179,7 +180,7 @@ namespace Yama
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 10 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=", "+=", "-=" }, 1 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=" }, 1 ) );
             layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, SyntaxKind.DoublePoint, 2 ) );
             layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, SyntaxKind.DoublePoint, 2 ) );
 
@@ -235,7 +236,7 @@ namespace Yama
             rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#defalgo" ), new ZeichenKette ( ":" ) ) );
             rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
             rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
-            rules.Add ( new Operator ( new ZeichenKette ( "∑" ), new ZeichenKette ( "<=" ), new ZeichenKette ( "++" ), new ZeichenKette ( "<>" ), new ZeichenKette ( ">=" ), new ZeichenKette ( "<" ), new ZeichenKette ( ">" ), new ZeichenKette ( "^^" ), new ZeichenKette ( "+" ), new ZeichenKette ( "-" ), new ZeichenKette ( "*" ), new ZeichenKette ( "/"), new ZeichenKette ( "%" ), new ZeichenKette ( "&" ), new ZeichenKette ( "|" ), new ZeichenKette ( "==" ), new ZeichenKette ( "=" ), new ZeichenKette ( "!=" ), new ZeichenKette ( "!" ), new ZeichenKette ( "^"), new ZeichenKette ( "~" ), new ZeichenKette ( "√" ), new ZeichenKette ( "?" ) ) );
+            rules.Add ( new Operator ( new ZeichenKette ( "∑" ), new ZeichenKette ( "<=" ), new ZeichenKette ( "--" ), new ZeichenKette ( "++" ), new ZeichenKette ( "<>" ), new ZeichenKette ( ">=" ), new ZeichenKette ( "<<" ), new ZeichenKette ( ">>" ), new ZeichenKette ( "<" ), new ZeichenKette ( ">" ), new ZeichenKette ( "^^" ), new ZeichenKette ( "+" ), new ZeichenKette ( "-" ), new ZeichenKette ( "*" ), new ZeichenKette ( "/"), new ZeichenKette ( "%" ), new ZeichenKette ( "&&" ), new ZeichenKette ( "||" ), new ZeichenKette ( "&" ), new ZeichenKette ( "|" ), new ZeichenKette ( "==" ), new ZeichenKette ( "=" ), new ZeichenKette ( "!=" ), new ZeichenKette ( "!" ), new ZeichenKette ( "^"), new ZeichenKette ( "~" ), new ZeichenKette ( "√" ), new ZeichenKette ( "?" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Whitespaces (  ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), SyntaxKind.OpenBracket ) );
@@ -250,14 +251,12 @@ namespace Yama
             rules.Add ( new Punctuation ( new ZeichenKette ( ";" ), SyntaxKind.EndOfCommand ) );
             rules.Add ( new Text ( new ZeichenKette ( "\"" ), new ZeichenKette ( "\"" ), escape ) );
             rules.Add ( new Text ( new ZeichenKette ( "\'" ), new ZeichenKette ( "\'" ), escape ) );
-            rules.Add ( new KeyWord ( "int", SyntaxKind.Int32Bit ) );
             rules.Add ( new KeyWord ( "char", SyntaxKind.Char ) );
             rules.Add ( new KeyWord ( "byte", SyntaxKind.Byte ) );
             rules.Add ( new KeyWord ( "set", SyntaxKind.Set ) );
             rules.Add ( new KeyWord ( "get", SyntaxKind.Get ) );
             rules.Add ( new KeyWord ( "for", SyntaxKind.For ) );
             rules.Add ( new KeyWord ( "while", SyntaxKind.While ) );
-            rules.Add ( new KeyWord ( "bool", SyntaxKind.Boolean ) );
             rules.Add ( new KeyWord ( "true", SyntaxKind.True ) );
             rules.Add ( new KeyWord ( "null", SyntaxKind.Null ) );
             rules.Add ( new KeyWord ( "enum", SyntaxKind.Enum ) );

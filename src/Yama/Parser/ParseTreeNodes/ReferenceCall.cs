@@ -33,12 +33,6 @@ namespace Yama.Parser
             }
         }
 
-        public CompileReferenceCall Compilen
-        {
-            get;
-            set;
-        } = new CompileReferenceCall();
-
         public int Prio
         {
             get;
@@ -117,7 +111,9 @@ namespace Yama.Parser
             if (mode == "setpoint") moderesult = mode;
             if (this.Reference.Deklaration is IndexMethodDeklaration) moderesult = "methode";
 
-            this.Compilen.Compile(compiler, this, moderesult);
+            CompileReferenceCall compileReference = new CompileReferenceCall();
+
+            compileReference.Compile(compiler, this, moderesult);
 
             return true;
         }

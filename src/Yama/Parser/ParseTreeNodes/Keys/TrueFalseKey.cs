@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -73,6 +74,13 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            Number number = new Number();
+            if (this.Token.Text == "true") number.Token = new SyntaxToken { Value = 0xff };
+            if (this.Token.Text == "false") number.Token = new SyntaxToken { Value = 0 };
+
+            CompileNumConst numConst = new CompileNumConst();
+            numConst.Compile(compiler, number, mode);
+
             return true;
         }
 

@@ -18,9 +18,57 @@ namespace "System.IO"
          *
          * @return (Int) The Adress (If this is null then is failed and not engough space exist)
          */
-        public static Int Malloc ( Int size )
+        public static int Malloc ( int size )
         {
-            return #defalgo Malloc,default: = size;
+            #defalgo Malloc,Init:
+
+            int currentadress;
+            int currentBlockState;
+            int currentBlockSize;
+            int nextAdress = #defalgo Malloc,CurrentAdress:;
+
+            while ( true )
+            {
+                currentadress = nextAdress;
+
+                currentBlockState = #defalgo Malloc,GetBlockState: = currentadress;
+                currentBlockSize = #defalgo Malloc,GetBlockSize: = currentadress;
+
+                nextAdress = currentadress + currentBlockSize + #defalgo Malloc,HeaderSize:;
+
+                if (currentBlockState == 2) continue;
+
+                if (size <= currentBlockSize) break;
+
+                if (currentBlockState == 1) return null;
+            }
+
+            MemoryManager.CreateBlock ( currentadress, 0, size );
+
+            currentadress = currentadress + #defalgo Malloc,HeaderSize:;
+
+            if (currentBlockState == 0) return currentadress;
+
+            nextAdress = currentadress + size;
+            size = size + #defalgo Malloc,HeaderSize:;
+            size = currentBlockSize - size;
+
+            MemoryManager.CreateBlock ( nextAdress, 1, size );
+
+            return currentadress;
+        }
+
+        // -----------------------------------------------
+
+        private static int CreateBlock ( int adresse, int blockState, int size )
+        {
+
+            #defalgo Malloc,SetBlockAdresse: = adresse;
+
+            #defalgo Malloc,SetBlockState: = blockState;
+
+            #defalgo Malloc,SetBlockSize: = size;
+
         }
 
         // -----------------------------------------------
@@ -32,7 +80,7 @@ namespace "System.IO"
          *
          * @return (Bool) true is Ok and false is not ok
          */
-        public static Bool Free ( Int addresse )
+        public static bool Free ( int addresse )
         {
             #defalgo MallocFree,default: = addresse;
 
@@ -44,11 +92,11 @@ namespace "System.IO"
         /**
          * Clean Memory Blocks
          */
-        private static Bool Clean ( Int addresse )
+        private static bool Clean ( int addresse )
         {
             #defalgo Malloc,Init:
 
-            Int currentadress = #defalgo Malloc,CurrentAdress:;
+            int currentadress = #defalgo Malloc,CurrentAdress:;
 
             while ( currentadress < addresse )
             {
@@ -68,3 +116,5 @@ namespace "System.IO"
 
     }
 }
+
+// --[EOF]--

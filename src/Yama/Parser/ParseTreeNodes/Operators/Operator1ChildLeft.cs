@@ -173,6 +173,8 @@ namespace Yama.Parser
 
             this.FunctionExecute.Compile(compiler, null, mode);
 
+            this.ChildNode.Compile(compiler, "set");
+
             return true;
         }
 
