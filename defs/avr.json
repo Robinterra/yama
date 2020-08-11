@@ -360,13 +360,21 @@
         {
           "Name": "[JUMPTO]",
           "Values": null
+        },
+        {
+          "Name": "[JUMPTO]",
+          "Values": [
+          "1"
+          ]
         }
       ],
       "PostKeys": [],
       "AssemblyCommands": [
         "or r24,r25",
         "tst r24",
-        "breq [JUMPTO]"
+        "brne [JUMPTO[0]]",
+        "rjmp [JUMPTO]",
+        "[JUMPTO[0]]:"
       ]
     },
     {
