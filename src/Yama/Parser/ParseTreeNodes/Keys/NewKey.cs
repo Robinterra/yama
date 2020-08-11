@@ -104,6 +104,8 @@ namespace Yama.Parser
 
             newKey.Parameters = parser.ParseCleanTokens ( beginkind.Position + 1, endToken.Position, true );
 
+            if (newKey.Parameters == null) return null;
+
             newKey.Token.Node = newKey;
             newKey.Definition.Node = newKey;
             newKey.Ende = endToken;

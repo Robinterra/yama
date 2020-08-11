@@ -80,15 +80,23 @@ namespace "Program"
 
         public this new()
         {
-
+            return this;
         }
     }
 }
 ```
 
 ### avr-gcc
- YamaCompile out out.S define atmega328p define avr-gcc def avr inc bin/Debug/netcoreapp3.1/System bin/Debug/netcoreapp3.1/iftest.yama
- avr-gcc -nostartfiles -mmcu=atmega328p -o out.elf out.S
+This commands will be (future - tomorrow or so) testet on a raspberry pi with arch linux
+```console
+./YamaCompile out out.S define atmega328p define avr-gcc def avr inc "./System" "./HelloWorld.yama"
+
+avr-gcc -nostartfiles -mmcu=atmega328p -o out.elf ./out.S
+
+avr-objcopy -j .text -j .data -O ihex out.elf out.hex
+
+avrdude -F -e -v -p m328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:"out.hex":i
+```
 
 ## Authors
 

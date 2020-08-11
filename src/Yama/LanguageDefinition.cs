@@ -370,6 +370,8 @@ namespace Yama
 
             if (!this.Compilen(nodes, main)) return false;
 
+            Console.WriteLine("Those blasted swamps... eating bugs... wading through filth... complete compilation");
+
             return true;
         }
 

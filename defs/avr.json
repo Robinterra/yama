@@ -468,7 +468,7 @@
     },
     {
       "Key": "[RAMBEGIN_HIGH]",
-      "Value": "0x00",
+      "Value": "0x01",
       "Defines": [
         "atmega328p"
       ]

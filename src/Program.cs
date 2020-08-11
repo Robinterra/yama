@@ -26,7 +26,7 @@ namespace Yama
 
         public static int Main ( string[] args )
         {
-            System.Console.WriteLine("Erinnerst du dich an Yama, alter Freund?");
+            System.Console.WriteLine("Remember Yama, old friend?");
 
             Program.Init (  );
 
