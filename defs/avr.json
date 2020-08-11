@@ -185,6 +185,8 @@
       ],
       "AssemblyCommands": [
         "[NAME]:",
+        "push r28",
+        "push r29",
         "[PUSHREG]",
         "in r28,[SPL]",
         "in r29,[SPH]",
@@ -226,8 +228,8 @@
         "out [SPL],r28",
         "out [SPH],r29",
         "[POPREG]",
-        "in r28,[SPL]",
-        "in r29,[SPH]",
+        "pop r29",
+        "pop r28",
         "ret"
       ]
     },

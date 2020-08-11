@@ -29,20 +29,20 @@ namespace "System.IO"
 
             while ( true )
             {
-                #defalgo Malloc,SetBlockAdresse: = currentadress = nextAdress;
+                currentadress = nextAdress;
 
-                currentBlockSize = #defalgo Malloc,GetBlockSize:;
+                currentBlockSize = #defalgo Malloc,GetBlockSize: = currentadress;
 
                 nextAdress = #defalgo Malloc,GetNextAdress:;
 
-                if (#defalgo Malloc,IsBlockInUse:) continue;
+                if (#defalgo Malloc,IsBlockInUse: = currentadress) continue;
 
                 if (size <= currentBlockSize) break;
 
-                if (#defalgo Malloc,IsBlockEnde:) return null;
+                if (#defalgo Malloc,IsBlockEnde: = currentadress) return null;
             }
 
-            currentBlockState = #defalgo Malloc,GetBlockState:;
+            currentBlockState = #defalgo Malloc,GetBlockState: = currentadress;
 
             return MemoryManager.ReservedNewBlock ( currentadress, size, currentBlockState, currentBlockSize );
         }
@@ -51,7 +51,7 @@ namespace "System.IO"
 
         private static int ReservedNewBlock ( int currentadress, int size, int nextBlockState, int currentBlockSize )
         {
-            MemoryManager.CreateBlock ( currentadress, 0, size );
+            MemoryManager.CreateBlock ( currentadress, 2, size );
 
             currentadress = currentadress + #defalgo Malloc,HeaderSize:;
 
@@ -94,9 +94,7 @@ namespace "System.IO"
 
             adresse = adresse - 3;
 
-            #defalgo Malloc,SetBlockAdresse: = adresse
-
-            return #defalgo Malloc,GetBlockSize:;
+            return #defalgo Malloc,GetBlockSize: = adresse;
         }
 
         // -----------------------------------------------
@@ -130,9 +128,9 @@ namespace "System.IO"
 
             while ( currentadress < addresse )
             {
-                currentadress = #defalgo Malloc,CurrentAdress:;
-
                 #defalgo MallocClean, default: = currentadress;
+
+                currentadress = #defalgo Malloc,CurrentAdress:;
             }
 
             return true;

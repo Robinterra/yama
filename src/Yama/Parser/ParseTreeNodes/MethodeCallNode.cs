@@ -3,6 +3,7 @@ using Yama.Lexer;
 using Yama.Index;
 using Yama.Compiler;
 using System;
+using System.Linq;
 
 namespace Yama.Parser
 {
@@ -155,19 +156,30 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            for (int i = this.ParametersNodes.Count; i > 0; i-- )
+            List<IParseTreeNode> copylist = this.ParametersNodes.ToArray().ToList();
+            copylist.Reverse();
+            IParseTreeNode dek = null;
+
+            int parasCount = 0;
+
+            foreach (IParseTreeNode par in copylist )
             {
-                this.ParametersNodes[i - 1].Compile(compiler, mode);
+                dek = par;
+                if (par is EnumartionExpression b) dek = b.ExpressionParent;
+                if (dek == null) continue;
+
+                dek.Compile(compiler, mode);
 
                 CompileMovResult movResultRight = new CompileMovResult();
 
                 movResultRight.Compile(compiler, null, mode);
+
+                parasCount++;
             }
 
             this.LeftNode.Compile(compiler, "methode");
             if (!(this.LeftNode is OperatorPoint op)) return false;
 
-            int parasCount = this.ParametersNodes.Count;
             if (op.IsANonStatic) parasCount++;
 
             for (int i = 0; i < parasCount; i++)
