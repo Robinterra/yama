@@ -179,7 +179,7 @@ namespace Yama.Index
 
             this.Deklaration = this.ParentUsesSet.Deklarationen.FirstOrDefault(t=>t.Name == this.Name);
 
-            if (this.Deklaration == null) return uses.GetIndex.CreateError(this.Use, "no defintion in index found");
+            if (this.Deklaration == null) return uses.GetIndex.CreateError(this.Use, string.Format("no defintion in index found {0}", this.Name));
 
             if (this.ParentCall != null) this.ParentCall.Mappen(this);
 

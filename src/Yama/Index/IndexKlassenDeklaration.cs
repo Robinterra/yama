@@ -98,17 +98,6 @@ namespace Yama.Index
                 dekList.Add(dekbaseVar);
                 this.BaseVar = dekbaseVar;
 
-                this.Methods.AddRange(dek.Methods.Where(t=>!this.Methods.Any(q=>q.Name == t.Name)));
-                this.Operators.AddRange(dek.Operators.Where(t=>!this.Operators.Any(q=>q.Name == t.Name)));
-                this.Ctors.AddRange(dek.Ctors.Where(t=>this.Ctors.Count == 0));
-                this.DeCtors.AddRange(dek.DeCtors.Where(t=>this.DeCtors.Count == 0));
-
-                List<IndexPropertyDeklaration> deks = dek.IndexProperties.Where(t=>true).ToList();
-
-                deks.AddRange(this.IndexProperties.Where(t=>!dek.IndexProperties.Any(q=>q.Name == t.Name)));
-
-                this.IndexProperties = deks;
-
                 return this.thisUses;
             }
         }
@@ -166,6 +155,19 @@ namespace Yama.Index
 
             this.InheritanceBase.Mappen(this.ParentUsesSet);
 
+            if (!(this.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return true;
+
+            this.Methods.AddRange(dek.Methods.Where(t=>!this.Methods.Any(q=>q.Name == t.Name)));
+            this.Operators.AddRange(dek.Operators.Where(t=>!this.Operators.Any(q=>q.Name == t.Name)));
+            this.Ctors.AddRange(dek.Ctors.Where(t=>this.Ctors.Count == 0));
+            this.DeCtors.AddRange(dek.DeCtors.Where(t=>this.DeCtors.Count == 0));
+
+            List<IndexPropertyDeklaration> deks = dek.IndexProperties.Where(t=>true).ToList();
+
+            deks.AddRange(this.IndexProperties.Where(t=>!dek.IndexProperties.Any(q=>q.Name == t.Name)));
+
+            this.IndexProperties = deks;
+
             return true;
         }
 
@@ -207,8 +209,11 @@ namespace Yama.Index
         {
             foreach (IndexPropertyDeklaration deklaration in indexProperties)
             {
-                if (!deklaration.Mappen()) continue;
+                if (deklaration.IsMapped) continue;
+
                 deklaration.Klasse = this;
+
+                deklaration.Mappen();
             }
 
             return true;
@@ -218,8 +223,11 @@ namespace Yama.Index
         {
             foreach (IndexPropertyDeklaration deklaration in indexProperties)
             {
-                if (!deklaration.PreMappen(thisUses)) continue;
+                if (deklaration.IsMapped) continue;
+
                 deklaration.Klasse = this;
+
+                deklaration.PreMappen(thisUses);
             }
 
             return true;
@@ -229,8 +237,11 @@ namespace Yama.Index
         {
             foreach (IndexMethodDeklaration deklaration in methods)
             {
-                if (!deklaration.PreMappen(thisUses)) continue;
+                if (deklaration.IsMapped) continue;
+
                 deklaration.Klasse = this;
+
+                deklaration.PreMappen(thisUses);
             }
 
             return true;
@@ -240,8 +251,11 @@ namespace Yama.Index
         {
             foreach (IndexMethodDeklaration deklaration in methods)
             {
-                if (!deklaration.Mappen()) continue;
+                if (deklaration.IsMapped) continue;
+
                 deklaration.Klasse = this;
+
+                deklaration.Mappen();
             }
 
             return true;

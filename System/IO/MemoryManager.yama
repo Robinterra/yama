@@ -29,32 +29,33 @@ namespace "System.IO"
 
             while ( true )
             {
-                currentadress = nextAdress;
+                #defalgo Malloc,SetBlockAdresse: = currentadress = nextAdress;
 
-                currentBlockState = #defalgo Malloc,GetBlockState: = currentadress;
-                currentBlockSize = #defalgo Malloc,GetBlockSize: = currentadress;
+                currentBlockSize = #defalgo Malloc,GetBlockSize:;
 
-                nextAdress = #defalgo Malloc,GetNextAdress: = currentadress;
+                nextAdress = #defalgo Malloc,GetNextAdress:;
 
-                if (#defalgo Malloc,IsBlockInUse:=currentadress) continue;
+                if (#defalgo Malloc,IsBlockInUse:) continue;
 
                 if (size <= currentBlockSize) break;
 
-                if (#defalgo Malloc,IsBlockEnde:=currentadress) return null;
+                if (#defalgo Malloc,IsBlockEnde:) return null;
             }
 
-            return MemoryManager.ReservedNewBlock ( currentadress, size, currentBlockState );
+            currentBlockState = #defalgo Malloc,GetBlockState:;
+
+            return MemoryManager.ReservedNewBlock ( currentadress, size, currentBlockState, currentBlockSize );
         }
 
         // -----------------------------------------------
 
-        private static int ReservedNewBlock ( int currentadress, int size, int nextBlockState )
+        private static int ReservedNewBlock ( int currentadress, int size, int nextBlockState, int currentBlockSize )
         {
             MemoryManager.CreateBlock ( currentadress, 0, size );
 
             currentadress = currentadress + #defalgo Malloc,HeaderSize:;
 
-            if (currentBlockState == 0) return currentadress;
+            if (nextBlockState == 0) return currentadress;
 
             int nextAdress = currentadress + size;
             size = size + #defalgo Malloc,HeaderSize:;
@@ -93,7 +94,9 @@ namespace "System.IO"
 
             adresse = adresse - 3;
 
-            return #defalgo Malloc,GetBlockSize: = adresse;
+            #defalgo Malloc,SetBlockAdresse: = adresse
+
+            return #defalgo Malloc,GetBlockSize:;
         }
 
         // -----------------------------------------------
