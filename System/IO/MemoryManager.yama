@@ -16,7 +16,7 @@ namespace "System.IO"
          *
          * @param[in] size (Int) The size to reserved
          *
-         * @return (Int) The Adress (If this is null then is failed and not engough space exist)
+         * @return (Int) The Adress of the Object (If this is null then is failed and not engough space exist)
          */
         public static int Malloc ( int size )
         {
@@ -34,22 +34,29 @@ namespace "System.IO"
                 currentBlockState = #defalgo Malloc,GetBlockState: = currentadress;
                 currentBlockSize = #defalgo Malloc,GetBlockSize: = currentadress;
 
-                nextAdress = currentadress + currentBlockSize + #defalgo Malloc,HeaderSize:;
+                nextAdress = #defalgo Malloc,GetNextAdress: = currentadress;
 
-                if (currentBlockState == 2) continue;
+                if (#defalgo Malloc,IsBlockInUse:=currentadress) continue;
 
                 if (size <= currentBlockSize) break;
 
-                if (currentBlockState == 1) return null;
+                if (#defalgo Malloc,IsBlockEnde:=currentadress) return null;
             }
 
+            return MemoryManager.ReservedNewBlock ( currentadress, size, currentBlockState );
+        }
+
+        // -----------------------------------------------
+
+        private static int ReservedNewBlock ( int currentadress, int size, int nextBlockState )
+        {
             MemoryManager.CreateBlock ( currentadress, 0, size );
 
             currentadress = currentadress + #defalgo Malloc,HeaderSize:;
 
             if (currentBlockState == 0) return currentadress;
 
-            nextAdress = currentadress + size;
+            int nextAdress = currentadress + size;
             size = size + #defalgo Malloc,HeaderSize:;
             size = currentBlockSize - size;
 
@@ -74,14 +81,34 @@ namespace "System.IO"
         // -----------------------------------------------
 
         /**
+        * Get the Size of Object instance in Memory
+        *
+        * @param[int] Adress (int) The object adress
+        *
+        * @return (int) Size of the object, without Header
+        */
+        public static int SizeOf ( int adresse )
+        {
+            if (adresse == null) return null;
+
+            adresse = adresse - 3;
+
+            return #defalgo Malloc,GetBlockSize: = adresse;
+        }
+
+        // -----------------------------------------------
+
+        /**
          * Dynamic memory allocate Free
          *
-         * @param[in] Adress (Int) The adress to free the block
+         * @param[in] Adress (Int) The object adress
          *
          * @return (Bool) true is Ok and false is not ok
          */
         public static bool Free ( int addresse )
         {
+            if (addresse == null) return null;
+
             #defalgo MallocFree,default: = addresse;
 
             return MemoryManager.Clean ( addresse );

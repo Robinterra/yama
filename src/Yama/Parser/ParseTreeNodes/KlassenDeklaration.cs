@@ -278,31 +278,43 @@ namespace Yama.Parser
         {
             foreach(IndexMethodDeklaration m in this.Deklaration.StaticMethods)
             {
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
+
                 m.Use.Compile(compiler, mode);
             }
 
             foreach(IndexMethodDeklaration m in this.Deklaration.Operators)
             {
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
+
                 m.Use.Compile(compiler, mode);
             }
 
             foreach(IndexMethodDeklaration m in this.Deklaration.Methods)
             {
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
+
                 m.Use.Compile(compiler, mode);
             }
 
             foreach(IndexPropertyDeklaration m in this.Deklaration.IndexProperties)
             {
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
+
                 m.Use.Compile(compiler, mode);
             }
 
             foreach(IndexMethodDeklaration m in this.Deklaration.Ctors)
             {
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
+
                 m.Use.Compile(compiler, mode);
             }
 
             foreach(IndexMethodDeklaration m in this.Deklaration.DeCtors)
             {
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
+
                 m.Use.Compile(compiler, mode);
             }
 

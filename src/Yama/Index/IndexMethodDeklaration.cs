@@ -108,10 +108,19 @@ namespace Yama.Index
                 if ("==" == this.Name) return "Equal";
                 if ("+" == this.Name) return "Addition";
                 if ("++" == this.Name) return "Incrementation";
-                if ("<" == this.Name) return "KleinAls";
-                if (">" == this.Name) return "GrosserAls";
+                if ("<" == this.Name) return "LessThen";
+                if ("<=" == this.Name) return "LessThenEquals";
+                if (">" == this.Name) return "GreaterThen";
+                if (">=" == this.Name) return "GreaterThenEquals";
                 if ("-" == this.Name) return "Subtraktion";
                 if ("--" == this.Name) return "Decrementation";
+                if ("*" == this.Name) return "Star";
+                if ("/" == this.Name) return "Dvide";
+                if ("&&" == this.Name) return "AndLogicBool";
+                if ("&" == this.Name) return "AndLogicBinary";
+                if ("||" == this.Name) return "OrLogicBool";
+                if ("|" == this.Name) return "OrLogicBinary";
+                if ("^" == this.Name) return "XorLogicBinary";
                 if ("~" == this.Name) return "DeCtor";
 
                 return "UnknownSonderzeichen";
