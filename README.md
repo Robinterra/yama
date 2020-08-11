@@ -4,7 +4,8 @@ This is a Compiler writen in C# for the Language Yama
 
 ## What is the Language Yama ?
 
-It is a object oriented programming Language, which is direct translate in Assembly.
+It is a Object-oriented Language for Microcontroller like ARM Cortex-M and AVR.
+Currently only support AVR Assembler (avrasm and avr-gcc). But i want support ARM Cortex in the next 15 days.
 
 ### Why this new Language, Why dont use C#, Java or C?
 
@@ -20,6 +21,18 @@ It was a memory from Vargard Obyron and is it a memory from Zanndrekh.
 You can read it in the book Severed.
 
 ## Documentation
+
+*comming soon*
+
+## What is comming soon ?
+chronological order
+0. Enums
+1. How to use Yama and Programming your first Project in this programming language - docu
+2. How to add a new Assembly this Language - docu
+3. A new git repository with Yama Sourcecode for use Input Output pins for the Atmega328p (My Test device is a Ardunio Uno)
+4. Support Cortex-M (My Test device is a Arduino Due)
+5. Show in a Blog little projects with yama - my own reason.
+You want support me and you have ideas please send me a email: robin.dandrea@gmail.com / robin.dandrea@versalitic.com
 
 ## Getting Started
 
@@ -42,7 +55,6 @@ dotnet build
 * dotnet build
 
 ## Example
-
 
 ### A Yama Code snippet:
  - The using "System" is for the types: int and bool.
@@ -87,7 +99,6 @@ namespace "Program"
 ```
 
 ### avr-gcc
-This commands will be (future - tomorrow or so) testet on a raspberry pi with arch linux
 ```console
 ./YamaCompile out out.S define atmega328p define avr-gcc def avr inc "./System" "./HelloWorld.yama"
 
