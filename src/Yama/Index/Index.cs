@@ -58,6 +58,11 @@ namespace Yama.Index
             set;
         }
         public List<FileInfo> AllUseFiles { get; set; }
+        public List<IndexEnumDeklaration> RegisterEnums
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
@@ -70,6 +75,7 @@ namespace Yama.Index
             this.Errors = new List<IndexError>();
             this.Namespaces = new Dictionary<string, IndexNamespaceDeklaration>();
             this.ZuCompilenNodes = new List<IParseTreeNode>();
+            this.RegisterEnums = new List<IndexEnumDeklaration>();
         }
 
         private bool Indezieren()
@@ -116,6 +122,8 @@ namespace Yama.Index
             {
                 this.AllUseFiles.AddRange(nameSpace.Value.Files);
 
+                this.RegisterEnums.AddRange(nameSpace.Value.EnumDeklarationen);
+
                 this.Register.AddRange(nameSpace.Value.KlassenDeklarationen);
             }
 
@@ -142,6 +150,11 @@ namespace Yama.Index
 
         private bool Mappen()
         {
+
+            foreach (IndexEnumDeklaration klasse in this.RegisterEnums)
+            {
+                this.RootValidUses.Add(klasse);
+            }
 
             foreach (IndexKlassenDeklaration klasse in this.Register)
             {

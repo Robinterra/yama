@@ -111,10 +111,21 @@ namespace Yama.Parser
             if (mode == "point") moderesult = mode;
             if (mode == "setpoint") moderesult = mode;
             if (this.Reference.Deklaration is IndexMethodDeklaration) moderesult = "methode";
+            if (this.Reference.Deklaration is IndexEnumEntryDeklaration ed) return this.CompileEnumEntry(compiler, ed);
+            if (this.Reference.Deklaration is IndexEnumDeklaration) return true;
 
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
             compileReference.Compile(compiler, this, moderesult);
+
+            return true;
+        }
+
+        private bool CompileEnumEntry(Compiler.Compiler compiler, IndexEnumEntryDeklaration dek)
+        {
+            CompileNumConst constNum = new CompileNumConst();
+
+            constNum.Compile(compiler, new Number { Token = dek.Value });
 
             return true;
         }

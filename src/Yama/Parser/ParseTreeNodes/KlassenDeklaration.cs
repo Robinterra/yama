@@ -148,7 +148,6 @@ namespace Yama.Parser
         private bool CheckHashValidClass ( SyntaxToken token )
         {
             if (token.Kind == SyntaxKind.Class) return true;
-            if (token.Kind == SyntaxKind.Enum) return true;
 
             return false;
         }

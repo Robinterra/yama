@@ -98,12 +98,13 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private ParserLayer KlassenLayer(ParserLayer inclassLayer)
+        private ParserLayer KlassenLayer(ParserLayer inclassLayer, ParserLayer inenumLayer)
         {
             ParserLayer layer = new ParserLayer("class");
 
             layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
             layer.ParserMembers.Add(new KlassenDeklaration ( inclassLayer ));
+            layer.ParserMembers.Add(new EnumDeklaration ( inenumLayer ));
             layer.ParserMembers.Add(new UsingKey (  ));
             layer.ParserMembers.Add(new NormalExpression (  ) );
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
@@ -134,6 +135,19 @@ namespace Yama
             layer.ParserMembers.Add(new MethodeDeclarationNode ( execlayer ));
             layer.ParserMembers.Add(new PropertyDeklaration ( inpropertyLayer ));
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer InEnumLayer()
+        {
+            ParserLayer layer = new ParserLayer("inenum");
+
+            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new EnumartionExpression());
+            layer.ParserMembers.Add(new EnumKeyValue());
 
             return layer;
         }
@@ -194,9 +208,10 @@ namespace Yama
             List<ParserLayer> parserRules = new List<ParserLayer>();
 
             ParserLayer executionlayer = this.ExecutionLayer();
+            ParserLayer inenumlayer = this.InEnumLayer();
             ParserLayer inpropertyLayer = this.InPropertyLayer(executionlayer);
             ParserLayer inclassLayer = this.InKlassenLayer(executionlayer, inpropertyLayer);
-            ParserLayer classLayer = this.KlassenLayer(inclassLayer);
+            ParserLayer classLayer = this.KlassenLayer(inclassLayer, inenumlayer);
             ParserLayer namespaceLayer = this.NamespaceLayer(classLayer);
             parserRules.Add(namespaceLayer);
             parserRules.Add(classLayer);

@@ -26,13 +26,29 @@ You can read it in the book Severed.
 
 ## What is comming soon ?
 chronological order
-1. Enums
+1. Array in System include and Array as Declaration like methode declaration
 2. How to use Yama and Programming your first Project in this programming language - docu
 3. How to add a new Assembly this Language - docu
 4. A new git repository with Yama Sourcecode for use Input Output pins for the Atmega328p (My Test device is a Ardunio Uno)
 5. Support Cortex-M (My Test device is a Arduino Due)
 6. Show in a Blog little projects with yama - my own reason.
  * You want support me or you have ideas then please send me a email: robin.dandrea@gmail.com / robin.dandrea@versalitic.com
+
+## What can current use?
+ - static and non static Methods
+ - Enums
+ - Properties (no static Properties aviable)
+ - Classes and Object instances
+ - Delegate Methods (not tested)
+ - Namespaces and usings
+ - Conditional Compilation
+  1. region and endregion
+  2. `#defalgo <name>,<mode>:` read from a json file a assembly algo and replace it with des assemlby commands
+ - keyword they work = if, else, while, for, continue, break, return, this, base, true, false, null, class, enum, static, namespace, using
+ - Simple Inheritance (base, this, override methods from the base class).
+  1. Possible is this case: `class A` `class B : A` `class C : A` `class D : B`
+  2. Not Possible is this case: `class A` `class B` `class C : A, B`
+  3. Not Possible is this case: `class A : B` `class B : A`
 
 ## Getting Started
 

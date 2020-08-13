@@ -105,6 +105,18 @@ namespace Yama.Index
                 return true;
             }
 
+            if (parentCall.Deklaration is IndexEnumDeklaration ed)
+            {
+                IParent dek = this.GetEnumFound(ed);
+
+                if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found");
+                this.Deklaration = dek;
+
+                if (this.ParentCall != null) this.ParentCall.Mappen(this);
+
+                return true;
+            }
+
             if (parentCall.Deklaration is IndexPropertyDeklaration pd)
             {
                 IParent dek = null;
@@ -173,6 +185,16 @@ namespace Yama.Index
             return null;
         }
 
+        private IParent GetEnumFound(IndexEnumDeklaration kd)
+        {
+            if (kd == null) return null;
+
+            IndexEnumEntryDeklaration md = kd.Entries.FirstOrDefault(t=>t.Name == this.Name);
+            if (md != null) { md.References.Add(this); return md; }
+
+            return null;
+        }
+
         public bool Mappen(ValidUses uses)
         {
             this.ParentUsesSet = uses;
@@ -187,6 +209,8 @@ namespace Yama.Index
             if (this.Deklaration is IndexMethodDeklaration md) { md.References.Add(this); return true; }
             if (this.Deklaration is IndexPropertyDeklaration pd) { pd.References.Add(this); return true; }
             if (this.Deklaration is IndexVariabelnDeklaration vd) { vd.References.Add(this); return true; }
+            if (this.Deklaration is IndexEnumDeklaration ed) { ed.References.Add(this); return true; }
+            if (this.Deklaration is IndexEnumEntryDeklaration eed) { eed.References.Add(this); return true; }
 
             return uses.GetIndex.CreateError(this.Use, "no support type definition");
         }

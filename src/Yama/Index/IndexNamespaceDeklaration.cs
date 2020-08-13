@@ -42,6 +42,12 @@ namespace Yama.Index
             set;
         }
 
+        public List<IndexEnumDeklaration> EnumDeklarationen
+        {
+            get;
+            set;
+        }
+
         private ValidUses thisUses;
 
         public ValidUses ThisUses
@@ -51,23 +57,6 @@ namespace Yama.Index
                 if (this.thisUses != null) return this.thisUses;
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
-
-                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration();
-                dekThisVar.Name = "this";
-                dekThisVar.Type = new IndexVariabelnReference { Deklaration = this, Name = this.Name, Use = this.Use };
-                dekThisVar.Use = this.Use;
-                dekThisVar.ParentUsesSet = this.thisUses;
-
-                //this.References.Add(dekThisVar.Type);
-
-                /*List<IParent> parents = new List<IParent>();
-                parents.AddRange(this.Methods.OfType<IParent>());
-                parents.AddRange(this.Operators.OfType<IParent>());
-                parents.AddRange(this.Ctors.OfType<IParent>());
-                parents.AddRange(this.DeCtors.OfType<IParent>());
-                parents.AddRange(this.IndexProperties.OfType<IParent>());*/
-
-                this.thisUses.Deklarationen = new List<IParent> { dekThisVar };
 
                 return this.thisUses;
             }
@@ -92,6 +81,7 @@ namespace Yama.Index
             this.KlassenDeklarationen = new List<IndexKlassenDeklaration>();
             this.Usings = new List<IndexNamespaceReference>();
             this.Files = new List<FileInfo>();
+            this.EnumDeklarationen = new List<IndexEnumDeklaration>();
         }
 
         private bool PreviusMappen()
