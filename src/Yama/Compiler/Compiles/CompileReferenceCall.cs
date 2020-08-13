@@ -38,10 +38,21 @@ namespace Yama.Compiler
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
-            query.Kategorie = mode;
+
+            string printmode = mode;
+            if ("vektorcall" == mode || mode == "setvektorcall") printmode = "methode";
+
+            query.Kategorie = printmode;
             query.Uses = node.ThisUses;
 
-            object queryValue = (object)node.AssemblyName;
+            string assemblyName = node.AssemblyName;
+            if (node.Deklaration is IndexVaktorDeklaration dek)
+            {
+                if ("vektorcall" == mode) assemblyName = dek.AssemblyNameGetMethode;
+                if (mode == "setvektorcall") assemblyName = dek.AssemblyNameSetMethode;
+            }
+
+            object queryValue = assemblyName;
             if ("[REG]" == key.Name) queryValue = 1;
             if ("[PROPERTY]" == key.Name) queryValue = node.Deklaration;
             //if ("setpoint" == mode) queryValue = node.Deklaration;
@@ -101,7 +112,10 @@ namespace Yama.Compiler
         {
             compiler.AssemblerSequence.Add(this);
 
-            this.Algo = compiler.GetAlgo(this.AlgoName, mode);
+            string printmode = mode;
+            if ("vektorcall" == mode || mode == "setvektorcall") printmode = "methode";
+
+            this.Algo = compiler.GetAlgo(this.AlgoName, printmode);
             if (this.Algo == null) return false;
 
             this.PrimaryKeys = new Dictionary<string, string>();

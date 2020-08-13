@@ -11,7 +11,7 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/YamaCompiler.exe",
-            "args": [ "define", "atmega328p", "define", "avrasm", "out", "out.S", "def", "avr", "inc", "${workspaceFolder}/bin/Debug/netcoreapp3.1/System", "${workspaceFolder}/bin/Debug/netcoreapp3.1/HalloWorld.yama" ],
+            "args": [ "define", "atmega328p", "define", "avrasm", "out", "out.S", "def", "avr", "inc", "${workspaceFolder}/bin/Debug/netcoreapp3.1/System", "${workspaceFolder}/bin/Debug/netcoreapp3.1/iftest.yama" ],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",

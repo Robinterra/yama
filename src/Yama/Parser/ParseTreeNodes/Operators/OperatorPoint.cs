@@ -134,6 +134,14 @@ namespace Yama.Parser
                         this.CompileNonStaticCall(compiler, "default", dek);
             }
 
+            if (mode == "vektorcall" || mode == "setvektorcall")
+            {
+                moderesult = mode;
+                if (this.RightNode is ReferenceCall rc)
+                    if (rc.Reference.Deklaration is IndexVaktorDeklaration dek)
+                        this.CompileNonStaticCall(compiler, "default", dek);
+            }
+
             this.RightNode.Compile(compiler, moderesult);
 
             return true;
@@ -154,6 +162,15 @@ namespace Yama.Parser
             if (!isok) isok = methdek.Type == MethodeType.Property;
             if (!isok) return false;
 
+            CompileMovResult movResultRight = new CompileMovResult();
+
+            movResultRight.Compile(compiler, null, mode);
+
+            return true;
+        }
+
+        private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexVaktorDeklaration methdek)
+        {
             CompileMovResult movResultRight = new CompileMovResult();
 
             movResultRight.Compile(compiler, null, mode);

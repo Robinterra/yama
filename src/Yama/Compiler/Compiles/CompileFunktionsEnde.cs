@@ -29,9 +29,34 @@ namespace Yama.Compiler
             set;
         }
 
+        
+        public VektorDeclaration GetNode { get; private set; }
+        public VektorDeclaration SetNode { get; private set; }
+
         #endregion get/set
 
         #region methods
+
+        private DefaultRegisterQuery BuildQuery(VektorDeclaration node, AlgoKeyCall key, string mode)
+        {
+            DefaultRegisterQuery query = new DefaultRegisterQuery();
+            query.Key = key;
+            query.Kategorie = "default";
+
+            if (mode == "set")
+            {
+                query.Uses = node.Deklaration.SetUses;
+                query.Value = (object)node.Deklaration.AssemblyNameSetMethode;
+            }
+
+            if (mode == "get")
+            {
+                query.Uses = node.Deklaration.GetUses;
+                query.Value = (object)node.Deklaration.AssemblyNameGetMethode;
+            }
+
+            return query;
+        }
 
         private DefaultRegisterQuery BuildQuery(MethodeDeclarationNode node, AlgoKeyCall key, string mode)
         {
@@ -70,16 +95,53 @@ namespace Yama.Compiler
             return true;
         }
 
+        public bool Compile(Compiler compiler, VektorDeclaration node, string mode = "default")
+        {
+            compiler.AssemblerSequence.Add(this);
+
+            if (mode == "set") this.SetNode = node;
+            if (mode == "get") this.GetNode = node;
+            this.Algo = compiler.GetAlgo(this.AlgoName, "default");
+            if (this.Algo == null)  return false;
+
+            this.PrimaryKeys = new Dictionary<string, string>();
+
+            foreach (AlgoKeyCall key in this.Algo.Keys)
+            {
+                DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
+
+                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+
+                foreach (KeyValuePair<string, string> pair in result)
+                {
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
+                }
+            }
+
+            return true;
+        }
+
         public bool InFileCompilen(Compiler compiler)
         {
             Dictionary<string, string> postreplaces = new Dictionary<string, string>();
+
+            int varcount = 0;
+            if (this.Node != null) varcount = this.Node.VariabelCounter;
+            if (this.SetNode != null) varcount = this.SetNode.SetVariabelCounter;
+            if (this.GetNode != null) varcount = this.GetNode.GetVariabelCounter;
+
+            List<string> registerInUse = null;
+            if (this.Node != null) registerInUse = this.Node.RegisterInUse;
+            if (this.SetNode != null) registerInUse = this.SetNode.SetRegisterInUse;
+            if (this.GetNode != null) registerInUse = this.GetNode.GetRegisterInUse;
 
             foreach (AlgoKeyCall key in this.Algo.PostKeys)
             {
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
-                query.Value = this.Node.RegisterInUse;
-                if (key.Name == "[VARCOUNT]") query.Value = this.Node.VariabelCounter;
+                query.Value = registerInUse;
+                if (key.Name == "[VARCOUNT]") query.Value = varcount;
 
                 string value = compiler.Definition.PostKeyReplace(query);
 

@@ -1,6 +1,9 @@
 using System.Collections.Generic;
-using Yama.Index;
 using Yama.Lexer;
+using Yama.Index;
+using Yama.Compiler;
+using System;
+using System.Linq;
 
 namespace Yama.Parser
 {
@@ -20,6 +23,12 @@ namespace Yama.Parser
             get;
             set;
         }
+
+        public CompileExecuteCall FunctionExecute
+        {
+            get;
+            set;
+        } = new CompileExecuteCall();
 
         public List<IParseTreeNode> ParametersNodes
         {
@@ -92,12 +101,6 @@ namespace Yama.Parser
         {
             if ( token.Kind != this.BeginZeichen ) return null;
 
-            MethodeCallNode node = new MethodeCallNode ( this.Prio );
-
-            SyntaxToken steuerToken = parser.FindEndToken ( token, this.EndeZeichen, this.BeginZeichen );
-
-            if ( steuerToken == null ) return null;
-
             SyntaxToken left = parser.Peek ( token, -1 );
 
             if ( left.Kind == SyntaxKind.Operator ) return null;
@@ -108,12 +111,20 @@ namespace Yama.Parser
             if ( left.Kind == SyntaxKind.EndOfCommand ) return null;
             if ( left.Kind == SyntaxKind.Comma ) return null;
 
+            SyntaxToken steuerToken = parser.FindEndToken ( token, this.EndeZeichen, this.BeginZeichen );
+
+            if ( steuerToken == null ) return null;
+
+            VektorCall node = new VektorCall ( this.Prio );
+
             node.LeftNode = parser.ParseCleanToken ( left );
 
             node.ParametersNodes = parser.ParseCleanTokens ( token.Position + 1, steuerToken.Position, true );
 
             node.Token = token;
             token.Node = node;
+
+            if (node.LeftNode == null) return null;
 
             node.LeftNode.Token.ParentNode = node;
             node.Ende = steuerToken;
@@ -138,11 +149,59 @@ namespace Yama.Parser
                 node.Indezieren(index, container);
             }
 
+            this.LeftNode.Indezieren(index, parent);
+
             return true;
         }
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            List<IParseTreeNode> copylist = this.ParametersNodes.ToArray().ToList();
+            copylist.Reverse();
+            IParseTreeNode dek = null;
+
+            int parasCount = 0;
+
+            if (mode == "set")
+            {
+                CompileMovResult movResultRight = new CompileMovResult();
+
+                movResultRight.Compile(compiler, null, "default");
+
+                parasCount++;
+            }
+
+            foreach (IParseTreeNode par in copylist )
+            {
+                dek = par;
+                if (par is EnumartionExpression b) dek = b.ExpressionParent;
+                if (dek == null) continue;
+
+                dek.Compile(compiler, "default");
+
+                CompileMovResult movResultRight = new CompileMovResult();
+
+                movResultRight.Compile(compiler, null, "default");
+
+                parasCount++;
+            }
+
+            string modeCall = "vektorcall";
+            if (mode == "set") modeCall = "setvektorcall";
+            this.LeftNode.Compile(compiler, modeCall);
+            if (!(this.LeftNode is OperatorPoint op)) return false;
+
+            parasCount++;
+
+            for (int i = 0; i < parasCount; i++)
+            {
+                CompileUsePara usePara = new CompileUsePara();
+
+                usePara.Compile(compiler, null);
+            }
+
+            this.FunctionExecute.Compile(compiler, null, "default");
+
             return true;
         }
 
