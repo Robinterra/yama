@@ -177,7 +177,7 @@ namespace Yama
             layer.ParserMembers.Add ( new TrueFalseKey ( 1 ) );
             layer.ParserMembers.Add ( new VariabelDeklaration ( 11 ) );
             layer.ParserMembers.Add ( new ReferenceCall ( 1 ) );
-            layer.ParserMembers.Add ( new VektorCall ( SyntaxKind.OpenSquareBracket, SyntaxKind.CloseSquareBracket, 1 ) );
+            //layer.ParserMembers.Add ( new VektorCall ( SyntaxKind.OpenSquareBracket, SyntaxKind.CloseSquareBracket, 1 ) );
             layer.ParserMembers.Add ( new Number ( 1 ) );
             layer.ParserMembers.Add ( new TextParser ( 1 ) );
             layer.ParserMembers.Add ( new OperatorPoint ( 11 ) );
