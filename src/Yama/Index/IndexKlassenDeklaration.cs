@@ -127,6 +127,7 @@ namespace Yama.Index
             set;
         }
         public IndexVariabelnDeklaration BaseVar { get; private set; }
+        public List<IndexVaktorDeklaration> VektorDeclaration { get; set; }
 
         #endregion get/set
 
@@ -141,6 +142,7 @@ namespace Yama.Index
             this.Operators = new List<IndexMethodDeklaration>();
             this.IndexProperties = new List<IndexPropertyDeklaration>();
             this.StaticMethods = new List<IndexMethodDeklaration>();
+            this.VektorDeclaration = new List<IndexVaktorDeklaration>();
         }
 
         #endregion ctor
@@ -161,6 +163,7 @@ namespace Yama.Index
             this.Operators.AddRange(dek.Operators.Where(t=>!this.Operators.Any(q=>q.Name == t.Name)));
             this.Ctors.AddRange(dek.Ctors.Where(t=>this.Ctors.Count == 0));
             this.DeCtors.AddRange(dek.DeCtors.Where(t=>this.DeCtors.Count == 0));
+            this.VektorDeclaration.AddRange(dek.VektorDeclaration.Where(t=>!this.Methods.Any(q=>q.Name == t.Name)));
 
             List<IndexPropertyDeklaration> deks = dek.IndexProperties.Where(t=>true).ToList();
 
@@ -178,8 +181,23 @@ namespace Yama.Index
             this.PreviusMethodeMappen(this.Operators, this.ParentUsesSet);
             this.PreviusMethodeMappen(this.Ctors, this.ThisUses);
             this.PreviusMethodeMappen(this.DeCtors, this.ThisUses);
+            this.PreviusVectorMappen(this.VektorDeclaration, this.ThisUses);
 
             this.PreviusPropertyMappen(this.IndexProperties, this.ThisUses);
+
+            return true;
+        }
+
+        private bool PreviusVectorMappen(List<IndexVaktorDeklaration> vektorDeclaration, ValidUses thisUses)
+        {
+            foreach (IndexVaktorDeklaration deklaration in vektorDeclaration)
+            {
+                if (deklaration.IsMapped) continue;
+
+                deklaration.Klasse = this;
+
+                deklaration.PreMappen(thisUses);
+            }
 
             return true;
         }
@@ -199,10 +217,25 @@ namespace Yama.Index
             this.MethodeMappen(this.Operators, this.ParentUsesSet);
             this.MethodeMappen(this.Ctors, this.ThisUses);
             this.MethodeMappen(this.DeCtors, this.ThisUses);
+            this.VektorMappen(this.VektorDeclaration, this.ThisUses);
 
             this.PropertyMappen(this.IndexProperties, this.ThisUses);
 
             return this.IsMapped = true;
+        }
+
+        private bool VektorMappen(List<IndexVaktorDeklaration> vektorDeclaration, ValidUses thisUses)
+        {
+            foreach (IndexVaktorDeklaration deklaration in vektorDeclaration)
+            {
+                if (deklaration.IsMapped) continue;
+
+                deklaration.Klasse = this;
+
+                deklaration.Mappen();
+            }
+
+            return true;
         }
 
         private bool PropertyMappen(List<IndexPropertyDeklaration> indexProperties, ValidUses thisUses)

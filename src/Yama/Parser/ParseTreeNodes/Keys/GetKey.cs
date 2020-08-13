@@ -83,8 +83,20 @@ namespace Yama.Parser
             return key;
         }
 
+        private bool IndezierenVektor(Index.Index index, IndexVaktorDeklaration parent)
+        {
+            IndexContainer container = new IndexContainer();
+
+            parent.GetContainer = container;
+
+            this.Statement.Indezieren(index, container);
+
+            return true;
+        }
+
         public bool Indezieren(Index.Index index, IParent parent)
         {
+            if (parent is IndexVaktorDeklaration vekdek) return this.IndezierenVektor(index, vekdek);
             if (!(parent is IndexPropertyDeklaration propertyDeklaration)) return index.CreateError(this);
             if (this.Statement == null) return index.CreateError(this);
 
@@ -99,6 +111,8 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            this.Statement.Compile(compiler, mode);
+
             return true;
         }
 

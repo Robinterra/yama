@@ -6,7 +6,7 @@ using Yama.Parser;
 
 namespace Yama.Index
 {
-    public class IndexMethodDeklaration : IParent
+    public class IndexVaktorDeklaration : IParent
     {
 
         public IParseTreeNode Use
@@ -57,15 +57,30 @@ namespace Yama.Index
             set;
         }
 
-        public IndexContainer Container
+        public IndexContainer SetContainer
+        {
+            get;
+            set;
+        }
+
+        public IndexContainer GetContainer
         {
             get;
             set;
         }
 
         private ValidUses thisUses;
+        private ValidUses getUses;
 
         public ValidUses ThisUses
+        {
+            get
+            {
+                return this.SetUses;
+            }
+        }
+
+        public ValidUses SetUses
         {
             get
             {
@@ -73,7 +88,31 @@ namespace Yama.Index
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
 
+                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration();
+                dekThisVar.Name = "invalue";
+                dekThisVar.Type = new IndexVariabelnReference { Deklaration = this.ReturnValue.Deklaration, Name = this.ReturnValue.Deklaration.Name, Use = this.Use };
+                dekThisVar.Use = this.Use;
+                dekThisVar.SetUsesSet = this.thisUses;
+
+                this.References.Add(dekThisVar.Type);
+
+                List<IParent> dekList = new List<IParent> { dekThisVar };
+
+                this.thisUses.Deklarationen = dekList;
+
                 return this.thisUses;
+            }
+        }
+
+        public ValidUses GetUses
+        {
+            get
+            {
+                if (this.getUses != null) return this.getUses;
+
+                this.getUses = new ValidUses(this.ParentUsesSet);
+
+                return this.getUses;
             }
         }
 
@@ -82,13 +121,21 @@ namespace Yama.Index
             get;
             set;
         }
-        public string AssemblyName
+        public string AssemblyNameGetMethode
         {
             get
             {
-                if (this.NameInText == "main") return "main";
+                string pattern = "{0}_{1}_{2}_Get";
 
-                string pattern = "{0}_{1}_{2}";
+                return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count);
+            }
+        }
+
+        public string AssemblyNameSetMethode
+        {
+            get
+            {
+                string pattern = "{0}_{1}_{2}_Set";
 
                 return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count);
             }
@@ -98,35 +145,17 @@ namespace Yama.Index
         {
             get
             {
-                if (this.Use.Token.Kind != SyntaxKind.Operator) return this.Name;
-
-
-                if ("!" == this.Name) return "Achtung";
-                if ("==" == this.Name) return "Equal";
-                if ("+" == this.Name) return "Addition";
-                if ("++" == this.Name) return "Incrementation";
-                if ("<" == this.Name) return "LessThen";
-                if ("<=" == this.Name) return "LessThenEquals";
-                if (">" == this.Name) return "GreaterThen";
-                if (">=" == this.Name) return "GreaterThenEquals";
-                if ("-" == this.Name) return "Subtraktion";
-                if ("--" == this.Name) return "Decrementation";
-                if ("*" == this.Name) return "Star";
-                if ("/" == this.Name) return "Dvide";
-                if ("&&" == this.Name) return "AndLogicBool";
-                if ("&" == this.Name) return "AndLogicBinary";
-                if ("||" == this.Name) return "OrLogicBool";
-                if ("|" == this.Name) return "OrLogicBinary";
-                if ("^" == this.Name) return "XorLogicBinary";
-                if ("~" == this.Name) return "DeCtor";
-
-                return "UnknownSonderzeichen";
+                return this.Name;
             }
         }
 
-        public bool IsMapped { get; private set; }
+        public bool IsMapped
+        {
+            get;
+            private set;
+        }
 
-        public IndexMethodDeklaration (  )
+        public IndexVaktorDeklaration (  )
         {
             this.References = new List<IndexVariabelnReference>();
             this.Parameters = new List<IndexVariabelnDeklaration>();
@@ -136,7 +165,8 @@ namespace Yama.Index
         {
             if (this.IsMapped) return false;
 
-            this.Container.Mappen(this.ThisUses);
+            this.SetContainer.Mappen(this.SetUses);
+            this.GetContainer.Mappen(this.GetUses);
 
             return this.IsMapped = true;
         }
@@ -147,29 +177,18 @@ namespace Yama.Index
 
             this.ParentUsesSet = uses;
 
+            this.ReturnValue.Mappen(this.ParentUsesSet);
+
             foreach (IndexVariabelnDeklaration dek in this.Parameters)
             {
-                dek.Mappen(this.ThisUses);
-                //this.ThisUses.Add(dek);
-            }
+                dek.Mappen(this.SetUses);
 
-            this.ReturnValue.Mappen(this.ThisUses);
+                if (dek.Name == "invalue") continue;
+
+                dek.Mappen(this.GetUses);
+            }
 
             return true;
         }
-    }
-
-    public enum MethodeType
-    {
-        Ctor,
-        Operator,
-        DeCtor,
-        Methode,
-        Static,
-        Explicit,
-        Implicit,
-        Property,
-        PropertyStatic,
-        VektorMethode
     }
 }

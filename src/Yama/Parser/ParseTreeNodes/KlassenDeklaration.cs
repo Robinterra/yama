@@ -317,6 +317,13 @@ namespace Yama.Parser
                 m.Use.Compile(compiler, mode);
             }
 
+            foreach(IndexVaktorDeklaration m in this.Deklaration.VektorDeclaration)
+            {
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
+
+                m.Use.Compile(compiler, mode);
+            }
+
             return true;
         }
 

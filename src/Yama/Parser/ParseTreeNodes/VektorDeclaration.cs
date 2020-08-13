@@ -13,7 +13,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexMethodDeklaration Deklaration
+        public IndexVaktorDeklaration Deklaration
         {
             get;
             set;
@@ -103,7 +103,13 @@ namespace Yama.Parser
             get;
         }
 
-        public List<string> RegisterInUse
+        public List<string> SetRegisterInUse
+        {
+            get;
+            set;
+        } = new List<string>();
+
+        public List<string> GetRegisterInUse
         {
             get;
             set;
@@ -120,6 +126,8 @@ namespace Yama.Parser
             get;
             set;
         }
+        public int GetVariabelCounter { get; private set; }
+        public int SetVariabelCounter { get; private set; }
 
         #endregion get/set
 
@@ -188,6 +196,8 @@ namespace Yama.Parser
 
             deklaration.TypeDefinition = token;
 
+            token = parser.Peek ( token, 1 );
+
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
@@ -220,6 +230,8 @@ namespace Yama.Parser
             if (!(container is Container ab)) return null;
             if (container.GetAllChilds.Count != 2) return null;
 
+            container.Token.Node = deklaration;
+
             deklaration.GetStatement = container.GetAllChilds[0];
             deklaration.SetStatement = container.GetAllChilds[1];
 
@@ -244,11 +256,6 @@ namespace Yama.Parser
                 deklaration.AccessDefinition.Node = deklaration;
                 deklaration.AccessDefinition.ParentNode = deklaration;
             }
-            if (deklaration.ZusatzDefinition != null)
-            {
-                deklaration.ZusatzDefinition.Node = deklaration;
-                deklaration.ZusatzDefinition.ParentNode = deklaration;
-            }
 
             deklaration.TypeDefinition.Node = deklaration;
             deklaration.Token.Node = deklaration;
@@ -267,11 +274,56 @@ namespace Yama.Parser
         {
             if (!(parent is IndexKlassenDeklaration klasse)) return index.CreateError(this);
 
+            IndexVaktorDeklaration deklaration = new IndexVaktorDeklaration();
+            deklaration.Use = this;
+            deklaration.Name = this.Token.Text;
+            deklaration.ReturnValue = this.GetReturnValueIndex(klasse);
+            this.Deklaration = deklaration;
+
+            AccessModify access = AccessModify.Private;
+            if (this.AccessDefinition != null) if (this.AccessDefinition.Kind == SyntaxKind.Public) access = AccessModify.Public;
+            deklaration.AccessModify = access;
+
+            deklaration.Type = this.GetMethodeType();
+
+            this.GetStatement.Indezieren(index, deklaration);
+            this.SetStatement.Indezieren(index, deklaration);
+
+            VariabelDeklaration dek = null;
+
+            this.IndezierenNonStaticDek(deklaration);
+
+            foreach (IParseTreeNode par in this.Parameters)
+            {
+                if (par is VariabelDeklaration t) dek = t;
+                if (par is EnumartionExpression b)
+                {
+                    if (b.ExpressionParent == null) continue;
+                    dek = (VariabelDeklaration)b.ExpressionParent;
+                }
+
+                if (dek == null) { index.CreateError(this, "A Index error by the parameters of this method"); continue; }
+
+                if (!dek.Indezieren(index, deklaration.SetContainer)) continue;
+
+                deklaration.Parameters.Add(dek.Deklaration);
+
+                if (dek.Token.Text == "invalue") continue;
+                if (!dek.Indezieren(index, deklaration.GetContainer)) continue;
+            }
+
+            IndexVariabelnDeklaration invaluesdek = new IndexVariabelnDeklaration();
+            invaluesdek.Name = "invalue";
+            deklaration.Parameters.Add(invaluesdek);
+
+            this.AddMethode(klasse, deklaration);
+
             return true;
         }
 
-        private bool IndezierenNonStaticDek(IndexMethodDeklaration deklaration)
+        private bool IndezierenNonStaticDek(IndexVaktorDeklaration deklaration)
         {
+
             IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration();
             thisdek.Name = "this";
             deklaration.Parameters.Add(thisdek);
@@ -284,15 +336,108 @@ namespace Yama.Parser
             return new IndexVariabelnReference { Name = this.TypeDefinition.Text, Use = this };
         }
 
-        private bool AddMethode(IndexKlassenDeklaration klasse, IndexMethodDeklaration deklaration)
+        private bool AddMethode(IndexKlassenDeklaration klasse, IndexVaktorDeklaration deklaration)
         {
-            // @todo add variabeldek methode to index klasse
+            klasse.VektorDeclaration.Add(deklaration);
 
             return true;
         }
 
+        public bool CompileSetMethode(Compiler.Compiler compiler, string mode = "default")
+        {
+            compiler.Definition.BeginNewMethode(this.SetRegisterInUse);
+
+            CompileContainer compileContainer = new CompileContainer();
+
+            compileContainer.Begin = new CompileSprungPunkt();
+            compileContainer.Ende = new CompileSprungPunkt();
+            compiler.SetNewContainer(compileContainer);
+
+            CompileFunktionsDeklaration dek = new CompileFunktionsDeklaration();
+
+            dek.Compile(compiler, this, "set");
+
+            return this.CompileNormalFunktionSet(compiler, compileContainer);
+        }
+
+        public bool CompileGetMethode(Compiler.Compiler compiler, string mode = "default")
+        {
+            compiler.Definition.BeginNewMethode(this.GetRegisterInUse);
+
+            CompileContainer compileContainer = new CompileContainer();
+
+            compileContainer.Begin = new CompileSprungPunkt();
+            compileContainer.Ende = new CompileSprungPunkt();
+            compiler.SetNewContainer(compileContainer);
+
+            CompileFunktionsDeklaration dek = new CompileFunktionsDeklaration();
+
+            dek.Compile(compiler, this, "get");
+
+            return this.CompileNormalFunktionGet(compiler, compileContainer);
+        }
+
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+
+            this.CompileGetMethode(compiler, mode);
+
+            this.CompileSetMethode(compiler, mode);
+
+            return true;
+        }
+
+        private bool CompileNormalFunktionSet(Compiler.Compiler compiler, CompileContainer compileContainer)
+        {
+            foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
+            {
+                CompileUsePara usePara = new CompileUsePara();
+
+                usePara.CompileIndexNode(compiler, node, "get");
+            }
+
+            compiler.Definition.ParaClean();
+
+            compileContainer.Begin.Compile(compiler, this, "default");
+
+            this.GetStatement.Compile(compiler, "default");
+
+            compileContainer.Ende.Compile(compiler, this, "default");
+
+            CompileFunktionsEnde ende = new CompileFunktionsEnde();
+
+            ende.Compile(compiler, this, "set");
+
+            this.SetVariabelCounter = compiler.Definition.VariabelCounter;
+
+            return true;
+        }
+
+        private bool CompileNormalFunktionGet(Compiler.Compiler compiler, CompileContainer compileContainer)
+        {
+            foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
+            {
+                if (node.Name == "invalue") continue;
+
+                CompileUsePara usePara = new CompileUsePara();
+
+                usePara.CompileIndexNode(compiler, node, "get");
+            }
+
+            compiler.Definition.ParaClean();
+
+            compileContainer.Begin.Compile(compiler, this, "default");
+
+            this.GetStatement.Compile(compiler, "default");
+
+            compileContainer.Ende.Compile(compiler, this, "default");
+
+            CompileFunktionsEnde ende = new CompileFunktionsEnde();
+
+            ende.Compile(compiler, this, "get");
+
+            this.GetVariabelCounter = compiler.Definition.VariabelCounter;
+
             return true;
         }
 

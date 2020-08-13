@@ -127,12 +127,29 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private ParserLayer InKlassenLayer(ParserLayer execlayer, ParserLayer inpropertyLayer)
+        
+        private ParserLayer InVektorLayer(ParserLayer execlayer)
+        {
+            ParserLayer layer = new ParserLayer("invektor");
+
+            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new GetKey(execlayer));
+            layer.ParserMembers.Add(new SetKey(execlayer));
+            layer.ParserMembers.Add(new EnumartionExpression());
+            layer.ParserMembers.Add(new VariabelDeklaration(11));
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer InKlassenLayer(ParserLayer execlayer, ParserLayer inpropertyLayer, ParserLayer invektorlayer)
         {
             ParserLayer layer = new ParserLayer("inclass");
 
             layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
             layer.ParserMembers.Add(new MethodeDeclarationNode ( execlayer ));
+            layer.ParserMembers.Add ( new VektorDeclaration ( invektorlayer ) );
             layer.ParserMembers.Add(new PropertyDeklaration ( inpropertyLayer ));
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
 
@@ -170,6 +187,7 @@ namespace Yama
             layer.ParserMembers.Add ( new BreakKey (  ) );
             layer.ParserMembers.Add ( new ExplicitConverting ( 10 ) );
             layer.ParserMembers.Add ( new MethodeCallNode ( SyntaxKind.OpenBracket, SyntaxKind.CloseBracket, 12 ) );
+            layer.ParserMembers.Add ( new VektorCall ( SyntaxKind.OpenSquareBracket, SyntaxKind.CloseSquareBracket, 12 ) );
             layer.ParserMembers.Add ( new ContainerExpression ( 11 ) );
             layer.ParserMembers.Add ( new NormalExpression (  ) );
             layer.ParserMembers.Add ( new EnumartionExpression (  ) );
@@ -177,7 +195,6 @@ namespace Yama
             layer.ParserMembers.Add ( new TrueFalseKey ( 1 ) );
             layer.ParserMembers.Add ( new VariabelDeklaration ( 11 ) );
             layer.ParserMembers.Add ( new ReferenceCall ( 1 ) );
-            //layer.ParserMembers.Add ( new VektorCall ( SyntaxKind.OpenSquareBracket, SyntaxKind.CloseSquareBracket, 1 ) );
             layer.ParserMembers.Add ( new Number ( 1 ) );
             layer.ParserMembers.Add ( new TextParser ( 1 ) );
             layer.ParserMembers.Add ( new OperatorPoint ( 11 ) );
@@ -210,7 +227,8 @@ namespace Yama
             ParserLayer executionlayer = this.ExecutionLayer();
             ParserLayer inenumlayer = this.InEnumLayer();
             ParserLayer inpropertyLayer = this.InPropertyLayer(executionlayer);
-            ParserLayer inclassLayer = this.InKlassenLayer(executionlayer, inpropertyLayer);
+            ParserLayer invektorlayer = this.InVektorLayer(executionlayer);
+            ParserLayer inclassLayer = this.InKlassenLayer(executionlayer, inpropertyLayer, invektorlayer);
             ParserLayer classLayer = this.KlassenLayer(inclassLayer, inenumlayer);
             ParserLayer namespaceLayer = this.NamespaceLayer(classLayer);
             parserRules.Add(namespaceLayer);
@@ -218,6 +236,8 @@ namespace Yama
             parserRules.Add(inclassLayer);
             parserRules.Add(inpropertyLayer);
             parserRules.Add(executionlayer);
+            parserRules.Add(invektorlayer);
+            parserRules.Add(inenumlayer);
 
             return parserRules;
         }

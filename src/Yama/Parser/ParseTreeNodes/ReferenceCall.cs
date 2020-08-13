@@ -113,6 +113,7 @@ namespace Yama.Parser
             if (this.Reference.Deklaration is IndexMethodDeklaration) moderesult = "methode";
             if (this.Reference.Deklaration is IndexEnumEntryDeklaration ed) return this.CompileEnumEntry(compiler, ed);
             if (this.Reference.Deklaration is IndexEnumDeklaration) return true;
+            if (this.Reference.Deklaration is IndexVaktorDeklaration) moderesult = mode;
 
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
