@@ -54,6 +54,12 @@ chronological order
 
 dotnet build
 
+### Install
+I use a link to YamaCompiler and use it
+```
+sudo ln -s /mnt/c/pro/learncs/bin/Release/netcoreapp3.1/YamaCompiler /usr/bin/yama
+```
+
 ### Prerequisites
 
 * dotnet
@@ -62,7 +68,6 @@ dotnet build
 ## Running the tests
 
 *placeholder*
-
 
 ## Built With
 
@@ -114,11 +119,11 @@ namespace "Program"
 
 ### avr-gcc
 ```console
-./YamaCompile out out.S define atmega328p define avr-gcc def avr inc "./System" "./HelloWorld.yama"
+./YamaCompile out "./bin/out.S" define atmega328p define avr-gcc def avr inc "./src"
 
-avr-gcc -nostartfiles -mmcu=atmega328p -o out.elf ./out.S
+avr-gcc -nostartfiles -mmcu=atmega328p -o ./bin/out.elf ./bin/out.S
 
-avr-objcopy -j .text -j .data -O ihex out.elf out.hex
+avr-objcopy -j .text -j .data -O ihex ./bin/out.elf ./bin/out.hex
 
 avrdude -F -e -v -p m328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:"out.hex":i
 ```

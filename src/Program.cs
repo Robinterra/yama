@@ -71,6 +71,9 @@ namespace Yama
                 if (command is StartNamespace) yama.StartNamespace = command.Value;
             }
 
+            DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
+            if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary.FullName );
+
             return yama.Compile();
         }
 
