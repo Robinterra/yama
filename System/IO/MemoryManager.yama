@@ -121,7 +121,7 @@ namespace "System.IO"
 
         private static bool CleanMerge2Blocks ( int addresse )
         {
-            #defalgo MallocMerge,default: = currentadress;
+            #defalgo MallocMerge,default: = addresse;
 
             /*int nextAdress = #defalgo Malloc,GetNextAdress: = addresse;
 
@@ -142,7 +142,7 @@ namespace "System.IO"
         /**
          * Clean Memory Blocks
          */
-        public static bool Clean ( int addresse )
+        public static bool Clean (  )
         {
             #defalgo Malloc,Init:
 
@@ -154,6 +154,10 @@ namespace "System.IO"
                 currentadress = nextAdress;
 
                 if (#defalgo Malloc,IsBlockEnde: = currentadress) return true;
+
+                nextAdress = #defalgo Malloc,GetNextAdress: = currentadress;
+
+                if (#defalgo Malloc,IsBlockInUse: = currentadress) continue;
 
                 MemoryManager.CleanMerge2Blocks ( currentadress );
 
