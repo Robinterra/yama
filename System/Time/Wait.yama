@@ -1,0 +1,85 @@
+namespace "System.Time"
+{
+    using "System";
+
+    /**
+    * Wait for a Time
+    */
+    public static class Wait
+    {
+
+        // -----------------------------------------------
+
+        /**
+         * Wait for n Seconds. Maximum is Adress bits. Example: 16 Bit = 65535 seconds
+         *
+         * @param[in] seconds (int) The Seconds to wait
+         *
+         * @return (bool) always true
+         */
+        public static bool InSeconds ( int seconds )
+        {
+            while ( true )
+            {
+                #defalgo Wait,second:;
+
+                seconds = #defalgo IntArimetics,Decremtation: = seconds;
+
+                if ( seconds ) continue;
+
+                return true;
+            }
+        }
+
+        // -----------------------------------------------
+
+        /**
+         * Wait for n Miliseconds. Maximum is Adress bits. Example: 16 Bit = 65.53 seconds
+         *
+         * @param[in] miliseconds (int) The Miliseconds to wait
+         *
+         * @return (bool) always true
+         */
+        public static bool InMiliseconds ( int miliseconds )
+        {
+            while ( true )
+            {
+                #defalgo Wait,milisecond:;
+
+                miliseconds = #defalgo IntArimetics,Decremtation: = miliseconds;
+
+                if ( miliseconds ) continue;
+
+                return true;
+            }
+        }
+
+        // -----------------------------------------------
+
+        /**
+         * Wait for n Microseconds. Maximum is Adress bits. Example: 16 Bit = 0.06 seconds
+         *
+         * @param[in] microseconds (int) The Microseconds to wait
+         *
+         * @return (bool) always true
+         */
+        public static bool InMicroseconds ( int microseconds )
+        {
+            while ( true )
+            {
+                #defalgo Wait,microsecond:;
+
+                microseconds = #defalgo IntArimetics,Decremtation: = microseconds;
+
+                if ( microseconds ) continue;
+
+                return true;
+            }
+        }
+
+        // -----------------------------------------------
+
+    }
+}
+
+// --[EOF]--

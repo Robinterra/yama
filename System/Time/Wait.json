@@ -1,0 +1,68 @@
+[
+    {
+        "Name": "avr",
+        "Algos": [
+            {
+                "Name": "Wait",
+                "Mode": "microsecond",
+                "Description": "Wait one microsecond",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                ]
+            },
+            {
+                "Name": "Wait",
+                "Mode": "second",
+                "Description": "Wait one second",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "2"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "ldi r30, 0xe8",
+                    "ldi r31, 0x3",
+                    "[JUMPTO[1]]:",
+                    "ldi r24, 0xd0",
+                    "ldi r25, 7",
+                    "[JUMPTO[0]]:",
+                    "sbiw r24, 1",
+                    "breq [JUMPTO[0]]",
+                    "sbiw r30, 1",
+                    "breq [JUMPTO[1]]"
+                ]
+            },
+            {
+                "Name": "Wait",
+                "Mode": "milisecond",
+                "Description": "Wait one milisecond",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "ldi r24, 0x6c",
+                    "ldi r25, 0x7",
+                    "[JUMPTO[0]]:",
+                    "sbiw r24, 1",
+                    "breq [JUMPTO[0]]"
+                ]
+            }
+       ],
+        "AdvancedKeyReplaces": [
+        ],
+        "KeyPatterns": [
+        ]
+    }
+]

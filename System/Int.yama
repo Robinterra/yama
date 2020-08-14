@@ -217,7 +217,21 @@ namespace "System"
         */
         public operator int ++(int a)
         {
-            return #defalgo IntArimetics,Incremtation:;
+            return #defalgo IntArimetics,Incremtation: = a;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Decrementation of one Operator
+        *
+        * @param[in] a (int) The Child of the Operator
+        *
+        * @return (int) Result
+        */
+        public operator int --(int a)
+        {
+            return #defalgo IntArimetics,Decremtation: = a;
         }
 
         // -----------------------------------------------

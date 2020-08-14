@@ -88,8 +88,18 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "movw r24, r2",
                     "adiw r24,0x1"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "Decremtation",
+                "Description": "Decremtation",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "sbiw r24,0x1"
                 ]
             },
             {
