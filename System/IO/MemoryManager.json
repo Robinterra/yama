@@ -62,6 +62,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
+                "movw r30,r24",
                 "ldd r24, Z+1",
                 "ldd r25, Z+2",
                 "add r24, r30",
@@ -183,20 +184,19 @@
                 ]
             },
             {
-                "Name":"MallocClean",
+                "Name":"MallocMerge",
                 "Mode":"default",
-                "Description":"Clean",
+                "Description":"Merge Two Blocks, if the next block is in use, then is not merge",
                 "Keys":[
                     {
                         "Name": "[JUMPTO]",
                         "Values": [
-                        "2"
+                        "1"
                         ]
                     }
                 ],
                 "PostKeys":[],
                 "AssemblyCommands":[
-                    "push r21",
                     "push r22",
                     "push r23",
                     "movw r30,r24",
@@ -208,34 +208,24 @@
                     "add r30,r26",
                     "adc r31,r27",
                     "adiw r30,3",
-                    "ld r21,Z",
+                    "ld 22,Z",
                     "ldi r27, 0x2",
-                    "cp r21,r27",
+                    "cp 22,r27",
                     "breq [JUMPTO[0]]",
                     "ldd r26,Z+1",
                     "ldd r27,Z+2",
                     "adiw r26, 3",
                     "movw r30,r24",
-                    "st Z, r21",
+                    "st Z, 22",
                     "ldd r22,Z+1",
                     "ldd r23,Z+2",
                     "add r22, r26",
                     "adc r23, r27",
                     "std Z+1, r22",
                     "std Z+2, r23",
-                    "tst r21",
-                    "breq [JUMPTO[1]]",
                     "[JUMPTO[0]]:",
-                    "movw r30,r24",
-                    "ldd r26,Z+1",
-                    "ldd r27,Z+2",
-                    "add r30,r26",
-                    "adc r31,r27",
-                    "adiw r30,3",
-                    "[JUMPTO[1]]:",
                     "pop r23",
-                    "pop r22",
-                    "pop r21"
+                    "pop r22"
                 ]
             }
        ],

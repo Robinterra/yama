@@ -33,7 +33,7 @@ namespace "System.IO"
 
                 currentBlockSize = #defalgo Malloc,GetBlockSize: = currentadress;
 
-                nextAdress = #defalgo Malloc,GetNextAdress:;
+                nextAdress = #defalgo Malloc,GetNextAdress: = currentadress;
 
                 if (#defalgo Malloc,IsBlockInUse: = currentadress) continue;
 
@@ -58,7 +58,9 @@ namespace "System.IO"
             if (nextBlockState == 0) return currentadress;
 
             int nextAdress = currentadress + size;
+
             size = size + #defalgo Malloc,HeaderSize:;
+
             size = currentBlockSize - size;
 
             MemoryManager.CreateBlock ( nextAdress, 1, size );
@@ -112,7 +114,27 @@ namespace "System.IO"
 
             #defalgo MallocFree,default: = addresse;
 
-            return MemoryManager.Clean ( addresse );
+            return MemoryManager.CleanMerge2Blocks ( addresse - #defalgo Malloc,HeaderSize: );
+        }
+
+        // -----------------------------------------------
+
+        private static bool CleanMerge2Blocks ( int addresse )
+        {
+            #defalgo MallocMerge,default: = currentadress;
+
+            /*int nextAdress = #defalgo Malloc,GetNextAdress: = addresse;
+
+            if (#defalgo Malloc,IsBlockInUse: = nextAdress) return true;
+
+            int blockState = #defalgo Malloc,GetBlockState: = nextAdress;
+            int currentblockSize = #defalgo Malloc,GetBlockSize: = addresse;
+            int nextblockSize = #defalgo Malloc,GetBlockSize: = nextAdress;
+            currentBlockSize = currentBlockSize + nextblockSize + #defalgo Malloc,HeaderSize:;
+
+            MemoryManager.CreateBlock ( addresse, blockState, currentBlockSize );*/
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -120,17 +142,26 @@ namespace "System.IO"
         /**
          * Clean Memory Blocks
          */
-        private static bool Clean ( int addresse )
+        public static bool Clean ( int addresse )
         {
             #defalgo Malloc,Init:
 
-            int currentadress = #defalgo Malloc,CurrentAdress:;
+            int nextAdress = #defalgo Malloc,CurrentAdress:;
+            int currentadress;
 
-            while ( currentadress < addresse )
+            while ( true )
             {
-                #defalgo MallocClean, default: = currentadress;
+                currentadress = nextAdress;
 
-                currentadress = #defalgo Malloc,CurrentAdress:;
+                if (#defalgo Malloc,IsBlockEnde: = currentadress) return true;
+
+                MemoryManager.CleanMerge2Blocks ( currentadress );
+
+                nextAdress = #defalgo Malloc,GetNextAdress: = currentadress;
+
+                if (#defalgo Malloc,IsBlockInUse: = nextAdress) continue;
+
+                nextAdress = currentadress;
             }
 
             return true;
