@@ -26,16 +26,16 @@ You can read it in the book Severed.
 
 ## What is comming soon ?
 chronological order
-1. Array in System include and Array as Declaration like methode declaration
-2. How to use Yama and Programming your first Project in this programming language - docu
-3. How to add a new Assembly this Language - docu
-4. A new git repository with Yama Sourcecode for use Input Output pins for the Atmega328p (My Test device is a Ardunio Uno)
-5. Support Cortex-M (My Test device is a Arduino Due)
-6. Show in a Blog little projects with yama - my own reason.
+1. How to use Yama and Programming your first Project in this programming language - docu
+2. How to add a new Assembly this Language - docu
+3. A new git repository with Yama Sourcecode for use Input Output pins for the Atmega328p (My Test device is a Ardunio Uno)
+4. Support Cortex-M (My Test device is a Arduino Due)
+5. Show in a Blog little projects with yama - my own reason.
  * You want support me or you have ideas then please send me a email: robin.dandrea@gmail.com / robin.dandrea@versalitic.com
 
 ## What can current use?
  - static and non static Methods
+ - Array Get Set Methods and Call
  - Enums
  - Properties (no static Properties aviable)
  - Classes and Object instances
