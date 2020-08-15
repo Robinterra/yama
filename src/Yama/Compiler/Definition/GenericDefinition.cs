@@ -597,6 +597,8 @@ namespace Yama.Compiler.Definition
 
             this.KeyPatterns.AddRange(correctDefinition.KeyPatterns);
 
+            this.AdvancedKeyReplaces.AddRange(correctDefinition.AdvancedKeyReplaces);
+
             this.Algos.AddRange(correctDefinition.Algos);
 
             return true;
