@@ -428,7 +428,7 @@ namespace Yama.Parser
 
             compileContainer.Begin.Compile(compiler, this, "default");
 
-            this.GetStatement.Compile(compiler, "default");
+            this.SetStatement.Compile(compiler, "default");
 
             compileContainer.Ende.Compile(compiler, this, "default");
 
