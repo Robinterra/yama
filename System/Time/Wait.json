@@ -33,8 +33,10 @@
                     "ldi r25, 7",
                     "[JUMPTO[0]]:",
                     "sbiw r24, 1",
+                    "tst r24",
                     "brne [JUMPTO[0]]",
                     "sbiw r30, 1",
+                    "tst r30",
                     "brne [JUMPTO[1]]"
                 ]
             },
@@ -56,6 +58,7 @@
                     "ldi r25, 0x7",
                     "[JUMPTO[0]]:",
                     "sbiw r24, 1",
+                    "tst r24",
                     "brne [JUMPTO[0]]"
                 ]
             }
