@@ -16,13 +16,13 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
         }
 
-        public SyntaxToken Value
+        public IdentifierToken Value
         {
             get;
             set;
@@ -53,7 +53,7 @@ namespace Yama.Parser
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
             EnumKeyValue node = new EnumKeyValue();
 
@@ -62,7 +62,7 @@ namespace Yama.Parser
             token = parser.Peek ( token, 1 );
 
             if (token == null) return null;
-            if ( token.Kind != SyntaxKind.NumberToken ) return null;
+            if ( token.Kind != IdentifierKind.NumberToken ) return null;
 
             node.Value = token;
 

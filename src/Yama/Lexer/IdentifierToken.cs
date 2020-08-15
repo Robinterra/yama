@@ -2,7 +2,7 @@ using System.IO;
 using Yama.Parser;
 namespace Yama.Lexer
 {
-    public class SyntaxToken
+    public class IdentifierToken
     {
 
         // -----------------------------------------------
@@ -11,7 +11,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get;
             set;
@@ -111,14 +111,14 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxToken()
+        public IdentifierToken()
         {
 
         }
 
         // -----------------------------------------------
 
-        public SyntaxToken ( SyntaxKind kind, int position, int line, int column, string text, object value )
+        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, string text, object value )
         {
             this.Kind = kind;
             this.Position = position;
@@ -130,7 +130,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxToken ( SyntaxKind kind, int position, int line, int column, byte[] data, object value )
+        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, byte[] data, object value )
         {
             this.Kind = kind;
             this.Position = position;
@@ -148,7 +148,7 @@ namespace Yama.Lexer
 
     }
 
-    public enum SyntaxKind
+    public enum IdentifierKind
     {
         Unknown,
         NumberToken,

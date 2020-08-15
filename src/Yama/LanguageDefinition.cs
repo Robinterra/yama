@@ -90,7 +90,7 @@ namespace Yama
         {
             ParserLayer layer = new ParserLayer("namespace");
 
-            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new NamespaceKey ( inNamespaceLayer ) );
 
             return layer;
@@ -102,7 +102,7 @@ namespace Yama
         {
             ParserLayer layer = new ParserLayer("class");
 
-            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new KlassenDeklaration ( inclassLayer ));
             layer.ParserMembers.Add(new EnumDeklaration ( inenumLayer ));
             layer.ParserMembers.Add(new UsingKey (  ));
@@ -118,7 +118,7 @@ namespace Yama
         {
             ParserLayer layer = new ParserLayer("inproperty");
 
-            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new GetKey(execlayer));
             layer.ParserMembers.Add(new SetKey(execlayer));
 
@@ -132,7 +132,7 @@ namespace Yama
         {
             ParserLayer layer = new ParserLayer("invektor");
 
-            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new GetKey(execlayer));
             layer.ParserMembers.Add(new SetKey(execlayer));
             layer.ParserMembers.Add(new EnumartionExpression());
@@ -147,7 +147,7 @@ namespace Yama
         {
             ParserLayer layer = new ParserLayer("inclass");
 
-            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new MethodeDeclarationNode ( execlayer ));
             layer.ParserMembers.Add ( new VektorDeclaration ( invektorlayer ) );
             layer.ParserMembers.Add(new PropertyDeklaration ( inpropertyLayer ));
@@ -162,7 +162,7 @@ namespace Yama
         {
             ParserLayer layer = new ParserLayer("inenum");
 
-            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new EnumartionExpression());
             layer.ParserMembers.Add(new EnumKeyValue());
 
@@ -175,7 +175,7 @@ namespace Yama
         {
             ParserLayer layer = new ParserLayer("execute");
 
-            layer.ParserMembers.Add(new Container ( SyntaxKind.BeginContainer, SyntaxKind.CloseContainer ));
+            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
             layer.ParserMembers.Add ( new IfKey (  ) );
             layer.ParserMembers.Add ( new ElseKey (  ) );
@@ -186,8 +186,8 @@ namespace Yama
             layer.ParserMembers.Add ( new ContinueKey (  ) );
             layer.ParserMembers.Add ( new BreakKey (  ) );
             layer.ParserMembers.Add ( new ExplicitConverting ( 10 ) );
-            layer.ParserMembers.Add ( new MethodeCallNode ( SyntaxKind.OpenBracket, SyntaxKind.CloseBracket, 12 ) );
-            layer.ParserMembers.Add ( new VektorCall ( SyntaxKind.OpenSquareBracket, SyntaxKind.CloseSquareBracket, 12 ) );
+            layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12 ) );
+            layer.ParserMembers.Add ( new VektorCall ( IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket, 12 ) );
             layer.ParserMembers.Add ( new ContainerExpression ( 11 ) );
             layer.ParserMembers.Add ( new NormalExpression (  ) );
             layer.ParserMembers.Add ( new EnumartionExpression (  ) );
@@ -198,22 +198,22 @@ namespace Yama
             layer.ParserMembers.Add ( new Number ( 1 ) );
             layer.ParserMembers.Add ( new TextParser ( 1 ) );
             layer.ParserMembers.Add ( new OperatorPoint ( 11 ) );
-            layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<SyntaxKind> { SyntaxKind.NumberToken, SyntaxKind.Word, SyntaxKind.OpenBracket }, new List<SyntaxKind> { SyntaxKind.OpenBracket } ) );
-            layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++", "!", "~" }, 11, new List<SyntaxKind> { SyntaxKind.Word, SyntaxKind.Unknown } ) );
+            layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<IdentifierKind> { IdentifierKind.NumberToken, IdentifierKind.Word, IdentifierKind.OpenBracket }, new List<IdentifierKind> { IdentifierKind.OpenBracket } ) );
+            layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++", "!", "~" }, 11, new List<IdentifierKind> { IdentifierKind.Word, IdentifierKind.Unknown } ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 2 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 3 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 4 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 5 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( SyntaxKind.LessThan, 6 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( SyntaxKind.GreaterThan, 6 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.LessThan, 6 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.GreaterThan, 6 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=", "<", ">" }, 6 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 7 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 10 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=" }, 1 ) );
-            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, SyntaxKind.DoublePoint, 2 ) );
-            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, SyntaxKind.DoublePoint, 2 ) );
+            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, IdentifierKind.DoublePoint, 2 ) );
+            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, IdentifierKind.DoublePoint, 2 ) );
 
             return layer;
         }
@@ -274,60 +274,60 @@ namespace Yama
             rules.Add ( new Operator ( new ZeichenKette ( "∑" ), new ZeichenKette ( "<=" ), new ZeichenKette ( "--" ), new ZeichenKette ( "++" ), new ZeichenKette ( "<>" ), new ZeichenKette ( ">=" ), new ZeichenKette ( "<<" ), new ZeichenKette ( ">>" ), new ZeichenKette ( "<" ), new ZeichenKette ( ">" ), new ZeichenKette ( "^^" ), new ZeichenKette ( "+" ), new ZeichenKette ( "-" ), new ZeichenKette ( "*" ), new ZeichenKette ( "/"), new ZeichenKette ( "%" ), new ZeichenKette ( "&&" ), new ZeichenKette ( "||" ), new ZeichenKette ( "&" ), new ZeichenKette ( "|" ), new ZeichenKette ( "==" ), new ZeichenKette ( "=" ), new ZeichenKette ( "!=" ), new ZeichenKette ( "!" ), new ZeichenKette ( "^"), new ZeichenKette ( "~" ), new ZeichenKette ( "√" ), new ZeichenKette ( "?" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Whitespaces (  ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), SyntaxKind.OpenBracket ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( ")" ), SyntaxKind.CloseBracket ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "{" ), SyntaxKind.BeginContainer ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "}" ), SyntaxKind.CloseContainer ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "[" ), SyntaxKind.OpenSquareBracket ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "]" ), SyntaxKind.CloseSquareBracket ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "." ), SyntaxKind.Point ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( "," ), SyntaxKind.Comma ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( ":" ), SyntaxKind.DoublePoint ) );
-            rules.Add ( new Punctuation ( new ZeichenKette ( ";" ), SyntaxKind.EndOfCommand ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), IdentifierKind.OpenBracket ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( ")" ), IdentifierKind.CloseBracket ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "{" ), IdentifierKind.BeginContainer ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "}" ), IdentifierKind.CloseContainer ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "[" ), IdentifierKind.OpenSquareBracket ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "]" ), IdentifierKind.CloseSquareBracket ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "." ), IdentifierKind.Point ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "," ), IdentifierKind.Comma ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( ":" ), IdentifierKind.DoublePoint ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( ";" ), IdentifierKind.EndOfCommand ) );
             rules.Add ( new Text ( new ZeichenKette ( "\"" ), new ZeichenKette ( "\"" ), escape ) );
             rules.Add ( new Text ( new ZeichenKette ( "\'" ), new ZeichenKette ( "\'" ), escape ) );
-            rules.Add ( new KeyWord ( "char", SyntaxKind.Char ) );
-            rules.Add ( new KeyWord ( "byte", SyntaxKind.Byte ) );
-            rules.Add ( new KeyWord ( "set", SyntaxKind.Set ) );
-            rules.Add ( new KeyWord ( "get", SyntaxKind.Get ) );
-            rules.Add ( new KeyWord ( "for", SyntaxKind.For ) );
-            rules.Add ( new KeyWord ( "while", SyntaxKind.While ) );
-            rules.Add ( new KeyWord ( "true", SyntaxKind.True ) );
-            rules.Add ( new KeyWord ( "null", SyntaxKind.Null ) );
-            rules.Add ( new KeyWord ( "enum", SyntaxKind.Enum ) );
-            rules.Add ( new KeyWord ( "operator", SyntaxKind.OperatorKey ) );
-            rules.Add ( new KeyWord ( "implicit", SyntaxKind.Implicit ) );
-            rules.Add ( new KeyWord ( "explicit", SyntaxKind.Explicit ) );
-            rules.Add ( new KeyWord ( "continue", SyntaxKind.Continue ) );
-            rules.Add ( new KeyWord ( "break", SyntaxKind.Break ) );
-            rules.Add ( new KeyWord ( "false", SyntaxKind.False ) );
-            rules.Add ( new KeyWord ( "void", SyntaxKind.Void ) );
-            rules.Add ( new KeyWord ( "return", SyntaxKind.Return ) );
-            rules.Add ( new KeyWord ( "class", SyntaxKind.Class ) );
-            rules.Add ( new KeyWord ( "static", SyntaxKind.Static ) );
-            rules.Add ( new KeyWord ( "nonref", SyntaxKind.Nonref ) );
-            rules.Add ( new KeyWord ( "public", SyntaxKind.Public ) );
-            rules.Add ( new KeyWord ( "private", SyntaxKind.Private ) );
-            rules.Add ( new KeyWord ( "uint", SyntaxKind.UInt32Bit ) );
-            rules.Add ( new KeyWord ( "ushort", SyntaxKind.UInt16Bit ) );
-            rules.Add ( new KeyWord ( "short", SyntaxKind.Int16Bit ) );
-            rules.Add ( new KeyWord ( "long", SyntaxKind.Int64Bit ) );
-            rules.Add ( new KeyWord ( "ulong", SyntaxKind.UInt64Bit ) );
-            rules.Add ( new KeyWord ( "ref", SyntaxKind.Ref ) );
-            rules.Add ( new KeyWord ( "is", SyntaxKind.Is ) );
-            rules.Add ( new KeyWord ( "in", SyntaxKind.In ) );
-            rules.Add ( new KeyWord ( "as", SyntaxKind.As ) );
-            rules.Add ( new KeyWord ( "if", SyntaxKind.If ) );
-            rules.Add ( new KeyWord ( "else", SyntaxKind.Else ) );
-            rules.Add ( new KeyWord ( "foreach", SyntaxKind.Foreach ) );
-            rules.Add ( new KeyWord ( "float", SyntaxKind.Float32Bit ) );
-            rules.Add ( new KeyWord ( "new", SyntaxKind.New ) );
-            rules.Add ( new KeyWord ( "delegate", SyntaxKind.Delegate ) );
-            rules.Add ( new KeyWord ( "this", SyntaxKind.This ) );
-            rules.Add ( new KeyWord ( "base", SyntaxKind.Base ) );
-            rules.Add ( new KeyWord ( "sizeof", SyntaxKind.Sizeof ) );
-            rules.Add ( new KeyWord ( "using", SyntaxKind.Using ) );
-            rules.Add ( new KeyWord ( "namespace", SyntaxKind.Namespace ) );
+            rules.Add ( new KeyWord ( "char", IdentifierKind.Char ) );
+            rules.Add ( new KeyWord ( "byte", IdentifierKind.Byte ) );
+            rules.Add ( new KeyWord ( "set", IdentifierKind.Set ) );
+            rules.Add ( new KeyWord ( "get", IdentifierKind.Get ) );
+            rules.Add ( new KeyWord ( "for", IdentifierKind.For ) );
+            rules.Add ( new KeyWord ( "while", IdentifierKind.While ) );
+            rules.Add ( new KeyWord ( "true", IdentifierKind.True ) );
+            rules.Add ( new KeyWord ( "null", IdentifierKind.Null ) );
+            rules.Add ( new KeyWord ( "enum", IdentifierKind.Enum ) );
+            rules.Add ( new KeyWord ( "operator", IdentifierKind.OperatorKey ) );
+            rules.Add ( new KeyWord ( "implicit", IdentifierKind.Implicit ) );
+            rules.Add ( new KeyWord ( "explicit", IdentifierKind.Explicit ) );
+            rules.Add ( new KeyWord ( "continue", IdentifierKind.Continue ) );
+            rules.Add ( new KeyWord ( "break", IdentifierKind.Break ) );
+            rules.Add ( new KeyWord ( "false", IdentifierKind.False ) );
+            rules.Add ( new KeyWord ( "void", IdentifierKind.Void ) );
+            rules.Add ( new KeyWord ( "return", IdentifierKind.Return ) );
+            rules.Add ( new KeyWord ( "class", IdentifierKind.Class ) );
+            rules.Add ( new KeyWord ( "static", IdentifierKind.Static ) );
+            rules.Add ( new KeyWord ( "nonref", IdentifierKind.Nonref ) );
+            rules.Add ( new KeyWord ( "public", IdentifierKind.Public ) );
+            rules.Add ( new KeyWord ( "private", IdentifierKind.Private ) );
+            rules.Add ( new KeyWord ( "uint", IdentifierKind.UInt32Bit ) );
+            rules.Add ( new KeyWord ( "ushort", IdentifierKind.UInt16Bit ) );
+            rules.Add ( new KeyWord ( "short", IdentifierKind.Int16Bit ) );
+            rules.Add ( new KeyWord ( "long", IdentifierKind.Int64Bit ) );
+            rules.Add ( new KeyWord ( "ulong", IdentifierKind.UInt64Bit ) );
+            rules.Add ( new KeyWord ( "ref", IdentifierKind.Ref ) );
+            rules.Add ( new KeyWord ( "is", IdentifierKind.Is ) );
+            rules.Add ( new KeyWord ( "in", IdentifierKind.In ) );
+            rules.Add ( new KeyWord ( "as", IdentifierKind.As ) );
+            rules.Add ( new KeyWord ( "if", IdentifierKind.If ) );
+            rules.Add ( new KeyWord ( "else", IdentifierKind.Else ) );
+            rules.Add ( new KeyWord ( "foreach", IdentifierKind.Foreach ) );
+            rules.Add ( new KeyWord ( "float", IdentifierKind.Float32Bit ) );
+            rules.Add ( new KeyWord ( "new", IdentifierKind.New ) );
+            rules.Add ( new KeyWord ( "delegate", IdentifierKind.Delegate ) );
+            rules.Add ( new KeyWord ( "this", IdentifierKind.This ) );
+            rules.Add ( new KeyWord ( "base", IdentifierKind.Base ) );
+            rules.Add ( new KeyWord ( "sizeof", IdentifierKind.Sizeof ) );
+            rules.Add ( new KeyWord ( "using", IdentifierKind.Using ) );
+            rules.Add ( new KeyWord ( "namespace", IdentifierKind.Namespace ) );
             rules.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
 
             return rules;
@@ -526,7 +526,7 @@ namespace Yama
         {
             foreach ( IndexError error in index.Errors )
             {
-                SyntaxToken token = error.Use.Token;
+                IdentifierToken token = error.Use.Token;
 
                 this.PrintSyntaxError ( token, error.Msg, "Index error" );
             }
@@ -536,7 +536,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public bool PrintSyntaxError(SyntaxToken token, string msg, string nexterrormsg = "Syntax error")
+        public bool PrintSyntaxError(IdentifierToken token, string msg, string nexterrormsg = "Syntax error")
         {
             //if (token.Kind != SyntaxKind.Unknown) return false;
 
@@ -556,9 +556,9 @@ namespace Yama
         {
             foreach ( IParseTreeNode error in p.ParserErrors )
             {
-                SyntaxToken token = error.Token;
+                IdentifierToken token = error.Token;
 
-                if (token.Kind == SyntaxKind.Unknown) token = error.Token.ParentNode.Token;
+                if (token.Kind == IdentifierKind.Unknown) token = error.Token.ParentNode.Token;
 
                 p.PrintSyntaxError ( token, token.Text );
             }

@@ -15,11 +15,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get
             {
-                return SyntaxKind.Operator;
+                return IdentifierKind.Operator;
             }
         }
 

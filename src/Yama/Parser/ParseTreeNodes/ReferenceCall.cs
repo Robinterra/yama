@@ -17,7 +17,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -56,7 +56,7 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
             if ( !this.CheckValidTokens ( token ) ) return null;
 
@@ -69,11 +69,11 @@ namespace Yama.Parser
             return result;
         }
 
-        private bool CheckValidTokens(SyntaxToken token)
+        private bool CheckValidTokens(IdentifierToken token)
         {
-            if (token.Kind == SyntaxKind.Word) return true;
-            if (token.Kind == SyntaxKind.This) return true;
-            if (token.Kind == SyntaxKind.Base) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
+            if (token.Kind == IdentifierKind.This) return true;
+            if (token.Kind == IdentifierKind.Base) return true;
 
             return false;
         }

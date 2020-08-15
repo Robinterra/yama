@@ -15,19 +15,19 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken AccessDefinition
+        public IdentifierToken AccessDefinition
         {
             get;
             set;
         }
 
-        public SyntaxToken ZusatzDefinition
+        public IdentifierToken ZusatzDefinition
         {
             get;
             set;
         }
 
-        public SyntaxToken ClassDefinition
+        public IdentifierToken ClassDefinition
         {
             get;
             set;
@@ -39,7 +39,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken InheritanceBase
+        public IdentifierToken InheritanceBase
         {
             get;
             set;
@@ -51,7 +51,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -74,7 +74,7 @@ namespace Yama.Parser
             }
         }
 
-        public List<SyntaxKind> Ausnahmen
+        public List<IdentifierKind> Ausnahmen
         {
             get;
         }
@@ -103,19 +103,19 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidName ( SyntaxToken token )
+        private bool CheckHashValidName ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            if (token.Kind == SyntaxKind.Word) return true;
-            if (token.Kind == SyntaxKind.Operator) return true;
-            if (token.Kind == SyntaxKind.Int32Bit) return true;
-            if (token.Kind == SyntaxKind.Boolean) return true;
-            if (token.Kind == SyntaxKind.Char) return true;
-            if (token.Kind == SyntaxKind.Byte) return true;
-            if (token.Kind == SyntaxKind.Int16Bit) return true;
-            if (token.Kind == SyntaxKind.Int64Bit) return true;
-            if (token.Kind == SyntaxKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
+            if (token.Kind == IdentifierKind.Operator) return true;
+            if (token.Kind == IdentifierKind.Int32Bit) return true;
+            if (token.Kind == IdentifierKind.Boolean) return true;
+            if (token.Kind == IdentifierKind.Char) return true;
+            if (token.Kind == IdentifierKind.Byte) return true;
+            if (token.Kind == IdentifierKind.Int16Bit) return true;
+            if (token.Kind == IdentifierKind.Int64Bit) return true;
+            if (token.Kind == IdentifierKind.Float32Bit) return true;
 
             return false;
         }
@@ -131,43 +131,43 @@ namespace Yama.Parser
 
             return false;
         }*/
-        private bool CheckHashValidTypeDefinition ( SyntaxToken token )
+        private bool CheckHashValidTypeDefinition ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Word) return true;
-            if (token.Kind == SyntaxKind.Int32Bit) return true;
-            if (token.Kind == SyntaxKind.Boolean) return true;
-            if (token.Kind == SyntaxKind.Char) return true;
-            if (token.Kind == SyntaxKind.Byte) return true;
-            if (token.Kind == SyntaxKind.Int16Bit) return true;
-            if (token.Kind == SyntaxKind.Int64Bit) return true;
-            if (token.Kind == SyntaxKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
+            if (token.Kind == IdentifierKind.Int32Bit) return true;
+            if (token.Kind == IdentifierKind.Boolean) return true;
+            if (token.Kind == IdentifierKind.Char) return true;
+            if (token.Kind == IdentifierKind.Byte) return true;
+            if (token.Kind == IdentifierKind.Int16Bit) return true;
+            if (token.Kind == IdentifierKind.Int64Bit) return true;
+            if (token.Kind == IdentifierKind.Float32Bit) return true;
 
             return false;
         }
 
-        private bool CheckHashValidClass ( SyntaxToken token )
+        private bool CheckHashValidClass ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Class) return true;
+            if (token.Kind == IdentifierKind.Class) return true;
 
             return false;
         }
 
-        private bool CheckHashValidAccessDefinition ( SyntaxToken token )
+        private bool CheckHashValidAccessDefinition ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Public) return true;
-            if (token.Kind == SyntaxKind.Private) return true;
+            if (token.Kind == IdentifierKind.Public) return true;
+            if (token.Kind == IdentifierKind.Private) return true;
 
             return false;
         }
 
-        private bool CheckHashValidZusatzDefinition ( SyntaxToken token )
+        private bool CheckHashValidZusatzDefinition ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Static) return true;
+            if (token.Kind == IdentifierKind.Static) return true;
 
             return false;
         }
 
-        private SyntaxToken MakeAccessValid( Parser parser, SyntaxToken token, KlassenDeklaration deklaration)
+        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -176,15 +176,15 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private SyntaxToken MakeInheritanceBase( Parser parser, SyntaxToken token, KlassenDeklaration deklaration)
+        private IdentifierToken MakeInheritanceBase( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
         {
-            if (token.Kind != SyntaxKind.DoublePoint) return token;
+            if (token.Kind != IdentifierKind.DoublePoint) return token;
 
             token.Node = deklaration;
 
             token = parser.Peek(token, 1);
 
-            if (token.Kind != SyntaxKind.Word) return token;
+            if (token.Kind != IdentifierKind.Word) return token;
 
             token.Node = deklaration;
 
@@ -193,7 +193,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private SyntaxToken MakeZusatzValid( Parser parser, SyntaxToken token, KlassenDeklaration deklaration)
+        private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
         {
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
@@ -202,7 +202,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
 
             KlassenDeklaration deklaration = new KlassenDeklaration();

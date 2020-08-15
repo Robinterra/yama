@@ -9,7 +9,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -21,7 +21,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Ende
+        public IdentifierToken Ende
         {
             get;
             set;
@@ -61,11 +61,11 @@ namespace Yama.Parser
          * @todo Ab in die Parser klasse damit!
          */
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.OpenBracket ) return null;
+            if ( token.Kind != IdentifierKind.OpenBracket ) return null;
 
-            SyntaxToken kind = parser.FindEndToken ( token, SyntaxKind.CloseBracket, SyntaxKind.OpenBracket );
+            IdentifierToken kind = parser.FindEndToken ( token, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
 
             if ( kind == null ) return null;
 

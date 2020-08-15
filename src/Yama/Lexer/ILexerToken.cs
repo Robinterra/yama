@@ -9,7 +9,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        SyntaxKind Kind
+        IdentifierKind Kind
         {
             get;
         }

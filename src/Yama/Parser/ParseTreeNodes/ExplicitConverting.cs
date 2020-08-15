@@ -27,13 +27,13 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken RightToken
+        public IdentifierToken RightToken
         {
             get;
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -56,7 +56,7 @@ namespace Yama.Parser
             }
         }
 
-        public SyntaxKind ValidKind
+        public IdentifierKind ValidKind
         {
             get;
         }
@@ -64,7 +64,7 @@ namespace Yama.Parser
         {
             get;
         }
-        public SyntaxToken ReferenceDeklaration
+        public IdentifierToken ReferenceDeklaration
         {
             get;
             set;
@@ -84,25 +84,25 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidTypeDefinition ( SyntaxToken token )
+        private bool CheckHashValidTypeDefinition ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            if (token.Kind == SyntaxKind.Word) return true;
-            if (token.Kind == SyntaxKind.Int32Bit) return true;
-            if (token.Kind == SyntaxKind.Boolean) return true;
-            if (token.Kind == SyntaxKind.Char) return true;
-            if (token.Kind == SyntaxKind.Byte) return true;
-            if (token.Kind == SyntaxKind.Int16Bit) return true;
-            if (token.Kind == SyntaxKind.Int64Bit) return true;
-            if (token.Kind == SyntaxKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
+            if (token.Kind == IdentifierKind.Int32Bit) return true;
+            if (token.Kind == IdentifierKind.Boolean) return true;
+            if (token.Kind == IdentifierKind.Char) return true;
+            if (token.Kind == IdentifierKind.Byte) return true;
+            if (token.Kind == IdentifierKind.Int16Bit) return true;
+            if (token.Kind == IdentifierKind.Int64Bit) return true;
+            if (token.Kind == IdentifierKind.Float32Bit) return true;
 
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.Is ) return null;
+            if ( token.Kind != IdentifierKind.Is ) return null;
 
             ExplicitConverting node = new ExplicitConverting ( this.Prio );
             node.Token = token;
@@ -114,7 +114,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return null;
 
             node.ReferenceDeklaration = parser.Peek ( node.RightToken, 1 );
-            if (node.ReferenceDeklaration.Kind != SyntaxKind.Word) return null;
+            if (node.ReferenceDeklaration.Kind != IdentifierKind.Word) return null;
 
             node.LeftNode.Token.ParentNode = node;
             node.RightToken.Node = node;

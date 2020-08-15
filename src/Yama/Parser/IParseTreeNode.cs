@@ -13,7 +13,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        SyntaxToken Token
+        IdentifierToken Token
         {
             get;
             set;
@@ -34,7 +34,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        IParseTreeNode Parse ( Parser parser, SyntaxToken token );
+        IParseTreeNode Parse ( Parser parser, IdentifierToken token );
 
         // -----------------------------------------------
 

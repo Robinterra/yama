@@ -10,7 +10,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -45,9 +45,9 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.Break ) return null;
+            if ( token.Kind != IdentifierKind.Break ) return null;
 
             BreakKey key = new BreakKey (  );
             token.Node = key;

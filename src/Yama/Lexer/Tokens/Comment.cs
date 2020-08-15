@@ -21,11 +21,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get
             {
-                return SyntaxKind.Comment;
+                return IdentifierKind.Comment;
             }
         }
 

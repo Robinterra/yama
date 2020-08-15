@@ -49,7 +49,7 @@ namespace Yama.Index
             set;
         }
 
-        public SyntaxToken Value
+        public IdentifierToken Value
         {
             get;
             set;

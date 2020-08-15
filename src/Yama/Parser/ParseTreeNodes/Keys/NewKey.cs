@@ -28,7 +28,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Definition
+        public IdentifierToken Definition
         {
             get;
             set;
@@ -46,7 +46,7 @@ namespace Yama.Parser
             set;
         } = new CompileExecuteCall();
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -65,30 +65,30 @@ namespace Yama.Parser
             }
         }
 
-        public SyntaxToken Ende { get; set; }
+        public IdentifierToken Ende { get; set; }
 
         #endregion get/set
 
         #region methods
 
-        private bool CheckHashValidOperator ( SyntaxToken token )
+        private bool CheckHashValidOperator ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Word) return true;
-            if (token.Kind == SyntaxKind.Int32Bit) return true;
-            if (token.Kind == SyntaxKind.Boolean) return true;
-            if (token.Kind == SyntaxKind.Char) return true;
-            if (token.Kind == SyntaxKind.Byte) return true;
-            if (token.Kind == SyntaxKind.Int16Bit) return true;
-            if (token.Kind == SyntaxKind.Int64Bit) return true;
-            if (token.Kind == SyntaxKind.Float32Bit) return true;
-            if (token.Kind == SyntaxKind.Void) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
+            if (token.Kind == IdentifierKind.Int32Bit) return true;
+            if (token.Kind == IdentifierKind.Boolean) return true;
+            if (token.Kind == IdentifierKind.Char) return true;
+            if (token.Kind == IdentifierKind.Byte) return true;
+            if (token.Kind == IdentifierKind.Int16Bit) return true;
+            if (token.Kind == IdentifierKind.Int64Bit) return true;
+            if (token.Kind == IdentifierKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.Void) return true;
 
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.New ) return null;
+            if ( token.Kind != IdentifierKind.New ) return null;
 
             NewKey newKey = new NewKey();
             newKey.Token = token;
@@ -96,9 +96,9 @@ namespace Yama.Parser
 
             if ( !this.CheckHashValidOperator( newKey.Definition )) return null;
 
-            SyntaxToken beginkind = parser.Peek ( newKey.Definition, 1 );
+            IdentifierToken beginkind = parser.Peek ( newKey.Definition, 1 );
 
-            SyntaxToken endToken = parser.FindEndToken ( beginkind, SyntaxKind.CloseBracket, SyntaxKind.OpenBracket );
+            IdentifierToken endToken = parser.FindEndToken ( beginkind, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
 
             if ( endToken == null ) return null;
 

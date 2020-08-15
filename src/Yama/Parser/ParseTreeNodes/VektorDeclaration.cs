@@ -19,19 +19,19 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken AccessDefinition
+        public IdentifierToken AccessDefinition
         {
             get;
             set;
         }
 
-        public SyntaxToken ZusatzDefinition
+        public IdentifierToken ZusatzDefinition
         {
             get;
             set;
         }
 
-        public SyntaxToken TypeDefinition
+        public IdentifierToken TypeDefinition
         {
             get;
             set;
@@ -73,7 +73,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -98,7 +98,7 @@ namespace Yama.Parser
             }
         }
 
-        public List<SyntaxKind> Ausnahmen
+        public List<IdentifierKind> Ausnahmen
         {
             get;
         }
@@ -147,36 +147,36 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidName ( SyntaxToken token )
+        private bool CheckHashValidName ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            if (token.Kind == SyntaxKind.Word) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
 
             return false;
         }
-        private bool CheckHashValidTypeDefinition ( SyntaxToken token )
+        private bool CheckHashValidTypeDefinition ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            if (token.Kind == SyntaxKind.Word) return true;
-            if (token.Kind == SyntaxKind.Int32Bit) return true;
-            if (token.Kind == SyntaxKind.Boolean) return true;
-            if (token.Kind == SyntaxKind.Int16Bit) return true;
-            if (token.Kind == SyntaxKind.Int64Bit) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
+            if (token.Kind == IdentifierKind.Int32Bit) return true;
+            if (token.Kind == IdentifierKind.Boolean) return true;
+            if (token.Kind == IdentifierKind.Int16Bit) return true;
+            if (token.Kind == IdentifierKind.Int64Bit) return true;
 
             return false;
         }
 
-        private bool CheckHashValidAccessDefinition ( SyntaxToken token )
+        private bool CheckHashValidAccessDefinition ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Public) return true;
-            if (token.Kind == SyntaxKind.Private) return true;
+            if (token.Kind == IdentifierKind.Public) return true;
+            if (token.Kind == IdentifierKind.Private) return true;
 
             return false;
         }
 
-        private SyntaxToken MakeAccessValid( Parser parser, SyntaxToken token, VektorDeclaration deklaration)
+        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, VektorDeclaration deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -185,7 +185,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
 
             VektorDeclaration deklaration = new VektorDeclaration();
@@ -204,7 +204,7 @@ namespace Yama.Parser
 
             token = parser.Peek ( token, 1 );
 
-            IParseTreeNode rule = new Container(SyntaxKind.OpenSquareBracket, SyntaxKind.CloseSquareBracket);
+            IParseTreeNode rule = new Container(IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket);
 
             if ( token == null ) return null;
 
@@ -281,7 +281,7 @@ namespace Yama.Parser
             this.Deklaration = deklaration;
 
             AccessModify access = AccessModify.Private;
-            if (this.AccessDefinition != null) if (this.AccessDefinition.Kind == SyntaxKind.Public) access = AccessModify.Public;
+            if (this.AccessDefinition != null) if (this.AccessDefinition.Kind == IdentifierKind.Public) access = AccessModify.Public;
             deklaration.AccessModify = access;
 
             deklaration.Type = this.GetMethodeType();

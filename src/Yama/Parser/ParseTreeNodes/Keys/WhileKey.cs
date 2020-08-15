@@ -22,13 +22,13 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
         }
 
-        public SyntaxToken Ende
+        public IdentifierToken Ende
         {
             get
             {
@@ -63,16 +63,16 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.While ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenBracket ) return null;
+            if ( token.Kind != IdentifierKind.While ) return null;
+            if ( parser.Peek ( token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
 
             WhileKey key = new WhileKey (  );
             key.Token = token;
             token.Node = key;
 
-            SyntaxToken conditionkind = parser.Peek ( token, 1 );
+            IdentifierToken conditionkind = parser.Peek ( token, 1 );
 
             IParseTreeNode rule = parser.GetRule<ContainerExpression>();
 
@@ -82,7 +82,7 @@ namespace Yama.Parser
 
             key.Condition.Token.ParentNode = key;
 
-            SyntaxToken Statementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
+            IdentifierToken Statementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
 
             key.Statement = parser.ParseCleanToken(Statementchild);
 

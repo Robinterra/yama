@@ -36,7 +36,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -60,18 +60,18 @@ namespace Yama.Parser
             }
         }
 
-        public SyntaxKind BeginZeichen
+        public IdentifierKind BeginZeichen
         {
             get;
             set;
         }
 
-        public SyntaxKind EndeZeichen
+        public IdentifierKind EndeZeichen
         {
             get;
             set;
         }
-        public SyntaxToken Ende
+        public IdentifierToken Ende
         {
             get;
             set;
@@ -86,7 +86,7 @@ namespace Yama.Parser
             this.Prio = prio;
         }
 
-        public MethodeCallNode ( SyntaxKind begin, SyntaxKind end, int prio )
+        public MethodeCallNode ( IdentifierKind begin, IdentifierKind end, int prio )
             : this ( prio )
         {
             this.BeginZeichen = begin;
@@ -97,21 +97,21 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
             if ( token.Kind != this.BeginZeichen ) return null;
 
-            SyntaxToken left = parser.Peek ( token, -1 );
+            IdentifierToken left = parser.Peek ( token, -1 );
 
-            if ( left.Kind == SyntaxKind.Operator ) return null;
-            if ( left.Kind == SyntaxKind.NumberToken ) return null;
-            if ( left.Kind == SyntaxKind.OpenBracket ) return null;
-            if ( left.Kind == SyntaxKind.BeginContainer ) return null;
-            if ( left.Kind == SyntaxKind.OpenSquareBracket ) return null;
-            if ( left.Kind == SyntaxKind.EndOfCommand ) return null;
-            if ( left.Kind == SyntaxKind.Comma ) return null;
+            if ( left.Kind == IdentifierKind.Operator ) return null;
+            if ( left.Kind == IdentifierKind.NumberToken ) return null;
+            if ( left.Kind == IdentifierKind.OpenBracket ) return null;
+            if ( left.Kind == IdentifierKind.BeginContainer ) return null;
+            if ( left.Kind == IdentifierKind.OpenSquareBracket ) return null;
+            if ( left.Kind == IdentifierKind.EndOfCommand ) return null;
+            if ( left.Kind == IdentifierKind.Comma ) return null;
 
-            SyntaxToken steuerToken = parser.FindEndToken ( token, this.EndeZeichen, this.BeginZeichen );
+            IdentifierToken steuerToken = parser.FindEndToken ( token, this.EndeZeichen, this.BeginZeichen );
 
             if ( steuerToken == null ) return null;
 

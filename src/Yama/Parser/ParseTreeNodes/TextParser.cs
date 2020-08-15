@@ -9,7 +9,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -45,9 +45,9 @@ namespace Yama.Parser
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.Text ) return null;
+            if ( token.Kind != IdentifierKind.Text ) return null;
 
             TextParser node = new TextParser { Token = token };
 

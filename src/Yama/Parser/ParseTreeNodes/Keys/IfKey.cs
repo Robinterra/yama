@@ -28,13 +28,13 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
         }
 
-        public SyntaxToken Ende
+        public IdentifierToken Ende
         {
             get
             {
@@ -66,16 +66,16 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.If ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenBracket ) return null;
+            if ( token.Kind != IdentifierKind.If ) return null;
+            if ( parser.Peek ( token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
 
             IfKey key = new IfKey (  );
             key.Token = token;
             token.Node = key;
 
-            SyntaxToken conditionkind = parser.Peek ( token, 1 );
+            IdentifierToken conditionkind = parser.Peek ( token, 1 );
 
             IParseTreeNode rule = parser.GetRule<ContainerExpression>();
 
@@ -85,7 +85,7 @@ namespace Yama.Parser
 
             key.Condition.Token.ParentNode = key;
 
-            SyntaxToken ifStatementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
+            IdentifierToken ifStatementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
 
             key.IfStatement = parser.ParseCleanToken(ifStatementchild);
 
@@ -93,15 +93,15 @@ namespace Yama.Parser
 
             key.IfStatement.Token.ParentNode = key;
 
-            SyntaxToken elsePeekToken = (key.IfStatement is IContainer t) ? t.Ende : key.IfStatement.Token;
+            IdentifierToken elsePeekToken = (key.IfStatement is IContainer t) ? t.Ende : key.IfStatement.Token;
 
-            SyntaxToken elseStatementChild = parser.Peek ( elsePeekToken, 1 );
+            IdentifierToken elseStatementChild = parser.Peek ( elsePeekToken, 1 );
 
             if ( elseStatementChild == null ) return key;
 
             if ( elseStatementChild.Node != null ) return key;
 
-            if ( elseStatementChild.Kind != SyntaxKind.Else ) return key;
+            if ( elseStatementChild.Kind != IdentifierKind.Else ) return key;
 
             key.ElseStatement = parser.ParseCleanToken ( elseStatementChild );
 

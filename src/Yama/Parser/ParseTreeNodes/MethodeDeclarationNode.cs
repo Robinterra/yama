@@ -19,19 +19,19 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken AccessDefinition
+        public IdentifierToken AccessDefinition
         {
             get;
             set;
         }
 
-        public SyntaxToken ZusatzDefinition
+        public IdentifierToken ZusatzDefinition
         {
             get;
             set;
         }
 
-        public SyntaxToken TypeDefinition
+        public IdentifierToken TypeDefinition
         {
             get;
             set;
@@ -67,7 +67,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -91,7 +91,7 @@ namespace Yama.Parser
             }
         }
 
-        public List<SyntaxKind> Ausnahmen
+        public List<IdentifierKind> Ausnahmen
         {
             get;
         }
@@ -161,20 +161,20 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidName ( SyntaxToken token )
+        private bool CheckHashValidName ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            if (token.Kind == SyntaxKind.Word) return true;
-            if (token.Kind == SyntaxKind.Operator) return true;
-            if (token.Kind == SyntaxKind.Int32Bit) return true;
-            if (token.Kind == SyntaxKind.Boolean) return true;
-            if (token.Kind == SyntaxKind.Char) return true;
-            if (token.Kind == SyntaxKind.Byte) return true;
-            if (token.Kind == SyntaxKind.Int16Bit) return true;
-            if (token.Kind == SyntaxKind.Int64Bit) return true;
-            if (token.Kind == SyntaxKind.Float32Bit) return true;
-            if (token.Kind == SyntaxKind.New) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
+            if (token.Kind == IdentifierKind.Operator) return true;
+            if (token.Kind == IdentifierKind.Int32Bit) return true;
+            if (token.Kind == IdentifierKind.Boolean) return true;
+            if (token.Kind == IdentifierKind.Char) return true;
+            if (token.Kind == IdentifierKind.Byte) return true;
+            if (token.Kind == IdentifierKind.Int16Bit) return true;
+            if (token.Kind == IdentifierKind.Int64Bit) return true;
+            if (token.Kind == IdentifierKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.New) return true;
 
             return false;
         }
@@ -190,45 +190,45 @@ namespace Yama.Parser
 
             return false;
         }*/
-        private bool CheckHashValidTypeDefinition ( SyntaxToken token )
+        private bool CheckHashValidTypeDefinition ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            if (token.Kind == SyntaxKind.Word) return true;
-            if (token.Kind == SyntaxKind.Int32Bit) return true;
-            if (token.Kind == SyntaxKind.Boolean) return true;
-            if (token.Kind == SyntaxKind.Char) return true;
-            if (token.Kind == SyntaxKind.Byte) return true;
-            if (token.Kind == SyntaxKind.Int16Bit) return true;
-            if (token.Kind == SyntaxKind.Int64Bit) return true;
-            if (token.Kind == SyntaxKind.Float32Bit) return true;
-            if (token.Kind == SyntaxKind.New) return true;
-            if (token.Kind == SyntaxKind.Operator && token.Text == "~") return true;
-            if (token.Kind == SyntaxKind.Implicit) return true;
-            if (token.Kind == SyntaxKind.Explicit) return true;
-            if (token.Kind == SyntaxKind.Void) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
+            if (token.Kind == IdentifierKind.Int32Bit) return true;
+            if (token.Kind == IdentifierKind.Boolean) return true;
+            if (token.Kind == IdentifierKind.Char) return true;
+            if (token.Kind == IdentifierKind.Byte) return true;
+            if (token.Kind == IdentifierKind.Int16Bit) return true;
+            if (token.Kind == IdentifierKind.Int64Bit) return true;
+            if (token.Kind == IdentifierKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.New) return true;
+            if (token.Kind == IdentifierKind.Operator && token.Text == "~") return true;
+            if (token.Kind == IdentifierKind.Implicit) return true;
+            if (token.Kind == IdentifierKind.Explicit) return true;
+            if (token.Kind == IdentifierKind.Void) return true;
 
             return false;
         }
 
-        private bool CheckHashValidAccessDefinition ( SyntaxToken token )
+        private bool CheckHashValidAccessDefinition ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Public) return true;
-            if (token.Kind == SyntaxKind.Private) return true;
+            if (token.Kind == IdentifierKind.Public) return true;
+            if (token.Kind == IdentifierKind.Private) return true;
 
             return false;
         }
 
-        private bool CheckHashValidZusatzDefinition ( SyntaxToken token )
+        private bool CheckHashValidZusatzDefinition ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Static) return true;
-            if (token.Kind == SyntaxKind.OperatorKey) return true;
-            if (token.Kind == SyntaxKind.This) return true;
+            if (token.Kind == IdentifierKind.Static) return true;
+            if (token.Kind == IdentifierKind.OperatorKey) return true;
+            if (token.Kind == IdentifierKind.This) return true;
 
             return false;
         }
 
-        private SyntaxToken MakeAccessValid( Parser parser, SyntaxToken token, MethodeDeclarationNode deklaration)
+        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, MethodeDeclarationNode deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -237,7 +237,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private SyntaxToken MakeZusatzValid( Parser parser, SyntaxToken token, MethodeDeclarationNode deklaration)
+        private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, MethodeDeclarationNode deklaration)
         {
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
@@ -246,7 +246,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
 
             MethodeDeclarationNode deklaration = new MethodeDeclarationNode();
@@ -267,7 +267,7 @@ namespace Yama.Parser
 
             token = parser.Peek ( token, 1 );
 
-            IParseTreeNode rule = new Container(SyntaxKind.OpenBracket, SyntaxKind.CloseBracket);
+            IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
 
             if ( token == null ) return null;
 
@@ -283,7 +283,7 @@ namespace Yama.Parser
             t.Token.ParentNode = deklaration;
             deklaration.Parameters = t.Statements;
 
-            SyntaxToken Statementchild = parser.Peek ( t.Ende, 1);
+            IdentifierToken Statementchild = parser.Peek ( t.Ende, 1);
 
             deklaration.Statement = parser.ParseCleanToken(Statementchild, this.layer);
 
@@ -292,12 +292,12 @@ namespace Yama.Parser
             return this.CleanUp(deklaration);
         }
 
-        private bool CheckSonderRegleung(SyntaxToken typeDefinition)
+        private bool CheckSonderRegleung(IdentifierToken typeDefinition)
         {
             if (typeDefinition == null) return false;
 
-            if ( typeDefinition.Kind == SyntaxKind.New) return true;
-            if ( typeDefinition.Kind == SyntaxKind.Operator && typeDefinition.Text == "~") return true;
+            if ( typeDefinition.Kind == IdentifierKind.New) return true;
+            if ( typeDefinition.Kind == IdentifierKind.Operator && typeDefinition.Text == "~") return true;
 
             return false;
         }
@@ -330,16 +330,16 @@ namespace Yama.Parser
 
             if (this.ZusatzDefinition != null)
             {
-                if (this.ZusatzDefinition.Kind == SyntaxKind.Static) type = MethodeType.Static;
-                if (this.ZusatzDefinition.Kind == SyntaxKind.OperatorKey)
+                if (this.ZusatzDefinition.Kind == IdentifierKind.Static) type = MethodeType.Static;
+                if (this.ZusatzDefinition.Kind == IdentifierKind.OperatorKey)
                 {
                     type = MethodeType.Operator;
-                    if (this.TypeDefinition.Kind == SyntaxKind.Explicit) type = MethodeType.Explicit;
-                    if (this.TypeDefinition.Kind == SyntaxKind.Implicit) type = MethodeType.Implicit;
+                    if (this.TypeDefinition.Kind == IdentifierKind.Explicit) type = MethodeType.Explicit;
+                    if (this.TypeDefinition.Kind == IdentifierKind.Implicit) type = MethodeType.Implicit;
                 }
-                if (this.ZusatzDefinition.Kind == SyntaxKind.This)
+                if (this.ZusatzDefinition.Kind == IdentifierKind.This)
                 {
-                    if (this.Token.Kind == SyntaxKind.New) type = MethodeType.Ctor;
+                    if (this.Token.Kind == IdentifierKind.New) type = MethodeType.Ctor;
                     if (this.Token.Text == "~") type = MethodeType.DeCtor;
                 }
             }
@@ -358,7 +358,7 @@ namespace Yama.Parser
             this.Deklaration = deklaration;
 
             AccessModify access = AccessModify.Private;
-            if (this.AccessDefinition != null) if (this.AccessDefinition.Kind == SyntaxKind.Public) access = AccessModify.Public;
+            if (this.AccessDefinition != null) if (this.AccessDefinition.Kind == IdentifierKind.Public) access = AccessModify.Public;
             deklaration.AccessModify = access;
 
             deklaration.Type = this.GetMethodeType();
@@ -481,7 +481,7 @@ namespace Yama.Parser
             if (this.Deklaration.Klasse.GetNonStaticPropCount == 0) return true;
 
             CompileNumConst num = new CompileNumConst();
-            num.Compile(compiler, new Number { Token = new SyntaxToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
+            num.Compile(compiler, new Number { Token = new IdentifierToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
 
             CompileMovResult movResultRight = new CompileMovResult();
             movResultRight.Compile(compiler, null, mode);

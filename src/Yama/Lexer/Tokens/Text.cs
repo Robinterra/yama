@@ -13,11 +13,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get
             {
-                return SyntaxKind.Text;
+                return IdentifierKind.Text;
             }
         }
 
@@ -99,7 +99,7 @@ namespace Yama.Lexer
             lexer.LexerTokens.Add ( new Replacer ( this.Ende, string.Empty ) );
 
             List<byte> daten = new List<byte>();
-            foreach ( SyntaxToken token in lexer )
+            foreach ( IdentifierToken token in lexer )
             {
                 daten.AddRange(token.CleanDaten);
             }

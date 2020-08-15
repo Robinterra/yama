@@ -9,7 +9,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -25,7 +25,7 @@ namespace Yama.Parser
 
         #endregion get/set
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
             ParserError result = new ParserError ();
 

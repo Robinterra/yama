@@ -34,7 +34,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -64,13 +64,13 @@ namespace Yama.Parser
             get;
         }
 
-        public SyntaxKind Steuerzeichen
+        public IdentifierKind Steuerzeichen
         {
             get;
             set;
         }
 
-        public SyntaxToken SteuerToken
+        public IdentifierToken SteuerToken
         {
             get;
             set;
@@ -86,7 +86,7 @@ namespace Yama.Parser
             this.Prio = prio;
         }
 
-        public Operator3Childs ( List<string> validOperators, SyntaxKind steuerzeichen, int prio )
+        public Operator3Childs ( List<string> validOperators, IdentifierKind steuerzeichen, int prio )
             : this ( prio )
         {
             this.ValidOperators = validOperators;
@@ -97,7 +97,7 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidOperator ( SyntaxToken token )
+        private bool CheckHashValidOperator ( IdentifierToken token )
         {
             foreach ( string op in this.ValidOperators )
             {
@@ -107,16 +107,16 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.Operator ) return null;
+            if ( token.Kind != IdentifierKind.Operator ) return null;
             if ( !this.CheckHashValidOperator ( token ) ) return null;
 
             Operator3Childs node = new Operator3Childs ( this.Prio );
             node.Token = token;
             token.Node = node;
 
-            SyntaxToken steuerToken = parser.FindAToken ( token, this.Steuerzeichen );
+            IdentifierToken steuerToken = parser.FindAToken ( token, this.Steuerzeichen );
 
             if ( steuerToken == null ) return null;
 

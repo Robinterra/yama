@@ -12,13 +12,13 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        SyntaxToken Token
+        IdentifierToken Token
         {
             get;
             set;
         }
 
-        SyntaxToken Ende
+        IdentifierToken Ende
         {
             get;
             set;

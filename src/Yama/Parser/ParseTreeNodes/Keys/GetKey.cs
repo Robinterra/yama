@@ -16,13 +16,13 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
         }
 
-        public SyntaxToken Ende
+        public IdentifierToken Ende
         {
             get
             {
@@ -64,15 +64,15 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.Get ) return null;
+            if ( token.Kind != IdentifierKind.Get ) return null;
 
             GetKey key = new GetKey (  );
             key.Token = token;
             token.Node = key;
 
-            SyntaxToken conditionkind = parser.Peek ( token, 1 );
+            IdentifierToken conditionkind = parser.Peek ( token, 1 );
 
             key.Statement = parser.ParseCleanToken(conditionkind, this.layer);
 

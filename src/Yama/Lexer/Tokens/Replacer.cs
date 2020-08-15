@@ -11,11 +11,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get
             {
-                return SyntaxKind.Replacer;
+                return IdentifierKind.Replacer;
             }
         }
 

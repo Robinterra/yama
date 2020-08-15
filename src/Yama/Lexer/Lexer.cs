@@ -126,20 +126,20 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxToken NextToken (  )
+        public IdentifierToken NextToken (  )
         {
             if (this.IsEnde (  ) ) return null;
 
             foreach ( ILexerToken lexerToken in this.LexerTokens )
             {
-                SyntaxToken result = this.ExecuteLexerToken ( lexerToken );
+                IdentifierToken result = this.ExecuteLexerToken ( lexerToken );
 
                 if (result == null) continue;
 
                 return result;
             }
 
-            SyntaxToken UnknownToken = new SyntaxToken ( SyntaxKind.Unknown, this.position, this.line, this.column, new byte[] { this.CurrentByte }, this.CurrentChar.ToString() );
+            IdentifierToken UnknownToken = new IdentifierToken ( IdentifierKind.Unknown, this.position, this.line, this.column, new byte[] { this.CurrentByte }, this.CurrentChar.ToString() );
 
             UnknownToken.CleanDaten = new byte[] { this.CurrentByte };
 
@@ -276,7 +276,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        private SyntaxToken ExecuteLexerToken ( ILexerToken token )
+        private IdentifierToken ExecuteLexerToken ( ILexerToken token )
         {
             TokenStatus status = this.ExecuteLexerToken ( token, out int start, out int column, out int line );
 
@@ -290,7 +290,7 @@ namespace Yama.Lexer
 
             object data = token.GetValue ( daten );
 
-            SyntaxToken result = new SyntaxToken ( token.Kind, this.position, this.line, this.column, daten, data );
+            IdentifierToken result = new IdentifierToken ( token.Kind, this.position, this.line, this.column, daten, data );
 
             if (!(data is string t)) return result;
 

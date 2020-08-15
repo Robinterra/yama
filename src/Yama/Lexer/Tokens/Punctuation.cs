@@ -27,7 +27,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get;
         }
@@ -38,7 +38,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public Punctuation ( ZeichenKette punctuation, SyntaxKind punctuationkind )
+        public Punctuation ( ZeichenKette punctuation, IdentifierKind punctuationkind )
         {
             this.punctuation = punctuation;
             this.Kind = punctuationkind;

@@ -23,11 +23,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get
             {
-                return SyntaxKind.ConditionalCompilation;
+                return IdentifierKind.ConditionalCompilation;
             }
         }
 
@@ -91,7 +91,7 @@ namespace Yama.Lexer
             lexer.LexerTokens.Add ( new Replacer ( this.End, string.Empty ) );
 
             List<byte> daten = new List<byte>();
-            foreach ( SyntaxToken token in lexer )
+            foreach ( IdentifierToken token in lexer )
             {
                 daten.AddRange(token.CleanDaten);
             }

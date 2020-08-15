@@ -15,13 +15,13 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken AccessDefinition
+        public IdentifierToken AccessDefinition
         {
             get;
             set;
         }
 
-        public SyntaxToken ClassDefinition
+        public IdentifierToken ClassDefinition
         {
             get;
             set;
@@ -33,7 +33,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -51,7 +51,7 @@ namespace Yama.Parser
             }
         }
 
-        public List<SyntaxKind> Ausnahmen
+        public List<IdentifierKind> Ausnahmen
         {
             get;
         }
@@ -75,31 +75,31 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidName ( SyntaxToken token )
+        private bool CheckHashValidName ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            if (token.Kind == SyntaxKind.Word) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
 
             return false;
         }
 
-        private bool CheckHashValidClass ( SyntaxToken token )
+        private bool CheckHashValidClass ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Enum) return true;
+            if (token.Kind == IdentifierKind.Enum) return true;
 
             return false;
         }
 
-        private bool CheckHashValidAccessDefinition ( SyntaxToken token )
+        private bool CheckHashValidAccessDefinition ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Public) return true;
-            if (token.Kind == SyntaxKind.Private) return true;
+            if (token.Kind == IdentifierKind.Public) return true;
+            if (token.Kind == IdentifierKind.Private) return true;
 
             return false;
         }
 
-        private SyntaxToken MakeAccessValid( Parser parser, SyntaxToken token, EnumDeklaration deklaration)
+        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, EnumDeklaration deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -108,7 +108,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
 
             EnumDeklaration deklaration = new EnumDeklaration();

@@ -98,7 +98,7 @@ namespace Yama.Index
         {
             get
             {
-                if (this.Use.Token.Kind != SyntaxKind.Operator) return this.Name;
+                if (this.Use.Token.Kind != IdentifierKind.Operator) return this.Name;
 
 
                 if ("!" == this.Name) return "Achtung";

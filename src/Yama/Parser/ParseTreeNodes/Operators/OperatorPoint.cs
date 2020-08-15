@@ -30,7 +30,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -79,14 +79,14 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidOperator ( SyntaxToken token )
+        private bool CheckHashValidOperator ( IdentifierToken token )
         {
-            return token.Kind == SyntaxKind.Point;
+            return token.Kind == IdentifierKind.Point;
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.Point ) return null;
+            if ( token.Kind != IdentifierKind.Point ) return null;
             if ( !this.CheckHashValidOperator ( token ) ) return null;
 
             OperatorPoint node = new OperatorPoint ( this.Prio );

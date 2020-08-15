@@ -19,7 +19,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get;
         }
@@ -30,7 +30,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public KeyWord ( string keyword, SyntaxKind keywordkind )
+        public KeyWord ( string keyword, IdentifierKind keywordkind )
         {
             this.Word = keyword;
             this.Kind = keywordkind;

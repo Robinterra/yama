@@ -13,11 +13,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get
             {
-                return SyntaxKind.Escape;
+                return IdentifierKind.Escape;
             }
         }
 
@@ -82,9 +82,9 @@ namespace Yama.Lexer
             lexer.LexerTokens.AddRange ( this.Replacers );
 
             StringBuilder builder = new StringBuilder();
-            foreach ( SyntaxToken token in lexer )
+            foreach ( IdentifierToken token in lexer )
             {
-                if (token.Kind == SyntaxKind.Unknown) continue;
+                if (token.Kind == IdentifierKind.Unknown) continue;
                 builder.Append ( token.Value );
             }
 

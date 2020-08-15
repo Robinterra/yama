@@ -9,7 +9,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -39,15 +39,15 @@ namespace Yama.Parser
 
         #endregion get/set
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
             //SyntaxToken kind = parser.FindAToken ( token, SyntaxKind.EndOfCommand );
             
             //if ( kind == null ) return null;
             //if ( kind.Node != null ) return null;
-            if ( token.Kind != SyntaxKind.Comma ) return null;
+            if ( token.Kind != IdentifierKind.Comma ) return null;
 
-            SyntaxToken left = parser.Peek ( token, -1 );
+            IdentifierToken left = parser.Peek ( token, -1 );
 
             EnumartionExpression expression = new EnumartionExpression (  );
 

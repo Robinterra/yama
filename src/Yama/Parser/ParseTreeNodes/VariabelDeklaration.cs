@@ -35,7 +35,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -64,7 +64,7 @@ namespace Yama.Parser
             set;
         } = new CompileReferenceCall();
 
-        public List<SyntaxKind> Ausnahmen
+        public List<IdentifierKind> Ausnahmen
         {
             get;
         }
@@ -82,11 +82,11 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidChild ( SyntaxToken token )
+        private bool CheckHashValidChild ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            if (token.Kind == SyntaxKind.Word) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
 
             return false;
         }
@@ -102,31 +102,31 @@ namespace Yama.Parser
 
             return false;
         }*/
-        private bool CheckHashValidOperator ( SyntaxToken token )
+        private bool CheckHashValidOperator ( IdentifierToken token )
         {
-            if (token.Kind == SyntaxKind.Word) return true;
-            if (token.Kind == SyntaxKind.Int32Bit) return true;
-            if (token.Kind == SyntaxKind.Boolean) return true;
-            if (token.Kind == SyntaxKind.Char) return true;
-            if (token.Kind == SyntaxKind.Byte) return true;
-            if (token.Kind == SyntaxKind.Int16Bit) return true;
-            if (token.Kind == SyntaxKind.Int64Bit) return true;
-            if (token.Kind == SyntaxKind.Float32Bit) return true;
-            if (token.Kind == SyntaxKind.Void) return true;
+            if (token.Kind == IdentifierKind.Word) return true;
+            if (token.Kind == IdentifierKind.Int32Bit) return true;
+            if (token.Kind == IdentifierKind.Boolean) return true;
+            if (token.Kind == IdentifierKind.Char) return true;
+            if (token.Kind == IdentifierKind.Byte) return true;
+            if (token.Kind == IdentifierKind.Int16Bit) return true;
+            if (token.Kind == IdentifierKind.Int64Bit) return true;
+            if (token.Kind == IdentifierKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.Void) return true;
 
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.Word )
+            if ( token.Kind != IdentifierKind.Word )
                 if ( !this.CheckHashValidOperator ( token ) ) return null;
 
-            SyntaxToken lexerLeft = parser.Peek ( token, -1 );
+            IdentifierToken lexerLeft = parser.Peek ( token, -1 );
 
             if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
 
-            SyntaxToken lexerRight = parser.Peek ( token, 1 );
+            IdentifierToken lexerRight = parser.Peek ( token, 1 );
 
             if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
 

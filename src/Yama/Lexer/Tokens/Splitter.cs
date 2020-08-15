@@ -23,11 +23,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get
             {
-                return SyntaxKind.Splitter;
+                return IdentifierKind.Splitter;
             }
         }
 
@@ -100,7 +100,7 @@ namespace Yama.Lexer
             foreach ( ZeichenKette z in this.Split ) lexer.LexerTokens.Add ( new Replacer ( z, string.Empty ) );
 
             StringBuilder builder = new StringBuilder();
-            foreach ( SyntaxToken token in lexer )
+            foreach ( IdentifierToken token in lexer )
             {
                 builder.Append ( token.Value );
             }

@@ -9,11 +9,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public SyntaxKind Kind
+        public IdentifierKind Kind
         {
             get
             {
-                return SyntaxKind.Whitespaces;
+                return IdentifierKind.Whitespaces;
             }
         }
 

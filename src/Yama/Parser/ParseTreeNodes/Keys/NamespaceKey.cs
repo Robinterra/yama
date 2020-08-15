@@ -15,7 +15,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -54,20 +54,20 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.Namespace ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.Text ) return null;
+            if ( token.Kind != IdentifierKind.Namespace ) return null;
+            if ( parser.Peek ( token, 1 ).Kind != IdentifierKind.Text ) return null;
 
             NamespaceKey key = new NamespaceKey (  );
             token.Node = key;
 
-            SyntaxToken keyNamenToken = parser.Peek ( token, 1 );
+            IdentifierToken keyNamenToken = parser.Peek ( token, 1 );
 
             key.Token = keyNamenToken;
             keyNamenToken.Node = key;
 
-            SyntaxToken Statementchild = parser.Peek ( keyNamenToken, 1);
+            IdentifierToken Statementchild = parser.Peek ( keyNamenToken, 1);
 
             key.Statement = parser.ParseCleanToken(Statementchild, this.NextLayer);
 

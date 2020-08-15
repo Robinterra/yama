@@ -41,7 +41,7 @@ namespace Yama.Parser
             set;
         } = new CompileExecuteCall();
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -65,7 +65,7 @@ namespace Yama.Parser
             }
         }
 
-        public SyntaxKind ValidKind
+        public IdentifierKind ValidKind
         {
             get;
         }
@@ -87,11 +87,11 @@ namespace Yama.Parser
         public Operator2Childs ( List<string> validOperators, int prio )
             : this ( prio )
         {
-            this.ValidKind = SyntaxKind.Operator;
+            this.ValidKind = IdentifierKind.Operator;
             this.ValidOperators = validOperators;
         }
 
-        public Operator2Childs ( SyntaxKind kind, int prio )
+        public Operator2Childs ( IdentifierKind kind, int prio )
             : this ( prio )
         {
             this.ValidKind = kind;
@@ -101,9 +101,9 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidOperator ( SyntaxToken token )
+        private bool CheckHashValidOperator ( IdentifierToken token )
         {
-            if (this.ValidKind != SyntaxKind.Operator) return true;
+            if (this.ValidKind != IdentifierKind.Operator) return true;
 
             foreach ( string op in this.ValidOperators )
             {
@@ -113,7 +113,7 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
             if ( token.Kind != this.ValidKind ) return null;
             if ( !this.CheckHashValidOperator ( token ) ) return null;

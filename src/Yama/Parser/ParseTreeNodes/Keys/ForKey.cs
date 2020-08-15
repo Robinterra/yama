@@ -32,13 +32,13 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
         }
 
-        public SyntaxToken Ende
+        public IdentifierToken Ende
         {
             get
             {
@@ -75,18 +75,18 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.For ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != SyntaxKind.OpenBracket ) return null;
+            if ( token.Kind != IdentifierKind.For ) return null;
+            if ( parser.Peek ( token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
 
             ForKey key = new ForKey (  );
             key.Token = token;
             token.Node = key;
 
-            SyntaxToken conditionkind = parser.Peek ( token, 1 );
+            IdentifierToken conditionkind = parser.Peek ( token, 1 );
 
-            IParseTreeNode rule = new Container(SyntaxKind.OpenBracket, SyntaxKind.CloseBracket);
+            IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
 
             IParseTreeNode klammer = rule.Parse(parser, conditionkind);
 
@@ -100,7 +100,7 @@ namespace Yama.Parser
             key.Condition = t.Statements[1];
             key.Inkrementation = t.Statements[2];
 
-            SyntaxToken Statementchild = parser.Peek ( t.Ende, 1);
+            IdentifierToken Statementchild = parser.Peek ( t.Ende, 1);
 
             key.Statement = parser.ParseCleanToken(Statementchild);
 

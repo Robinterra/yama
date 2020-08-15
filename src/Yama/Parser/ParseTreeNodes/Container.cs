@@ -10,7 +10,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -22,19 +22,19 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxKind BeginKind
+        public IdentifierKind BeginKind
         {
             get;
             set;
         }
 
-        public SyntaxKind EndeKind
+        public IdentifierKind EndeKind
         {
             get;
             set;
         }
 
-        public SyntaxToken Ende
+        public IdentifierToken Ende
         {
             get;
             set;
@@ -59,7 +59,7 @@ namespace Yama.Parser
 
         }
 
-        public Container ( SyntaxKind begin, SyntaxKind ende )
+        public Container ( IdentifierKind begin, IdentifierKind ende )
         {
             this.BeginKind = begin;
             this.EndeKind = ende;
@@ -69,11 +69,11 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
             if ( token.Kind != this.BeginKind ) return null;
 
-            SyntaxToken kind = parser.FindEndTokenWithoutParse ( token, this.EndeKind, this.BeginKind );
+            IdentifierToken kind = parser.FindEndTokenWithoutParse ( token, this.EndeKind, this.BeginKind );
 
             if ( kind == null ) return null;
 

@@ -23,7 +23,7 @@ namespace Yama.Parser
             set;
         }
 
-        public SyntaxToken Token
+        public IdentifierToken Token
         {
             get;
             set;
@@ -63,12 +63,12 @@ namespace Yama.Parser
             get;
         }
 
-        public List<SyntaxKind> ValidChilds
+        public List<IdentifierKind> ValidChilds
         {
             get;
         }
 
-        public List<SyntaxKind> Ausnahmen
+        public List<IdentifierKind> Ausnahmen
         {
             get;
         }
@@ -83,7 +83,7 @@ namespace Yama.Parser
             this.Prio = prio;
         }
 
-        public Operator1ChildRight ( List<string> validOperators, int prio, List<SyntaxKind> validChilds, List<SyntaxKind> ausnahmen )
+        public Operator1ChildRight ( List<string> validOperators, int prio, List<IdentifierKind> validChilds, List<IdentifierKind> ausnahmen )
             : this ( prio )
         {
             this.ValidOperators = validOperators;
@@ -95,11 +95,11 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidChild ( SyntaxToken token )
+        private bool CheckHashValidChild ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            foreach ( SyntaxKind op in this.ValidChilds )
+            foreach ( IdentifierKind op in this.ValidChilds )
             {
                 if ( op == token.Kind ) return true;
             }
@@ -107,18 +107,18 @@ namespace Yama.Parser
             return false;
         }
 
-        private bool CheckAusnahmen ( SyntaxToken token )
+        private bool CheckAusnahmen ( IdentifierToken token )
         {
             if (token == null) return false;
 
-            foreach ( SyntaxKind op in this.Ausnahmen )
+            foreach ( IdentifierKind op in this.Ausnahmen )
             {
                 if ( op == token.Kind ) return true;
             }
 
             return false;
         }
-        private bool CheckHashValidOperator ( SyntaxToken token )
+        private bool CheckHashValidOperator ( IdentifierToken token )
         {
             foreach ( string op in this.ValidOperators )
             {
@@ -128,16 +128,16 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, SyntaxToken token )
+        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
-            if ( token.Kind != SyntaxKind.Operator ) return null;
+            if ( token.Kind != IdentifierKind.Operator ) return null;
             if ( !this.CheckHashValidOperator ( token ) ) return null;
 
-            SyntaxToken lexerLeft = parser.Peek ( token, -1 );
+            IdentifierToken lexerLeft = parser.Peek ( token, -1 );
 
             if ( this.CheckHashValidChild ( lexerLeft ) && !this.CheckAusnahmen ( lexerLeft ) ) return null;
 
-            SyntaxToken lexerRight = parser.Peek ( token, 1 );
+            IdentifierToken lexerRight = parser.Peek ( token, 1 );
 
             if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
 
