@@ -160,10 +160,11 @@ namespace Yama.Index
             if (!(this.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return true;
 
             this.Methods.AddRange(dek.Methods.Where(t=>!this.Methods.Any(q=>q.Name == t.Name)));
+            this.StaticMethods.AddRange(dek.StaticMethods.Where(t=>!this.StaticMethods.Any(q=>q.Name == t.Name)));
             this.Operators.AddRange(dek.Operators.Where(t=>!this.Operators.Any(q=>q.Name == t.Name)));
             this.Ctors.AddRange(dek.Ctors.Where(t=>this.Ctors.Count == 0));
             this.DeCtors.AddRange(dek.DeCtors.Where(t=>this.DeCtors.Count == 0));
-            this.VektorDeclaration.AddRange(dek.VektorDeclaration.Where(t=>!this.Methods.Any(q=>q.Name == t.Name)));
+            this.VektorDeclaration.AddRange(dek.VektorDeclaration.Where(t=>!this.VektorDeclaration.Any(q=>q.Name == t.Name)));
 
             List<IndexPropertyDeklaration> deks = dek.IndexProperties.Where(t=>true).ToList();
 
@@ -181,7 +182,8 @@ namespace Yama.Index
             this.PreviusMethodeMappen(this.Operators, this.ParentUsesSet);
             this.PreviusMethodeMappen(this.Ctors, this.ThisUses);
             this.PreviusMethodeMappen(this.DeCtors, this.ThisUses);
-            this.PreviusVectorMappen(this.VektorDeclaration, this.ThisUses);
+            this.PreviusVectorMappen(this.VektorDeclaration.Where(t=>t.Type == MethodeType.VektorMethode).ToList(), this.ThisUses);
+            this.PreviusVectorMappen(this.VektorDeclaration.Where(t=>t.Type == MethodeType.VektorStatic).ToList(), this.ParentUsesSet);
 
             this.PreviusPropertyMappen(this.IndexProperties, this.ThisUses);
 

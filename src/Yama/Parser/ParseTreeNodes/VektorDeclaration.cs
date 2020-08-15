@@ -185,12 +185,30 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
+        private bool CheckHashValidZusatzDefinition ( IdentifierToken token )
+        {
+            if (token.Kind == IdentifierKind.Static) return true;
+
+            return false;
+        }
+
+        private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, VektorDeclaration deklaration)
+        {
+            if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
+
+            deklaration.ZusatzDefinition = token;
+
+            return parser.Peek(token, 1);
+        }
+
         public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
 
             VektorDeclaration deklaration = new VektorDeclaration();
 
             token = this.MakeAccessValid(parser, token, deklaration);
+
+            token = this.MakeZusatzValid ( parser, token, deklaration );
 
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
@@ -257,6 +275,12 @@ namespace Yama.Parser
                 deklaration.AccessDefinition.ParentNode = deklaration;
             }
 
+            if (deklaration.ZusatzDefinition != null)
+            {
+                deklaration.ZusatzDefinition.Node = deklaration;
+                deklaration.ZusatzDefinition.ParentNode = deklaration;
+            }
+
             deklaration.TypeDefinition.Node = deklaration;
             deklaration.Token.Node = deklaration;
 
@@ -266,6 +290,8 @@ namespace Yama.Parser
         public MethodeType GetMethodeType()
         {
             MethodeType type = MethodeType.VektorMethode;
+
+            if (this.ZusatzDefinition != null) return MethodeType.VektorStatic;
 
             return type;
         }
@@ -323,6 +349,8 @@ namespace Yama.Parser
 
         private bool IndezierenNonStaticDek(IndexVaktorDeklaration deklaration)
         {
+
+            if (deklaration.Type != MethodeType.VektorMethode) return true;
 
             IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration();
             thisdek.Name = "this";

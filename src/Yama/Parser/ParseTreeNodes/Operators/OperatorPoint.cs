@@ -46,8 +46,13 @@ namespace Yama.Parser
             get
             {
                 if (this.RightNode is ReferenceCall rc)
+                {
                     if (rc.Reference.Deklaration is IndexMethodDeklaration dek)
                         return dek.Type != MethodeType.Static;
+
+                    if (rc.Reference.Deklaration is IndexVaktorDeklaration vd)
+                        return vd.Type != MethodeType.VektorStatic;
+                }
 
                 return false;
             }
@@ -150,8 +155,13 @@ namespace Yama.Parser
         private bool CompileLeftNodeIfNotStaticClass(Compiler.Compiler compiler, string mode)
         {
             if (this.RightNode is ReferenceCall rct)
+            {
                 if (rct.Reference.Deklaration is IndexMethodDeklaration t)
                     if (t.Type == MethodeType.Static) return true;
+
+                if (rct.Reference.Deklaration is IndexVaktorDeklaration vd)
+                    if (vd.Type == MethodeType.VektorStatic) return true;
+            }
 
             return this.LeftNode.Compile(compiler, "default");
         }
@@ -171,6 +181,8 @@ namespace Yama.Parser
 
         private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexVaktorDeklaration methdek)
         {
+            if (methdek.Type == MethodeType.VektorStatic) return true;
+
             CompileMovResult movResultRight = new CompileMovResult();
 
             movResultRight.Compile(compiler, null, mode);

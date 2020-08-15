@@ -160,7 +160,7 @@ namespace Yama.Index
             if (md != null) { md.References.Add(this); return md; }
             md = kd.Operators.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
-            IndexVaktorDeklaration vd = kd.VektorDeclaration.FirstOrDefault(t=>t.Name == this.Name);
+            IndexVaktorDeklaration vd = kd.VektorDeclaration.FirstOrDefault(t=>t.Name == this.Name && t.Type == MethodeType.VektorMethode);
             if (vd != null) return vd;
             IndexPropertyDeklaration pd = kd.IndexProperties.FirstOrDefault(t=>t.Name == this.Name);
             if (pd == null) return null;
@@ -179,6 +179,8 @@ namespace Yama.Index
             if (md != null) { md.References.Add(this); return md; }
             md = kd.Operators.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
+            IndexVaktorDeklaration vd = kd.VektorDeclaration.FirstOrDefault(t=>t.Name == this.Name && t.Type == MethodeType.VektorStatic);
+            if (vd != null) return vd;
             IndexPropertyDeklaration pd = kd.IndexProperties.FirstOrDefault(t=>t.Name == this.Name);
             if (pd == null) return null;
 

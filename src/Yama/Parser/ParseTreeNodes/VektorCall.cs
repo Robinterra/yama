@@ -191,7 +191,7 @@ namespace Yama.Parser
             this.LeftNode.Compile(compiler, modeCall);
             if (!(this.LeftNode is OperatorPoint op)) return false;
 
-            parasCount++;
+            if (op.IsANonStatic) parasCount++;
 
             for (int i = 0; i < parasCount; i++)
             {

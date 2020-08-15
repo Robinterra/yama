@@ -148,6 +148,7 @@ namespace Yama.Parser
             //container.VariabelnReferences.Add(reference);
 
             if (this.Token.Text == "=") return true;
+            if (varref == null) return index.CreateError(this);
 
             varref.ParentCall = reference;
             varref.VariabelnReferences.Add(reference);

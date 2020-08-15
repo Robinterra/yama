@@ -170,6 +170,7 @@ namespace Yama.Index
         Implicit,
         Property,
         PropertyStatic,
-        VektorMethode
+        VektorMethode,
+        VektorStatic
     }
 }
