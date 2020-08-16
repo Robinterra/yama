@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
@@ -150,18 +151,36 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            for (int i = this.Parameters.Count; i > 0; i-- )
+            List<IParseTreeNode> copylist = this.Parameters.ToArray().ToList();
+            copylist.Reverse();
+            IParseTreeNode dek = null;
+
+            int parasCount = 0;
+
+            foreach (IParseTreeNode par in copylist )
             {
-                this.Parameters[i - 1].Compile(compiler, mode);
+                dek = par;
+                if (par is EnumartionExpression b) dek = b.ExpressionParent;
+                if (dek == null) continue;
+
+                dek.Compile(compiler, mode);
 
                 CompileMovResult movResultRight = new CompileMovResult();
 
-                movResultRight.Compile(compiler, null, mode);
+                movResultRight.Compile(compiler, null, "default");
+
+                parasCount++;
             }
+
+            CompileMovResult thisres = new CompileMovResult();
+
+            thisres.Compile(compiler, null, "default");
 
             this.CtorCall.Compile(compiler, this.Reference, "methode");
 
-            for (int i = 0; i < this.Parameters.Count; i++)
+            parasCount++;
+
+            for (int i = 0; i < parasCount; i++)
             {
                 CompileUsePara usePara = new CompileUsePara();
 

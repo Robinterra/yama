@@ -398,7 +398,11 @@ namespace Yama.Compiler.Definition
 
                 if (registerStart > this.WorkingRegisterLast) { this.Compiler.AddError("Arbeitsregister voll Ausgelastet"); return null; }
 
-                result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
+                string reg = this.AviableRegisters[registerStart];
+
+                result.Add(string.Format(keypattern, i), reg);
+
+                if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
             }
 
             return result;
