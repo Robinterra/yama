@@ -65,7 +65,7 @@ namespace Yama.Parser
         {
             if ( token.Kind != IdentifierKind.OpenBracket ) return null;
 
-            IdentifierToken kind = parser.FindEndToken ( token, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
+            IdentifierToken kind = parser.FindEndTokenWithoutParse ( token, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
 
             if ( kind == null ) return null;
 

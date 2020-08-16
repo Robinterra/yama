@@ -117,7 +117,9 @@ namespace Yama.Parser
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
             if (this.ElseStatement != null) this.ElseStatement.Indezieren(index, parent);
+
             this.IfStatement.Indezieren(index, parent);
+
             this.Condition.Indezieren(index, parent);
 
             return true;
