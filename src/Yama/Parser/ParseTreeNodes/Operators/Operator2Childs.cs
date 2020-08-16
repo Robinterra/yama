@@ -172,13 +172,13 @@ namespace Yama.Parser
 
             CompileMovResult movResultRight = new CompileMovResult();
 
-            movResultRight.Compile(compiler, null, mode);
+            movResultRight.Compile(compiler, null, "default");
 
             this.LeftNode.Compile(compiler, mode);
 
             CompileMovResult movResultLeft = new CompileMovResult();
 
-            movResultLeft.Compile(compiler, null, mode);
+            movResultLeft.Compile(compiler, null, "default");
 
             this.OperatorCall.Compile(compiler, this.Reference, "methode");
 

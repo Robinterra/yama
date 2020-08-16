@@ -462,7 +462,7 @@ namespace Yama.Parser
             refCall.CompileDek(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");
 
             CompileMovResult movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, mode);
+            movResultRight.Compile(compiler, null, "default");
 
             usePara = new CompileUsePara();
             usePara.Compile(compiler, null);
@@ -484,7 +484,7 @@ namespace Yama.Parser
             num.Compile(compiler, new Number { Token = new IdentifierToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
 
             CompileMovResult movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, mode);
+            movResultRight.Compile(compiler, null, "default");
 
             CompileUsePara usePara = new CompileUsePara();
             usePara.Compile(compiler, null);
@@ -496,7 +496,7 @@ namespace Yama.Parser
             executeCall.Compile(compiler, (MethodeDeclarationNode)this.Malloc.ParentCall.Deklaration.Use);
 
             movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, mode);
+            movResultRight.Compile(compiler, null, "default");
 
             usePara = new CompileUsePara();
             usePara.Compile(compiler, null);

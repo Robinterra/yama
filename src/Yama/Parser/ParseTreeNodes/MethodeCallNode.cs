@@ -156,6 +156,7 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+
             List<IParseTreeNode> copylist = this.ParametersNodes.ToArray().ToList();
             copylist.Reverse();
             IParseTreeNode dek = null;
@@ -172,7 +173,7 @@ namespace Yama.Parser
 
                 CompileMovResult movResultRight = new CompileMovResult();
 
-                movResultRight.Compile(compiler, null, mode);
+                movResultRight.Compile(compiler, null, "default");
 
                 parasCount++;
             }

@@ -174,7 +174,7 @@ namespace Yama.Parser
 
             CompileMovResult movResultRight = new CompileMovResult();
 
-            movResultRight.Compile(compiler, null, mode);
+            movResultRight.Compile(compiler, null, "default");
 
             return true;
         }
@@ -185,7 +185,7 @@ namespace Yama.Parser
 
             CompileMovResult movResultRight = new CompileMovResult();
 
-            movResultRight.Compile(compiler, null, mode);
+            movResultRight.Compile(compiler, null, "default");
 
             return true;
         }
