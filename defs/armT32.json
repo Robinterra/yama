@@ -1,0 +1,551 @@
+{
+    "Name": "arm-t32",
+    "CalculationBytes": 4,
+    "AdressBytes": 4,
+    "WorkingRegisterStart": 2,
+    "PlaceToKeepRegisterStart": 2,
+    "WorkingRegisterLast": 23,
+    "PlaceToKeepRegisterLast": 23,
+    "Algos": [
+      {
+        "Name": "ReferenceCall",
+        "Mode": "default",
+        "Description": "Der aufruf einer ganz normalen Variabel",
+        "Keys": [
+          {
+            "Name": "[VAR]",
+            "Values": [
+              "2",
+              "2"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "ldd r24,[VAR[0]]",
+          "ldd r25,[VAR[1]]"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "point",
+        "Description": "Der aufruf eines Property einer Instance",
+        "Keys": [
+          {
+            "Name": "[PROPERTY]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "movw r30, r24",
+          "ldi r24,[PROPERTY[0]]",
+          "add r30,r24",
+          "adc r31, r0",
+          "LD r24, Z",
+          "adiw r30, 1",
+          "LD r25, Z"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "setpoint",
+        "Description": "Der setzen eines Property einer Instance",
+        "Keys": [
+          {
+            "Name": "[PROPERTY]",
+            "Values": [
+            ]
+          },
+          {
+            "Name": "[REGPOP]",
+            "Values": [
+              "2",
+              "1"
+            ]
+          }
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "movw r30, r24",
+          "ldi r24,[PROPERTY[0]]",
+          "add r30,r24",
+          "adc r31, r0",
+          "st Z,[REGPOP[1]]",
+          "adiw r30, 1",
+          "st Z,[REGPOP[0]]"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "methode",
+        "Description": "Der aufruf einer ganz normalen Methode",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          },
+          {
+            "Name": "[GS]",
+            "Values": null
+          },
+          {
+            "Name": "[HIGH]",
+            "Values": null
+          },
+          {
+            "Name": "[LOW]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "ldi r24,[LOW]([GS]([NAME]))",
+          "ldi r25,[HIGH]([GS]([NAME]))"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "set",
+        "Description": "Das setzen einer ganz normalen Variabel",
+        "Keys": [
+          {
+            "Name": "[VAR]",
+            "Values": [
+              "2",
+              "2"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "std [VAR[0]],r24",
+          "std [VAR[1]],r25"
+        ]
+      },
+      {
+        "Name": "MovResult",
+        "Mode": "default",
+        "Description": "Das verschieben eines Ergebnisses",
+        "Keys": [
+          {
+            "Name": "[REG]",
+            "Values": [
+              "2",
+              "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "movw [REG[0]], r24"
+        ]
+      },
+      {
+        "Name": "ExecuteCall",
+        "Mode": "default",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "movw r30, r24",
+          "icall"
+        ]
+      },
+      {
+        "Name": "FunktionsDeklaration",
+        "Mode": "default",
+        "Description": "Die Deklaration einer Funktion",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          },
+          {
+            "Name": "[SPH]",
+            "Values": null
+          },
+          {
+            "Name": "[SPL]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [
+          {
+            "Name": "[PUSHREG]",
+            "Values": null
+          },
+          {
+            "Name": "[VARCOUNT]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "[NAME]:",
+          "push r28",
+          "push r29",
+          "[PUSHREG]",
+          "in r28,[SPL]",
+          "in r29,[SPH]",
+          "sbiw r28,[VARCOUNT]",
+          "out [SPL],r28",
+          "out [SPH],r29"
+        ]
+      },
+      {
+        "Name": "FunktionsEnde",
+        "Mode": "default",
+        "Description": "Das ende einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SPH]",
+            "Values": null
+          },
+          {
+            "Name": "[SPL]",
+            "Values": null
+          },
+          {
+            "Name": "[SREG]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [
+          {
+            "Name": "[POPREG]",
+            "Values": null
+          },
+          {
+            "Name": "[VARCOUNT]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "adiw r28,[VARCOUNT]",
+          "out [SPL],r28",
+          "out [SPH],r29",
+          "[POPREG]",
+          "pop r29",
+          "pop r28",
+          "ret"
+        ]
+      },
+      {
+        "Name": "UsePara",
+        "Mode": "default",
+        "Description": "Ein Registry Cache Entry als Parameter nutzen",
+        "Keys": [
+          {
+            "Name": "[REGPOP]",
+            "Values": null
+          },
+          {
+            "Name": "[PARA]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "movw [PARA[0]],[REGPOP[0]]"
+        ]
+      },
+      {
+        "Name": "UsePara",
+        "Mode": "get",
+        "Description": "Ein Parameter in seine Variabel laden",
+        "Keys": [
+          {
+            "Name": "[VAR]",
+            "Values": [
+              "2",
+              "2"
+            ]
+          },
+          {
+            "Name": "[PARA]",
+            "Values": [
+              "2",
+              "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "std [VAR[0]],[PARA[0]]",
+          "std [VAR[1]],[PARA[1]]"
+        ]
+      },
+      {
+        "Name": "NumConst",
+        "Mode": "default",
+        "Description": "Die Konstante in das Register laden",
+        "Keys": [
+          {
+            "Name": "[NUMCONST]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "ldi r24,[NUMCONST[0]]",
+          "ldi r25,[NUMCONST[1]]"
+        ]
+      },
+      {
+        "Name": "CompileHeader",
+        "Mode": "default",
+        "Description": "Das setzen des Headers, hier wird der Stack und der Heap initialisiert",
+        "Keys": [
+          {
+            "Name": "[SPH]",
+            "Values": null
+          },
+          {
+            "Name": "[SPL]",
+            "Values": null
+          },
+          {
+            "Name": "[RAMBEGIN_LOW]",
+            "Values": null
+          },
+          {
+            "Name": "[RAMBEGIN_HIGH]",
+            "Values": null
+          },
+          {
+            "Name": "[RAMENDE_LOW]",
+            "Values": null
+          },
+          {
+            "Name": "[RAMENDE_HIGH]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "ldi r24, 0x1",
+          "ldi r30, [RAMBEGIN_LOW]",
+          "ldi r31, [RAMBEGIN_HIGH]",
+          "ST Z,r24",
+          "ldi r24, [RAMENDE_LOW]",
+          "STD Z+1,r24",
+          "out [SPL],r24",
+          "ldi r24, [RAMENDE_HIGH]",
+          "STD Z+2,r24",
+          "out [SPH],r24",
+          "rjmp main"
+        ]
+      },
+      {
+        "Name": "JumpTo",
+        "Mode": "default",
+        "Description": "Springt zum ziel punkt",
+        "Keys": [
+          {
+            "Name": "[JUMPTO]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "rjmp [JUMPTO]"
+        ]
+      },
+      {
+        "Name": "JumpWithCondition",
+        "Mode": "isZero",
+        "Description": "Springt zum ziel punkt wenn ist 0",
+        "Keys": [
+          {
+            "Name": "[JUMPTO]",
+            "Values": null
+          },
+          {
+            "Name": "[JUMPTO]",
+            "Values": [
+            "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "or r24,r25",
+          "tst r24",
+          "brne [JUMPTO[0]]",
+          "rjmp [JUMPTO]",
+          "[JUMPTO[0]]:"
+        ]
+      },
+      {
+        "Name": "SprungPunkt",
+        "Mode": "default",
+        "Description": "Das setzen eines sprungounktes",
+        "Keys": [],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "[NAME]:"
+        ]
+      }
+    ],
+    "ZuweisungsRegister": 0,
+    "AviableRegisters": [
+      "r0",
+      "r1",
+      "r2",
+      "r3",
+      "r4",
+      "r5",
+      "r6",
+      "r7",
+      "r8",
+      "r9",
+      "r10",
+      "r11",
+      "r12",
+      "r13",
+      "r14",
+      "r15",
+      "r16",
+      "r17",
+      "r18",
+      "r19",
+      "r20",
+      "r21",
+      "r22",
+      "r23",
+      "r24",
+      "r25",
+      "r26",
+      "r27",
+      "r28",
+      "r29",
+      "r30",
+      "r31"
+    ],
+    "AdvancedKeyReplaces": [
+      {
+        "Key": "[SPL]",
+        "Value": "0x3d",
+        "Defines": [
+          "atmega328p"
+        ]
+      },
+      {
+        "Key": "[SPH]",
+        "Value": "0x3e",
+        "Defines": [
+          "atmega328p"
+        ]
+      },
+      {
+        "Key": "[SREG]",
+        "Value": "0x3f",
+        "Defines": [
+          "atmega328p"
+        ]
+      },
+      {
+        "Key": "[RAMENDE_LOW]",
+        "Value": "0xff",
+        "Defines": [
+          "atmega328p"
+        ]
+      },
+      {
+        "Key": "[RAMENDE_HIGH]",
+        "Value": "0x08",
+        "Defines": [
+          "atmega328p"
+        ]
+      },
+      {
+        "Key": "[RAMBEGIN_LOW]",
+        "Value": "0x00",
+        "Defines": [
+          "atmega328p"
+        ]
+      },
+      {
+        "Key": "[RAMBEGIN_HIGH]",
+        "Value": "0x01",
+        "Defines": [
+          "atmega328p"
+        ]
+      },
+      {
+        "Key": "[HIGH]",
+        "Value": "hi8",
+        "Defines": [
+          "avr-gcc"
+        ]
+      },
+      {
+        "Key": "[LOW]",
+        "Value": "lo8",
+        "Defines": [
+          "avr-gcc"
+        ]
+      },
+      {
+        "Key": "[GS]",
+        "Value": "gs",
+        "Defines": [
+          "avr-gcc"
+        ]
+      },
+      {
+        "Key": "[HIGH]",
+        "Value": "high",
+        "Defines": [
+          "avrasm"
+        ]
+      },
+      {
+        "Key": "[LOW]",
+        "Value": "low",
+        "Defines": [
+          "avrasm"
+        ]
+      },
+      {
+        "Key": "[GS]",
+        "Value": "",
+        "Defines": [
+          "avrasm"
+        ]
+      }
+    ],
+    "KeyPatterns": [
+      {
+        "Key": "[NUMCONST]",
+        "Pattern": "0x{0:X}"
+      },
+      {
+        "Key": "[PROPERTY]",
+        "Pattern": "0x{0:X}"
+      },
+      {
+        "Key": "[VARCOUNT]",
+        "Pattern": "0x{0:X}"
+      },
+      {
+        "Key": "[VAR]",
+        "Pattern": "Y\u002B{0}"
+      },
+      {
+        "Key":"JUMPHELPER",
+        "Pattern":"JUMPHELPER_{0}"
+      },
+      {
+        "Key": "[POPREG]",
+        "Pattern": "POP {0}\n{1}"
+      },
+      {
+        "Key":"[PUSHREG]",
+        "Pattern":"{1}PUSH {0}\n"
+      }
+    ]
+  }
