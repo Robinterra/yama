@@ -389,7 +389,7 @@ namespace Yama.Compiler.Definition
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
-            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
+            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : (this.AdressBytes / this.CalculationBytes);
 
             for (int i = 0; i < duration; i++ )
             {
@@ -416,12 +416,14 @@ namespace Yama.Compiler.Definition
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
-            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
+            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : (this.AdressBytes / this.CalculationBytes);
 
-            this.CurrentPlaceToKeepRegister += (bytes * duration) + 1;
+            int einzelbyte = bytes / duration;
+
+            this.CurrentPlaceToKeepRegister += bytes + 1;
             for (int i = 0; i < duration; i++ )
             {
-                this.CurrentPlaceToKeepRegister -= bytes;
+                this.CurrentPlaceToKeepRegister -= einzelbyte;
                 int registerStart = this.CurrentPlaceToKeepRegister;
 
                 if (registerStart > this.PlaceToKeepRegisterLast)
@@ -429,7 +431,7 @@ namespace Yama.Compiler.Definition
 
                 result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
             }
-            this.CurrentPlaceToKeepRegister += (bytes * duration) - 1;
+            this.CurrentPlaceToKeepRegister += bytes - 1;
 
             return result;
         }
@@ -442,13 +444,15 @@ namespace Yama.Compiler.Definition
             Dictionary<string,string> result = new Dictionary<string,string>();
 
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
-            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
+            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : (this.AdressBytes / this.CalculationBytes);
 
-            this.CurrentPlaceToKeepRegister -= (bytes * duration)-1;
+            int einzelbyte = bytes / duration;
+
+            this.CurrentPlaceToKeepRegister -= bytes - 1;
             for (int i = 0; i < duration; i++ )
             {
                 int registerStart = this.CurrentPlaceToKeepRegister;
-                this.CurrentPlaceToKeepRegister += bytes;
+                this.CurrentPlaceToKeepRegister += einzelbyte;
 
                 if (registerStart < this.PlaceToKeepRegisterStart ) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
 
@@ -458,7 +462,7 @@ namespace Yama.Compiler.Definition
 
                 if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
             }
-            this.CurrentPlaceToKeepRegister -= (bytes * duration) + 1;
+            this.CurrentPlaceToKeepRegister -= bytes + 1;
 
             return result;
         }

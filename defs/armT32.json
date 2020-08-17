@@ -2,10 +2,10 @@
     "Name": "arm-t32",
     "CalculationBytes": 4,
     "AdressBytes": 4,
-    "WorkingRegisterStart": 2,
-    "PlaceToKeepRegisterStart": 2,
-    "WorkingRegisterLast": 23,
-    "PlaceToKeepRegisterLast": 23,
+    "WorkingRegisterStart": 0,
+    "PlaceToKeepRegisterStart": 0,
+    "WorkingRegisterLast": 11,
+    "PlaceToKeepRegisterLast": 11,
     "Algos": [
       {
         "Name": "ReferenceCall",
@@ -133,15 +133,12 @@
         "Keys": [
           {
             "Name": "[REG]",
-            "Values": [
-              "2",
-              "1"
-            ]
+            "Values": [ ]
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "movw [REG[0]], r24"
+          "mov [REG[0]], r12"
         ]
       },
       {
@@ -240,16 +237,16 @@
         "Keys": [
           {
             "Name": "[REGPOP]",
-            "Values": null
+            "Values": []
           },
           {
             "Name": "[PARA]",
-            "Values": null
+            "Values": []
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "movw [PARA[0]],[REGPOP[0]]"
+          "mov [PARA[0]],[REGPOP[0]]"
         ]
       },
       {
@@ -285,13 +282,12 @@
         "Keys": [
           {
             "Name": "[NUMCONST]",
-            "Values": null
+            "Values": []
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "ldi r24,[NUMCONST[0]]",
-          "ldi r25,[NUMCONST[1]]"
+          "ldr r12,=[NUMCONST[0]]"
         ]
       },
       {
@@ -405,25 +401,9 @@
       "r10",
       "r11",
       "r12",
-      "r13",
-      "r14",
-      "r15",
-      "r16",
-      "r17",
-      "r18",
-      "r19",
-      "r20",
-      "r21",
-      "r22",
-      "r23",
-      "r24",
-      "r25",
-      "r26",
-      "r27",
-      "r28",
-      "r29",
-      "r30",
-      "r31"
+      "sp",
+      "lr",
+      "pc"
     ],
     "AdvancedKeyReplaces": [
       {
