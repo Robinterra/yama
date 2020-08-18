@@ -24,9 +24,9 @@ namespace "System"
         *
         * @return (bool) Wenn a kleiner ist dann true ansonsten false
         */
-        public operator bool <(int a, int b)
+        simple operator bool <(int a, int b)
         {
-            return #defalgo IntCompare,LessThan:;
+            #defalgo IntCompare,LessThan:;
         }
 
         // -----------------------------------------------
@@ -56,9 +56,9 @@ namespace "System"
         *
         * @return (bool) Wenn a kleiner ist dann true ansonsten false
         */
-        public operator bool >=(int a, int b)
+        simple operator bool >=(int a, int b)
         {
-            return #defalgo IntCompare,GreaterEqualsThan:;
+            #defalgo IntCompare,GreaterEqualsThan:;
         }
 
         // -----------------------------------------------
@@ -88,9 +88,9 @@ namespace "System"
         *
         * @return (bool) if equals then return true
         */
-        public operator bool ==(int a, int b)
+        simple operator bool ==(int a, int b)
         {
-            return #defalgo IntCompare,Equals:;
+            #defalgo IntCompare,Equals:;
         }
 
         // -----------------------------------------------
@@ -128,10 +128,10 @@ namespace "System"
         *
         * @return (int) Result
         */
-        public operator int &(int a, int b)
+        simple operator int &(int a, int b)
         {
 
-            return #defalgo IntArimetics,BinaryAnd:;
+            #defalgo IntArimetics,BinaryAnd:;
         }
 
         // -----------------------------------------------
@@ -144,10 +144,10 @@ namespace "System"
         *
         * @return (int) Result
         */
-        public operator int |(int a, int b)
+        simple operator int |(int a, int b)
         {
 
-            return #defalgo IntArimetics,BinaryOr:;
+            #defalgo IntArimetics,BinaryOr:;
         }
 
         // -----------------------------------------------
@@ -160,10 +160,10 @@ namespace "System"
         *
         * @return (int) Result
         */
-        public operator int !(int a, int b)
+        simple operator int !(int a, int b)
         {
 
-            return #defalgo IntArimetics,BinaryNegation:;
+            #defalgo IntArimetics,BinaryNegation:;
         }
 
         // -----------------------------------------------
@@ -176,10 +176,10 @@ namespace "System"
         *
         * @return (int) Result
         */
-        public operator int ^(int a, int b)
+        simple operator int ^(int a, int b)
         {
 
-            return #defalgo IntArimetics,BinaryXor:;
+            #defalgo IntArimetics,BinaryXor:;
         }
 
         // -----------------------------------------------
@@ -200,10 +200,10 @@ namespace "System"
         *
         * @return (int) Result
         */
-        public operator int -(int a, int b)
+        simple operator int -(int a, int b)
         {
 
-            return #defalgo IntArimetics,Subtraction:;
+            #defalgo IntArimetics,Subtraction:;
         }
 
         // -----------------------------------------------
@@ -215,9 +215,9 @@ namespace "System"
         *
         * @return (int) Result
         */
-        public operator int ++(int a)
+        simple operator int ++(int a)
         {
-            return #defalgo IntArimetics,Incremtation: = a;
+            #defalgo IntArimetics,Incremtation:;
         }
 
         // -----------------------------------------------
@@ -229,9 +229,9 @@ namespace "System"
         *
         * @return (int) Result
         */
-        public operator int --(int a)
+        simple operator int --(int a)
         {
-            return #defalgo IntArimetics,Decremtation: = a;
+            #defalgo IntArimetics,Decremtation:;
         }
 
         // -----------------------------------------------
@@ -244,9 +244,9 @@ namespace "System"
         *
         * @return (int) Result
         */
-        public operator int +(int a, int b)
+        simple operator int +(int a, int b)
         {
-            return #defalgo IntArimetics,Addition:;
+            #defalgo IntArimetics,Addition:;
         }
 
         // -----------------------------------------------

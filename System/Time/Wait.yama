@@ -23,7 +23,7 @@ namespace "System.Time"
             {
                 #defalgo Wait,second:;
 
-                seconds = #defalgo IntArimetics,Decremtation: = seconds;
+                --seconds;
 
                 if ( seconds ) continue;
 

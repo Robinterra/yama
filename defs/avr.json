@@ -155,6 +155,22 @@
     },
     {
       "Name": "FunktionsDeklaration",
+      "Mode": "simple",
+      "Description": "Die Deklaration einer Funktion",
+      "Keys": [
+        {
+          "Name": "[NAME]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [
+      ],
+      "AssemblyCommands": [
+        "[NAME]:"
+      ]
+    },
+    {
+      "Name": "FunktionsDeklaration",
       "Mode": "default",
       "Description": "Die Deklaration einer Funktion",
       "Keys": [
@@ -228,6 +244,16 @@
         "[POPREG]",
         "pop r29",
         "pop r28",
+        "ret"
+      ]
+    },
+    {
+      "Name": "FunktionsEnde",
+      "Mode": "simple",
+      "Description": "Das ende einer Funktion",
+      "Keys": [ ],
+      "PostKeys": [],
+      "AssemblyCommands": [
         "ret"
       ]
     },

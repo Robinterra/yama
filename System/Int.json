@@ -88,6 +88,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
+                    "movw r24, r2",
                     "adiw r24,0x1"
                 ]
             },
@@ -99,6 +100,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
+                    "movw r24, r2",
                     "sbiw r24,0x1"
                 ]
             },

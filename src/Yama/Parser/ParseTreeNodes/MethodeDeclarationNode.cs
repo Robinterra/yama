@@ -215,6 +215,8 @@ namespace Yama.Parser
         {
             if (token.Kind == IdentifierKind.Public) return true;
             if (token.Kind == IdentifierKind.Private) return true;
+            if (token.Kind == IdentifierKind.Copy) return true;
+            if (token.Kind == IdentifierKind.Simple) return true;
 
             return false;
         }
@@ -443,6 +445,9 @@ namespace Yama.Parser
             this.CompileContainer.Ende = new CompileSprungPunkt();
             compiler.SetNewContainer(this.CompileContainer);
 
+            if (this.AccessDefinition != null)
+                if (this.AccessDefinition.Kind == IdentifierKind.Simple) mode = "simple";
+
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
 
             if (this.Deklaration.Type == MethodeType.Ctor) this.CompileCtor(compiler, mode);
@@ -506,29 +511,30 @@ namespace Yama.Parser
 
         private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode)
         {
-            foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
-            {
-                CompileUsePara usePara = new CompileUsePara();
+            if (mode != "simple")
+                foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
+                {
+                    CompileUsePara usePara = new CompileUsePara();
 
-                usePara.CompileIndexNode(compiler, node, "get");
+                    usePara.CompileIndexNode(compiler, node, "get");
 
-                if (node.Name != "this") continue;
-                if (this.Deklaration.Klasse.InheritanceBase == null) continue;
+                    if (node.Name != "this") continue;
+                    if (this.Deklaration.Klasse.InheritanceBase == null) continue;
 
-                CompileReferenceCall compileReference = new CompileReferenceCall();
-                compileReference.CompileDek(compiler, node, "default");
+                    CompileReferenceCall compileReference = new CompileReferenceCall();
+                    compileReference.CompileDek(compiler, node, "default");
 
-                compileReference = new CompileReferenceCall();
-                compileReference.CompileDek(compiler, this.Deklaration.Klasse.BaseVar, "set");
-            }
+                    compileReference = new CompileReferenceCall();
+                    compileReference.CompileDek(compiler, this.Deklaration.Klasse.BaseVar, "set");
+                }
 
             compiler.Definition.ParaClean();
 
-            this.CompileContainer.Begin.Compile(compiler, this, mode);
+            this.CompileContainer.Begin.Compile(compiler, this, "default");
 
-            this.Statement.Compile(compiler, mode);
+            this.Statement.Compile(compiler, "default");
 
-            this.CompileContainer.Ende.Compile(compiler, this, mode);
+            this.CompileContainer.Ende.Compile(compiler, this, "default");
 
             this.FunktionsEndeCompile.Compile(compiler, this, mode);
 

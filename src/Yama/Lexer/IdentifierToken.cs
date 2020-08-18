@@ -225,6 +225,8 @@ namespace Yama.Lexer
         OperatorKey,
         Explicit,
         Implicit,
+        Simple,
+        Copy,
     }
 }
 
