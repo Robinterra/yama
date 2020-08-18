@@ -396,7 +396,8 @@ namespace Yama.Compiler.Definition
                 int registerStart = this.CurrentWorkingRegister;
                 this.CurrentWorkingRegister += bytes;
 
-                if (registerStart > this.WorkingRegisterLast) { this.Compiler.AddError("Arbeitsregister voll Ausgelastet"); return null; }
+                if (registerStart > this.WorkingRegisterLast)
+                { this.Compiler.AddError("Arbeitsregister voll Ausgelastet"); return null; }
 
                 string reg = this.AviableRegisters[registerStart];
 

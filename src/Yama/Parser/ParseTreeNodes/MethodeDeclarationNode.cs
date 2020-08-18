@@ -439,6 +439,9 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            if (this.AccessDefinition != null)
+                if (this.AccessDefinition.Kind == IdentifierKind.Copy) return true;
+
             compiler.Definition.BeginNewMethode(this.RegisterInUse);
 
             this.CompileContainer.Begin = new CompileSprungPunkt();
