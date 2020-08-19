@@ -403,7 +403,7 @@ namespace Yama.Compiler.Definition
 
                 result.Add(string.Format(keypattern, i), reg);
 
-                if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
+                //if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
             }
 
             return result;

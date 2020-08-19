@@ -453,6 +453,27 @@ namespace Yama.Parser
 
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
 
+            if (mode != "simple")
+            {
+                foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
+                {
+                    CompileUsePara usePara = new CompileUsePara();
+
+                    usePara.CompileIndexNode(compiler, node, "get");
+
+                    if (node.Name != "this") continue;
+                    if (this.Deklaration.Klasse.InheritanceBase == null) continue;
+
+                    CompileReferenceCall compileReference = new CompileReferenceCall();
+                    compileReference.CompileDek(compiler, node, "default");
+
+                    compileReference = new CompileReferenceCall();
+                    compileReference.CompileDek(compiler, this.Deklaration.Klasse.BaseVar, "set");
+                }
+
+                compiler.Definition.ParaClean();
+            }
+
             if (this.Deklaration.Type == MethodeType.Ctor) this.CompileCtor(compiler, mode);
             if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(compiler, mode);
 
@@ -506,33 +527,15 @@ namespace Yama.Parser
             movResultRight = new CompileMovResult();
             movResultRight.Compile(compiler, null, "default");
 
-            usePara = new CompileUsePara();
-            usePara.Compile(compiler, null);
+            IndexVariabelnDeklaration dek = this.Deklaration.Parameters.FirstOrDefault(t=>t.Name == "this");
+            CompileReferenceCall a = new CompileReferenceCall();
+            a.CompileDek(compiler, dek, "set");
 
             return compiler.Definition.ParaClean();
         }
 
         private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode)
         {
-            if (mode != "simple")
-                foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
-                {
-                    CompileUsePara usePara = new CompileUsePara();
-
-                    usePara.CompileIndexNode(compiler, node, "get");
-
-                    if (node.Name != "this") continue;
-                    if (this.Deklaration.Klasse.InheritanceBase == null) continue;
-
-                    CompileReferenceCall compileReference = new CompileReferenceCall();
-                    compileReference.CompileDek(compiler, node, "default");
-
-                    compileReference = new CompileReferenceCall();
-                    compileReference.CompileDek(compiler, this.Deklaration.Klasse.BaseVar, "set");
-                }
-
-            compiler.Definition.ParaClean();
-
             this.CompileContainer.Begin.Compile(compiler, this, "default");
 
             this.Statement.Compile(compiler, "default");
