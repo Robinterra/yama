@@ -332,7 +332,7 @@
           "ldi r24, [RAMENDE_HIGH]",
           "STD Z+2,r24",
           "out [SPH],r24",
-          "rjmp main"
+          "b main"
         ]
       },
       {
@@ -347,7 +347,7 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "rjmp [JUMPTO]"
+          "b [JUMPTO]"
         ]
       },
       {
@@ -370,8 +370,8 @@
         "AssemblyCommands": [
           "or r24,r25",
           "tst r24",
-          "brne [JUMPTO[0]]",
-          "rjmp [JUMPTO]",
+          "bne [JUMPTO[0]]",
+          "b [JUMPTO]",
           "[JUMPTO[0]]:"
         ]
       },
