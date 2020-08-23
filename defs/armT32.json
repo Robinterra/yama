@@ -4,8 +4,8 @@
     "AdressBytes": 4,
     "WorkingRegisterStart": 0,
     "PlaceToKeepRegisterStart": 0,
-    "WorkingRegisterLast": 11,
-    "PlaceToKeepRegisterLast": 11,
+    "WorkingRegisterLast": 10,
+    "PlaceToKeepRegisterLast": 10,
     "Algos": [
       {
         "Name": "ReferenceCall",
@@ -15,15 +15,12 @@
           {
             "Name": "[VAR]",
             "Values": [
-              "2",
-              "2"
             ]
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "ldd r24,[VAR[0]]",
-          "ldd r25,[VAR[1]]"
+          "ldr r12,[VAR[0]]"
         ]
       },
       {
@@ -87,24 +84,11 @@
           {
             "Name": "[NAME]",
             "Values": null
-          },
-          {
-            "Name": "[GS]",
-            "Values": null
-          },
-          {
-            "Name": "[HIGH]",
-            "Values": null
-          },
-          {
-            "Name": "[LOW]",
-            "Values": null
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "ldi r24,[LOW]([GS]([NAME]))",
-          "ldi r25,[HIGH]([GS]([NAME]))"
+          "ldr r12, =[NAME]"
         ]
       },
       {
@@ -115,15 +99,12 @@
           {
             "Name": "[VAR]",
             "Values": [
-              "2",
-              "2"
             ]
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "std [VAR[0]],r24",
-          "std [VAR[1]],r25"
+          "str r12, [VAR[0]]"
         ]
       },
       {
@@ -148,8 +129,7 @@
         "Keys": [],
         "PostKeys": [],
         "AssemblyCommands": [
-          "movw r30, r24",
-          "icall"
+          "blx r12"
         ]
       },
       {
@@ -159,14 +139,6 @@
         "Keys": [
           {
             "Name": "[NAME]",
-            "Values": null
-          },
-          {
-            "Name": "[SPH]",
-            "Values": null
-          },
-          {
-            "Name": "[SPL]",
             "Values": null
           }
         ],
@@ -182,14 +154,10 @@
         ],
         "AssemblyCommands": [
           "[NAME]:",
-          "push r28",
-          "push r29",
-          "[PUSHREG]",
-          "in r28,[SPL]",
-          "in r29,[SPH]",
-          "sbiw r28,[VARCOUNT]",
-          "out [SPL],r28",
-          "out [SPH],r29"
+          "mov r11, sp",
+          "push {[PUSHREG]r11}",
+          "push {lr}",
+          "sub sp, sp, #[VARCOUNT]"
         ]
       },
       {
@@ -197,18 +165,6 @@
         "Mode": "default",
         "Description": "Das ende einer Funktion",
         "Keys": [
-          {
-            "Name": "[SPH]",
-            "Values": null
-          },
-          {
-            "Name": "[SPL]",
-            "Values": null
-          },
-          {
-            "Name": "[SREG]",
-            "Values": null
-          }
         ],
         "PostKeys": [
           {
@@ -221,13 +177,11 @@
           }
         ],
         "AssemblyCommands": [
-          "adiw r28,[VARCOUNT]",
-          "out [SPL],r28",
-          "out [SPH],r29",
-          "[POPREG]",
-          "pop r29",
-          "pop r28",
-          "ret"
+          "add sp, sp, #[VARCOUNT]",
+          "pop {lr}",
+          "pop {[POPREG]r11}",
+          "mov sp, r11",
+          "bx lr"
         ]
       },
       {
@@ -257,22 +211,17 @@
           {
             "Name": "[VAR]",
             "Values": [
-              "2",
-              "2"
             ]
           },
           {
             "Name": "[PARA]",
             "Values": [
-              "2",
-              "1"
             ]
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "std [VAR[0]],[PARA[0]]",
-          "std [VAR[1]],[PARA[1]]"
+          "str [PARA[0]], [VAR[0]]"
         ]
       },
       {
@@ -291,32 +240,42 @@
         ]
       },
       {
+        "Name": "FunktionsDeklaration",
+        "Mode": "simple",
+        "Description": "Die Deklaration einer Funktion",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "[NAME]:"
+        ]
+      },
+      {
+        "Name": "FunktionsEnde",
+        "Mode": "simple",
+        "Description": "Das ende einer Funktion",
+        "Keys": [ ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "bx lr"
+        ]
+      },
+      {
         "Name": "CompileHeader",
         "Mode": "default",
         "Description": "Das setzen des Headers, hier wird der Stack und der Heap initialisiert",
         "Keys": [
           {
-            "Name": "[SPH]",
+            "Name": "[RAMBEGIN]",
             "Values": null
           },
           {
-            "Name": "[SPL]",
-            "Values": null
-          },
-          {
-            "Name": "[RAMBEGIN_LOW]",
-            "Values": null
-          },
-          {
-            "Name": "[RAMBEGIN_HIGH]",
-            "Values": null
-          },
-          {
-            "Name": "[RAMENDE_LOW]",
-            "Values": null
-          },
-          {
-            "Name": "[RAMENDE_HIGH]",
+            "Name": "[RAMENDE]",
             "Values": null
           }
         ],
@@ -368,8 +327,7 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "or r24,r25",
-          "tst r24",
+          "cmp r12, #0",
           "bne [JUMPTO[0]]",
           "b [JUMPTO]",
           "[JUMPTO[0]]:"
@@ -407,94 +365,17 @@
     ],
     "AdvancedKeyReplaces": [
       {
-        "Key": "[SPL]",
-        "Value": "0x3d",
-        "Defines": [
-          "atmega328p"
-        ]
-      },
-      {
-        "Key": "[SPH]",
-        "Value": "0x3e",
-        "Defines": [
-          "atmega328p"
-        ]
-      },
-      {
-        "Key": "[SREG]",
-        "Value": "0x3f",
-        "Defines": [
-          "atmega328p"
-        ]
-      },
-      {
-        "Key": "[RAMENDE_LOW]",
+        "Key": "[RAMENDE]",
         "Value": "0xff",
         "Defines": [
-          "atmega328p"
+          "SAM3X8E"
         ]
       },
       {
-        "Key": "[RAMENDE_HIGH]",
-        "Value": "0x08",
-        "Defines": [
-          "atmega328p"
-        ]
-      },
-      {
-        "Key": "[RAMBEGIN_LOW]",
+        "Key": "[RAMBEGIN]",
         "Value": "0x00",
         "Defines": [
-          "atmega328p"
-        ]
-      },
-      {
-        "Key": "[RAMBEGIN_HIGH]",
-        "Value": "0x01",
-        "Defines": [
-          "atmega328p"
-        ]
-      },
-      {
-        "Key": "[HIGH]",
-        "Value": "hi8",
-        "Defines": [
-          "avr-gcc"
-        ]
-      },
-      {
-        "Key": "[LOW]",
-        "Value": "lo8",
-        "Defines": [
-          "avr-gcc"
-        ]
-      },
-      {
-        "Key": "[GS]",
-        "Value": "gs",
-        "Defines": [
-          "avr-gcc"
-        ]
-      },
-      {
-        "Key": "[HIGH]",
-        "Value": "high",
-        "Defines": [
-          "avrasm"
-        ]
-      },
-      {
-        "Key": "[LOW]",
-        "Value": "low",
-        "Defines": [
-          "avrasm"
-        ]
-      },
-      {
-        "Key": "[GS]",
-        "Value": "",
-        "Defines": [
-          "avrasm"
+          "SAM3X8E"
         ]
       }
     ],
@@ -513,7 +394,7 @@
       },
       {
         "Key": "[VAR]",
-        "Pattern": "Y\u002B{0}"
+        "Pattern": "[sp,#{0}]"
       },
       {
         "Key":"JUMPHELPER",
@@ -521,11 +402,11 @@
       },
       {
         "Key": "[POPREG]",
-        "Pattern": "POP {0}\n{1}"
+        "Pattern": "{0},{1}"
       },
       {
         "Key":"[PUSHREG]",
-        "Pattern":"{1}PUSH {0}\n"
+        "Pattern":"{0},{1}"
       }
     ]
   }
