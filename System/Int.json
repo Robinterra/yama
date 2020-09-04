@@ -212,9 +212,8 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "com r2",
-                "com r3",
-                "movw r24, r2"
+                "ldr r12, =0xffffffff",
+                "eor r12, r12, r0"
                 ]
             },
             {
@@ -286,12 +285,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "cp r2,r4",
-                "cpc r3,r5",
-                "ldi r24, 0xff",
-                "breq [JUMPTO[0]]",
-                "ldi r24, 0x00",
-                "ldi r25, 0x00",
+                "cmp r0,r1",
+                "ldr r12, =0xff",
+                "beq [JUMPTO[0]]",
+                "ldr r12, =0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -309,12 +306,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "cp r2,r4",
-                "cpc r3,r5",
-                "ldi r24, 0xff",
-                "brlo [JUMPTO[0]]",
-                "ldi r24, 0x00",
-                "ldi r25, 0x00",
+                "cmp r0,r1",
+                "ldr r12, =0xff",
+                "blt [JUMPTO[0]]",
+                "ldr r12, =0x0",
                 "[JUMPTO[0]]:"
                 ]
             },

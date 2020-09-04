@@ -281,16 +281,7 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "ldi r24, 0x1",
-          "ldi r30, [RAMBEGIN_LOW]",
-          "ldi r31, [RAMBEGIN_HIGH]",
-          "ST Z,r24",
-          "ldi r24, [RAMENDE_LOW]",
-          "STD Z+1,r24",
-          "out [SPL],r24",
-          "ldi r24, [RAMENDE_HIGH]",
-          "STD Z+2,r24",
-          "out [SPH],r24",
+          
           "b main"
         ]
       },
