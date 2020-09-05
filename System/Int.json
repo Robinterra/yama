@@ -129,6 +129,29 @@
             },
             {
                 "Name": "IntCompare",
+                "Mode": "NotEquals",
+                "Description": "NotEquals",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cp r2,r4",
+                "cpc r3,r5",
+                "ldi r24, 0xff",
+                "brne [JUMPTO[0]]",
+                "ldi r24, 0x00",
+                "ldi r25, 0x00",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
                 "Mode": "LessThan",
                 "Description": "LessThan",
                 "Keys": [
@@ -145,6 +168,54 @@
                 "cpc r3,r5",
                 "ldi r24, 0xff",
                 "brlo [JUMPTO[0]]",
+                "ldi r24, 0x00",
+                "ldi r25, 0x00",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "GreaterThan",
+                "Description": "GreaterThan",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cp r2,r4",
+                "cpc r3,r5",
+                "ldi r24, 0x00",
+                "ldi r25, 0x00",
+                "brlo [JUMPTO[0]]",
+                "breq [JUMPTO[0]]",
+                "ldi r24, 0xff",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "LessEqualsThan",
+                "Description": "LessEqualsThan",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cp r2,r4",
+                "cpc r3,r5",
+                "ldi r24, 0xff",
+                "brlo [JUMPTO[0]]",
+                "breq [JUMPTO[0]]",
                 "ldi r24, 0x00",
                 "ldi r25, 0x00",
                 "[JUMPTO[0]]:"
@@ -294,6 +365,27 @@
             },
             {
                 "Name": "IntCompare",
+                "Mode": "NotEquals",
+                "Description": "NotEquals",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp r0,r1",
+                "ldr r12, =0xff",
+                "bne [JUMPTO[0]]",
+                "ldr r12, =0x0",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
                 "Mode": "LessThan",
                 "Description": "LessThan",
                 "Keys": [
@@ -315,6 +407,48 @@
             },
             {
                 "Name": "IntCompare",
+                "Mode": "LessEqualsThan",
+                "Description": "LessEqualsThan",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp r0,r1",
+                "ldr r12, =0xff",
+                "ble [JUMPTO[0]]",
+                "ldr r12, =0x0",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "GreaterThan",
+                "Description": "GreaterThan",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp r0,r1",
+                "ldr r12, =0xff",
+                "bgt [JUMPTO[0]]",
+                "ldr r12, =0x0",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
                 "Mode": "GreaterEqualsThan",
                 "Description": "GreaterEqualsThan",
                 "Keys": [
@@ -327,12 +461,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "cp r2,r4",
-                "cpc r3,r5",
-                "ldi r24, 0xff",
-                "brsh [JUMPTO[0]]",
-                "ldi r24, 0x00",
-                "ldi r25, 0x00",
+                "cmp r0,r1",
+                "ldr r12, =0xff",
+                "bge [JUMPTO[0]]",
+                "ldr r12, =0x0",
                 "[JUMPTO[0]]:"
                 ]
             }

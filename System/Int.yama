@@ -39,11 +39,9 @@ namespace "System"
         *
         * @return (bool) Wenn a kleiner ist dann true ansonsten false
         */
-        public operator bool >(int a, int b)
+        copy operator bool >(int a, int b)
         {
-            if ( a == b ) return false;
-
-            return a >= b;
+            #defalgo IntCompare,GreaterThan:;
         }
 
         // -----------------------------------------------
@@ -71,11 +69,9 @@ namespace "System"
         *
         * @return (bool) if equals or Less than then return true
         */
-        public operator bool <=(int a, int b)
+        copy operator bool <=(int a, int b)
         {
-            if (a == b) return true;
-
-            return a < b;
+            #defalgo IntCompare,LessEqualsThan:;
         }
 
         // -----------------------------------------------
@@ -103,11 +99,9 @@ namespace "System"
         *
         * @return (bool) if equals then return true
         */
-        public operator bool !=(int a, int b)
+        copy operator bool !=(int a, int b)
         {
-            bool result = #defalgo IntCompare,Equals:;
-
-            return !result;
+            #defalgo IntCompare,NotEquals:;
         }
 
         // -----------------------------------------------
@@ -130,7 +124,6 @@ namespace "System"
         */
         copy operator int &(int a, int b)
         {
-
             #defalgo IntArimetics,BinaryAnd:;
         }
 
@@ -146,7 +139,6 @@ namespace "System"
         */
         copy operator int |(int a, int b)
         {
-
             #defalgo IntArimetics,BinaryOr:;
         }
 
@@ -162,7 +154,6 @@ namespace "System"
         */
         copy operator int !(int a, int b)
         {
-
             #defalgo IntArimetics,BinaryNegation:;
         }
 
@@ -178,7 +169,6 @@ namespace "System"
         */
         copy operator int ^(int a, int b)
         {
-
             #defalgo IntArimetics,BinaryXor:;
         }
 
@@ -215,7 +205,7 @@ namespace "System"
         *
         * @return (int) Result
         */
-        simple operator int ++(int a)
+        copy operator int ++(int a)
         {
             #defalgo IntArimetics,Incremtation:;
         }
@@ -229,7 +219,7 @@ namespace "System"
         *
         * @return (int) Result
         */
-        simple operator int --(int a)
+        copy operator int --(int a)
         {
             #defalgo IntArimetics,Decremtation:;
         }
