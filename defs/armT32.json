@@ -281,7 +281,13 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          
+          ".syntax unified",
+          "ldr sp,=[RAMENDE]",
+          "ldr r10,=[RAMBEGIN]",
+          "ldr r11,=0x1",
+          "sub r12,sp,r10",
+          "str r11,[r10]",
+          "str r12,[r10,#4]",
           "b main"
         ]
       },
@@ -357,14 +363,14 @@
     "AdvancedKeyReplaces": [
       {
         "Key": "[RAMENDE]",
-        "Value": "0xff",
+        "Value": "0x2000FA00",
         "Defines": [
           "SAM3X8E"
         ]
       },
       {
         "Key": "[RAMBEGIN]",
-        "Value": "0x00",
+        "Value": "0x20000000",
         "Defines": [
           "SAM3X8E"
         ]
