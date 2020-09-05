@@ -487,6 +487,8 @@ namespace Yama.Compiler.Definition
 
                 counter++;
 
+                if (this.VariabelCounter < counter) this.VariabelCounter = counter;
+
                 if (a.Name != query.Value.ToString()) continue;
 
                 counter = counter - 1;
@@ -495,8 +497,6 @@ namespace Yama.Compiler.Definition
                 for (int i = 0; i < duration; i++ )
                 {
                     result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i + 1) );
-
-                    if (this.VariabelCounter < counter + i + 1) this.VariabelCounter = counter + i + 1;
                 }
 
                 return  result;
@@ -507,11 +507,11 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        
         private string VarCountQuery(IRegisterQuery query)
         {
             GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
             if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
             /*Dictionary<string,string> result = new Dictionary<string,string>();
             int bytes = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
@@ -524,7 +524,7 @@ namespace Yama.Compiler.Definition
                 counter++;
             }*/
 
-            return string.Format( keyPattern.Pattern, query.Value );
+            return string.Format( keyPattern.Pattern, ((int)query.Value) * this.AdressBytes );
         }
 
         // -----------------------------------------------
