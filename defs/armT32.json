@@ -282,6 +282,7 @@
         "PostKeys": [],
         "AssemblyCommands": [
           ".syntax unified",
+          ".thumb",
           "ldr sp,=[RAMENDE]",
           "ldr r10,=[RAMBEGIN]",
           "ldr r11,=0x1",
