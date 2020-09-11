@@ -62,8 +62,7 @@
         {
           "Name": "[REGPOP]",
           "Values": [
-            "2",
-            "1"
+            "2"
           ]
         }
       ],
@@ -134,8 +133,7 @@
         {
           "Name": "[REG]",
           "Values": [
-            "2",
-            "1"
+            "2"
           ]
         }
       ],
@@ -153,6 +151,22 @@
       "AssemblyCommands": [
         "movw r30, r24",
         "icall"
+      ]
+    },
+    {
+      "Name": "FunktionsDeklaration",
+      "Mode": "simple",
+      "Description": "Die Deklaration einer Funktion",
+      "Keys": [
+        {
+          "Name": "[NAME]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [
+      ],
+      "AssemblyCommands": [
+        "[NAME]:"
       ]
     },
     {
@@ -234,13 +248,23 @@
       ]
     },
     {
+      "Name": "FunktionsEnde",
+      "Mode": "simple",
+      "Description": "Das ende einer Funktion",
+      "Keys": [ ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        "ret"
+      ]
+    },
+    {
       "Name": "UsePara",
       "Mode": "default",
       "Description": "Ein Registry Cache Entry als Parameter nutzen",
       "Keys": [
         {
           "Name": "[REGPOP]",
-          "Values": null
+          "Values": []
         },
         {
           "Name": "[PARA]",

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Yama.Compiler;
@@ -170,6 +171,48 @@ namespace Yama.Parser
                 return true;
             }
 
+            if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
+            {
+                bool isok = this.CompileCopy(compiler, mode, t);
+
+                if (isok) return true;
+            }
+
+            this.FunctionsCall(compiler, mode);
+
+            return true;
+        }
+
+        private bool CompileCopy(Compiler.Compiler compiler, string mode, MethodeDeclarationNode t)
+        {
+            if (t.AccessDefinition == null) return false;
+            if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
+
+            CompileMovResult movResultRight = new CompileMovResult();
+
+            movResultRight.Compile(compiler, null, "default");
+
+            this.LeftNode.Compile(compiler, mode);
+
+            CompileMovResult movResultLeft = new CompileMovResult();
+
+            movResultLeft.Compile(compiler, null, "default");
+
+            CompileUsePara usePara = new CompileUsePara();
+
+            usePara.Compile(compiler);
+
+            usePara = new CompileUsePara();
+
+            usePara.Compile(compiler);
+
+            t.Statement.Compile(compiler, "default");
+
+            return compiler.Definition.ParaClean();
+        }
+
+        private bool FunctionsCall(Compiler.Compiler compiler, string mode)
+        {
             CompileMovResult movResultRight = new CompileMovResult();
 
             movResultRight.Compile(compiler, null, "default");

@@ -276,7 +276,7 @@ namespace Yama.Index
 
                 deklaration.Klasse = this;
 
-                deklaration.PreMappen(thisUses);
+                deklaration.PreMappen(uses);
             }
 
             return true;

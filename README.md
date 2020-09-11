@@ -127,6 +127,12 @@ avr-objcopy -j .text -j .data -O ihex ./bin/out.elf ./bin/out.hex
 
 avrdude -F -e -v -p m328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:"out.hex":i
 ```
+### arm-gcc
+```console
+dotnet run out "./out.S" define SAM3X8E def arm-t32 ./bin/Debug/netcoreapp3.1/iftest.yama
+
+arm-none-eabi-gcc -nostartfiles -nostdlib -mcpu=cortex-m3 -Ttext=0x80000 -o ./bin/out.elf out.S
+```
 
 ## Authors
 

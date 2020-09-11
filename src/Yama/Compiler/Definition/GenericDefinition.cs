@@ -389,20 +389,21 @@ namespace Yama.Compiler.Definition
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
-            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
+            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : (this.AdressBytes / this.CalculationBytes);
 
             for (int i = 0; i < duration; i++ )
             {
                 int registerStart = this.CurrentWorkingRegister;
                 this.CurrentWorkingRegister += bytes;
 
-                if (registerStart > this.WorkingRegisterLast) { this.Compiler.AddError("Arbeitsregister voll Ausgelastet"); return null; }
+                if (registerStart > this.WorkingRegisterLast)
+                { this.Compiler.AddError("Arbeitsregister voll Ausgelastet"); return null; }
 
                 string reg = this.AviableRegisters[registerStart];
 
                 result.Add(string.Format(keypattern, i), reg);
 
-                if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
+                //if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
             }
 
             return result;
@@ -416,12 +417,14 @@ namespace Yama.Compiler.Definition
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
-            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
+            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : (this.AdressBytes / this.CalculationBytes);
 
-            this.CurrentPlaceToKeepRegister += (bytes * duration) + 1;
+            int einzelbyte = bytes / duration;
+
+            this.CurrentPlaceToKeepRegister += bytes + 1;
             for (int i = 0; i < duration; i++ )
             {
-                this.CurrentPlaceToKeepRegister -= bytes;
+                this.CurrentPlaceToKeepRegister -= einzelbyte;
                 int registerStart = this.CurrentPlaceToKeepRegister;
 
                 if (registerStart > this.PlaceToKeepRegisterLast)
@@ -429,7 +432,7 @@ namespace Yama.Compiler.Definition
 
                 result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
             }
-            this.CurrentPlaceToKeepRegister += (bytes * duration) - 1;
+            this.CurrentPlaceToKeepRegister += bytes - 1;
 
             return result;
         }
@@ -442,13 +445,15 @@ namespace Yama.Compiler.Definition
             Dictionary<string,string> result = new Dictionary<string,string>();
 
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
-            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
+            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : (this.AdressBytes / this.CalculationBytes);
 
-            this.CurrentPlaceToKeepRegister -= (bytes * duration)-1;
+            int einzelbyte = bytes / duration;
+
+            this.CurrentPlaceToKeepRegister -= bytes - 1;
             for (int i = 0; i < duration; i++ )
             {
                 int registerStart = this.CurrentPlaceToKeepRegister;
-                this.CurrentPlaceToKeepRegister += bytes;
+                this.CurrentPlaceToKeepRegister += einzelbyte;
 
                 if (registerStart < this.PlaceToKeepRegisterStart ) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
 
@@ -458,7 +463,7 @@ namespace Yama.Compiler.Definition
 
                 if (!this.RegisterUses.Contains(reg)) this.RegisterUses.Add(reg);
             }
-            this.CurrentPlaceToKeepRegister -= (bytes * duration) + 1;
+            this.CurrentPlaceToKeepRegister -= bytes + 1;
 
             return result;
         }
@@ -482,6 +487,8 @@ namespace Yama.Compiler.Definition
 
                 counter++;
 
+                if (this.VariabelCounter < counter) this.VariabelCounter = counter;
+
                 if (a.Name != query.Value.ToString()) continue;
 
                 counter = counter - 1;
@@ -490,8 +497,6 @@ namespace Yama.Compiler.Definition
                 for (int i = 0; i < duration; i++ )
                 {
                     result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i + 1) );
-
-                    if (this.VariabelCounter < counter + i + 1) this.VariabelCounter = counter + i + 1;
                 }
 
                 return  result;
@@ -502,11 +507,11 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        
         private string VarCountQuery(IRegisterQuery query)
         {
             GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
             if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
             /*Dictionary<string,string> result = new Dictionary<string,string>();
             int bytes = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
@@ -519,7 +524,7 @@ namespace Yama.Compiler.Definition
                 counter++;
             }*/
 
-            return string.Format( keyPattern.Pattern, query.Value );
+            return string.Format( keyPattern.Pattern, ((int)query.Value) * this.AdressBytes );
         }
 
         // -----------------------------------------------

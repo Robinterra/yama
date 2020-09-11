@@ -1,0 +1,396 @@
+{
+    "Name": "arm-t32",
+    "CalculationBytes": 4,
+    "AdressBytes": 4,
+    "WorkingRegisterStart": 0,
+    "PlaceToKeepRegisterStart": 0,
+    "WorkingRegisterLast": 10,
+    "PlaceToKeepRegisterLast": 10,
+    "Algos": [
+      {
+        "Name": "ReferenceCall",
+        "Mode": "default",
+        "Description": "Der aufruf einer ganz normalen Variabel",
+        "Keys": [
+          {
+            "Name": "[VAR]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "ldr r12,[VAR[0]]"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "point",
+        "Description": "Der aufruf eines Property einer Instance",
+        "Keys": [
+          {
+            "Name": "[PROPERTY]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "ldr r12,[r12,[PROPERTY[0]]]"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "setpoint",
+        "Description": "Der setzen eines Property einer Instance",
+        "Keys": [
+          {
+            "Name": "[PROPERTY]",
+            "Values": [
+            ]
+          },
+          {
+            "Name": "[REGPOP]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "str [REGPOP[0]],[r12,[PROPERTY[0]]]"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "methode",
+        "Description": "Der aufruf einer ganz normalen Methode",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "ldr r12, =[NAME]"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "set",
+        "Description": "Das setzen einer ganz normalen Variabel",
+        "Keys": [
+          {
+            "Name": "[VAR]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "str r12, [VAR[0]]"
+        ]
+      },
+      {
+        "Name": "MovResult",
+        "Mode": "default",
+        "Description": "Das verschieben eines Ergebnisses",
+        "Keys": [
+          {
+            "Name": "[REG]",
+            "Values": [ ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "mov [REG[0]], r12"
+        ]
+      },
+      {
+        "Name": "ExecuteCall",
+        "Mode": "default",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "blx r12"
+        ]
+      },
+      {
+        "Name": "FunktionsDeklaration",
+        "Mode": "default",
+        "Description": "Die Deklaration einer Funktion",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [
+          {
+            "Name": "[PUSHREG]",
+            "Values": null
+          },
+          {
+            "Name": "[VARCOUNT]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "[NAME]:",
+          "mov r11, sp",
+          "push {[PUSHREG]r11}",
+          "push {lr}",
+          "sub sp, sp, #[VARCOUNT]"
+        ]
+      },
+      {
+        "Name": "FunktionsEnde",
+        "Mode": "default",
+        "Description": "Das ende einer Funktion",
+        "Keys": [
+        ],
+        "PostKeys": [
+          {
+            "Name": "[POPREG]",
+            "Values": null
+          },
+          {
+            "Name": "[VARCOUNT]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "add sp, sp, #[VARCOUNT]",
+          "pop {lr}",
+          "pop {[POPREG]r11}",
+          "mov sp, r11",
+          "bx lr"
+        ]
+      },
+      {
+        "Name": "UsePara",
+        "Mode": "default",
+        "Description": "Ein Registry Cache Entry als Parameter nutzen",
+        "Keys": [
+          {
+            "Name": "[REGPOP]",
+            "Values": []
+          },
+          {
+            "Name": "[PARA]",
+            "Values": []
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "mov [PARA[0]],[REGPOP[0]]"
+        ]
+      },
+      {
+        "Name": "UsePara",
+        "Mode": "get",
+        "Description": "Ein Parameter in seine Variabel laden",
+        "Keys": [
+          {
+            "Name": "[VAR]",
+            "Values": [
+            ]
+          },
+          {
+            "Name": "[PARA]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "str [PARA[0]], [VAR[0]]"
+        ]
+      },
+      {
+        "Name": "NumConst",
+        "Mode": "default",
+        "Description": "Die Konstante in das Register laden",
+        "Keys": [
+          {
+            "Name": "[NUMCONST]",
+            "Values": []
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "ldr r12,=[NUMCONST[0]]"
+        ]
+      },
+      {
+        "Name": "FunktionsDeklaration",
+        "Mode": "simple",
+        "Description": "Die Deklaration einer Funktion",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "[NAME]:"
+        ]
+      },
+      {
+        "Name": "FunktionsEnde",
+        "Mode": "simple",
+        "Description": "Das ende einer Funktion",
+        "Keys": [ ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "bx lr"
+        ]
+      },
+      {
+        "Name": "CompileHeader",
+        "Mode": "default",
+        "Description": "Das setzen des Headers, hier wird der Stack und der Heap initialisiert",
+        "Keys": [
+          {
+            "Name": "[RAMBEGIN]",
+            "Values": null
+          },
+          {
+            "Name": "[RAMENDE]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          ".syntax unified",
+          ".thumb",
+          "ldr sp,=[RAMENDE]",
+          "ldr r10,=[RAMBEGIN]",
+          "ldr r11,=0x1",
+          "sub r12,sp,r10",
+          "str r11,[r10]",
+          "str r12,[r10,#4]",
+          "b main"
+        ]
+      },
+      {
+        "Name": "JumpTo",
+        "Mode": "default",
+        "Description": "Springt zum ziel punkt",
+        "Keys": [
+          {
+            "Name": "[JUMPTO]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "b [JUMPTO]"
+        ]
+      },
+      {
+        "Name": "JumpWithCondition",
+        "Mode": "isZero",
+        "Description": "Springt zum ziel punkt wenn ist 0",
+        "Keys": [
+          {
+            "Name": "[JUMPTO]",
+            "Values": null
+          },
+          {
+            "Name": "[JUMPTO]",
+            "Values": [
+            "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "cmp r12, #0",
+          "bne [JUMPTO[0]]",
+          "b [JUMPTO]",
+          "[JUMPTO[0]]:"
+        ]
+      },
+      {
+        "Name": "SprungPunkt",
+        "Mode": "default",
+        "Description": "Das setzen eines sprungounktes",
+        "Keys": [],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "[NAME]:"
+        ]
+      }
+    ],
+    "ZuweisungsRegister": 0,
+    "AviableRegisters": [
+      "r0",
+      "r1",
+      "r2",
+      "r3",
+      "r4",
+      "r5",
+      "r6",
+      "r7",
+      "r8",
+      "r9",
+      "r10",
+      "r11",
+      "r12",
+      "sp",
+      "lr",
+      "pc"
+    ],
+    "AdvancedKeyReplaces": [
+      {
+        "Key": "[RAMENDE]",
+        "Value": "0x2000FA00",
+        "Defines": [
+          "SAM3X8E"
+        ]
+      },
+      {
+        "Key": "[RAMBEGIN]",
+        "Value": "0x20000000",
+        "Defines": [
+          "SAM3X8E"
+        ]
+      }
+    ],
+    "KeyPatterns": [
+      {
+        "Key": "[NUMCONST]",
+        "Pattern": "0x{0:X}"
+      },
+      {
+        "Key": "[PROPERTY]",
+        "Pattern": "#0x{0:X}"
+      },
+      {
+        "Key": "[VARCOUNT]",
+        "Pattern": "0x{0:X}"
+      },
+      {
+        "Key": "[VAR]",
+        "Pattern": "[sp,#{0}]"
+      },
+      {
+        "Key":"JUMPHELPER",
+        "Pattern":"JUMPHELPER_{0}"
+      },
+      {
+        "Key": "[POPREG]",
+        "Pattern": "{0},{1}"
+      },
+      {
+        "Key":"[PUSHREG]",
+        "Pattern":"{0},{1}"
+      }
+    ]
+  }

@@ -16,7 +16,7 @@ namespace "System"
         *
         * @return (bool) Negate result
         */
-        public operator bool !( bool a )
+        simple operator bool !( bool a )
         {
             if ( a ) return false;
 
@@ -33,7 +33,7 @@ namespace "System"
         *
         * @return (bool) The result of Or
         */
-        public operator bool ||( bool a, bool b )
+        simple operator bool ||( bool a, bool b )
         {
             if ( a ) return true;
 
@@ -50,7 +50,7 @@ namespace "System"
         *
         * @return (bool) The result of And
         */
-        public operator bool &&( bool a, bool b )
+        simple operator bool &&( bool a, bool b )
         {
             if ( a )
             {
