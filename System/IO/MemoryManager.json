@@ -245,10 +245,9 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "movw r30, r24",
-                "sbiw r30, 3",
-                "ldi r27, 0x0",
-                "st Z, r27"
+                "sub r12, r12, #8",
+                "mov r11, #0",
+                "str r11,[r12]"
                 ]
             },
             {
@@ -259,9 +258,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "movw r30, r24",
-                "ld r24, Z",
-                "ldi r25, 0x0"
+                "ldr r12, [r12]"
                 ]
             },
             {
@@ -272,8 +269,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "ldi r24, 0x3",
-                "ldi r25, 0x0"
+                "mov r12, #0x8"
                 ]
             },
             {
@@ -284,9 +280,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "movw r30, r24",
-                "ldd r24, Z+1",
-                "ldd r25, Z+2"
+                "ldr r12, [r12, #4]"
                 ]
             },
             {
@@ -297,12 +291,9 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "movw r30,r24",
-                "ldd r24, Z+1",
-                "ldd r25, Z+2",
-                "add r24, r30",
-                "adc r25, r31",
-                "adiw r24, 0x3"
+                "ldr r11, [r12, #4]",
+                "add r12, r11, r12",
+                "add r12, r12, #8"
                 ]
             },
             {
@@ -319,13 +310,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "movw r30, r24",
-                "ld r24, Z",
-                "ldi r25, 2",
-                "cp r24,r25",
-                "breq [JUMPTO[0]]",
-                "ldi r24, 0x0",
-                "ldi r25, 0x0",
+                "ldr r12,[r12]",
+                "cmp r12, #2",
+                "beq [JUMPTO[0]]",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -343,13 +331,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "movw r30, r24",
-                "ld r24, Z",
-                "ldi r25, 1",
-                "cp r24,r25",
-                "breq [JUMPTO[0]]",
-                "ldi r24, 0x0",
-                "ldi r25, 0x0",
+                "ldr r12, [r12]",
+                "cmp r12, #1",
+                "beq [JUMPTO[0]]",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -361,7 +346,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "movw r30, r24"
+                "mov lr, r12"
                 ]
             },
             {
@@ -372,7 +357,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "st Z, r24"
+                "str r12, [lr]"
                 ]
             },
             {
@@ -383,8 +368,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "std Z+1, r24",
-                "std Z+2, r25"
+                "str r12, [lr, #4]"
                 ]
             },
             {
@@ -393,18 +377,14 @@
                 "Description": "Dynamic memory allocate Init",
                 "Keys": [
                     {
-                        "Name": "[RAMBEGIN_LOW]",
-                        "Values": null
-                    },
-                    {
-                        "Name": "[RAMBEGIN_HIGH]",
+                        "Name": "[RAMBEGIN]",
                         "Values": null
                     }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "ldi r30, [RAMBEGIN_LOW]",
-                    "ldi r31, [RAMBEGIN_HIGH]"
+                    "ldr r12, =[RAMBEGIN]",
+                    "mov lr, r12"
                 ]
             },
             {
@@ -415,7 +395,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "movw r24, r30"
+                    "mov r12, lr"
                 ]
             },
             {
@@ -432,35 +412,26 @@
                 ],
                 "PostKeys":[],
                 "AssemblyCommands":[
-                    "push r22",
-                    "push r23",
-                    "movw r30,r24",
-                    "ld r27,Z",
-                    "tst r27",
+                    "push {r10}",
+                    "mov lr,r12",
+                    "ldr r11,[lr]",
+                    "cmp r11, #0",
                     "bne [JUMPTO[0]]",
-                    "ldd r26,Z+1",
-                    "ldd r27,Z+2",
-                    "add r30,r26",
-                    "adc r31,r27",
-                    "adiw r30,3",
-                    "ld r22,Z",
-                    "ldi r27, 0x2",
-                    "cp r22,r27",
-                    "breq [JUMPTO[0]]",
-                    "ldd r26,Z+1",
-                    "ldd r27,Z+2",
-                    "adiw r26, 3",
-                    "movw r30,r24",
-                    "st Z, r22",
-                    "ldd r22,Z+1",
-                    "ldd r23,Z+2",
-                    "add r22, r26",
-                    "adc r23, r27",
-                    "std Z+1, r22",
-                    "std Z+2, r23",
+                    "ldr r11,[lr,#4]",
+                    "add lr,lr,r11",
+                    "add lr,lr,#8",
+                    "ldr r10,[lr]",
+                    "cmp r10,#0x2",
+                    "beq [JUMPTO[0]]",
+                    "ldr r11,[lr, #4]",
+                    "add r11, r11, #8",
+                    "mov lr,r12",
+                    "str r10,[lr]",
+                    "ldr r10,[lr, #4]",
+                    "add r10, r10, r11",
+                    "str r10,[lr,#4]",
                     "[JUMPTO[0]]:",
-                    "pop r23",
-                    "pop r22"
+                    "pop {r10}"
                 ]
             }
        ],
