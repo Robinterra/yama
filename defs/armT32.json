@@ -37,13 +37,7 @@
         "PostKeys": [
         ],
         "AssemblyCommands": [
-          "movw r30, r24",
-          "ldi r24,[PROPERTY[0]]",
-          "add r30,r24",
-          "adc r31, r0",
-          "LD r24, Z",
-          "adiw r30, 1",
-          "LD r25, Z"
+          "ldr r12,[r12,[PROPERTY[0]]]"
         ]
       },
       {
@@ -59,21 +53,13 @@
           {
             "Name": "[REGPOP]",
             "Values": [
-              "2",
-              "1"
             ]
           }
         ],
         "PostKeys": [
         ],
         "AssemblyCommands": [
-          "movw r30, r24",
-          "ldi r24,[PROPERTY[0]]",
-          "add r30,r24",
-          "adc r31, r0",
-          "st Z,[REGPOP[1]]",
-          "adiw r30, 1",
-          "st Z,[REGPOP[0]]"
+          "str [REGPOP[0]],[r12,[PROPERTY[0]]]"
         ]
       },
       {
@@ -384,7 +370,7 @@
       },
       {
         "Key": "[PROPERTY]",
-        "Pattern": "0x{0:X}"
+        "Pattern": "#0x{0:X}"
       },
       {
         "Key": "[VARCOUNT]",
