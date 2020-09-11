@@ -5,7 +5,9 @@ This is a Compiler writen in C# for the Language Yama
 ## What is the Language Yama ?
 
 It is a Object-oriented Language for Microcontroller like ARM Cortex-M and AVR.
-Currently only support AVR Assembler (avrasm and avr-gcc). But i want support ARM Cortex in the next 15 days.
+Currently support:
+ - AVR Assembler (avrasm and avr-gcc),
+ - ARM-T32 Assemlber (arm-gcc)
 
 ### Why this new Language, Why dont use C#, Java or C?
 
