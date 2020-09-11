@@ -26,12 +26,14 @@ You can read it in the book Severed.
 
 ## What is comming soon ?
 chronological order
-2. How to add a new Assembly this Language - docu
-4. Support Cortex-M (My Test device is a Arduino Due)
-5. Show in a Blog little projects with yama - my own reason.
+1. Better Properties - (Get/Set can current not use, make it usable)
+2. Array, LinkListand List in Framework
+3. How to add a new Assembly this Language - docu
+4. Show in a Blog little projects with yama - my own reason.
  * You want support me or you have ideas then please send me a email: robin.dandrea@gmail.com / robin.dandrea@versalitic.com
 
 ## What can current use?
+ - AVR and ARM Assembler, (ARM Current not testet)
  - static and non static Methods
  - Array Get Set Methods and Call
  - Enums
