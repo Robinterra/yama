@@ -480,6 +480,7 @@ namespace Yama.Compiler.Definition
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
             int counter = 0;
+            int skip = bytes / duration;
 
             foreach (IParent a in query.Uses.Deklarationen)
             {
@@ -496,7 +497,7 @@ namespace Yama.Compiler.Definition
 
                 for (int i = 0; i < duration; i++ )
                 {
-                    result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i + 1) );
+                    result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i + skip) );
                 }
 
                 return  result;
