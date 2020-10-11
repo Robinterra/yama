@@ -151,6 +151,7 @@ namespace Yama
             layer.ParserMembers.Add(new MethodeDeclarationNode ( execlayer ));
             layer.ParserMembers.Add ( new VektorDeclaration ( invektorlayer ) );
             layer.ParserMembers.Add(new PropertyDeklaration ( inpropertyLayer ));
+            layer.ParserMembers.Add(new PropertyGetSetDeklaration ( invektorlayer ));
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
 
             return layer;

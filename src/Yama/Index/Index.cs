@@ -85,7 +85,7 @@ namespace Yama.Index
                 node.Indezieren(this, null);
             }
 
-            if (this.MainFunction == null) this.CreateError(this.Roots[0], "Keine main function gefunden!");
+            if (this.MainFunction == null) this.CreateError(this.Roots[0], "No main method found!");
 
             if (this.Errors.Count != 0) return false;
 
@@ -116,6 +116,8 @@ namespace Yama.Index
         {
             Dictionary<string, IndexNamespaceDeklaration> aviableNamespaces = new Dictionary<string, IndexNamespaceDeklaration>();
 
+            if (!this.Namespaces.ContainsKey(this.StartNamespace)) return this.CreateError(null, string.Format("no start '{0}' namespace found", this.StartNamespace));
+
             this.MakeRegisterFromValidsNamespaces(this.Namespaces[this.StartNamespace], aviableNamespaces);
 
             foreach (KeyValuePair<string, IndexNamespaceDeklaration> nameSpace in aviableNamespaces)
@@ -138,7 +140,7 @@ namespace Yama.Index
 
             foreach (IndexNamespaceReference refer in indexNamespaceDeklaration.Usings)
             {
-                if (!this.Namespaces.ContainsKey(refer.Name)) return this.CreateError(refer.Use, "Der Namespace konnte nicht gefunden werden!");
+                if (!this.Namespaces.ContainsKey(refer.Name)) return this.CreateError(refer.Use, "The Namespace can not be found!");
 
                 IndexNamespaceDeklaration dek = this.Namespaces[refer.Name];
 
@@ -189,10 +191,8 @@ namespace Yama.Index
             return this.Errors.Count == 0;
         }
 
-        public bool CreateError(IParseTreeNode node, string msg = "Der Aufruf ist hier nicht erlaubt")
+        public bool CreateError(IParseTreeNode node, string msg = "The call is not allowed here")
         {
-            if (node == null) return false;
-
             IndexError error = new IndexError();
             error.Use = node;
             error.Msg = msg;
@@ -203,7 +203,7 @@ namespace Yama.Index
 
         public bool SetMainFunction(MethodeDeclarationNode funktionsDeklaration)
         {
-            if (this.MainFunction != null) return this.CreateError(funktionsDeklaration, "Eine Main Funktion existiert bereits");
+            if (this.MainFunction != null) return this.CreateError(funktionsDeklaration, "One Main Method is already exist");
 
             this.MainFunction = funktionsDeklaration;
 

@@ -41,15 +41,21 @@ namespace Yama.Compiler
 
             string printmode = mode;
             if ("vektorcall" == mode || mode == "setvektorcall") printmode = "methode";
+            if (node.Deklaration is IndexPropertyGetSetDeklaration) printmode = "methode";
 
             query.Kategorie = printmode;
             query.Uses = node.ThisUses;
 
             string assemblyName = node.AssemblyName;
-            if (node.Deklaration is IndexVaktorDeklaration dek)
+            if (node.Deklaration is IndexVektorDeklaration dek)
             {
                 if ("vektorcall" == mode) assemblyName = dek.AssemblyNameGetMethode;
                 if (mode == "setvektorcall") assemblyName = dek.AssemblyNameSetMethode;
+            }
+            if (node.Deklaration is IndexPropertyGetSetDeklaration pdek)
+            {
+                if ("point" == mode) assemblyName = pdek.AssemblyNameGetMethode;
+                if (mode == "setpoint") assemblyName = pdek.AssemblyNameSetMethode;
             }
 
             object queryValue = assemblyName;
@@ -114,6 +120,7 @@ namespace Yama.Compiler
 
             string printmode = mode;
             if ("vektorcall" == mode || mode == "setvektorcall") printmode = "methode";
+            if (node.Deklaration is IndexPropertyGetSetDeklaration) printmode = "methode";
 
             this.Algo = compiler.GetAlgo(this.AlgoName, printmode);
             if (this.Algo == null) return false;

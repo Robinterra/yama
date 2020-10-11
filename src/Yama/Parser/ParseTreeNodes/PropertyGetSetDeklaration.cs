@@ -7,13 +7,13 @@ using Yama.Compiler;
 
 namespace Yama.Parser
 {
-    public class VektorDeclaration : IParseTreeNode
+    public class PropertyGetSetDeklaration : IParseTreeNode
     {
         private ParserLayer layer;
 
         #region get/set
 
-        public IndexVektorDeklaration Deklaration
+        public IndexPropertyGetSetDeklaration Deklaration
         {
             get;
             set;
@@ -37,30 +37,6 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode GenericDefintion
-        {
-            get;
-            set;
-        }
-
-        public List<IParseTreeNode> Parameters
-        {
-            get;
-            set;
-        }
-
-        public CompileFunktionsDeklaration FunktionsDeklarationCompile
-        {
-            get;
-            set;
-        } = new CompileFunktionsDeklaration();
-
-        public CompileFunktionsEnde FunktionsEndeCompile
-        {
-            get;
-            set;
-        } = new CompileFunktionsEnde();
-
         public IParseTreeNode GetStatement
         {
             get;
@@ -72,6 +48,40 @@ namespace Yama.Parser
             get;
             set;
         }
+
+        public List<string> SetRegisterInUse
+        {
+            get;
+            set;
+        } = new List<string>();
+
+        public List<string> GetRegisterInUse
+        {
+            get;
+            set;
+        } = new List<string>();
+        public CompileFunktionsDeklaration FunktionsDeklarationCompileGet
+        {
+            get;
+            set;
+        } = new CompileFunktionsDeklaration();
+
+        public CompileFunktionsEnde FunktionsEndeCompileSet
+        {
+            get;
+            set;
+        } = new CompileFunktionsEnde();
+        public CompileFunktionsDeklaration FunktionsDeklarationCompileSet
+        {
+            get;
+            set;
+        } = new CompileFunktionsDeklaration();
+
+        public CompileFunktionsEnde FunktionsEndeCompileGet
+        {
+            get;
+            set;
+        } = new CompileFunktionsEnde();
 
         public IdentifierToken Token
         {
@@ -90,7 +100,6 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.AddRange ( this.Parameters );
                 result.Add ( this.GetStatement );
                 result.Add ( this.SetStatement );
 
@@ -102,30 +111,18 @@ namespace Yama.Parser
         {
             get;
         }
-
-        public List<string> SetRegisterInUse
-        {
-            get;
-            set;
-        } = new List<string>();
-
-        public List<string> GetRegisterInUse
-        {
-            get;
-            set;
-        } = new List<string>();
-
-        public CompileContainer CompileContainer
+        public CompileContainer CompileContainerGet
         {
             get;
             set;
         } = new CompileContainer();
 
-        public int VariabelCounter
+        public CompileContainer CompileContainerSet
         {
             get;
             set;
-        }
+        } = new CompileContainer();
+
         public int GetVariabelCounter { get; private set; }
         public int SetVariabelCounter { get; private set; }
 
@@ -133,14 +130,19 @@ namespace Yama.Parser
 
         #region ctor
 
-        public VektorDeclaration()
+        public PropertyGetSetDeklaration()
         {
 
         }
 
-        public VektorDeclaration(ParserLayer layer)
+        public PropertyGetSetDeklaration(ParserLayer layer)
         {
             this.layer = layer;
+        }
+
+        public PropertyGetSetDeklaration ( int prio )
+        {
+            this.Prio = prio;
         }
 
         #endregion ctor
@@ -155,6 +157,18 @@ namespace Yama.Parser
 
             return false;
         }
+
+        /*private bool CheckAusnahmen ( SyntaxToken token )
+        {
+            if (token == null) return false;
+
+            foreach ( SyntaxKind op in this.Ausnahmen )
+            {
+                if ( op == token.Kind ) return true;
+            }
+
+            return false;
+        }*/
         private bool CheckHashValidTypeDefinition ( IdentifierToken token )
         {
             if (token == null) return false;
@@ -176,7 +190,14 @@ namespace Yama.Parser
             return false;
         }
 
-        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, VektorDeclaration deklaration)
+        private bool CheckHashValidZusatzDefinition ( IdentifierToken token )
+        {
+            if (token.Kind == IdentifierKind.Static) return true;
+
+            return false;
+        }
+
+        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, PropertyGetSetDeklaration deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -185,14 +206,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private bool CheckHashValidZusatzDefinition ( IdentifierToken token )
-        {
-            if (token.Kind == IdentifierKind.Static) return true;
-
-            return false;
-        }
-
-        private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, VektorDeclaration deklaration)
+        private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, PropertyGetSetDeklaration deklaration)
         {
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
@@ -204,7 +218,7 @@ namespace Yama.Parser
         public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
 
-            VektorDeclaration deklaration = new VektorDeclaration();
+            PropertyGetSetDeklaration deklaration = new PropertyGetSetDeklaration();
 
             token = this.MakeAccessValid(parser, token, deklaration);
 
@@ -215,30 +229,13 @@ namespace Yama.Parser
             deklaration.TypeDefinition = token;
 
             token = parser.Peek ( token, 1 );
-
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
 
             token = parser.Peek ( token, 1 );
 
-            IParseTreeNode rule = new Container(IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket);
-
-            if ( token == null ) return null;
-
-            parser.ActivateLayer(this.layer);
-
-            IParseTreeNode parametersVektor = rule.Parse(parser, token);
-
-            parser.VorherigesLayer();
-
-            if (parametersVektor == null) return null;
-            if (!(parametersVektor is Container t)) return null;
-
-            t.Token.ParentNode = deklaration;
-            deklaration.Parameters = t.Statements;
-
-            token = parser.Peek ( t.Ende, 1);
+            //IParseTreeNode rule = new Container(SyntaxKind.BeginContainer, SyntaxKind.CloseContainer);
 
             if ( token == null ) return null;
 
@@ -264,7 +261,7 @@ namespace Yama.Parser
             return this.CleanUp(deklaration);
         }
 
-        private VektorDeclaration CleanUp(VektorDeclaration deklaration)
+        private PropertyGetSetDeklaration CleanUp(PropertyGetSetDeklaration deklaration)
         {
             deklaration.GetStatement.Token.ParentNode = deklaration;
             deklaration.SetStatement.Token.ParentNode = deklaration;
@@ -289,18 +286,35 @@ namespace Yama.Parser
 
         public MethodeType GetMethodeType()
         {
-            MethodeType type = MethodeType.VektorMethode;
+            MethodeType type = MethodeType.PropertyGetSet;
 
-            if (this.ZusatzDefinition != null) return MethodeType.VektorStatic;
+            if (this.ZusatzDefinition != null) return MethodeType.Static;
 
             return type;
+        }
+
+        private IndexVariabelnReference GetReturnValueIndex(IndexKlassenDeklaration klasse)
+        {
+            return new IndexVariabelnReference { Name = this.TypeDefinition.Text, Use = this };
+        }
+
+        private bool IndezierenNonStaticDek(IndexPropertyGetSetDeklaration deklaration)
+        {
+
+            if (deklaration.Type != MethodeType.PropertyGetSet) return true;
+
+            IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration();
+            thisdek.Name = "this";
+            deklaration.Parameters.Add(thisdek);
+
+            return true;
         }
 
         public bool Indezieren(Index.Index index, IParent parent)
         {
             if (!(parent is IndexKlassenDeklaration klasse)) return index.CreateError(this);
 
-            IndexVektorDeklaration deklaration = new IndexVektorDeklaration();
+            IndexPropertyGetSetDeklaration deklaration = new IndexPropertyGetSetDeklaration();
             deklaration.Use = this;
             deklaration.Name = this.Token.Text;
             deklaration.ReturnValue = this.GetReturnValueIndex(klasse);
@@ -315,28 +329,7 @@ namespace Yama.Parser
             this.GetStatement.Indezieren(index, deklaration);
             this.SetStatement.Indezieren(index, deklaration);
 
-            VariabelDeklaration dek = null;
-
             this.IndezierenNonStaticDek(deklaration);
-
-            foreach (IParseTreeNode par in this.Parameters)
-            {
-                if (par is VariabelDeklaration t) dek = t;
-                if (par is EnumartionExpression b)
-                {
-                    if (b.ExpressionParent == null) continue;
-                    dek = (VariabelDeklaration)b.ExpressionParent;
-                }
-
-                if (dek == null) { index.CreateError(this, "A Index error by the parameters of this method"); continue; }
-
-                if (!dek.Indezieren(index, deklaration.SetContainer)) continue;
-
-                deklaration.Parameters.Add(dek.Deklaration);
-
-                if (dek.Token.Text == "invalue") continue;
-                if (!dek.Indezieren(index, deklaration.GetContainer)) continue;
-            }
 
             IndexVariabelnDeklaration invaluesdek = new IndexVariabelnDeklaration();
             invaluesdek.Name = "invalue";
@@ -347,26 +340,9 @@ namespace Yama.Parser
             return true;
         }
 
-        private bool IndezierenNonStaticDek(IndexVektorDeklaration deklaration)
+        private bool AddMethode(IndexKlassenDeklaration klasse, IndexPropertyGetSetDeklaration deklaration)
         {
-
-            if (deklaration.Type != MethodeType.VektorMethode) return true;
-
-            IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration();
-            thisdek.Name = "this";
-            deklaration.Parameters.Add(thisdek);
-
-            return true;
-        }
-
-        private IndexVariabelnReference GetReturnValueIndex(IndexKlassenDeklaration klasse)
-        {
-            return new IndexVariabelnReference { Name = this.TypeDefinition.Text, Use = this };
-        }
-
-        private bool AddMethode(IndexKlassenDeklaration klasse, IndexVektorDeklaration deklaration)
-        {
-            klasse.VektorDeclaration.Add(deklaration);
+            klasse.PropertyGetSetDeclaration.Add(deklaration);
 
             return true;
         }
@@ -434,9 +410,9 @@ namespace Yama.Parser
 
             CompileFunktionsEnde ende = new CompileFunktionsEnde();
 
-            ende.Compile(compiler, this, "set");
-
             this.SetVariabelCounter = compiler.Definition.VariabelCounter;
+
+            ende.Compile(compiler, this, "set");
 
             return true;
         }
@@ -462,9 +438,9 @@ namespace Yama.Parser
 
             CompileFunktionsEnde ende = new CompileFunktionsEnde();
 
-            ende.Compile(compiler, this, "get");
-
             this.GetVariabelCounter = compiler.Definition.VariabelCounter;
+
+            ende.Compile(compiler, this, "get");
 
             return true;
         }

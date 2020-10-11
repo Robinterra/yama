@@ -63,6 +63,9 @@ namespace Yama.Index
             get;
             set;
         }
+        
+        public List<IndexVektorDeklaration> VektorDeclaration { get; set; }
+        public List<IndexPropertyGetSetDeklaration> PropertyGetSetDeclaration { get; set; }
 
         private ValidUses thisUses;
 
@@ -127,7 +130,6 @@ namespace Yama.Index
             set;
         }
         public IndexVariabelnDeklaration BaseVar { get; private set; }
-        public List<IndexVaktorDeklaration> VektorDeclaration { get; set; }
 
         #endregion get/set
 
@@ -142,7 +144,8 @@ namespace Yama.Index
             this.Operators = new List<IndexMethodDeklaration>();
             this.IndexProperties = new List<IndexPropertyDeklaration>();
             this.StaticMethods = new List<IndexMethodDeklaration>();
-            this.VektorDeclaration = new List<IndexVaktorDeklaration>();
+            this.VektorDeclaration = new List<IndexVektorDeklaration>();
+            this.PropertyGetSetDeclaration = new List<IndexPropertyGetSetDeklaration>();
         }
 
         #endregion ctor
@@ -165,6 +168,7 @@ namespace Yama.Index
             this.Ctors.AddRange(dek.Ctors.Where(t=>this.Ctors.Count == 0));
             this.DeCtors.AddRange(dek.DeCtors.Where(t=>this.DeCtors.Count == 0));
             this.VektorDeclaration.AddRange(dek.VektorDeclaration.Where(t=>!this.VektorDeclaration.Any(q=>q.Name == t.Name)));
+            this.PropertyGetSetDeclaration.AddRange(dek.PropertyGetSetDeclaration.Where(t=>!this.PropertyGetSetDeclaration.Any(q=>q.Name == t.Name)));
 
             List<IndexPropertyDeklaration> deks = dek.IndexProperties.Where(t=>true).ToList();
 
@@ -186,13 +190,14 @@ namespace Yama.Index
             this.PreviusVectorMappen(this.VektorDeclaration.Where(t=>t.Type == MethodeType.VektorStatic).ToList(), this.ParentUsesSet);
 
             this.PreviusPropertyMappen(this.IndexProperties, this.ThisUses);
+            this.PreviusPropertyGetSetMappen(this.PropertyGetSetDeclaration, this.ThisUses);
 
             return true;
         }
 
-        private bool PreviusVectorMappen(List<IndexVaktorDeklaration> vektorDeclaration, ValidUses thisUses)
+        private bool PreviusVectorMappen(List<IndexVektorDeklaration> vektorDeclaration, ValidUses thisUses)
         {
-            foreach (IndexVaktorDeklaration deklaration in vektorDeclaration)
+            foreach (IndexVektorDeklaration deklaration in vektorDeclaration)
             {
                 if (deklaration.IsMapped) continue;
 
@@ -220,15 +225,30 @@ namespace Yama.Index
             this.MethodeMappen(this.Ctors, this.ThisUses);
             this.MethodeMappen(this.DeCtors, this.ThisUses);
             this.VektorMappen(this.VektorDeclaration, this.ThisUses);
+            this.PropertyGetSetMappen(this.PropertyGetSetDeclaration, this.ThisUses);
 
             this.PropertyMappen(this.IndexProperties, this.ThisUses);
 
             return this.IsMapped = true;
         }
 
-        private bool VektorMappen(List<IndexVaktorDeklaration> vektorDeclaration, ValidUses thisUses)
+        private bool VektorMappen(List<IndexVektorDeklaration> vektorDeclaration, ValidUses thisUses)
         {
-            foreach (IndexVaktorDeklaration deklaration in vektorDeclaration)
+            foreach (IndexVektorDeklaration deklaration in vektorDeclaration)
+            {
+                if (deklaration.IsMapped) continue;
+
+                deklaration.Klasse = this;
+
+                deklaration.Mappen();
+            }
+
+            return true;
+        }
+
+        private bool PropertyGetSetMappen(List<IndexPropertyGetSetDeklaration> vektorDeclaration, ValidUses thisUses)
+        {
+            foreach (IndexPropertyGetSetDeklaration deklaration in vektorDeclaration)
             {
                 if (deklaration.IsMapped) continue;
 
@@ -257,6 +277,20 @@ namespace Yama.Index
         private bool PreviusPropertyMappen(List<IndexPropertyDeklaration> indexProperties, ValidUses thisUses)
         {
             foreach (IndexPropertyDeklaration deklaration in indexProperties)
+            {
+                if (deklaration.IsMapped) continue;
+
+                deklaration.Klasse = this;
+
+                deklaration.PreMappen(thisUses);
+            }
+
+            return true;
+        }
+
+        private bool PreviusPropertyGetSetMappen(List<IndexPropertyGetSetDeklaration> indexProperties, ValidUses thisUses)
+        {
+            foreach (IndexPropertyGetSetDeklaration deklaration in indexProperties)
             {
                 if (deklaration.IsMapped) continue;
 

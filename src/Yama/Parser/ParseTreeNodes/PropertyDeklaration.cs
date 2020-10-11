@@ -37,18 +37,6 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode GetStatement
-        {
-            get;
-            set;
-        }
-
-        public IParseTreeNode SetStatement
-        {
-            get;
-            set;
-        }
-
         public List<string> RegisterInUseGet
         {
             get;
@@ -100,9 +88,6 @@ namespace Yama.Parser
             get
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
-
-                result.Add ( this.GetStatement );
-                result.Add ( this.SetStatement );
 
                 return result;
             }
@@ -254,31 +239,25 @@ namespace Yama.Parser
 
             if ( token == null ) return null;
 
-            IParseTreeNode klammer = parser.ParseCleanToken(token, this.layer);
+            if (token.Kind != IdentifierKind.EndOfCommand) return null;
+            //if (klammer.GetAllChilds.Count != 2) return null;
 
-            if (klammer == null) return null;
-            if (!(klammer is Container t)) return null;
-            if (klammer.GetAllChilds.Count != 2) return null;
+            //deklaration.GetStatement = klammer.GetAllChilds[0];
+            //deklaration.SetStatement = klammer.GetAllChilds[1];
 
-            deklaration.GetStatement = klammer.GetAllChilds[0];
-            deklaration.SetStatement = klammer.GetAllChilds[1];
+            token.Node = deklaration;
 
-            t.Token.ParentNode = deklaration;
+            //if (deklaration.GetStatement == null) return null;
+            //if (deklaration.SetStatement == null) return null;
 
-            if (deklaration.GetStatement == null) return null;
-            if (deklaration.SetStatement == null) return null;
-
-            if (!(deklaration.GetStatement is GetKey)) return null;
-            if (!(deklaration.SetStatement is SetKey)) return null;
+            //if (!(deklaration.GetStatement is GetKey)) return null;
+            //if (!(deklaration.SetStatement is SetKey)) return null;
 
             return this.CleanUp(deklaration);
         }
 
         private PropertyDeklaration CleanUp(PropertyDeklaration deklaration)
         {
-            deklaration.SetStatement.Token.ParentNode = deklaration;
-            deklaration.GetStatement.Token.ParentNode = deklaration;
-
             if (deklaration.AccessDefinition != null)
             {
                 deklaration.AccessDefinition.Node = deklaration;
@@ -326,8 +305,8 @@ namespace Yama.Parser
 
             this.AddMethode(klasse, deklaration);
 
-            this.SetStatement.Indezieren(index, deklaration);
-            this.GetStatement.Indezieren(index, deklaration);
+            //this.SetStatement.Indezieren(index, deklaration);
+            //this.GetStatement.Indezieren(index, deklaration);
 
             return true;
         }

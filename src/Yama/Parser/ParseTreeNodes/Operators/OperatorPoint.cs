@@ -50,8 +50,11 @@ namespace Yama.Parser
                     if (rc.Reference.Deklaration is IndexMethodDeklaration dek)
                         return dek.Type != MethodeType.Static;
 
-                    if (rc.Reference.Deklaration is IndexVaktorDeklaration vd)
+                    if (rc.Reference.Deklaration is IndexVektorDeklaration vd)
                         return vd.Type != MethodeType.VektorStatic;
+
+                    if (rc.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsd)
+                        return pgsd.Type != MethodeType.PropertyStaticGetSet;
                 }
 
                 return false;
@@ -125,12 +128,21 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            if (this.RightNode is ReferenceCall rct)
+                if (rct.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
+                    if (!this.CompileNonStaticCallt(compiler, mode, pgsdek)) return true;
+
             if (mode == "set") { CompileMovResult movResultRight = new CompileMovResult(); movResultRight.Compile(compiler, null, "default"); }
 
             this.CompileLeftNodeIfNotStaticClass(compiler, mode);
 
+            if (this.RightNode is ReferenceCall rctu)
+                if (rctu.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
+                    if (!this.CompileNonStaticCall(compiler, mode, pgsdek)) return true;
+
             string moderesult = "point";
             if (mode == "set") moderesult = "setpoint";
+
             if (mode == "methode")
             {
                 moderesult = mode;
@@ -143,7 +155,7 @@ namespace Yama.Parser
             {
                 moderesult = mode;
                 if (this.RightNode is ReferenceCall rc)
-                    if (rc.Reference.Deklaration is IndexVaktorDeklaration dek)
+                    if (rc.Reference.Deklaration is IndexVektorDeklaration dek)
                         this.CompileNonStaticCall(compiler, "default", dek);
             }
 
@@ -159,8 +171,11 @@ namespace Yama.Parser
                 if (rct.Reference.Deklaration is IndexMethodDeklaration t)
                     if (t.Type == MethodeType.Static) return true;
 
-                if (rct.Reference.Deklaration is IndexVaktorDeklaration vd)
+                if (rct.Reference.Deklaration is IndexVektorDeklaration vd)
                     if (vd.Type == MethodeType.VektorStatic) return true;
+
+                if (rct.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsd)
+                    if (pgsd.Type == MethodeType.VektorStatic) return true;
             }
 
             return this.LeftNode.Compile(compiler, "default");
@@ -179,13 +194,44 @@ namespace Yama.Parser
             return true;
         }
 
-        private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexVaktorDeklaration methdek)
+        private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexVektorDeklaration methdek)
         {
             if (methdek.Type == MethodeType.VektorStatic) return true;
 
             CompileMovResult movResultRight = new CompileMovResult();
 
             movResultRight.Compile(compiler, null, "default");
+
+            return true;
+        }
+
+        private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexPropertyGetSetDeklaration methdek)
+        {
+            if (methdek.Type == MethodeType.PropertyStaticGetSet) return true;
+
+            CompileMovResult movResultRight = new CompileMovResult();
+
+            movResultRight.Compile(compiler, null, "default");
+
+            return true;
+        }
+
+        private bool CompileNonStaticCallt(Compiler.Compiler compiler, string mode, IndexPropertyGetSetDeklaration methdek)
+        {
+            if (methdek.Type == MethodeType.PropertyStaticGetSet) return true;
+
+            if (mode == "default" || mode == "set")
+            {
+                if ("default" == mode) mode = "point";
+
+                VektorCall call = new VektorCall(5);
+                call.LeftNode = this;
+                call.ParametersNodes = new List<IParseTreeNode>();
+
+                call.Compile(compiler, mode);
+
+                return false;
+            }
 
             return true;
         }

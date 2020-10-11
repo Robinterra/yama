@@ -6,7 +6,7 @@ using Yama.Parser;
 
 namespace Yama.Index
 {
-    public class IndexVektorDeklaration : IParent
+    public class IndexPropertyGetSetDeklaration : IParent
     {
 
         public IParseTreeNode Use
@@ -155,7 +155,7 @@ namespace Yama.Index
             private set;
         }
 
-        public IndexVektorDeklaration (  )
+        public IndexPropertyGetSetDeklaration (  )
         {
             this.References = new List<IndexVariabelnReference>();
             this.Parameters = new List<IndexVariabelnDeklaration>();

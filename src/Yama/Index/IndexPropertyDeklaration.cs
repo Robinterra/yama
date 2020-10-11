@@ -125,8 +125,8 @@ namespace Yama.Index
         {
             if (this.IsMapped) return false;
 
-            this.SetContainer.Mappen(this.ThisUses);
-            this.GetContainer.Mappen(this.ThisUses);
+            //this.SetContainer.Mappen(this.ThisUses);
+            //this.GetContainer.Mappen(this.ThisUses);
 
             return this.IsMapped = true;
         }
