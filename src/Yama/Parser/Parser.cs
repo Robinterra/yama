@@ -571,7 +571,7 @@ namespace Yama.Parser
 
             this.Max = this.CleanTokens.Count;
             List<IParseTreeNode> parentNodes = this.ParseCleanTokens ( 0, this.CleanTokens.Count );
-            if ( parentNodes == null ) return false;
+            if ( parentNodes == null ) return this.EmptyFileError();
 
             this.ParentContainer = new Container (  );
             this.ParentContainer.Statements = parentNodes;
@@ -585,6 +585,17 @@ namespace Yama.Parser
             //this.PrintPretty ( this.ParentContainer );
 
             return this.ParserErrors.Count == 0;
+        }
+
+        // -----------------------------------------------
+
+        private bool EmptyFileError()
+        {
+            IdentifierToken token = new IdentifierToken ( IdentifierKind.Unknown, -1, -1, -1, this.Fileinfo.Name, "Empty File" );
+
+            this.PrintSyntaxError(token, "Empty File");
+
+            return false;
         }
 
         // -----------------------------------------------
