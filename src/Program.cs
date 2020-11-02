@@ -72,6 +72,13 @@ namespace Yama
 
         // -----------------------------------------------
 
+        private static bool Assemble ( List<ICommandLine> commands )
+        {
+            return true;
+        }
+
+        // -----------------------------------------------
+
         private static bool Build ( List<ICommandLine> commands, DefinitionManager defs )
         {
             LanguageDefinition yama = new LanguageDefinition();
@@ -135,16 +142,17 @@ namespace Yama
         {
             Program.EnabledCommandLines = new List<ICommandLine> (  );
 
-            Program.EnabledCommandLines.Add ( new FileExpression (  ) );
             Program.EnabledCommandLines.Add ( new CompileExpression (  ) );
+            Program.EnabledCommandLines.Add ( new AssembleExpression (  ) );
+            Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );
             Program.EnabledCommandLines.Add ( new IncludeExpression (  ) );
             Program.EnabledCommandLines.Add ( new DefinitionExpression (  ) );
-            Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
             Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new StartNamespace (  ) );
             Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
             Program.EnabledCommandLines.Add ( new Print (  ) );
+            Program.EnabledCommandLines.Add ( new FileExpression (  ) );
             Program.EnabledCommandLines.Add ( new LearnCsStuf.CommandLines.Commands.Help (  ) );
             return true;
         }
