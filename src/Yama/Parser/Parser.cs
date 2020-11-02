@@ -582,8 +582,6 @@ namespace Yama.Parser
                 node.Token.ParentNode = this.ParentContainer;
             }
 
-            //this.PrintPretty ( this.ParentContainer );
-
             return this.ParserErrors.Count == 0;
         }
 
@@ -684,7 +682,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private bool PrintPretty ( IParseTreeNode node, string lebchilds = "" )
+        public bool PrintPretty ( IParseTreeNode node, string lebchilds = "" )
         {
             if (node == null) return true;
 

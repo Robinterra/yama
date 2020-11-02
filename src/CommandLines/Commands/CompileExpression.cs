@@ -1,6 +1,6 @@
 namespace LearnCsStuf.CommandLines.Commands
 {
-    public class Print : ICommandLine
+    public class CompileExpression : ICommandLine
     {
 
         // -----------------------------------------------
@@ -13,7 +13,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return "print";
+                return "build";
             }
         }
 
@@ -23,7 +23,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return true;
+                return false;
             }
         }
 
@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<subcommand>", "Gibt <subcommand> (tree) in der Console aus" );
+                return string.Format (CommandLines.Help.HilfePattern, this.Key, string.Empty, "Build a Yama Programm" );
             }
         }
 
@@ -57,9 +57,9 @@ namespace LearnCsStuf.CommandLines.Commands
 
         public ICommandLine Check ( string command )
         {
-            if (string.Format ( "{0}", this.Key ) != command) return null;
+            if (this.Key != command) return null;
 
-            return new Print();
+            return new CompileExpression (  );
         }
 
         // -----------------------------------------------

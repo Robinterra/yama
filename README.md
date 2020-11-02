@@ -123,7 +123,7 @@ namespace "Program"
 
 ### avr-gcc
 ```console
-./YamaCompile out "./bin/out.S" define atmega328p define avr-gcc def avr inc "./src"
+./YamaCompile build out "./bin/out.S" define atmega328p define avr-gcc def avr inc "./src"
 
 avr-gcc -nostartfiles -mmcu=atmega328p -o ./bin/out.elf ./bin/out.S
 
@@ -133,7 +133,7 @@ avrdude -F -e -v -p m328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:"out.h
 ```
 ### arm-gcc
 ```console
-dotnet run out "./out.S" define SAM3X8E def arm-t32 ./bin/Debug/netcoreapp3.1/iftest.yama
+dotnet run build out "./out.S" define SAM3X8E def arm-t32 ./bin/Debug/netcoreapp3.1/iftest.yama
 
 arm-none-eabi-gcc -nostartfiles -nostdlib -mcpu=cortex-m3 -Ttext=0x80000 -o ./bin/out.elf out.S
 ```

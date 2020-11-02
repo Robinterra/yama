@@ -66,6 +66,14 @@ namespace Yama
 
         // -----------------------------------------------
 
+        public bool PrintParserTree
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public string StartNamespace
         {
             get;
@@ -369,6 +377,8 @@ namespace Yama
                 if (!p.Parse(startlayer)) return this.PrintingErrors(p);
 
                 IParseTreeNode node = p.ParentContainer;
+
+                if (this.PrintParserTree) p.PrintPretty ( node );
 
                 nodes.AddRange(node.GetAllChilds);
             }

@@ -46,28 +46,44 @@ namespace Yama
                 pcl.ArgumentAuswerten ( arg );
             }
 
-            if (!Program.Execute ( pcl.Result )) return 1;
+            if (!Program.ExecuteArguments ( pcl.Result )) return 1;
 
             return 0;
         }
 
         // -----------------------------------------------
 
-        private static bool Execute ( List<ICommandLine> commands )
+        private static bool ExecuteArguments ( List<ICommandLine> commands )
+        {
+            if (commands.Count == 0) return Program.HelpPrinten() == 1;
+            DefinitionManager defs = new DefinitionManager();
+
+            ICommandLine firstCommand = commands[0];
+
+            if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
+            if (firstCommand is LearnCsStuf.CommandLines.Commands.Help) return Program.HelpPrinten (  ) == 1;
+            if (firstCommand is AutoExpression) return Program.RunAuto ( firstCommand );
+            if (firstCommand is PrintDefinitionsExpression) return defs.PrintAllDefinitions (  );
+
+            Console.Error.WriteLine ( "please enter a allowd argument first" );
+
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        private static bool Build ( List<ICommandLine> commands, DefinitionManager defs )
         {
             LanguageDefinition yama = new LanguageDefinition();
-            DefinitionManager defs = new DefinitionManager();
 
             foreach ( ICommandLine command in commands )
             {
-                if (command is LearnCsStuf.CommandLines.Commands.Help) return Program.HelpPrinten (  ) == 1;
                 if (command is FileExpression) yama.Files.Add ( command.Value );
-                if (command is AutoExpression) return Program.RunAuto ( command );
                 if (command is IncludeExpression) yama.Includes.Add ( command.Value );
                 if (command is OutputFileExpression) yama.OutputFile = command.Value;
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
-                if (command is PrintDefinitionsExpression) return defs.PrintAllDefinitions (  );
                 if (command is DefinesExpression) yama.Defines.Add(command.Value);
+                if (command is Print t) Program.CheckPrint ( yama, t );
                 if (command is StartNamespace) yama.StartNamespace = command.Value;
             }
 
@@ -75,6 +91,13 @@ namespace Yama
             if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary.FullName );
 
             return yama.Compile();
+        }
+
+        private static bool CheckPrint(LanguageDefinition yama, Print t)
+        {
+            if (t.Value == "tree") yama.PrintParserTree = true;
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -113,6 +136,7 @@ namespace Yama
             Program.EnabledCommandLines = new List<ICommandLine> (  );
 
             Program.EnabledCommandLines.Add ( new FileExpression (  ) );
+            Program.EnabledCommandLines.Add ( new CompileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );
             Program.EnabledCommandLines.Add ( new IncludeExpression (  ) );
             Program.EnabledCommandLines.Add ( new DefinitionExpression (  ) );
@@ -120,6 +144,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new StartNamespace (  ) );
             Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
+            Program.EnabledCommandLines.Add ( new Print (  ) );
             Program.EnabledCommandLines.Add ( new LearnCsStuf.CommandLines.Commands.Help (  ) );
             return true;
         }
