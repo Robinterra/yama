@@ -61,6 +61,7 @@ namespace Yama
             ICommandLine firstCommand = commands[0];
 
             if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
+            if (firstCommand is AssembleExpression) return Program.Assemble ( commands );
             if (firstCommand is LearnCsStuf.CommandLines.Commands.Help) return Program.HelpPrinten (  ) == 1;
             if (firstCommand is AutoExpression) return Program.RunAuto ( firstCommand );
             if (firstCommand is PrintDefinitionsExpression) return defs.PrintAllDefinitions (  );
@@ -74,6 +75,18 @@ namespace Yama
 
         private static bool Assemble ( List<ICommandLine> commands )
         {
+            Assembler.Assembler assembler = new Assembler.Assembler();
+            FileInfo file = null;
+
+            foreach ( ICommandLine command in commands )
+            {
+                if (command is FileExpression) file = new FileInfo ( command.Value );
+            }
+
+            if (file == null) return false;
+
+            assembler.Assemble(file);
+
             return true;
         }
 

@@ -227,6 +227,8 @@ namespace Yama.Lexer
         Implicit,
         Simple,
         Copy,
+        Hash,
+        Gleich,
     }
 }
 
