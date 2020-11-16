@@ -8,6 +8,7 @@ using Yama.Compiler.Definition;
 using LearnCsStuf.Automaten;
 using LearnCsStuf.CommandLines;
 using LearnCsStuf.CommandLines.Commands;
+using Yama.Assembler;
 
 namespace Yama
 {
@@ -75,17 +76,27 @@ namespace Yama
 
         private static bool Assemble ( List<ICommandLine> commands )
         {
-            Assembler.Assembler assembler = new Assembler.Assembler();
-            FileInfo file = null;
+            Definitionen def = new Definitionen();
+            Assembler.Assembler assembler = def.GenerateAssembler();
+            RequestAssemble request = new RequestAssemble();
 
             foreach ( ICommandLine command in commands )
             {
-                if (command is FileExpression) file = new FileInfo ( command.Value );
+                if (command is FileExpression) request.InputFile = new FileInfo ( command.Value );
+                if (command is OutputFileExpression)
+                {
+                    FileInfo file = new FileInfo ( command.Value );
+                    if (file.Exists) file.Delete();
+                    request.Stream = file.OpenWrite();
+                }
             }
 
-            if (file == null) return false;
+            if (request.InputFile == null) return false;
+            if (request.Stream == null) return false;
 
-            assembler.Assemble(file);
+            assembler.Assemble(request);
+
+            request.Stream.Close();
 
             return true;
         }

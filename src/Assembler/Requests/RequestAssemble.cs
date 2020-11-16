@@ -1,25 +1,27 @@
 using System.Collections.Generic;
+using System.IO;
+using Yama.Parser;
 
 namespace Yama.Assembler
 {
-    public class RequestAssembleFormat
+    public class RequestAssemble
     {
-        public uint Command
+        public FileInfo InputFile
         {
             get;
             set;
         }
 
-        public List<uint> Arguments
+        public Stream Stream
         {
             get;
             set;
-        } = new List<uint>();
+        }
 
-        public List<byte> Result
+        public bool WithMapper
         {
             get;
             set;
-        } = new List<byte>();
+        }
     }
 }

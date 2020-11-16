@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Yama.Compiler;
+using Yama.Parser;
 
 namespace Yama.Assembler
 {
@@ -8,16 +9,32 @@ namespace Yama.Assembler
         string Key
         {
             get;
-            set;
         }
 
         string Format
+        {
+            get;
+        }
+
+        uint CommandId
+        {
+            get;
+            set;
+        }
+
+        int Size
         {
             get;
             set;
         }
 
         byte[] Data
+        {
+            get;
+            set;
+        }
+
+        IParseTreeNode Node
         {
             get;
             set;
@@ -31,6 +48,7 @@ namespace Yama.Assembler
 
         bool Assemble(RequestAssembleCommand request);
 
+        bool Identify(RequestIdentify request);
         bool DisAssemble(RequestDisAssembleCommand request);
 
     }

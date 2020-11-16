@@ -5,7 +5,6 @@ namespace Yama.Assembler
         string Name
         {
             get;
-            set;
         }
 
         bool Assemble(RequestAssembleFormat request);

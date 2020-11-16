@@ -15,18 +15,18 @@ namespace Yama.Assembler
         {
             get;
             set;
-        }
+        } = new List<Register>();
 
         public List<ICommand> Commands
         {
             get;
             set;
-        }
+        } = new List<ICommand>();
 
         public List<IFormat> Formats
         {
             get;
             set;
-        }
+        } = new List<IFormat>();
     }
 }

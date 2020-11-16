@@ -92,6 +92,7 @@ namespace Yama.Assembler
             } );
             rules.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
+            rules.Add ( new Comment ( new ZeichenKette ( "." ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), IdentifierKind.OpenBracket ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( ")" ), IdentifierKind.CloseBracket ) );
@@ -127,6 +128,85 @@ namespace Yama.Assembler
         // -----------------------------------------------
 
         #endregion LexerDefintion
+
+        // -----------------------------------------------
+
+        #region ARM-T32 Definition
+
+        // -----------------------------------------------
+
+        private bool T3ImmediateDefinitionen(AssemblerDefinition definition)
+        {
+            definition.Formats.Add(new T3ImmediateFormat());
+
+            definition.Commands.Add(new T3ImmediateCommand ("adc", "T3Immediate", 0xF14, 4));
+            definition.Commands.Add(new T3ImmediateCommand ("add", "T3Immediate", 0xF20, 4));
+            definition.Commands.Add(new T3ImmediateCommand ("and", "T3Immediate", 0xF00, 4));
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+
+        private bool T3RegisterDefinitionen(AssemblerDefinition definition)
+        {
+            definition.Formats.Add(new T3RegisterFormat());
+
+            definition.Commands.Add(new T3RegisterCommand ("adc", "T3Register", 0xEB4, 4));
+            definition.Commands.Add(new T3RegisterCommand ("add", "T3Register", 0xEB0, 4));
+            definition.Commands.Add(new T3RegisterCommand ("and", "T3Register", 0xEA0, 4));
+            
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool T3asrDefinition(AssemblerDefinition definition)
+        {
+            definition.Formats.Add(new T3AsrImmediateFormat());
+            definition.Formats.Add(new T3AsrRegisterFormat());
+
+            definition.Commands.Add(new T3ImmediateCommand ("asr", "T3AsrIm", 0xEA4, 4));
+            definition.Commands.Add(new T3RegisterCommand ("asr", "T3AsrRe", 0xFA4, 4));
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool GenerateRegister(AssemblerDefinition definition)
+        {
+            for (uint i = 0; i <= 12; i++)
+            {
+                definition.Registers.Add(new Register(string.Format("r{0}", i), i));
+            }
+
+            definition.Registers.Add(new Register("sp", 13));
+            definition.Registers.Add(new Register("lr", 14));
+            definition.Registers.Add(new Register("pc", 15));
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public Assembler GenerateAssembler()
+        {
+            Assembler assembler = new Assembler();
+            assembler.Definition = new AssemblerDefinition();
+
+            this.T3ImmediateDefinitionen ( assembler.Definition );
+            this.T3RegisterDefinitionen ( assembler.Definition );
+            this.GenerateRegister ( assembler.Definition );
+
+            return assembler;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ARM-T32 Definition
 
         // -----------------------------------------------
     }
