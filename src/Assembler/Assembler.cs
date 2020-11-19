@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Yama.Assembler.ARMT32;
 using Yama.Parser;
 
 namespace Yama.Assembler
@@ -38,6 +40,30 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
+        public List<JumpPointMapper> Mapper
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public uint Position
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public List<IParseTreeNode> Errors
+        {
+            get;
+            set;
+        } = new List<IParseTreeNode>();
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -65,39 +91,108 @@ namespace Yama.Assembler
 
             if (!this.Parser.Parse(startlayer))
             {
-                System.Console.WriteLine("Error");
+                this.Errors = this.Parser.ParserErrors;
 
-                foreach (IParseTreeNode node in this.Parser.ParserErrors)
-                {
-                    this.Parser.PrintSyntaxError(node.Token,"Error");
-                }
-
-                return false;
+                return this.PrintErrors();
             }
 
-            foreach (IParseTreeNode node in this.Parser.ParentContainer.Statements)
+            this.Skipper();
+
+            if (!this.IdentifyAndAssemble(this.Parser.ParentContainer.Statements)) return this.PrintErrors();
+
+            return true;
+        }
+
+        private bool PrintErrors()
+        {
+            foreach (IParseTreeNode node in this.Errors)
             {
-                this.AssembleStep(node);
+                this.Parser.PrintSyntaxError(node.Token, "Assembler error", "Assembler error");
+            }
+
+            return false;
+        }
+
+        private bool Skipper()
+        {
+            byte[] result = new byte[this.Position];
+
+            this.Stream.Write(result);
+
+            return true;
+        }
+
+        private bool IdentifyAndAssemble(List<IParseTreeNode> nodes)
+        {
+            List<KeyValuePair<ICommand, IParseTreeNode>> maptranslate = new List<KeyValuePair<ICommand, IParseTreeNode>>();
+
+            bool isok = true;
+            foreach (IParseTreeNode node in nodes)
+            {
+                if (node is JumpPointMarker)
+                {
+                    this.Mappen(node.Token.Text, this.Position);
+                    continue;
+                }
+
+                ICommand command = this.Identify(node);
+                if (command == null)
+                {
+                    this.Errors.Add(node);
+                    isok = false;
+                    continue;
+                }
+                this.Position += (uint)command.Size;
+
+                maptranslate.Add(new KeyValuePair<ICommand, IParseTreeNode>(command, node));
+            }
+
+            if (!isok) return false;
+
+            foreach (KeyValuePair<ICommand, IParseTreeNode> assmblepair in maptranslate)
+            {
+                this.AssembleStep(assmblepair);
             }
 
             return true;
         }
 
-        private bool AssembleStep(IParseTreeNode node)
+        private bool Mappen (string key, uint position)
         {
-            RequestAssembleCommand request = new RequestAssembleCommand();
+            JumpPointMapper map = new JumpPointMapper();
+            map.Key = key;
+            map.Adresse = position;
+
+            this.Mapper.Add(map);
+
+            return true;
+        }
+
+        private ICommand Identify(IParseTreeNode node)
+        {
+            RequestIdentify request = new RequestIdentify();
             request.Node = node;
-            request.Assembler = this;
-            request.Stream = this.Stream;
 
             foreach (ICommand command in this.Definition.Commands)
             {
-                if (!command.Assemble(request)) continue;
+                if (!command.Identify(request)) continue;
 
-                return true;
+                return command;
             }
 
-            return false;
+            return null;
+        }
+
+        private bool AssembleStep(KeyValuePair<ICommand, IParseTreeNode> assmblepair)
+        {
+            RequestAssembleCommand request = new RequestAssembleCommand();
+            request.Node = assmblepair.Value;
+            request.Assembler = this;
+            request.Stream = this.Stream;
+
+            assmblepair.Key.Assemble(request);
+
+            return true;
         }
 
         public uint GetRegister(string text)

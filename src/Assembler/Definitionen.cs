@@ -199,6 +199,7 @@ namespace Yama.Assembler
 
             this.T3ImmediateDefinitionen ( assembler.Definition );
             this.T3RegisterDefinitionen ( assembler.Definition );
+            this.T3asrDefinition ( assembler.Definition );
             this.GenerateRegister ( assembler.Definition );
 
             return assembler;

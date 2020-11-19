@@ -83,6 +83,7 @@ namespace Yama
             foreach ( ICommandLine command in commands )
             {
                 if (command is FileExpression) request.InputFile = new FileInfo ( command.Value );
+                if (command is SkipExpression) assembler.Position = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
                 if (command is OutputFileExpression)
                 {
                     FileInfo file = new FileInfo ( command.Value );
@@ -175,6 +176,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new StartNamespace (  ) );
             Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
+            Program.EnabledCommandLines.Add ( new SkipExpression (  ) );
             Program.EnabledCommandLines.Add ( new Print (  ) );
             Program.EnabledCommandLines.Add ( new FileExpression (  ) );
             Program.EnabledCommandLines.Add ( new LearnCsStuf.CommandLines.Commands.Help (  ) );
