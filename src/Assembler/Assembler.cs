@@ -44,7 +44,7 @@ namespace Yama.Assembler
         {
             get;
             set;
-        }
+        } = new List<JumpPointMapper>();
 
         // -----------------------------------------------
 
@@ -103,6 +103,34 @@ namespace Yama.Assembler
             return true;
         }
 
+        // -----------------------------------------------
+
+        public uint BuildJumpSkipper(uint position, uint adresse, uint size)
+        {
+            position = position + this.Definition.ProgramCounterIncress;
+
+            if (position > adresse) return (~((position - adresse) / this.Definition.CommandEntitySize)) + 1;
+
+            size = size / this.Definition.CommandEntitySize;
+
+            uint result = (adresse - position) / this.Definition.CommandEntitySize;
+
+            size = 2 - size;
+
+            if ( result < size ) return (~(size - result)) + 1;
+
+             return result - size;
+        }
+
+        // -----------------------------------------------
+
+        public JumpPointMapper GetJumpPoint(string key)
+        {
+            return this.Mapper.FirstOrDefault(t=>t.Key == key);
+        }
+
+        // -----------------------------------------------
+
         private bool PrintErrors()
         {
             foreach (IParseTreeNode node in this.Errors)
@@ -113,6 +141,8 @@ namespace Yama.Assembler
             return false;
         }
 
+        // -----------------------------------------------
+
         private bool Skipper()
         {
             byte[] result = new byte[this.Position];
@@ -122,8 +152,12 @@ namespace Yama.Assembler
             return true;
         }
 
+        // -----------------------------------------------
+
         private bool IdentifyAndAssemble(List<IParseTreeNode> nodes)
         {
+            uint startposition = this.Position;
+
             List<KeyValuePair<ICommand, IParseTreeNode>> maptranslate = new List<KeyValuePair<ICommand, IParseTreeNode>>();
 
             bool isok = true;
@@ -151,11 +185,15 @@ namespace Yama.Assembler
 
             foreach (KeyValuePair<ICommand, IParseTreeNode> assmblepair in maptranslate)
             {
-                this.AssembleStep(assmblepair);
+                if (!this.AssembleStep(assmblepair, startposition)) return false;
+
+                startposition += (uint)assmblepair.Key.Size;
             }
 
-            return true;
+            return this.Errors.Count == 0;
         }
+
+        // -----------------------------------------------
 
         private bool Mappen (string key, uint position)
         {
@@ -167,6 +205,8 @@ namespace Yama.Assembler
 
             return true;
         }
+
+        // -----------------------------------------------
 
         private ICommand Identify(IParseTreeNode node)
         {
@@ -183,17 +223,24 @@ namespace Yama.Assembler
             return null;
         }
 
-        private bool AssembleStep(KeyValuePair<ICommand, IParseTreeNode> assmblepair)
+        // -----------------------------------------------
+
+        private bool AssembleStep(KeyValuePair<ICommand, IParseTreeNode> assmblepair, uint position)
         {
             RequestAssembleCommand request = new RequestAssembleCommand();
             request.Node = assmblepair.Value;
             request.Assembler = this;
             request.Stream = this.Stream;
+            request.Position = position;
 
-            assmblepair.Key.Assemble(request);
+            if (assmblepair.Key.Assemble(request)) return true;
+
+            this.Errors.Add(request.Node);
 
             return true;
         }
+
+        // -----------------------------------------------
 
         public uint GetRegister(string text)
         {

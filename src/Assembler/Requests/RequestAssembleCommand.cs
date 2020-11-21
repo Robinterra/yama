@@ -35,5 +35,10 @@ namespace Yama.Assembler
             get;
             set;
         } = new List<ICommand>();
+        public uint Position
+        {
+            get;
+            set;
+        }
     }
 }

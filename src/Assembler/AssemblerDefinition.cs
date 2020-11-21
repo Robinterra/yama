@@ -28,5 +28,16 @@ namespace Yama.Assembler
             get;
             set;
         } = new List<IFormat>();
+        public uint ProgramCounterIncress
+        {
+            get;
+            set;
+        }
+
+        public uint CommandEntitySize
+        {
+            get;
+            set;
+        }
     }
 }

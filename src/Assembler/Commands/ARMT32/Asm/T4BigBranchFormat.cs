@@ -2,29 +2,27 @@ using System;
 
 namespace Yama.Assembler.ARMT32
 {
-    public class T3AsrImmediateFormat : IFormat
+    public class T4BigBranchFormat : IFormat
     {
         public string Name
         {
             get
             {
-                return "T3AsrIm";
+                return "T4BigBranch";
             }
         }
 
         // https://developer.arm.com/docs/ddi0597/h/base-instructions-alphabetic-order/adc-adcs-immediate-add-with-carry-immediate
         public bool Assemble(RequestAssembleFormat request)
         {
-            if (request.Arguments.Count != 3) return false;
+            if (request.Arguments.Count != 1) return false;
 
-            uint firstFragment = ( request.Command << 4 ) & 0xFFF0;
-            firstFragment |= 0x000F;
+            uint firstFragment = 0xF000;
+            firstFragment |= ( (request.Arguments[0] & 0x80000000) == 0x80000000 ) ? (uint)0x0400 : (uint)0;
+            firstFragment |= (request.Arguments[0] >> 11) & 0x03FF;
 
-            uint secondFragment = ( request.Arguments[0] << 8 ) & 0x0F00;
-            secondFragment |= 0x20;
-            secondFragment |= ( request.Arguments[1] ) & 0x000F;
-            secondFragment |= ( request.Arguments[2] << 10 ) & 0x7000;
-            secondFragment |= ( request.Arguments[2] << 6 ) & 0x00C0;
+            uint secondFragment = 0x9000;
+            secondFragment |= ( request.Arguments[0] ) & 0x07FF;
 
             byte[] tmp = BitConverter.GetBytes ( firstFragment );
             request.Result.Add ( tmp[0] );

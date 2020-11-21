@@ -163,6 +163,17 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
+        private bool BranchesDefinitionen(AssemblerDefinition definition)
+        {
+            definition.Formats.Add(new T4BigBranchFormat());
+
+            definition.Commands.Add(new T4BranchCommand("b", "T4BigBranch", 0, 4));
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
         private bool T3asrDefinition(AssemblerDefinition definition)
         {
             definition.Formats.Add(new T3AsrImmediateFormat());
@@ -196,10 +207,13 @@ namespace Yama.Assembler
         {
             Assembler assembler = new Assembler();
             assembler.Definition = new AssemblerDefinition();
+            assembler.Definition.ProgramCounterIncress = 4;
+            assembler.Definition.CommandEntitySize = 2;
 
             this.T3ImmediateDefinitionen ( assembler.Definition );
             this.T3RegisterDefinitionen ( assembler.Definition );
             this.T3asrDefinition ( assembler.Definition );
+            this.BranchesDefinitionen ( assembler.Definition );
             this.GenerateRegister ( assembler.Definition );
 
             return assembler;
