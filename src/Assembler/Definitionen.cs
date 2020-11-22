@@ -166,8 +166,10 @@ namespace Yama.Assembler
         private bool BranchesDefinitionen(AssemblerDefinition definition)
         {
             definition.Formats.Add(new T4BigBranchFormat());
+            definition.Formats.Add(new T1BranchRegisterFormat());
 
             definition.Commands.Add(new T4BranchCommand("b", "T4BigBranch", 0, 4));
+            definition.Commands.Add(new T1RegisterCommand("blx", "T1BLX", 0x08F, 2));
 
             return true;
         }
