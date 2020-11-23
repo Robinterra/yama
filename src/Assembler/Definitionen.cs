@@ -142,6 +142,18 @@ namespace Yama.Assembler
             definition.Commands.Add(new T3ImmediateCommand ("adc", "T3Immediate", 0xF14, 4));
             definition.Commands.Add(new T3ImmediateCommand ("add", "T3Immediate", 0xF20, 4));
             definition.Commands.Add(new T3ImmediateCommand ("and", "T3Immediate", 0xF00, 4));
+            definition.Commands.Add(new T2RegisterImmediateCommand("cmp", "T3Immediate", 0xF1B, 4));
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool T1RegisterDefinition(AssemblerDefinition definition)
+        {
+            definition.Formats.Add(new T1SmallRegisterFormat());
+
+            definition.Commands.Add(new T1RegistersCommand("cmp", "T1Register", 0x10A, 2));
 
             return true;
         }
@@ -216,6 +228,7 @@ namespace Yama.Assembler
             this.T3ImmediateDefinitionen ( assembler.Definition );
             this.T3RegisterDefinitionen ( assembler.Definition );
             this.T3asrDefinition ( assembler.Definition );
+            this.T1RegisterDefinition ( assembler.Definition );
             this.BranchesDefinitionen ( assembler.Definition );
             this.GenerateRegister ( assembler.Definition );
 
