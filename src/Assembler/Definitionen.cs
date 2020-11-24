@@ -143,6 +143,7 @@ namespace Yama.Assembler
             definition.Commands.Add(new T3ImmediateCommand ("add", "T3Immediate", 0xF20, 4));
             definition.Commands.Add(new T3ImmediateCommand ("and", "T3Immediate", 0xF00, 4));
             definition.Commands.Add(new T2RegisterImmediateCommand("cmp", "T3Immediate", 0xF1B, 4));
+            definition.Commands.Add(new T3ImmediateCommand("eor", "T3Immediate", 0xF08, 4));
 
             return true;
         }
@@ -168,7 +169,7 @@ namespace Yama.Assembler
             definition.Commands.Add(new T3RegisterCommand ("adc", "T3Register", 0xEB4, 4));
             definition.Commands.Add(new T3RegisterCommand ("add", "T3Register", 0xEB0, 4));
             definition.Commands.Add(new T3RegisterCommand ("and", "T3Register", 0xEA0, 4));
-            
+            definition.Commands.Add(new T3RegisterCommand ("eor", "T3Register", 0xEA8, 4));
 
             return true;
         }
