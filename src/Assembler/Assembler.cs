@@ -212,6 +212,7 @@ namespace Yama.Assembler
         {
             RequestIdentify request = new RequestIdentify();
             request.Node = node;
+            request.Assembler = this;
 
             foreach (ICommand command in this.Definition.Commands)
             {

@@ -138,12 +138,21 @@ namespace Yama.Assembler
         private bool T3ImmediateDefinitionen(AssemblerDefinition definition)
         {
             definition.Formats.Add(new T3ImmediateFormat());
+            definition.Formats.Add(new T2LDRSPFormat());
+            definition.Formats.Add(new T3LdrRegisterFormat());
+            definition.Formats.Add(new ConstFormat());
+            definition.Formats.Add(new T2BranchImmediateFormat());
 
             definition.Commands.Add(new T3ImmediateCommand ("adc", "T3Immediate", 0xF14, 4));
             definition.Commands.Add(new T3ImmediateCommand ("add", "T3Immediate", 0xF20, 4));
             definition.Commands.Add(new T3ImmediateCommand ("and", "T3Immediate", 0xF00, 4));
             definition.Commands.Add(new T2RegisterImmediateCommand("cmp", "T3Immediate", 0xF1B, 4));
             definition.Commands.Add(new T3ImmediateCommand("eor", "T3Immediate", 0xF08, 4));
+
+            definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T2LdrSp", 0x13, 2, 0x7, 4));
+            definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T3LdrRegister", 0xF8D, 4, 0x14, 1));
+            definition.Commands.Add(new T2LdrConstCommand("ldr", "T3LdrRegister", 0xF85, 9));
+            definition.Commands.Add(new T2LdrJumpCommand("ldr", "T3LdrRegister", 0xF85, 9));
 
             return true;
         }
