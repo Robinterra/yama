@@ -87,7 +87,7 @@ namespace Yama.Assembler.ARMT32
             assembleFormat.Command = this.CommandId;
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
             assembleFormat.Arguments.Add(0xF);
-            assembleFormat.Arguments.Add(0x1);
+            assembleFormat.Arguments.Add(0x2);
 
             RequestAssembleFormat assembleFormatBranch = new RequestAssembleFormat();
             assembleFormatBranch.Command = 0x1C;
