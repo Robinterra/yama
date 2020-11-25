@@ -75,6 +75,8 @@ namespace Yama.Assembler.ARMT32
         {
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
             if (!(request.Node is CommandWith3ArgsNode t)) return false;
+            if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
+            if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument2.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
             IFormat format = request.Assembler.GetFormat(this.Format);
@@ -96,6 +98,8 @@ namespace Yama.Assembler.ARMT32
         {
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
             if (!(request.Node is CommandWith3ArgsNode t)) return false;
+            if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
+            if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument2.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
             return true;

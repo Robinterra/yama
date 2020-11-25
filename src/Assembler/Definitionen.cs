@@ -144,15 +144,19 @@ namespace Yama.Assembler
             definition.Formats.Add(new T2BranchImmediateFormat());
 
             definition.Commands.Add(new T3ImmediateCommand ("adc", "T3Immediate", 0xF14, 4));
-            definition.Commands.Add(new T3ImmediateCommand ("add", "T3Immediate", 0xF20, 4));
+            definition.Commands.Add(new T3ImmediateCommand ("add", "T3Immediate", 0xF10, 4));
+            //definition.Commands.Add(new T3ImmediateCommand ("mul", "T3Immediate", 0xFB0, 4));
             definition.Commands.Add(new T3ImmediateCommand ("and", "T3Immediate", 0xF00, 4));
             definition.Commands.Add(new T2RegisterImmediateCommand("cmp", "T3Immediate", 0xF1B, 4));
             definition.Commands.Add(new T3ImmediateCommand("eor", "T3Immediate", 0xF08, 4));
+            definition.Commands.Add(new T3ImmediateCommand("orr", "T3Immediate", 0xF04, 4));
 
             definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T2LdrSp", 0x13, 2, 0x7, 4));
-            definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T3LdrRegister", 0xF8D, 4, 0x14, 1));
+            definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T3LdrRegister", 0xF8D, 4, 0xe, 1));
             definition.Commands.Add(new T2LdrConstCommand("ldr", "T3LdrRegister", 0xF85, 9));
             definition.Commands.Add(new T2LdrJumpCommand("ldr", "T3LdrRegister", 0xF85, 9));
+
+            definition.Commands.Add(new T2RegisterImmediateCommand("mov", "T3Immediate", 0xF04, 4));
 
             return true;
         }
@@ -163,7 +167,8 @@ namespace Yama.Assembler
         {
             definition.Formats.Add(new T1SmallRegisterFormat());
 
-            definition.Commands.Add(new T1RegistersCommand("cmp", "T1Register", 0x10A, 2));
+            definition.Commands.Add(new T1RegistersCommand("cmp", "T1Register", 0x45, 2));
+            definition.Commands.Add(new T1RegistersCommand("mov", "T1Register", 0x46, 2));
 
             return true;
         }
@@ -177,8 +182,10 @@ namespace Yama.Assembler
 
             definition.Commands.Add(new T3RegisterCommand ("adc", "T3Register", 0xEB4, 4));
             definition.Commands.Add(new T3RegisterCommand ("add", "T3Register", 0xEB0, 4));
+            definition.Commands.Add(new T3RegisterCommand ("mul", "T3Register", 0xFB0, 4, true));
             definition.Commands.Add(new T3RegisterCommand ("and", "T3Register", 0xEA0, 4));
             definition.Commands.Add(new T3RegisterCommand ("eor", "T3Register", 0xEA8, 4));
+            //definition.Commands.Add(new T3RegisterCommand ("eor", "T3Register", 0xF04, 4));
 
             return true;
         }

@@ -41,6 +41,7 @@ namespace Yama.Assembler.ARMT32
             get;
             set;
         }
+
         public IParseTreeNode Node
         {
             get;

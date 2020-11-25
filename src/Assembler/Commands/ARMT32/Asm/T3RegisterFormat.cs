@@ -21,6 +21,7 @@ namespace Yama.Assembler.ARMT32
             firstFragment |= ( request.Arguments[1] ) & 0x000F;
 
             uint secondFragment = ( request.Arguments[0] << 8 ) & 0x0F00;
+            if (request.Sonder) secondFragment |= 0xf000;
             secondFragment |= ( request.Arguments[2] ) & 0x000F;
 
             byte[] tmp = BitConverter.GetBytes ( firstFragment );
