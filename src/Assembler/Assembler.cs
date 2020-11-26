@@ -96,7 +96,7 @@ namespace Yama.Assembler
                 return this.PrintErrors();
             }
 
-            this.Skipper();
+            if (request.IsSkipper) this.Skipper();
 
             if (!this.IdentifyAndAssemble(this.Parser.ParentContainer.Statements)) return this.PrintErrors();
 
@@ -107,19 +107,22 @@ namespace Yama.Assembler
 
         public uint BuildJumpSkipper(uint position, uint adresse, uint size)
         {
+            uint orgpos = position;
             position = position + this.Definition.ProgramCounterIncress;
 
             if (position > adresse) return (~((position - adresse) / this.Definition.CommandEntitySize)) + 1;
 
-            size = size / this.Definition.CommandEntitySize;
-
             uint result = (adresse - position) / this.Definition.CommandEntitySize;
+            if ( result == 1 && adresse - (orgpos + size) == 4 ) return 1;
 
+            size = size / this.Definition.CommandEntitySize;
             size = 2 - size;
 
-            if ( result < size ) return (~(size - result)) + 1;
+            if ( result == 0 ) return 0;//(~(result)) + 1;
 
-             return result - size;
+            if (result - size != 0) return result;
+
+            return result - size;
         }
 
         // -----------------------------------------------

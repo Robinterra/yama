@@ -41,6 +41,7 @@ namespace Yama.Assembler.ARMT32
             get;
             set;
         }
+        public uint Maximum { get; }
         public IParseTreeNode Node
         {
             get;
@@ -51,12 +52,13 @@ namespace Yama.Assembler.ARMT32
 
         #region ctor
 
-        public T4BranchCommand(string key, string format, uint id, int size)
+        public T4BranchCommand(string key, string format, uint id, int size, uint max)
         {
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
+            this.Maximum = max;
         }
 
         public T4BranchCommand(T4BranchCommand t, IParseTreeNode node, List<byte> bytes)
@@ -81,6 +83,18 @@ namespace Yama.Assembler.ARMT32
             if (map == null) return false;
 
             uint target = request.Assembler.BuildJumpSkipper(request.Position, map.Adresse, (uint)this.Size);
+
+            if ((target & 0x80000000) != 0x80000000)
+            {
+                if (target > this.Maximum) return false;
+            }
+            else
+            {
+                uint smaleentity = (~this.Maximum) + 1;
+                if (target < smaleentity) return false;
+            }
+
+            //target = target >> this.BitSkipper;
 
             IFormat format = request.Assembler.GetFormat(this.Format);
 

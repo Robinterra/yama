@@ -23,5 +23,10 @@ namespace Yama.Assembler
             get;
             set;
         }
+        public bool IsSkipper
+        {
+            get;
+            set;
+        }
     }
 }

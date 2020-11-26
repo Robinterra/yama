@@ -197,7 +197,8 @@ namespace Yama.Assembler
             definition.Formats.Add(new T4BigBranchFormat());
             definition.Formats.Add(new T1BranchRegisterFormat());
 
-            definition.Commands.Add(new T4BranchCommand("b", "T4BigBranch", 0, 4));
+            definition.Commands.Add(new T4BranchCommand("b", "T2BranchImmediate", 0x1C, 2, 0x3FF));
+            //definition.Commands.Add(new T4BranchCommand("b", "T4BigBranch", 0, 4));
             definition.Commands.Add(new T1RegisterCommand("blx", "T1BLX", 0x08F, 2));
             definition.Commands.Add(new T1RegisterCommand("bx", "T1BLX", 0x08E, 2));
 
