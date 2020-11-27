@@ -142,6 +142,7 @@ namespace Yama.Assembler
             definition.Formats.Add(new T3LdrRegisterFormat());
             definition.Formats.Add(new ConstFormat());
             definition.Formats.Add(new T2BranchImmediateFormat());
+            definition.Formats.Add(new T1InputOutputSmallFormat());
 
             definition.Commands.Add(new T3ImmediateCommand ("adc", "T3Immediate", 0xF14, 4));
             definition.Commands.Add(new T3ImmediateCommand ("add", "T3Immediate", 0xF10, 4));
@@ -153,10 +154,15 @@ namespace Yama.Assembler
             definition.Commands.Add(new T3ImmediateCommand("eor", "T3Immediate", 0xF08, 4));
             definition.Commands.Add(new T3ImmediateCommand("orr", "T3Immediate", 0xF04, 4));
 
-            definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T2LdrSp", 0x13, 2, 0x7, 4));
+            definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T2LdrSp", 0x13, 2, 0x7, 4, true));
+            definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T1InputOutputSmall", 0xD, 2, 0x7, 4));
             definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T3LdrRegister", 0xF8D, 4, 0xe, 1));
             definition.Commands.Add(new T2LdrConstCommand("ldr", "T3LdrRegister", 0xF85, 9));
             definition.Commands.Add(new T2LdrJumpCommand("ldr", "T3LdrRegister", 0xF85, 9));
+
+            definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T2LdrSp", 0x12, 2, 0x7, 4, true));
+            definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T1InputOutputSmall", 0xC, 2, 0x7, 4));
+            definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T3LdrRegister", 0xF8C, 4, 0xe, 1));
 
             definition.Commands.Add(new T2RegisterImmediateCommand("mov", "T3Immediate", 0xF04, 4));
 
@@ -206,11 +212,18 @@ namespace Yama.Assembler
         {
             definition.Formats.Add(new T4BigBranchFormat());
             definition.Formats.Add(new T1BranchRegisterFormat());
+            definition.Formats.Add(new T1BranchConditionFormat());
 
             definition.Commands.Add(new T4BranchCommand("b", "T2BranchImmediate", 0x1C, 2, 0x3FF));
             //definition.Commands.Add(new T4BranchCommand("b", "T4BigBranch", 0, 4));
             definition.Commands.Add(new T1RegisterCommand("blx", "T1BLX", 0x08F, 2));
             definition.Commands.Add(new T1RegisterCommand("bx", "T1BLX", 0x08E, 2));
+            definition.Commands.Add(new T4BranchCommand("bge", "T1BranchCondition", 0xDA, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("blt", "T1BranchCondition", 0xDB, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("bgt", "T1BranchCondition", 0xDC, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("ble", "T1BranchCondition", 0xDD, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("bne", "T1BranchCondition", 0xD1, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("beq", "T1BranchCondition", 0xD0, 2, 0xFF));
 
             return true;
         }

@@ -43,6 +43,7 @@ namespace Yama.Assembler.ARMT32
         }
         public int MaxRegister { get; }
         public uint Teiler { get; }
+        public bool IsSpTwo { get; }
         public IParseTreeNode Node
         {
             get;
@@ -53,7 +54,7 @@ namespace Yama.Assembler.ARMT32
 
         #region ctor
 
-        public T2LdrArrayRegisterCommand(string key, string format, uint id, int size, int maxregister, uint teiler)
+        public T2LdrArrayRegisterCommand(string key, string format, uint id, int size, int maxregister, uint teiler, bool issptwo = false)
         {
             this.Key = key;
             this.Format = format;
@@ -61,6 +62,7 @@ namespace Yama.Assembler.ARMT32
             this.Size = size;
             this.MaxRegister = maxregister;
             this.Teiler = teiler;
+            this.IsSpTwo = issptwo;
         }
 
         public T2LdrArrayRegisterCommand(T2LdrArrayRegisterCommand t, IParseTreeNode node, List<byte> bytes)
@@ -107,6 +109,14 @@ namespace Yama.Assembler.ARMT32
             if (!(t.Argument1 is SquareArgumentNode s)) return false;
             if (request.Assembler.GetRegister(t.Argument0.Token.Text) > this.MaxRegister) return false;
             if (Convert.ToUInt32(s.Number.Value) % this.Teiler != 0) return false;
+            if (this.IsSpTwo)
+            {
+                if (request.Assembler.GetRegister(s.Token.Text) != 13) return false;
+            }
+            else
+            {
+                if (request.Assembler.GetRegister(s.Token.Text) > this.MaxRegister) return false;
+            }
 
             return true;
         }
