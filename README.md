@@ -7,7 +7,7 @@ This is a Compiler writen in C# for the Language Yama
 It is a Object-oriented Language for Microcontroller like ARM Cortex-M and AVR.
 Currently support:
  - AVR Assembler (avrasm and avr-gcc)
- - ARM-T32 Assemlber (arm-gcc) (current not testet)
+ - ARM-T32 Assemlber (current not testet)
 
 ### Why this new Language, Why dont use C#, Java or C?
 
@@ -65,7 +65,7 @@ sudo ln -s /mnt/c/pro/learncs/bin/Release/netcoreapp3.1/YamaCompiler /usr/bin/ya
 ### Prerequisites
 
 * dotnet
-* assembler for your Platfform (maybe in future i write my own assembler)
+* assembler for your Platfform (for ARM-T32 a Assembler is include)
 
 ## Running the tests
 
@@ -132,12 +132,15 @@ avr-objcopy -j .text -j .data -O ihex ./bin/out.elf ./bin/out.hex
 avrdude -F -e -v -p m328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:"out.hex":i
 ```
 ### arm-gcc
+
+#### Translate to Binary
 ```console
-dotnet run build out "./out.S" define SAM3X8E def arm-t32 ./bin/Debug/netcoreapp3.1/iftest.yama
-
-arm-none-eabi-gcc -nostartfiles -nostdlib -mcpu=cortex-m3 -Ttext=0x80000 -o ./bin/out.elf out.S
+./YamaCompile build skip 0x80000 out "./out.bin" define SAM3X8E def arm-t32 ./iftest.yama
 ```
-
+#### Translate to Binary and Assembler
+```console
+./YamaCompile build skip 0x80000 ao "out.S out "./out.bin" define SAM3X8E def arm-t32 ./iftest.yama
+```
 ## Authors
 
 * **Robin D'Andrea** - *Robinterra* - [Robinterra](https://github.com/Robinterra)

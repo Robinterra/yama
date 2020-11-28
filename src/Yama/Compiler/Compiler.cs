@@ -66,25 +66,28 @@ namespace Yama.Compiler
             return null;
         }
 
-        public bool AddLine(string assemblyCode, Dictionary<string, string> dictionaries, Dictionary<string, string> postreplaces = null)
+        public bool AddLine(RequestAddLine request)
         {
-            if (dictionaries != null)
+            if (request.Dictionaries != null)
             {
-                foreach(KeyValuePair<string, string> pair in dictionaries)
+                foreach(KeyValuePair<string, string> pair in request.Dictionaries)
                 {
-                    assemblyCode = assemblyCode.Replace(pair.Key, pair.Value);
+                    request.AssemblyCode = request.AssemblyCode.Replace(pair.Key, pair.Value);
                 }
             }
 
-            if (postreplaces != null)
+            if (request.PostReplaces != null)
             {
-                foreach(KeyValuePair<string, string> pair in postreplaces)
+                foreach(KeyValuePair<string, string> pair in request.PostReplaces)
                 {
-                    assemblyCode = assemblyCode.Replace(pair.Key, pair.Value);
+                    request.AssemblyCode = request.AssemblyCode.Replace(pair.Key, pair.Value);
                 }
             }
 
-            this.Writer.WriteLine(assemblyCode);
+            if (this.Writer != null)
+                this.Writer.WriteLine(request.AssemblyCode);
+
+            request.Root.AssemblyCommands.Add(request.AssemblyCode);
 
             return true;
         }
@@ -110,11 +113,13 @@ namespace Yama.Compiler
 
         private bool RunAssmblerSequence()
         {
-            if (this.OutputFile.Exists) this.OutputFile.Delete();
+            if (this.OutputFile != null)
+                if (this.OutputFile.Exists) this.OutputFile.Delete();
 
             try
             {
-                this.Writer = new StreamWriter(this.OutputFile.OpenWrite());
+                if (this.OutputFile != null)
+                    this.Writer = new StreamWriter(this.OutputFile.OpenWrite());
             }
             catch (Exception e) { return this.AddError(string.Format("Die Datei in der Assemblercode geschrieben werden sollte konnte nicht angelegt werden. {0}", e.Message)); }
 
@@ -123,7 +128,8 @@ namespace Yama.Compiler
                 if (!root.InFileCompilen(this)) this.AddError("Beim Schreiben der Assemblersequence ist ein Fehler aufgetreten");
             }
 
-            this.Writer.Close();
+            if (this.OutputFile != null)
+                this.Writer.Close();
 
             return true;
         }

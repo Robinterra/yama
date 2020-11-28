@@ -273,7 +273,7 @@
           "ldr r10,=[RAMBEGIN]",
           "ldr r11,=0x1",
           "sub r12,sp,r10",
-          "str r11,[r10]",
+          "str r11,[r10,#0]",
           "str r12,[r10,#4]",
           "b main"
         ]

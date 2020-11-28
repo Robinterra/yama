@@ -8,6 +8,7 @@ using Yama.Compiler.Definition;
 using LearnCsStuf.Automaten;
 using LearnCsStuf.CommandLines;
 using LearnCsStuf.CommandLines.Commands;
+using Yama.Assembler;
 
 namespace Yama
 {
@@ -61,6 +62,7 @@ namespace Yama
             ICommandLine firstCommand = commands[0];
 
             if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
+            if (firstCommand is AssembleExpression) return Program.Assemble ( commands );
             if (firstCommand is LearnCsStuf.CommandLines.Commands.Help) return Program.HelpPrinten (  ) == 1;
             if (firstCommand is AutoExpression) return Program.RunAuto ( firstCommand );
             if (firstCommand is PrintDefinitionsExpression) return defs.PrintAllDefinitions (  );
@@ -68,6 +70,37 @@ namespace Yama
             Console.Error.WriteLine ( "please enter a allowd argument first" );
 
             return false;
+        }
+
+        // -----------------------------------------------
+
+        private static bool Assemble ( List<ICommandLine> commands )
+        {
+            Definitionen def = new Definitionen();
+            Assembler.Assembler assembler = new Assembler.Assembler();
+            RequestAssemble request = new RequestAssemble();
+
+            foreach ( ICommandLine command in commands )
+            {
+                if (command is DefinitionExpression) assembler = def.GenerateAssembler ( assembler, command.Value );
+                if (command is FileExpression) request.InputFile = new FileInfo ( command.Value );
+                if (command is SkipExpression) assembler.Position = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+                if (command is OutputFileExpression)
+                {
+                    FileInfo file = new FileInfo ( command.Value );
+                    if (file.Exists) file.Delete();
+                    request.Stream = file.OpenWrite();
+                }
+            }
+
+            if (request.InputFile == null) return false;
+            if (request.Stream == null) return false;
+
+            assembler.Assemble(request);
+
+            request.Stream.Close();
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -80,10 +113,12 @@ namespace Yama
             {
                 if (command is FileExpression) yama.Files.Add ( command.Value );
                 if (command is IncludeExpression) yama.Includes.Add ( command.Value );
+                if (command is AssemblerOutputFileExpression) yama.OutputAssemblerFile = command.Value;
                 if (command is OutputFileExpression) yama.OutputFile = command.Value;
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
                 if (command is DefinesExpression) yama.Defines.Add(command.Value);
                 if (command is Print t) Program.CheckPrint ( yama, t );
+                if (command is SkipExpression) yama.StartPosition = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
                 if (command is StartNamespace) yama.StartNamespace = command.Value;
             }
 
@@ -135,16 +170,19 @@ namespace Yama
         {
             Program.EnabledCommandLines = new List<ICommandLine> (  );
 
-            Program.EnabledCommandLines.Add ( new FileExpression (  ) );
             Program.EnabledCommandLines.Add ( new CompileExpression (  ) );
+            Program.EnabledCommandLines.Add ( new AssembleExpression (  ) );
+            Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
+            Program.EnabledCommandLines.Add ( new AssemblerOutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );
             Program.EnabledCommandLines.Add ( new IncludeExpression (  ) );
             Program.EnabledCommandLines.Add ( new DefinitionExpression (  ) );
-            Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
             Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new StartNamespace (  ) );
             Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
+            Program.EnabledCommandLines.Add ( new SkipExpression (  ) );
             Program.EnabledCommandLines.Add ( new Print (  ) );
+            Program.EnabledCommandLines.Add ( new FileExpression (  ) );
             Program.EnabledCommandLines.Add ( new LearnCsStuf.CommandLines.Commands.Help (  ) );
             return true;
         }
