@@ -10,6 +10,17 @@ namespace Yama.Compiler
 
         #region get/set
 
+        public List<string> AssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+        public IParseTreeNode Node
+        {
+            get;
+            set;
+        }
+
         public string AlgoName
         {
             get;
@@ -28,6 +39,8 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, ConditionalCompilationNode node, string mode = "default")
         {
+            this.Node = node;
+
             compiler.AssemblerSequence.Add(this);
 
             this.Algo = new CompileAlgo();
@@ -41,7 +54,7 @@ namespace Yama.Compiler
         {
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(this.Algo.AssemblyCommands[i], null);
+                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i]));
             }
 
             return true;

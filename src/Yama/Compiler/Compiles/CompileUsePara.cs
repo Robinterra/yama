@@ -22,7 +22,16 @@ namespace Yama.Compiler
             set;
         } = 2;
 
-        
+        public List<string> AssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+        public IParseTreeNode Node
+        {
+            get;
+            set;
+        }
 
         public CompileAlgo Algo
         {
@@ -60,6 +69,7 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, VariabelDeklaration node, string mode = "default")
         {
+            this.Node = node;
             IndexVariabelnDeklaration dek = null;
             if (node != null) dek = node.Deklaration;
 
@@ -68,6 +78,7 @@ namespace Yama.Compiler
 
         public bool CompileIndexNode(Compiler compiler, IndexVariabelnDeklaration node, string mode = "default")
         {
+            if (node != null) this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
 
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
@@ -95,7 +106,7 @@ namespace Yama.Compiler
         {
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(this.Algo.AssemblyCommands[i], this.PrimaryKeys);
+                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys));
             }
 
             return true;

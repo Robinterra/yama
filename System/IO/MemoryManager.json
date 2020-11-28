@@ -310,7 +310,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "ldr r12,[r12]",
+                "ldr r12,[r12, #0]",
                 "cmp r12, #2",
                 "beq [JUMPTO[0]]",
                 "mov r12, #0x0",
@@ -331,7 +331,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "ldr r12, [r12]",
+                "ldr r12, [r12, #0]",
                 "cmp r12, #1",
                 "beq [JUMPTO[0]]",
                 "mov r12, #0x0",
@@ -357,7 +357,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "str r12, [lr]"
+                "str r12, [lr, #0]"
                 ]
             },
             {
@@ -414,19 +414,19 @@
                 "AssemblyCommands":[
                     "push {r10}",
                     "mov lr,r12",
-                    "ldr r11,[lr]",
+                    "ldr r11,[lr,#0]",
                     "cmp r11, #0",
                     "bne [JUMPTO[0]]",
                     "ldr r11,[lr,#4]",
                     "add lr,lr,r11",
                     "add lr,lr,#8",
-                    "ldr r10,[lr]",
+                    "ldr r10,[lr,#0]",
                     "cmp r10,#0x2",
                     "beq [JUMPTO[0]]",
                     "ldr r11,[lr, #4]",
                     "add r11, r11, #8",
                     "mov lr,r12",
-                    "str r10,[lr]",
+                    "str r10,[lr,#0]",
                     "ldr r10,[lr, #4]",
                     "add r10, r10, r11",
                     "str r10,[lr,#4]",

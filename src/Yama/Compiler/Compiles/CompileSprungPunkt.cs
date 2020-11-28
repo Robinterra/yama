@@ -29,6 +29,17 @@ namespace Yama.Compiler
         } = new List<ICompileRoot>();
         public string JumpPointName { get; set; }
 
+        public List<string> AssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+        public IParseTreeNode Node
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -44,6 +55,7 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, IParseTreeNode parent, string mode = "default")
         {
+            this.Node = parent;
             compiler.AssemblerSequence.Add(this);
 
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
@@ -60,7 +72,7 @@ namespace Yama.Compiler
 
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName } });
+                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName } }));
             }
 
             return true;

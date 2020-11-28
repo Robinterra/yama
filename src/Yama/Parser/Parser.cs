@@ -196,6 +196,17 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
+        public bool NewParse()
+        {
+            this.SyntaxErrors.Clear();
+            this.Tokenizer.Reset();
+            if (this.CleanTokens != null) this.CleanTokens.Clear();
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
         public List<IParseTreeNode> ParseCleanTokens(IdentifierToken left, int start, int position)
         {
             if (left.Node == null) return this.ParseCleanTokens(start, position);
@@ -234,7 +245,10 @@ namespace Yama.Parser
             ConsoleColor colr = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
 
-            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, this.Fileinfo.FullName, nexterrormsg );
+            string filename = "Stream";
+            if (this.Fileinfo != null) filename = this.Fileinfo.FullName;
+
+            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, filename, nexterrormsg );
 
             Console.ForegroundColor = colr;
 
@@ -576,6 +590,36 @@ namespace Yama.Parser
             this.ParentContainer = new Container (  );
             this.ParentContainer.Statements = parentNodes;
             this.ParentContainer.Token = new IdentifierToken ( IdentifierKind.BeginContainer, 0, 0, 0, "File", this.Fileinfo.FullName );
+
+            foreach ( IParseTreeNode node in parentNodes )
+            {
+                node.Token.ParentNode = this.ParentContainer;
+            }
+
+            return this.ParserErrors.Count == 0;
+        }
+
+        // -----------------------------------------------
+
+        public bool Parse ( ParserLayer start, MemoryStream stream )
+        {
+            if (start == null) return false;
+
+            this.ActivateLayer(start);
+
+            this.InputStream = stream;
+
+            if (!this.CheckTokens (  )) return false;
+
+            this.Max = this.CleanTokens.Count;
+            List<IParseTreeNode> parentNodes = this.ParseCleanTokens ( 0, this.CleanTokens.Count );
+
+            if ( parentNodes == null )
+                parentNodes = new List<IParseTreeNode>();
+
+            this.ParentContainer = new Container (  );
+            this.ParentContainer.Statements = parentNodes;
+            this.ParentContainer.Token = new IdentifierToken ( IdentifierKind.BeginContainer, 0, 0, 0, "Stream", "stream" );
 
             foreach ( IParseTreeNode node in parentNodes )
             {

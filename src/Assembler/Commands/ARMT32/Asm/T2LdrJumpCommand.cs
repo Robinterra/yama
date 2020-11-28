@@ -81,7 +81,8 @@ namespace Yama.Assembler.ARMT32
 
             JumpPointMapper map = request.Assembler.GetJumpPoint(t.Argument1.Token.Text);
 
-            if (map == null) return false;
+            if (map == null)
+                return false;
 
             IFormat format = request.Assembler.GetFormat(this.Format);
             IFormat branch = request.Assembler.GetFormat("T2BranchImmediate");

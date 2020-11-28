@@ -77,11 +77,12 @@ namespace Yama
         private static bool Assemble ( List<ICommandLine> commands )
         {
             Definitionen def = new Definitionen();
-            Assembler.Assembler assembler = def.GenerateAssembler();
+            Assembler.Assembler assembler = new Assembler.Assembler();
             RequestAssemble request = new RequestAssemble();
 
             foreach ( ICommandLine command in commands )
             {
+                if (command is DefinitionExpression) assembler = def.GenerateAssembler ( assembler, command.Value );
                 if (command is FileExpression) request.InputFile = new FileInfo ( command.Value );
                 if (command is SkipExpression) assembler.Position = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
                 if (command is OutputFileExpression)
@@ -112,10 +113,12 @@ namespace Yama
             {
                 if (command is FileExpression) yama.Files.Add ( command.Value );
                 if (command is IncludeExpression) yama.Includes.Add ( command.Value );
+                if (command is AssemblerOutputFileExpression) yama.OutputAssemblerFile = command.Value;
                 if (command is OutputFileExpression) yama.OutputFile = command.Value;
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
                 if (command is DefinesExpression) yama.Defines.Add(command.Value);
                 if (command is Print t) Program.CheckPrint ( yama, t );
+                if (command is SkipExpression) yama.StartPosition = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
                 if (command is StartNamespace) yama.StartNamespace = command.Value;
             }
 
@@ -170,6 +173,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new CompileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AssembleExpression (  ) );
             Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
+            Program.EnabledCommandLines.Add ( new AssemblerOutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );
             Program.EnabledCommandLines.Add ( new IncludeExpression (  ) );
             Program.EnabledCommandLines.Add ( new DefinitionExpression (  ) );

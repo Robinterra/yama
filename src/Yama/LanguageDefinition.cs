@@ -18,6 +18,14 @@ namespace Yama
 
         // -----------------------------------------------
 
+        public uint StartPosition
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public List<string> Files
         {
             get;
@@ -26,11 +34,19 @@ namespace Yama
 
         // -----------------------------------------------
 
+        public string OutputAssemblerFile
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public string OutputFile
         {
             get;
             set;
-        } = "out.S";
+        } = "out.bin";
 
         // -----------------------------------------------
 
@@ -410,13 +426,16 @@ namespace Yama
             if (this.Definition == null) return false;
 
             List<IParseTreeNode> nodes = new List<IParseTreeNode>();
+            List<ICompileRoot> compileRoots = new List<ICompileRoot>();
             MethodeDeclarationNode main = null;
 
             if (!this.Parse(nodes)) return false;
 
             if (!this.Indezieren(ref nodes, ref main)) return false;
 
-            if (!this.Compilen(nodes, main)) return false;
+            if (!this.Compilen(nodes, main, ref compileRoots)) return false;
+
+            if (!this.Assemblen(compileRoots)) return false;
 
             Console.WriteLine("Those blasted swamps... eating bugs... wading through filth... complete compilation");
 
@@ -425,17 +444,46 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool Compilen(List<IParseTreeNode> nodes, MethodeDeclarationNode main)
+        private bool Assemblen(List<ICompileRoot> compileRoots)
+        {
+            FileInfo file = new FileInfo(this.OutputFile);
+            if (file.Exists) file.Delete();
+
+            Assembler.Assembler assembler = new Assembler.Assembler();
+            Assembler.Definitionen definitionen = new Assembler.Definitionen();
+            definitionen.GenerateAssembler(assembler, this.Definition.Name);
+            assembler.Position = this.StartPosition;
+
+            Assembler.RequestAssemble request = new Assembler.RequestAssemble();
+            request.Stream = file.OpenWrite();
+            request.Roots = compileRoots;
+            request.WithMapper = true;
+
+            assembler.Assemble(request);
+
+            request.Stream.Close();
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool Compilen(List<IParseTreeNode> nodes, MethodeDeclarationNode main, ref List<ICompileRoot> roots)
         {
             Compiler.Compiler compiler = new Compiler.Compiler();
-            compiler.OutputFile = new FileInfo(this.OutputFile);
+            if (!string.IsNullOrEmpty(this.OutputAssemblerFile)) compiler.OutputFile = new FileInfo(this.OutputAssemblerFile);
             compiler.Definition = this.Definition;
             compiler.MainFunction = main;
             compiler.Defines = this.Defines;
 
             if (!compiler.Definition.LoadExtensions(this.AllFilesInUse)) return false;
 
-            if (compiler.Compilen(nodes)) return true;
+            if (compiler.Compilen(nodes))
+            {
+                roots = compiler.AssemblerSequence;
+
+                return true;
+            }
 
             foreach (CompilerError error in compiler.Errors)
             {

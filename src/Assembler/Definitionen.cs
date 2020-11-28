@@ -259,9 +259,8 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public Assembler GenerateAssembler()
+        private Assembler GenerateArmT32Assembler(Assembler assembler)
         {
-            Assembler assembler = new Assembler();
             assembler.Definition = new AssemblerDefinition();
             assembler.Definition.ProgramCounterIncress = 4;
             assembler.Definition.CommandEntitySize = 2;
@@ -274,6 +273,15 @@ namespace Yama.Assembler
             this.GenerateRegister ( assembler.Definition );
 
             return assembler;
+        }
+
+        // -----------------------------------------------
+
+        public Assembler GenerateAssembler(Assembler assembler, string name)
+        {
+            if (name == "arm-t32") return this.GenerateArmT32Assembler(assembler);
+
+            return null;
         }
 
         // -----------------------------------------------

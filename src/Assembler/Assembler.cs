@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Yama.Assembler.ARMT32;
+using Yama.Compiler;
 using Yama.Parser;
 
 namespace Yama.Assembler
@@ -61,6 +63,7 @@ namespace Yama.Assembler
             get;
             set;
         } = new List<IParseTreeNode>();
+        public List<AssemblerCompilerMap> AsmCompilerMap { get; private set; } = new List<AssemblerCompilerMap>();
 
         // -----------------------------------------------
 
@@ -89,16 +92,53 @@ namespace Yama.Assembler
 
             ParserLayer startlayer = this.Parser.ParserLayers.FirstOrDefault(t=>t.Name == "main");
 
-            if (!this.Parser.Parse(startlayer))
-            {
-                this.Errors = this.Parser.ParserErrors;
-
-                return this.PrintErrors();
-            }
+            if (!this.Parse(startlayer, request)) return this.PrintErrors();
 
             if (request.IsSkipper) this.Skipper();
 
-            if (!this.IdentifyAndAssemble(this.Parser.ParentContainer.Statements)) return this.PrintErrors();
+            if (!this.IdentifyAndAssemble()) return this.PrintErrors();
+
+            return true;
+        }
+
+        private bool Parse(ParserLayer startlayer, RequestAssemble request)
+        {
+            if (request.InputFile != null) return this.Parser.Parse(startlayer);
+            if (request.Roots == null) return false;
+
+            foreach (ICompileRoot root in request.Roots)
+            {
+                if (this.ParseRoot(startlayer, root)) continue;
+            }
+
+            return this.Errors.Count == 0;
+        }
+
+        private bool ParseRoot(ParserLayer startlayer, ICompileRoot root)
+        {
+            StringBuilder builder = new StringBuilder();
+            foreach(string entity in root.AssemblyCommands)
+            {
+                builder.Append(entity);
+                builder.Append("\n");
+            }
+
+            MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString()));
+
+            this.Parser.NewParse();
+
+            if (!this.Parser.Parse(startlayer, stream))
+            {
+                this.Errors.AddRange(this.Parser.ParserErrors);
+
+                return false;
+            }
+
+            AssemblerCompilerMap map = new AssemblerCompilerMap();
+            map.Root = root;
+            map.Nodes = this.Parser.ParentContainer.Statements;
+
+            this.AsmCompilerMap.Add(map);
 
             return true;
         }
@@ -157,13 +197,35 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        private bool IdentifyAndAssemble(List<IParseTreeNode> nodes)
+        private bool IdentifyAndAssemble()
         {
             uint startposition = this.Position;
 
-            List<KeyValuePair<ICommand, IParseTreeNode>> maptranslate = new List<KeyValuePair<ICommand, IParseTreeNode>>();
+            List<CommandCompilerMap> maptranslate = new List<CommandCompilerMap>();
 
-            bool isok = true;
+            if (this.AsmCompilerMap.Count == 0) this.IdentifyCommandFromNodes(this.Parser.ParentContainer.Statements, maptranslate);
+            else
+            {
+                foreach (AssemblerCompilerMap map in this.AsmCompilerMap)
+                {
+                    this.IdentifyCommandFromNodes(map, maptranslate);
+                }
+            }
+
+            if (this.Errors.Count != 0) return false;
+
+            foreach (CommandCompilerMap assmblepair in maptranslate)
+            {
+                if (!this.AssembleStep(assmblepair, startposition)) return false;
+
+                startposition += (uint)assmblepair.Command.Size;
+            }
+
+            return this.Errors.Count == 0;
+        }
+
+        private bool IdentifyCommandFromNodes(List<IParseTreeNode> nodes, List<CommandCompilerMap> maptranslate)
+        {
             foreach (IParseTreeNode node in nodes)
             {
                 if (node is JumpPointMarker)
@@ -176,24 +238,43 @@ namespace Yama.Assembler
                 if (command == null)
                 {
                     this.Errors.Add(node);
-                    isok = false;
+
                     continue;
                 }
                 this.Position += (uint)command.Size;
 
-                maptranslate.Add(new KeyValuePair<ICommand, IParseTreeNode>(command, node));
+                maptranslate.Add(new CommandCompilerMap(command, node));
             }
 
-            if (!isok) return false;
+            return true;
+        }
 
-            foreach (KeyValuePair<ICommand, IParseTreeNode> assmblepair in maptranslate)
+        // -----------------------------------------------
+
+        
+        private bool IdentifyCommandFromNodes(AssemblerCompilerMap map, List<CommandCompilerMap> maptranslate)
+        {
+            foreach (IParseTreeNode node in map.Nodes)
             {
-                if (!this.AssembleStep(assmblepair, startposition)) return false;
+                if (node is JumpPointMarker)
+                {
+                    this.Mappen(node.Token.Text, this.Position);
+                    continue;
+                }
 
-                startposition += (uint)assmblepair.Key.Size;
+                ICommand command = this.Identify(node);
+                if (command == null)
+                {
+                    this.Errors.Add(node);
+
+                    continue;
+                }
+                this.Position += (uint)command.Size;
+
+                maptranslate.Add(new CommandCompilerMap(command, node, map));
             }
 
-            return this.Errors.Count == 0;
+            return true;
         }
 
         // -----------------------------------------------
@@ -229,15 +310,15 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        private bool AssembleStep(KeyValuePair<ICommand, IParseTreeNode> assmblepair, uint position)
+        private bool AssembleStep(CommandCompilerMap assmblepair, uint position)
         {
             RequestAssembleCommand request = new RequestAssembleCommand();
-            request.Node = assmblepair.Value;
+            request.Node = assmblepair.Node;
             request.Assembler = this;
             request.Stream = this.Stream;
             request.Position = position;
 
-            if (assmblepair.Key.Assemble(request)) return true;
+            if (assmblepair.Command.Assemble(request)) return true;
 
             this.Errors.Add(request.Node);
 

@@ -93,7 +93,8 @@ namespace Yama.Assembler.ARMT32
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(s.Token.Text));
             assembleFormat.Arguments.Add(Convert.ToUInt32(s.Number.Value) / this.Teiler);
 
-            if (!format.Assemble(assembleFormat)) return false;
+            if (!format.Assemble(assembleFormat))
+                return false;
 
             if (request.WithMapper) request.Result.Add(new T2LdrArrayRegisterCommand(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());
@@ -108,6 +109,11 @@ namespace Yama.Assembler.ARMT32
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (!(t.Argument1 is SquareArgumentNode s)) return false;
             if (request.Assembler.GetRegister(t.Argument0.Token.Text) > this.MaxRegister) return false;
+            if (s.Number == null)
+            {
+                s.Number = new Lexer.IdentifierToken();
+                s.Number.Value = 0;
+            }
             if (Convert.ToUInt32(s.Number.Value) % this.Teiler != 0) return false;
             if (this.IsSpTwo)
             {

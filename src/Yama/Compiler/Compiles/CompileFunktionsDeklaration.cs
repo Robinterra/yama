@@ -16,12 +16,23 @@ namespace Yama.Compiler
             set;
         } = "FunktionsDeklaration";
 
+        public List<string> AssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+        public IParseTreeNode Node
+        {
+            get;
+            set;
+        }
+
         public Dictionary<string, string> PrimaryKeys
         {
             get;
             set;
         }
-        public MethodeDeclarationNode Node { get; private set; }
+        public MethodeDeclarationNode MethodNode { get; private set; }
 
         public VektorDeclaration GetNode { get; private set; }
         public VektorDeclaration SetNode { get; private set; }
@@ -93,9 +104,10 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, MethodeDeclarationNode node, string mode = "default")
         {
+            this.Node = node;
             compiler.AssemblerSequence.Add(this);
 
-            this.Node = node;
+            this.MethodNode = node;
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
 
@@ -119,6 +131,7 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, VektorDeclaration node, string mode = "default")
         {
+            this.Node = node;
             compiler.AssemblerSequence.Add(this);
 
             if (mode == "set") this.SetNode = node;
@@ -146,6 +159,7 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, PropertyGetSetDeklaration node, string mode = "default")
         {
+            this.Node = node;
             compiler.AssemblerSequence.Add(this);
 
             if (mode == "set") this.PSetNode = node;
@@ -176,14 +190,14 @@ namespace Yama.Compiler
             Dictionary<string, string> postreplaces = new Dictionary<string, string>();
 
             int varcount = 0;
-            if (this.Node != null) varcount = this.Node.VariabelCounter;
+            if (this.MethodNode != null) varcount = this.MethodNode.VariabelCounter;
             if (this.SetNode != null) varcount = this.SetNode.SetVariabelCounter;
             if (this.GetNode != null) varcount = this.GetNode.GetVariabelCounter;
             if (this.PSetNode != null) varcount = this.PSetNode.SetVariabelCounter;
             if (this.PGetNode != null) varcount = this.PGetNode.GetVariabelCounter;
 
             List<string> registerInUse = null;
-            if (this.Node != null) registerInUse = this.Node.RegisterInUse;
+            if (this.MethodNode != null) registerInUse = this.MethodNode.RegisterInUse;
             if (this.SetNode != null) registerInUse = this.SetNode.SetRegisterInUse;
             if (this.GetNode != null) registerInUse = this.GetNode.GetRegisterInUse;
             if (this.PSetNode != null) registerInUse = this.PSetNode.SetRegisterInUse;
@@ -203,7 +217,7 @@ namespace Yama.Compiler
 
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(this.Algo.AssemblyCommands[i], this.PrimaryKeys, postreplaces);
+                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys, postreplaces));
             }
 
             return true;
