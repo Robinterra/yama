@@ -218,12 +218,16 @@ namespace Yama.Assembler
             //definition.Commands.Add(new T4BranchCommand("b", "T4BigBranch", 0, 4));
             definition.Commands.Add(new T1RegisterCommand("blx", "T1BLX", 0x08F, 2));
             definition.Commands.Add(new T1RegisterCommand("bx", "T1BLX", 0x08E, 2));
+            definition.Commands.Add(new T4BranchCommand("beq", "T1BranchCondition", 0xD0, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("bne", "T1BranchCondition", 0xD1, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("bcs", "T1BranchCondition", 0xD2, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("bcc", "T1BranchCondition", 0xD3, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("bvs", "T1BranchCondition", 0xD6, 2, 0xFF));
+            definition.Commands.Add(new T4BranchCommand("bvc", "T1BranchCondition", 0xD7, 2, 0xFF));
             definition.Commands.Add(new T4BranchCommand("bge", "T1BranchCondition", 0xDA, 2, 0xFF));
             definition.Commands.Add(new T4BranchCommand("blt", "T1BranchCondition", 0xDB, 2, 0xFF));
             definition.Commands.Add(new T4BranchCommand("bgt", "T1BranchCondition", 0xDC, 2, 0xFF));
             definition.Commands.Add(new T4BranchCommand("ble", "T1BranchCondition", 0xDD, 2, 0xFF));
-            definition.Commands.Add(new T4BranchCommand("bne", "T1BranchCondition", 0xD1, 2, 0xFF));
-            definition.Commands.Add(new T4BranchCommand("beq", "T1BranchCondition", 0xD0, 2, 0xFF));
 
             return true;
         }
