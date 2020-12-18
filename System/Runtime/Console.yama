@@ -1,0 +1,43 @@
+namespace "System.Runtime"
+{
+    using "System";
+
+    public static class Console
+    {
+
+        // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
+        /**
+         * Print int
+         */
+        public static bool Print ( int input )
+        {
+            #defalgo Console,Print: = input;
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        /**
+         * Read int
+         */
+        public static int Read (  )
+        {
+            return #defalgo Console,Print:;
+        }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
+
+    }
+}
+
+// --[EOF]--

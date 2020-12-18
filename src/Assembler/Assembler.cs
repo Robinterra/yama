@@ -145,10 +145,17 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public uint BuildJumpSkipper(uint position, uint adresse, uint size)
+        public uint BuildJumpSkipper(uint position, uint adresse, uint size, bool isnormal = false)
         {
             uint orgpos = position;
             position = position + this.Definition.ProgramCounterIncress;
+
+            if (isnormal)
+            {
+                if (position > adresse) return (~(position - adresse )) + 1;
+
+                return adresse - position;
+            }
 
             if (position > adresse) return (~((position - adresse) / this.Definition.CommandEntitySize)) + 1;
 
@@ -297,6 +304,8 @@ namespace Yama.Assembler
             RequestIdentify request = new RequestIdentify();
             request.Node = node;
             request.Assembler = this;
+
+            if (this.Definition == null) return null;
 
             foreach (ICommand command in this.Definition.Commands)
             {

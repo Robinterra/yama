@@ -473,5 +473,229 @@
         ],
         "KeyPatterns": [
         ]
+    },
+    {
+        "Name": "runtime",
+        "Algos": [
+            {
+                "Name": "IntArimetics",
+                "Mode": "BinaryAnd",
+                "Description": "BinaryAnd",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "and r12,r1,r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "BinaryOr",
+                "Description": "BinaryOr",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "orr r12,r1,r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "BinaryNegation",
+                "Description": "BinaryNegation",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "ldr r12, =0xffffffff",
+                "eor r12, r12, r1"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "BinaryXor",
+                "Description": "BinaryXor",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "eor r12,r1,r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "Subtraction",
+                "Description": "Subtraction",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "sub r12,r1,r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "Addition",
+                "Description": "Addition",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "add r12,r1,r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "Incremtation",
+                "Description": "Incremtation",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "add r12, r1 , #1"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "Decremtation",
+                "Description": "Decremtation",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "sub r12, r1 , #1"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "Equals",
+                "Description": "Equals",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp r1,r2",
+                "mov r12, #0xff",
+                "beq [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "NotEquals",
+                "Description": "NotEquals",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp r1,r2",
+                "mov r12, #0xff",
+                "bne [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "LessThan",
+                "Description": "LessThan",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp r1,r2",
+                "mov r12, #0xff",
+                "blt [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "LessEqualsThan",
+                "Description": "LessEqualsThan",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp r1,r2",
+                "mov r12, #0xff",
+                "ble [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "GreaterThan",
+                "Description": "GreaterThan",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp r1,r2",
+                "mov r12, #0xff",
+                "bgt [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:"
+                ]
+            },
+            {
+                "Name": "IntCompare",
+                "Mode": "GreaterEqualsThan",
+                "Description": "GreaterEqualsThan",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp r1,r2",
+                "mov r12, #0xff",
+                "bge [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:"
+                ]
+            }
+       ],
+        "AdvancedKeyReplaces": [
+        ],
+        "KeyPatterns": [
+        ]
     }
 ]

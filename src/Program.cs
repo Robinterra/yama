@@ -94,7 +94,13 @@ namespace Yama
             }
 
             if (request.InputFile == null) return false;
-            if (request.Stream == null) return false;
+            if (request.Stream == null)
+            {
+                FileInfo file = new FileInfo ( "out.bin" );
+                if (file.Exists) file.Delete();
+                request.Stream = file.OpenWrite();
+            }
+            if (assembler.Definition == null) assembler = def.GenerateAssembler ( assembler, "runtime" );
 
             assembler.Assemble(request);
 
