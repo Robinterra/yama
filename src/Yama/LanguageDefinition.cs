@@ -449,9 +449,12 @@ namespace Yama
             FileInfo file = new FileInfo(this.OutputFile);
             if (file.Exists) file.Delete();
 
+            string def = this.Definition.Name;
+            if (this.Defines.Contains("runtime")) def = "runtime";
+
             Assembler.Assembler assembler = new Assembler.Assembler();
             Assembler.Definitionen definitionen = new Assembler.Definitionen();
-            definitionen.GenerateAssembler(assembler, this.Definition.Name);
+            definitionen.GenerateAssembler(assembler, def);
             assembler.Position = this.StartPosition;
 
             Assembler.RequestAssemble request = new Assembler.RequestAssemble();

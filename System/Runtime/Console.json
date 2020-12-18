@@ -1,0 +1,36 @@
+[
+    {
+        "Name": "runtime",
+        "Algos": [
+            {
+                "Name": "Console",
+                "Mode": "Print",
+                "Description": "Print int",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "mov r1, r12",
+                "mov r12, #1",
+                "exec r12"
+                ]
+            },
+            {
+                "Name": "Console",
+                "Mode": "Read",
+                "Description": "Read int",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "mov r12, #2",
+                "exec r12"
+                ]
+            }
+       ],
+        "AdvancedKeyReplaces": [
+        ],
+        "KeyPatterns": [
+        ]
+    }
+]

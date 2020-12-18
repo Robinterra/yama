@@ -1,6 +1,6 @@
 namespace LearnCsStuf.CommandLines.Commands
 {
-    public class OutputFileExpression : ICommandLine
+    public class RunExpression : ICommandLine
     {
 
         // -----------------------------------------------
@@ -13,7 +13,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return "output";
+                return "run";
             }
         }
 
@@ -23,7 +23,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return true;
+                return false;
             }
         }
 
@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<file>", "The output Filename (Default:out.bin) Shortcut:out" );
+                return string.Format (CommandLines.Help.HilfePattern, this.Key, string.Empty, "Run/Debug a Binary File" );
             }
         }
 
@@ -57,10 +57,9 @@ namespace LearnCsStuf.CommandLines.Commands
 
         public ICommandLine Check ( string command )
         {
-            if (string.Format ( "{0}", this.Key ) == command) return new OutputFileExpression (  );
-            if (string.Format ( "out", this.Key ) == command) return new OutputFileExpression (  );
+            if (this.Key != command) return null;
 
-            return null;
+            return new RunExpression (  );
         }
 
         // -----------------------------------------------

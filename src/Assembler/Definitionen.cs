@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Yama.Assembler.ARMT32;
+using Yama.Assembler.Runtime;
 using Yama.Lexer;
 using Yama.Parser;
 
@@ -284,6 +285,7 @@ namespace Yama.Assembler
         public Assembler GenerateAssembler(Assembler assembler, string name)
         {
             if (name == "arm-t32") return this.GenerateArmT32Assembler(assembler);
+            if (name == "runtime") return this.GenerateRuntime(assembler);
 
             return null;
         }
@@ -291,6 +293,118 @@ namespace Yama.Assembler
         // -----------------------------------------------
 
         #endregion ARM-T32 Definition
+
+        // -----------------------------------------------
+
+        #region Runtime Definition
+
+        // -----------------------------------------------
+
+        private bool RuntimeFormat1Def(AssemblerDefinition definition)
+        {
+            definition.Formats.Add(new Format1());
+
+            definition.Commands.Add(new Command3Register("add", "Format1", 0x50, 4));
+            definition.Commands.Add(new Command3Register("adc", "Format1", 0x51, 4));
+            definition.Commands.Add(new Command3Register("sub", "Format1", 0x52, 4));
+            definition.Commands.Add(new Command3Register("sbc", "Format1", 0x53, 4));
+            definition.Commands.Add(new Command3Register("mul", "Format1", 0x54, 4));
+            definition.Commands.Add(new Command3Register("div", "Format1", 0x55, 4));
+            definition.Commands.Add(new Command3Register("and", "Format1", 0x56, 4));
+            definition.Commands.Add(new Command3Register("eor", "Format1", 0x57, 4));
+            definition.Commands.Add(new Command3Register("orr", "Format1", 0x58, 4));
+            definition.Commands.Add(new Command3Register("asr", "Format1", 0x59, 4));
+            definition.Commands.Add(new Command3Register("asl", "Format1", 0x5A, 4));
+
+            definition.Commands.Add(new Command1Register("bx", "Format1", 0x30, 4));
+            definition.Commands.Add(new Command1Register("blx", "Format1", 0x31, 4));
+
+            definition.Commands.Add(new Command1Register("exec", "Format1", 0xFF, 4));
+            //definition.Commands.Add(new Command1Register("end", "Format1", 0xFE, 4));
+
+            definition.Commands.Add(new Command2Register("mov", "Format1", 0x5E, 4));
+            definition.Commands.Add(new Command2Register("cmp", "Format1", 0x5F, 4));
+
+            return true;
+        }
+
+        // -----------------------------------------------
+        private bool RuntimeFormat2Def(AssemblerDefinition definition)
+        {
+            definition.Formats.Add(new Format2());
+
+            definition.Commands.Add(new Command2Register1Imediate("add", "Format2", 0x10, 4));
+            definition.Commands.Add(new Command2Register1Imediate("adc", "Format2", 0x11, 4));
+            definition.Commands.Add(new Command2Register1Imediate("sub", "Format2", 0x12, 4));
+            definition.Commands.Add(new Command2Register1Imediate("sbc", "Format2", 0x13, 4));
+            definition.Commands.Add(new Command2Register1Imediate("mul", "Format2", 0x14, 4));
+            definition.Commands.Add(new Command2Register1Imediate("div", "Format2", 0x15, 4));
+            definition.Commands.Add(new Command2Register1Imediate("and", "Format2", 0x16, 4));
+            definition.Commands.Add(new Command2Register1Imediate("eor", "Format2", 0x17, 4));
+            definition.Commands.Add(new Command2Register1Imediate("orr", "Format2", 0x18, 4));
+            definition.Commands.Add(new Command2Register1Imediate("asr", "Format2", 0x19, 4));
+            definition.Commands.Add(new Command2Register1Imediate("asl", "Format2", 0x1A, 4));
+
+            definition.Commands.Add(new Command1Register1Container("ldr", "Format2", 0x1B, 4, 15, 4));
+            definition.Commands.Add(new Command1Register1Container("str", "Format2", 0x1C, 4, 15, 4));
+
+            definition.Commands.Add(new Command1RegisterJumpPoint("ldr", "Format2", 0x1B, 8, 0xF));
+            definition.Commands.Add(new Command1RegisterConst("ldr", "Format2", 0x1B, 8, 0xF));
+
+            return true;
+        }
+        // -----------------------------------------------
+        private bool RuntimeFormat3Def(AssemblerDefinition definition)
+        {
+            definition.Formats.Add(new Format3());
+
+            definition.Commands.Add(new Command1Imediate("mov", "Format3", 0x2E, 4));
+            definition.Commands.Add(new Command1Imediate("cmp", "Format3", 0x2F, 4));
+
+            definition.Commands.Add(new CommandF3List("push", "Format3", 0x40, 4, 15));
+            definition.Commands.Add(new CommandF3List("pop", "Format3", 0x41, 4, 15));
+
+            definition.Commands.Add(new CommandJumpPoint("b", "Format3", 0x32, 4, 0x1FFFF, 0));
+            definition.Commands.Add(new CommandJumpPoint("beq", "Format3", 0x32, 4, 0x1FFFF, 1));
+            definition.Commands.Add(new CommandJumpPoint("bne", "Format3", 0x32, 4, 0x1FFFF, 2));
+            definition.Commands.Add(new CommandJumpPoint("bgt", "Format3", 0x32, 4, 0x1FFFF, 3));
+            definition.Commands.Add(new CommandJumpPoint("bge", "Format3", 0x32, 4, 0x1FFFF, 4));
+            definition.Commands.Add(new CommandJumpPoint("blt", "Format3", 0x32, 4, 0x1FFFF, 5));
+            definition.Commands.Add(new CommandJumpPoint("ble", "Format3", 0x32, 4, 0x1FFFF, 6));
+
+            return true;
+        }
+        // -----------------------------------------------
+        private Assembler GenerateRuntime(Assembler assembler)
+        {
+            assembler.Definition = new AssemblerDefinition();
+            assembler.Definition.ProgramCounterIncress = 4;
+            assembler.Definition.CommandEntitySize = 4;
+
+            this.RuntimeFormat1Def ( assembler.Definition );
+            this.RuntimeFormat2Def ( assembler.Definition );
+            this.RuntimeFormat3Def ( assembler.Definition );
+            this.RuntimeGenerateRegister ( assembler.Definition );
+
+            return assembler;
+        }
+        private bool RuntimeGenerateRegister(AssemblerDefinition definition)
+        {
+            for (uint i = 0; i <= 15; i++)
+            {
+                definition.Registers.Add(new Register(string.Format("r{0}", i), i));
+            }
+
+            definition.Registers.Add(new Register("sp", 13));
+            definition.Registers.Add(new Register("lr", 14));
+            definition.Registers.Add(new Register("pc", 15));
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        #endregion Runtime Definition
 
         // -----------------------------------------------
     }
