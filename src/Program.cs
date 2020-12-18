@@ -81,6 +81,7 @@ namespace Yama
             foreach ( ICommandLine command in commands )
             {
                 if (command is FileExpression) runtime.Input = new FileInfo ( command.Value );
+                if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
             }
 
             if (runtime.Input == null) return false;
@@ -206,6 +207,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new StartNamespace (  ) );
             Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
             Program.EnabledCommandLines.Add ( new SkipExpression (  ) );
+            Program.EnabledCommandLines.Add ( new SizeExpression (  ) );
             Program.EnabledCommandLines.Add ( new Print (  ) );
             Program.EnabledCommandLines.Add ( new FileExpression (  ) );
             Program.EnabledCommandLines.Add ( new LearnCsStuf.CommandLines.Commands.Help (  ) );

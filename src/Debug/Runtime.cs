@@ -125,6 +125,7 @@ namespace Yama.Debug
             get;
             set;
         }
+        public uint StepCounter { get; private set; }
 
         // -----------------------------------------------
 
@@ -181,6 +182,8 @@ namespace Yama.Debug
 
             this.IsRun = true;
 
+            this.DebugReader();
+
             while (this.IsRun)
             {
                 this.MakeCommand();
@@ -213,7 +216,7 @@ namespace Yama.Debug
 
         private bool DebugEvent()
         {
-            if (this.IsStepMode) this.StepPrint();
+            if (this.IsStepMode) this.DebugReader();
 
             return true;
         }
@@ -239,13 +242,17 @@ namespace Yama.Debug
             }
             Console.WriteLine();
 
-            Console.Write("SP: {2}, LR: {1}, PC: {0}", this.Register[15], this.Register[14], this.Register[13]);
-
-            this.DebugReader();
+            Console.WriteLine("SP: {2}, LR: {1}, PC: {0}", this.Register[15], this.Register[14], this.Register[13]);
         }
 
         private bool DebugReader()
         {
+            if (this.StepCounter > 0)
+            {
+                this.StepCounter--;
+                return true;
+            }
+
             bool notContinue = true;
 
             while (notContinue)
@@ -266,8 +273,71 @@ namespace Yama.Debug
 
                     continue;
                 }
+                if (cmd.Contains("step "))
+                {
+                    notContinue = false;
+                    this.IsStepMode = true;
+
+                    string[] spliter = cmd.Split(' ');
+                    uint.TryParse(spliter[1], out uint result);
+
+                    this.StepCounter = result;
+
+                    continue;
+                }
+                if (cmd == "break") this.CreateBreaks();
+                //if (cmd == "inspect") this.Inspect();
+
+                if (cmd == "stat") this.StepPrint();
+                if (cmd.Contains("mem")) this.PrintMem(cmd);
             }
 
+            return true;
+        }
+
+        private bool Inspect()
+        {
+            Console.Write("inspect> ");
+            string cmd = Console.ReadLine();
+
+            return true;
+        }
+
+        private bool PrintMem(string cmd)
+        {
+            string[] daten = cmd.Split(' ');
+            if (daten.Length != 3) return false;
+            if (!uint.TryParse(daten[1], out uint adresse)) return false;
+            if (!uint.TryParse(daten[2], out uint length)) return false;
+            length += 0x10;
+
+            Console.WriteLine("0x{0:x8}  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F", adresse);
+            for (uint lineCounter = 0; lineCounter < length >> 4; lineCounter++)
+            {
+                this.PrintLine(adresse + (lineCounter << 4));
+            }
+
+            return true;
+        }
+
+        private bool PrintLine(uint v)
+        {
+            Console.Write("0x{0:x8} ", v);
+
+            for (uint i = 0; i < 0x10; i++)
+            {
+                if (v + i >= this.Memory.Length) continue;
+
+                Console.Write("{0:x2} ", this.Memory[v + i]);
+            }
+
+            Console.WriteLine();
+
+            return true;
+        }
+
+        private bool CreateBreaks()
+        {
             return true;
         }
 
