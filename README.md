@@ -28,10 +28,9 @@ You can read it in the book Severed.
 
 ## What is comming soon ?
 chronological order
-1. Better Properties - (Get/Set can current not use, make it usable)
-2. Array, LinkListand List in Framework
-3. How to add a new Assembly this Language - docu
-4. Show in a Blog little projects with yama - my own reason.
+1. Array, LinkListand List in Framework
+2. How to add a new Assembly this Language - docu
+3. Show in a Blog little projects with yama - my own reason.
  * You want support me or you have ideas then please send me a email: robin.dandrea@gmail.com / robin.dandrea@versalitic.com
 
 ## What can current use?
@@ -93,10 +92,18 @@ namespace "Program"
 
     public class MyStartClass
     {
+        private int globalVariable;
+
         public int PropertyOne
         {
-            get{}
-            set{}
+            get
+            {
+                return this.globalVariable;
+            }
+            set
+            {
+                this.globalVariable = invalue;
+            }
         }
 
         public static int main()
@@ -131,15 +138,24 @@ avr-objcopy -j .text -j .data -O ihex ./bin/out.elf ./bin/out.hex
 
 avrdude -F -e -v -p m328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:"out.hex":i
 ```
+### runtime
+#### Translate To Binary
+```console
+./YamaCompiler build ao temp.S out "./out.bin" def runtime ./test.yama
+```
+#### Debug
+```console
+./YamaCompiler run out.bin
+```
 ### arm-gcc
 
 #### Translate to Binary
 ```console
-./YamaCompile build skip 0x80000 out "./out.bin" define SAM3X8E def arm-t32 ./iftest.yama
+./YamaCompiler build skip 0x80000 out "./out.bin" define SAM3X8E def arm-t32 ./iftest.yama
 ```
 #### Translate to Binary and Assembler
 ```console
-./YamaCompile build skip 0x80000 ao "out.S out "./out.bin" define SAM3X8E def arm-t32 ./iftest.yama
+./YamaCompiler build skip 0x80000 ao "out.S out "./out.bin" define SAM3X8E def arm-t32 ./iftest.yama
 ```
 ## Authors
 
