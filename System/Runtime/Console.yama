@@ -28,7 +28,7 @@ namespace "System.Runtime"
          */
         public static int Read (  )
         {
-            return #defalgo Console,Print:;
+            return #defalgo Console,Read:;
         }
 
         // -----------------------------------------------

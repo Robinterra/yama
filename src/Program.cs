@@ -9,6 +9,7 @@ using LearnCsStuf.Automaten;
 using LearnCsStuf.CommandLines;
 using LearnCsStuf.CommandLines.Commands;
 using Yama.Assembler;
+using Yama.Debug;
 
 namespace Yama
 {
@@ -63,6 +64,7 @@ namespace Yama
 
             if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
             if (firstCommand is AssembleExpression) return Program.Assemble ( commands );
+            if (firstCommand is RunExpression) return Program.Run ( commands );
             if (firstCommand is LearnCsStuf.CommandLines.Commands.Help) return Program.HelpPrinten (  ) == 1;
             if (firstCommand is AutoExpression) return Program.RunAuto ( firstCommand );
             if (firstCommand is PrintDefinitionsExpression) return defs.PrintAllDefinitions (  );
@@ -70,6 +72,22 @@ namespace Yama
             Console.Error.WriteLine ( "please enter a allowd argument first" );
 
             return false;
+        }
+
+        private static bool Run(List<ICommandLine> commands)
+        {
+            Runtime runtime = new Runtime();
+
+            foreach ( ICommandLine command in commands )
+            {
+                if (command is FileExpression) runtime.Input = new FileInfo ( command.Value );
+            }
+
+            if (runtime.Input == null) return false;
+
+            runtime.Execute();
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -178,6 +196,7 @@ namespace Yama
 
             Program.EnabledCommandLines.Add ( new CompileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AssembleExpression (  ) );
+            Program.EnabledCommandLines.Add ( new RunExpression (  ) );
             Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
             Program.EnabledCommandLines.Add ( new AssemblerOutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );

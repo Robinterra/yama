@@ -91,7 +91,7 @@ namespace Yama.Assembler.Runtime
             assembleFormat.Arguments.Add(this.Condition);
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
             assembleFormat.Arguments.Add(request.Assembler.GetRegister("pc"));
-            assembleFormat.Arguments.Add(1);
+            assembleFormat.Arguments.Add(0);
 
             if (!format.Assemble(assembleFormat)) return false;
 

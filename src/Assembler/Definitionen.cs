@@ -304,26 +304,26 @@ namespace Yama.Assembler
         {
             definition.Formats.Add(new Format1());
 
-            definition.Commands.Add(new Command3Register("add", "Format1", 0x00, 4));
-            definition.Commands.Add(new Command3Register("adc", "Format1", 0x01, 4));
-            definition.Commands.Add(new Command3Register("sub", "Format1", 0x02, 4));
-            definition.Commands.Add(new Command3Register("sbc", "Format1", 0x03, 4));
-            definition.Commands.Add(new Command3Register("mul", "Format1", 0x04, 4));
-            definition.Commands.Add(new Command3Register("div", "Format1", 0x05, 4));
-            definition.Commands.Add(new Command3Register("and", "Format1", 0x06, 4));
-            definition.Commands.Add(new Command3Register("eor", "Format1", 0x07, 4));
-            definition.Commands.Add(new Command3Register("orr", "Format1", 0x08, 4));
-            definition.Commands.Add(new Command3Register("asr", "Format1", 0x09, 4));
-            definition.Commands.Add(new Command3Register("asl", "Format1", 0x0A, 4));
+            definition.Commands.Add(new Command3Register("add", "Format1", 0x50, 4));
+            definition.Commands.Add(new Command3Register("adc", "Format1", 0x51, 4));
+            definition.Commands.Add(new Command3Register("sub", "Format1", 0x52, 4));
+            definition.Commands.Add(new Command3Register("sbc", "Format1", 0x53, 4));
+            definition.Commands.Add(new Command3Register("mul", "Format1", 0x54, 4));
+            definition.Commands.Add(new Command3Register("div", "Format1", 0x55, 4));
+            definition.Commands.Add(new Command3Register("and", "Format1", 0x56, 4));
+            definition.Commands.Add(new Command3Register("eor", "Format1", 0x57, 4));
+            definition.Commands.Add(new Command3Register("orr", "Format1", 0x58, 4));
+            definition.Commands.Add(new Command3Register("asr", "Format1", 0x59, 4));
+            definition.Commands.Add(new Command3Register("asl", "Format1", 0x5A, 4));
 
             definition.Commands.Add(new Command1Register("bx", "Format1", 0x30, 4));
             definition.Commands.Add(new Command1Register("blx", "Format1", 0x31, 4));
 
             definition.Commands.Add(new Command1Register("exec", "Format1", 0xFF, 4));
-            definition.Commands.Add(new Command1Register("end", "Format1", 0xFE, 4));
+            //definition.Commands.Add(new Command1Register("end", "Format1", 0xFE, 4));
 
-            definition.Commands.Add(new Command2Register("mov", "Format1", 0x0E, 4));
-            definition.Commands.Add(new Command2Register("cmp", "Format1", 0x0F, 4));
+            definition.Commands.Add(new Command2Register("mov", "Format1", 0x5E, 4));
+            definition.Commands.Add(new Command2Register("cmp", "Format1", 0x5F, 4));
 
             return true;
         }

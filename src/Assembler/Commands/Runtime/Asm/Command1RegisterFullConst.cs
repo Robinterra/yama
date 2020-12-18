@@ -91,7 +91,7 @@ namespace Yama.Assembler.Runtime
             assembleFormat.Arguments.Add(this.Condition);
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
             assembleFormat.Arguments.Add(request.Assembler.GetRegister("pc"));
-            assembleFormat.Arguments.Add(1);
+            assembleFormat.Arguments.Add(0);
 
             if (!format.Assemble(assembleFormat)) return false;
 
@@ -99,7 +99,7 @@ namespace Yama.Assembler.Runtime
 
             JumpPointMapper map = request.Assembler.GetJumpPoint(t.Argument1.Token.Text);
 
-            byte[] tmp = BitConverter.GetBytes ( map.Adresse );
+            byte[] tmp = BitConverter.GetBytes ( map.Adresse - 4 );
             assembleFormat.Result.Add ( tmp[0] );
             assembleFormat.Result.Add ( tmp[1] );
             assembleFormat.Result.Add ( tmp[2] );
