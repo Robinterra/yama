@@ -50,6 +50,11 @@ namespace Yama.Compiler
         public List<CompilerError> Errors { get; set; } = new List<CompilerError>();
 
         public List<string> Defines { get; set; }
+        public Optimize OptimizeLevel
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 

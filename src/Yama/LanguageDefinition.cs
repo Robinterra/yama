@@ -98,6 +98,14 @@ namespace Yama
 
         // -----------------------------------------------
 
+        public Optimize OptimizeLevel
+        {
+            get;
+            set;
+        } = Optimize.Level1;
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -474,6 +482,7 @@ namespace Yama
         private bool Compilen(List<IParseTreeNode> nodes, MethodeDeclarationNode main, ref List<ICompileRoot> roots)
         {
             Compiler.Compiler compiler = new Compiler.Compiler();
+            compiler.OptimizeLevel = this.OptimizeLevel;
             if (!string.IsNullOrEmpty(this.OutputAssemblerFile)) compiler.OutputFile = new FileInfo(this.OutputAssemblerFile);
             compiler.Definition = this.Definition;
             compiler.MainFunction = main;
@@ -640,6 +649,13 @@ namespace Yama
 
         // -----------------------------------------------
 
+    }
+
+    public enum Optimize
+    {
+        None,
+        Level1,
+        SSA
     }
 
 }

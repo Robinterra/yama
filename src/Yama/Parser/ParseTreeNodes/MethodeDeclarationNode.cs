@@ -439,6 +439,8 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            if (!this.CanCompile(compiler)) return true;
+
             if (this.AccessDefinition != null)
                 if (this.AccessDefinition.Kind == IdentifierKind.Copy) return true;
 
@@ -478,6 +480,14 @@ namespace Yama.Parser
             if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(compiler, mode);
 
             return this.CompileNormalFunktion(compiler, mode);
+        }
+
+        private bool CanCompile(Compiler.Compiler compiler)
+        {
+            if (compiler.OptimizeLevel != Optimize.Level1) return true;
+            if (this.Deklaration.Name == "main") return true;
+
+            return this.Deklaration.References.Count != 0;
         }
 
         private bool CompileDeCtor(Compiler.Compiler compiler, string mode)

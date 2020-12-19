@@ -140,7 +140,7 @@
         ],
         "AssemblyCommands": [
           "[NAME]:",
-          "push {[PUSHREG]sp, lr}",
+          "push {[PUSHREG]lr}",
           "sub sp, sp, #[VARCOUNT]"
         ]
       },
@@ -162,7 +162,7 @@
         ],
         "AssemblyCommands": [
           "add sp, sp, #[VARCOUNT]",
-          "pop {[POPREG]sp,lr}",
+          "pop {[POPREG]lr}",
           "bx lr"
         ]
       },
@@ -293,20 +293,12 @@
           {
             "Name": "[JUMPTO]",
             "Values": null
-          },
-          {
-            "Name": "[JUMPTO]",
-            "Values": [
-            "1"
-            ]
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
           "cmp r12, #0",
-          "bne [JUMPTO[0]]",
-          "b [JUMPTO]",
-          "[JUMPTO[0]]:"
+          "beq [JUMPTO]"
         ]
       },
       {

@@ -98,6 +98,7 @@ namespace Yama.Assembler.Runtime
             if (request.WithMapper) request.Result.Add(new Command1RegisterJumpPoint(this, request.Node, assembleFormat.Result));
 
             JumpPointMapper map = request.Assembler.GetJumpPoint(t.Argument1.Token.Text);
+            if (map == null) return false;
 
             byte[] tmp = BitConverter.GetBytes ( map.Adresse - 4 );
             assembleFormat.Result.Add ( tmp[0] );

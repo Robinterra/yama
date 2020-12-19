@@ -381,8 +381,16 @@ namespace Yama.Parser
             return this.CompileNormalFunktionGet(compiler, compileContainer);
         }
 
+        private bool CanCompile(Compiler.Compiler compiler)
+        {
+            if (compiler.OptimizeLevel != Optimize.Level1) return true;
+
+            return this.Deklaration.References.Count != 0;
+        }
+
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            if (!this.CanCompile(compiler)) return true;
 
             this.CompileGetMethode(compiler, mode);
 

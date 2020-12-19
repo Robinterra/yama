@@ -140,6 +140,7 @@ namespace Yama
                 if (command is IncludeExpression) yama.Includes.Add ( command.Value );
                 if (command is AssemblerOutputFileExpression) yama.OutputAssemblerFile = command.Value;
                 if (command is OutputFileExpression) yama.OutputFile = command.Value;
+                if (command is OptimizingExpression) yama.OptimizeLevel = Program.GetOptimizeLevel ( command.Value );
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
                 if (command is DefinesExpression) yama.Defines.Add(command.Value);
                 if (command is Print t) Program.CheckPrint ( yama, t );
@@ -152,6 +153,18 @@ namespace Yama
 
             return yama.Compile();
         }
+
+        // -----------------------------------------------
+
+        private static Optimize GetOptimizeLevel(string value)
+        {
+            if (value == "none") return Optimize.None;
+            if (value == "ssa") return Optimize.SSA;
+
+            return Optimize.Level1;
+        }
+
+        // -----------------------------------------------
 
         private static bool CheckPrint(LanguageDefinition yama, Print t)
         {
@@ -203,6 +216,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );
             Program.EnabledCommandLines.Add ( new IncludeExpression (  ) );
             Program.EnabledCommandLines.Add ( new DefinitionExpression (  ) );
+            Program.EnabledCommandLines.Add ( new OptimizingExpression (  ) );
             Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new StartNamespace (  ) );
             Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
