@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Yama.Assembler;
 using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
@@ -103,6 +104,13 @@ namespace Yama
             get;
             set;
         } = Optimize.Level1;
+
+        // -----------------------------------------------
+        public List<ICommand> Sequence
+        {
+            get;
+            set;
+        }
 
         // -----------------------------------------------
 
@@ -473,6 +481,8 @@ namespace Yama
             assembler.Assemble(request);
 
             request.Stream.Close();
+
+            this.Sequence = assembler.Sequence;
 
             return true;
         }

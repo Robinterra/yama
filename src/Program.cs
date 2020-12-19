@@ -18,6 +18,10 @@ namespace Yama
 
         // -----------------------------------------------
 
+        private static LanguageDefinition yama;
+
+        // -----------------------------------------------
+
         public static List<ICommandLine> EnabledCommandLines
         {
             get;
@@ -63,6 +67,7 @@ namespace Yama
             ICommandLine firstCommand = commands[0];
 
             if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
+            if (firstCommand is DebugExpression) return Program.Debug ( commands, defs );
             if (firstCommand is AssembleExpression) return Program.Assemble ( commands );
             if (firstCommand is RunExpression) return Program.Run ( commands );
             if (firstCommand is LearnCsStuf.CommandLines.Commands.Help) return Program.HelpPrinten (  ) == 1;
@@ -73,6 +78,28 @@ namespace Yama
 
             return false;
         }
+
+        // -----------------------------------------------
+
+        private static bool Debug(List<ICommandLine> commands, DefinitionManager defs)
+        {
+            Program.yama = new LanguageDefinition();
+
+            if (!Program.Assemble(commands)) return false;
+
+            Runtime runtime = new Runtime();
+            runtime.Sequence = Program.yama.Sequence;
+            runtime.Input = new FileInfo(Program.yama.OutputFile);
+
+            foreach ( ICommandLine command in commands )
+            {
+                if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+            }
+
+            return runtime.Execute();
+        }
+
+        // -----------------------------------------------
 
         private static bool Run(List<ICommandLine> commands)
         {
@@ -86,9 +113,7 @@ namespace Yama
 
             if (runtime.Input == null) return false;
 
-            runtime.Execute();
-
-            return true;
+            return runtime.Execute();
         }
 
         // -----------------------------------------------
@@ -98,6 +123,7 @@ namespace Yama
             Definitionen def = new Definitionen();
             Assembler.Assembler assembler = new Assembler.Assembler();
             RequestAssemble request = new RequestAssemble();
+            if (Program.yama == null) Program.yama = new LanguageDefinition();
 
             foreach ( ICommandLine command in commands )
             {
@@ -121,18 +147,20 @@ namespace Yama
             }
             if (assembler.Definition == null) assembler = def.GenerateAssembler ( assembler, "runtime" );
 
-            assembler.Assemble(request);
+            bool isok = assembler.Assemble(request);
 
             request.Stream.Close();
 
-            return true;
+            if (isok) Program.yama.Sequence = assembler.Sequence;
+
+            return isok;
         }
 
         // -----------------------------------------------
 
         private static bool Build ( List<ICommandLine> commands, DefinitionManager defs )
         {
-            LanguageDefinition yama = new LanguageDefinition();
+            if (Program.yama == null) Program.yama = new LanguageDefinition();
 
             foreach ( ICommandLine command in commands )
             {
@@ -211,6 +239,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new CompileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AssembleExpression (  ) );
             Program.EnabledCommandLines.Add ( new RunExpression (  ) );
+            Program.EnabledCommandLines.Add ( new DebugExpression (  ) );
             Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
             Program.EnabledCommandLines.Add ( new AssemblerOutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );

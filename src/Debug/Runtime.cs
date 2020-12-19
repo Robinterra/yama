@@ -125,7 +125,29 @@ namespace Yama.Debug
             get;
             set;
         }
-        public uint StepCounter { get; private set; }
+
+        // -----------------------------------------------
+
+        public uint StepCounter
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+        public List<Assembler.ICommand> Sequence
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public List<uint> BreakAdresses
+        {
+            get;
+            set;
+        } = new List<uint>();
 
         // -----------------------------------------------
 
@@ -216,7 +238,13 @@ namespace Yama.Debug
 
         private bool DebugEvent()
         {
-            if (this.IsStepMode) this.DebugReader();
+            if (this.IsStepMode) return this.DebugReader();
+
+            if (this.BreakAdresses.Contains(this.Register[15]))
+            {
+                Console.WriteLine("Breakpoint at {0:x} reached", this.Register[15]);
+                return this.DebugReader();
+            }
 
             return true;
         }
@@ -226,7 +254,25 @@ namespace Yama.Debug
             this.IsStepMode = false;
             Console.WriteLine("--------------");
 
+            this.PrintCmd();
+
+            Console.WriteLine("A: {0:x}, B: {1:x}, C: {2:x}", this.A, this.B, this.C);
+
+            for (int registers = 0; registers < 13; registers++)
+            {
+                Console.Write("r{0:x}: {1:x}, ", registers, this.Register[registers]);
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("SP: {2:x}, LR: {1:x}, PC: {0:x}", this.Register[15], this.Register[14], this.Register[13]);
+        }
+
+        private bool PrintCmd()
+        {
+            if (this.Sequence != null) return this.PrintCmdFromSequence(this.Register[15] >> 2);
+
             uint cmd = this.Command;
+
             foreach (ICommand command in this.Commands)
             {
                 if (command.CommandId != cmd) continue;
@@ -234,15 +280,40 @@ namespace Yama.Debug
                 Console.Write("CMD: {0}, ", command.GetType().Name);
                 break;
             }
-            Console.WriteLine("A: {0}, B: {1}, C: {2}", this.A, this.B, this.C);
 
-            for (int registers = 0; registers < 13; registers++)
+            return true;
+        }
+
+        private bool PrintCmdFromSequence(uint index)
+        {
+            if (this.Sequence.Count <= index) return this.WriteError("Out of bounds");
+
+            IParseTreeNode node = this.FindSequence((int)index);
+            if (node == null) return true;
+
+            Console.Write("{0}: {1} ", node.Token.Line, node.Token.Text);
+
+            foreach (IParseTreeNode child in node.GetAllChilds)
             {
-                Console.Write("r{0}: {1}, ", registers, this.Register[registers]);
+                Console.Write("{0}, ", child.Token.Text);
             }
+
             Console.WriteLine();
 
-            Console.WriteLine("SP: {2}, LR: {1}, PC: {0}", this.Register[15], this.Register[14], this.Register[13]);
+            return true;
+        }
+
+        private IParseTreeNode FindSequence(int index)
+        {
+            int counter = 0;
+            foreach (Assembler.ICommand command in this.Sequence)
+            {
+                if (counter == index) return command.Node;
+
+                counter += command.Size >> 2;
+            }
+
+            return null;
         }
 
         private bool DebugReader()
@@ -285,12 +356,43 @@ namespace Yama.Debug
 
                     continue;
                 }
-                if (cmd == "break") this.CreateBreaks();
+                if (cmd.Contains("print")) this.PrintCmds(cmd);
+                if (cmd.Contains("break")) this.CreateBreaks(cmd);
                 //if (cmd == "inspect") this.Inspect();
 
                 if (cmd == "stat") this.StepPrint();
                 if (cmd.Contains("mem")) this.PrintMem(cmd);
+                if (cmd.Contains("edit")) this.EditMem(cmd);
             }
+
+            return true;
+        }
+
+        private bool PrintCmds(string cmd)
+        {
+            string[] daten = cmd.Split(' ');
+            if (daten.Length != 2) return false;
+            if (!uint.TryParse(daten[1], out uint count)) return this.WriteError("Argument Number can not be parse");
+            if (this.Sequence == null) return this.WriteError("only sequence mode supprt");
+
+            uint start = this.Register[15] >> 2;
+            for (uint i = 0; i < count; i++)
+            {
+                this.PrintCmdFromSequence(start + i);
+            }
+
+            return true;
+        }
+
+        private bool EditMem(string cmd)
+        {
+            string[] daten = cmd.Split(' ');
+            if (daten.Length != 3) return false;
+            if (!uint.TryParse(daten[1], System.Globalization.NumberStyles.HexNumber, null, out uint adresse)) return this.WriteError("Argument Number can not be parse");
+            if (!uint.TryParse(daten[2], System.Globalization.NumberStyles.HexNumber, null, out uint value)) return this.WriteError("Argument Number can not be parse");
+            if (value > 0xff) return this.WriteError("The Value is to big");
+
+            this.Memory[adresse] = (byte)value;
 
             return true;
         }
@@ -306,10 +408,10 @@ namespace Yama.Debug
         private bool PrintMem(string cmd)
         {
             string[] daten = cmd.Split(' ');
-            if (daten.Length != 3) return false;
-            if (!uint.TryParse(daten[1], out uint adresse)) return false;
-            if (!uint.TryParse(daten[2], out uint length)) return false;
-            length += 0x10;
+            if (daten.Length != 3) return this.WriteError("Missing Parameters");
+            if (!uint.TryParse(daten[1], System.Globalization.NumberStyles.HexNumber, null, out uint adresse)) return this.WriteError("Argument Number can not be parse");
+            if (!uint.TryParse(daten[2], System.Globalization.NumberStyles.HexNumber, null, out uint length)) return this.WriteError("Argument Number can not be parse");
+            length = length << 4;
 
             Console.WriteLine("0x{0:x8}  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F", adresse);
             for (uint lineCounter = 0; lineCounter < length >> 4; lineCounter++)
@@ -318,6 +420,13 @@ namespace Yama.Debug
             }
 
             return true;
+        }
+
+        private bool WriteError(string v)
+        {
+            Console.Error.WriteLine(v);
+
+            return false;
         }
 
         private bool PrintLine(uint v)
@@ -336,9 +445,35 @@ namespace Yama.Debug
             return true;
         }
 
-        private bool CreateBreaks()
+        private bool CreateBreaks(string cmd)
         {
-            return true;
+            string[] daten = cmd.Split(' ');
+            if (daten.Length != 2) return this.WriteError("Missing Parameters");
+
+            if (this.Sequence == null)
+            {
+                if (!uint.TryParse(daten[1], System.Globalization.NumberStyles.HexNumber, null, out uint pointadres)) return this.WriteError("Argument Number can not be parse");
+
+                this.BreakAdresses.Add(pointadres);
+
+                return true;
+            }
+            if (!uint.TryParse(daten[1], out uint line)) return this.WriteError("Argument Number can not be parse");
+
+            uint counter = 0;
+            foreach (Assembler.ICommand command in this.Sequence)
+            {
+                counter +=(uint) command.Size >> 2;
+                if (command.Node.Token.Line != line) continue;
+
+                counter -= (uint) command.Size >> 2;
+                Console.WriteLine("Breakpoint at 0x{0:x} created", counter << 2);
+                this.BreakAdresses.Add(counter << 2);
+
+                return true;
+            }
+
+            return this.WriteError("breakpoint can not be created");
         }
 
         private bool MakeCommand()

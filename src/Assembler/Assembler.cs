@@ -63,7 +63,22 @@ namespace Yama.Assembler
             get;
             set;
         } = new List<IParseTreeNode>();
-        public List<AssemblerCompilerMap> AsmCompilerMap { get; private set; } = new List<AssemblerCompilerMap>();
+
+        // -----------------------------------------------
+
+        public List<AssemblerCompilerMap> AsmCompilerMap
+        {
+            get;
+            set;
+        } = new List<AssemblerCompilerMap>();
+
+        // -----------------------------------------------
+
+        public List<ICommand> Sequence
+        {
+            get;
+            set;
+        } = new List<ICommand>();
 
         // -----------------------------------------------
 
@@ -231,6 +246,8 @@ namespace Yama.Assembler
             return this.Errors.Count == 0;
         }
 
+        // -----------------------------------------------
+
         private bool IdentifyCommandFromNodes(List<IParseTreeNode> nodes, List<CommandCompilerMap> maptranslate)
         {
             foreach (IParseTreeNode node in nodes)
@@ -258,7 +275,6 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        
         private bool IdentifyCommandFromNodes(AssemblerCompilerMap map, List<CommandCompilerMap> maptranslate)
         {
             foreach (IParseTreeNode node in map.Nodes)
@@ -325,9 +341,15 @@ namespace Yama.Assembler
             request.Node = assmblepair.Node;
             request.Assembler = this;
             request.Stream = this.Stream;
+            request.WithMapper = true;
             request.Position = position;
 
-            if (assmblepair.Command.Assemble(request)) return true;
+            if (assmblepair.Command.Assemble(request))
+            {
+                this.Sequence.AddRange(request.Result);
+
+                return true;
+            }
 
             this.Errors.Add(request.Node);
 
