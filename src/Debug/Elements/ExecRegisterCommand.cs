@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
 using Yama.Compiler;
 using Yama.Parser;
 
@@ -18,14 +20,13 @@ namespace Yama.Debug
 
             if (runtime.Register[runtime.A] == 1)
             {
-                System.Console.WriteLine("Out->{0}", runtime.Register[1]);
+                System.Console.Write("{0}", runtime.Register[1]);
 
                 return true;
             }
 
             if (runtime.Register[runtime.A] == 2)
             {
-                System.Console.Write("In-> ");
                 string input = System.Console.ReadLine();
                 if (!int.TryParse(input, out int number))
                 {
@@ -42,6 +43,19 @@ namespace Yama.Debug
             {
                 runtime.IsRun = false;
                 runtime.Register[12] = runtime.Register[1];
+
+                return true;
+            }
+
+            if (runtime.Register[runtime.A] == 4)
+            {
+                uint adresse = runtime.Register[1];
+
+                uint length = BitConverter.ToUInt32(runtime.Memory, (int)adresse);
+
+                string printtext = Encoding.UTF8.GetString(runtime.Memory, (int)adresse + 4, (int)length);
+
+                Console.Write(printtext);
 
                 return true;
             }

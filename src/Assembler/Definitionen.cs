@@ -25,6 +25,7 @@ namespace Yama.Assembler
             //layer.ParserMembers.Add(new BedingtesAssemblen());
             layer.ParserMembers.Add(new JumpPointMarker());
             layer.ParserMembers.Add(new CommandWithList());
+            layer.ParserMembers.Add(new DataNode());
             layer.ParserMembers.Add(new CommandWith3ArgsNode(argumentLayer));
             layer.ParserMembers.Add(new CommandWith2ArgsNode(argumentLayer));
             layer.ParserMembers.Add(new CommandWith1ArgNode(argumentLayer));
@@ -93,6 +94,7 @@ namespace Yama.Assembler
             } );
             rules.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
+            rules.Add ( new KeyWord ( ".data", IdentifierKind.Base ) );
             rules.Add ( new Comment ( new ZeichenKette ( "." ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), IdentifierKind.OpenBracket ) );
@@ -371,6 +373,8 @@ namespace Yama.Assembler
             definition.Commands.Add(new CommandJumpPoint("bge", "Format3", 0x32, 4, 0x1FFFF, 4));
             definition.Commands.Add(new CommandJumpPoint("blt", "Format3", 0x32, 4, 0x1FFFF, 5));
             definition.Commands.Add(new CommandJumpPoint("ble", "Format3", 0x32, 4, 0x1FFFF, 6));
+
+            definition.Commands.Add(new CommandData());
 
             return true;
         }

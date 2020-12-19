@@ -23,6 +23,15 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        public static bool PrintText ( int input )
+        {
+            #defalgo Console,PrintText: = input;
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
         /**
          * Read int
          */

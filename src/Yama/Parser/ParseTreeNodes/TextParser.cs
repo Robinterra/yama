@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -65,6 +66,12 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            CompileData compile = new CompileData();
+            compile.Compile(compiler, this);
+
+            CompileReferenceCall referenceCall = new CompileReferenceCall();
+            referenceCall.CompileData(compiler, this, compile.JumpPointName);
+
             return true;
         }
     }

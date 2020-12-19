@@ -27,7 +27,17 @@ namespace Yama.Lexer
             }
         }
 
-        public int Length { get; internal set; }
+        public int Length
+        {
+            get
+            {
+                return this.Data.Length;
+            }
+            set
+            {
+
+            }
+        }
 
         // -----------------------------------------------
 

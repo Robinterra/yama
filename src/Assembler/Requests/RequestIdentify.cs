@@ -14,5 +14,10 @@ namespace Yama.Assembler
             get;
             set;
         }
+        public bool IsData
+        {
+            get;
+            set;
+        }
     }
 }

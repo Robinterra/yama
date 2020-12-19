@@ -55,6 +55,7 @@ namespace Yama.Compiler
             get;
             set;
         }
+        public List<ICompileRoot> DataSequence { get; internal set; } = new List<ICompileRoot>();
 
         #endregion get/set
 
@@ -120,6 +121,8 @@ namespace Yama.Compiler
         {
             if (this.OutputFile != null)
                 if (this.OutputFile.Exists) this.OutputFile.Delete();
+
+            this.AssemblerSequence.AddRange(this.DataSequence);
 
             try
             {

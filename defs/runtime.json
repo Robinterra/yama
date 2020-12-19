@@ -78,6 +78,25 @@
         ]
       },
       {
+        "Name": "Data",
+        "Mode": "default",
+        "Description": "Datensatz",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          },
+          {
+            "Name": "[DATA]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          ".data [NAME]=[DATA]"
+        ]
+      },
+      {
         "Name": "ReferenceCall",
         "Mode": "set",
         "Description": "Das setzen einer ganz normalen Variabel",

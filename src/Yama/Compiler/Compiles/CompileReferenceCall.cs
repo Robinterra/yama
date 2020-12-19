@@ -85,6 +85,30 @@ namespace Yama.Compiler
             return this.Compile(compiler, node.Reference, mode);
         }
 
+        public bool CompileData(Compiler compiler, IParseTreeNode node, string adressPorint)
+        {
+            this.Node = node;
+            compiler.AssemblerSequence.Add(this);
+
+            this.Algo = compiler.GetAlgo(this.AlgoName, "methode");
+            if (this.Algo == null) return false;
+
+            this.PrimaryKeys = new Dictionary<string, string>();
+
+            foreach (AlgoKeyCall key in this.Algo.Keys)
+            {
+                Dictionary<string, string> result = new Dictionary<string, string>();
+                result.Add("[NAME]", adressPorint);
+
+                foreach (KeyValuePair<string, string> pair in result)
+                {
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
+                }
+            }
+
+            return true;
+        }
+
         public bool CompileDek(Compiler compiler, IndexVariabelnDeklaration node, string mode = "default")
         {
             this.Node = node.Use;
