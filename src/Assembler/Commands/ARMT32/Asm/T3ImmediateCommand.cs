@@ -41,6 +41,7 @@ namespace Yama.Assembler.ARMT32
             get;
             set;
         }
+        public int Mode { get; private set; }
         public IParseTreeNode Node
         {
             get;
@@ -51,12 +52,13 @@ namespace Yama.Assembler.ARMT32
 
         #region ctor
 
-        public T3ImmediateCommand(string key, string format, uint id, int size)
+        public T3ImmediateCommand(string key, string format, uint id, int size, int mode = -1)
         {
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
+            this.Mode = mode;
         }
 
         public T3ImmediateCommand(T3ImmediateCommand t, IParseTreeNode node, List<byte> bytes)
@@ -82,6 +84,7 @@ namespace Yama.Assembler.ARMT32
             IFormat format = request.Assembler.GetFormat(this.Format);
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
+            if (this.Mode != -1) assembleFormat.Arguments.Add((uint)this.Mode);
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument1.Token.Text));
             assembleFormat.Arguments.Add(Convert.ToUInt32(t.Argument2.Token.Value));

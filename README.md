@@ -148,6 +148,8 @@ avrdude -F -e -v -p m328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:"out.h
 ./YamaCompiler run out.bin
 ```
 ### arm-gcc
+* STM32F401 0x0800 0000
+* SAM3X8E 0x0008 0000
 
 #### Translate to Binary
 ```console

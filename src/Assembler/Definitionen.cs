@@ -242,8 +242,11 @@ namespace Yama.Assembler
             definition.Formats.Add(new T3AsrImmediateFormat());
             definition.Formats.Add(new T3AsrRegisterFormat());
 
-            definition.Commands.Add(new T3ImmediateCommand ("asr", "T3AsrIm", 0xEA4, 4));
+            definition.Commands.Add(new T3ImmediateCommand ("asr", "T3AsrIm", 0xEA4, 4, 2));
             definition.Commands.Add(new T3RegisterCommand ("asr", "T3AsrRe", 0xFA4, 4));
+
+            definition.Commands.Add(new T3ImmediateCommand ("lsl", "T3AsrIm", 0xEA4, 4, 0));
+            definition.Commands.Add(new T3RegisterCommand ("lsl", "T3AsrRe", 0xFA0, 4));
 
             return true;
         }
@@ -316,7 +319,7 @@ namespace Yama.Assembler
             definition.Commands.Add(new Command3Register("eor", "Format1", 0x57, 4));
             definition.Commands.Add(new Command3Register("orr", "Format1", 0x58, 4));
             definition.Commands.Add(new Command3Register("asr", "Format1", 0x59, 4));
-            definition.Commands.Add(new Command3Register("asl", "Format1", 0x5A, 4));
+            definition.Commands.Add(new Command3Register("lsl", "Format1", 0x5A, 4));
 
             definition.Commands.Add(new Command1Register("bx", "Format1", 0x30, 4));
             definition.Commands.Add(new Command1Register("blx", "Format1", 0x31, 4));
@@ -345,7 +348,7 @@ namespace Yama.Assembler
             definition.Commands.Add(new Command2Register1Imediate("eor", "Format2", 0x17, 4));
             definition.Commands.Add(new Command2Register1Imediate("orr", "Format2", 0x18, 4));
             definition.Commands.Add(new Command2Register1Imediate("asr", "Format2", 0x19, 4));
-            definition.Commands.Add(new Command2Register1Imediate("asl", "Format2", 0x1A, 4));
+            definition.Commands.Add(new Command2Register1Imediate("lsl", "Format2", 0x1A, 4));
 
             definition.Commands.Add(new Command1Register1Container("ldr", "Format2", 0x1B, 4, 15, 4));
             definition.Commands.Add(new Command1Register1Container("str", "Format2", 0x1C, 4, 15, 4));

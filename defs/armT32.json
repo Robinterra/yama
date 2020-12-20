@@ -361,6 +361,20 @@
         "Defines": [
           "SAM3X8E"
         ]
+      },
+      {
+        "Key": "[RAMENDE]",
+        "Value": "0x2000FFFF",
+        "Defines": [
+          "STM32F401"
+        ]
+      },
+      {
+        "Key": "[RAMBEGIN]",
+        "Value": "0x20000000",
+        "Defines": [
+          "STM32F401"
+        ]
       }
     ],
     "KeyPatterns": [
