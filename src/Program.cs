@@ -32,8 +32,6 @@ namespace Yama
 
         public static int Main ( string[] args )
         {
-            System.Console.WriteLine("Remember Yama, old friend?");
-
             Program.Init (  );
 
             return Program.NormalStart ( args );
@@ -66,6 +64,8 @@ namespace Yama
 
             ICommandLine firstCommand = commands[0];
 
+            if (firstCommand is FileExpression) return Program.RunSofort ( firstCommand.Value );
+            System.Console.WriteLine("Remember Yama, old friend?");
             if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
             if (firstCommand is DebugExpression) return Program.Debug ( commands, defs );
             if (firstCommand is AssembleExpression) return Program.Assemble ( commands );
@@ -77,6 +77,22 @@ namespace Yama
             Console.Error.WriteLine ( "please enter a allowd argument first" );
 
             return false;
+        }
+
+        // -----------------------------------------------
+
+        private static bool RunSofort(string value)
+        {
+            FileInfo file = new FileInfo(value);
+            if (file.Extension != ".yexe") return false;
+            if (!file.Exists) return false;
+
+            Runtime runtime = new Runtime();
+            runtime.IsDebug = false;
+            runtime.MemorySize = 0x2FAF080;
+            runtime.Input = file;
+
+            return runtime.Execute();
         }
 
         // -----------------------------------------------
