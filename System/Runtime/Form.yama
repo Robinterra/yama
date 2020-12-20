@@ -1,0 +1,65 @@
+namespace "System.Runtime.Forms"
+{
+    using "System";
+    using "System.IO";
+    using "System.Runtime.IO";
+
+    public class Form
+    {
+
+        // -----------------------------------------------
+
+        private int reference;
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public this new ()
+        {
+            this.reference = InputOutput.Exec ( 1, 7 );
+
+            return this;
+        }
+
+        // -----------------------------------------------
+
+        public this ~()
+        {
+            InputOutput.ExecWith1Arg ( 3, this.reference, 7 );
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
+        public bool Show()
+        {
+            InputOutput.ExecWith1Arg ( 2, this.reference, 7 );
+        }
+
+        // -----------------------------------------------
+
+        public bool StartMain()
+        {
+            InputOutput.ExecWith1Arg ( 4, this.reference, 7 );
+        }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
+
+    }
+}
+
+// --[EOF]--

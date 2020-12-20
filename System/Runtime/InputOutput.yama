@@ -25,6 +25,12 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
+        public static int Exec ( int cmd, int guide )
+        {
+            #defalgo Exec,Call: = guide;
+        }
+
+        // -----------------------------------------------
         /**
          * Print int
          */
