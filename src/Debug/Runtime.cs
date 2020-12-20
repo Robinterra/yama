@@ -217,7 +217,7 @@ namespace Yama.Debug
                 this.EndPhase();
             }
 
-            Console.WriteLine("Program Exit with {0} Returncode", this.Register[12]);
+            Console.WriteLine("\nProgram Exit with {0} Returncode", this.Register[12]);
             Environment.Exit((int)this.Register[12]);
 
             return true;

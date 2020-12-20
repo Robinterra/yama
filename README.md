@@ -146,6 +146,7 @@ avrdude -F -e -v -p m328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:"out.h
 #### Debug
 ```console
 ./YamaCompiler run out.bin
+./YamaCompiler debug out "./out.bin" def runtime ./temp.S
 ```
 ### arm-gcc
 * STM32F401 0x0800 0000
