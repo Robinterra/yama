@@ -59,6 +59,26 @@ namespace Yama.Debug
 
                 return true;
             }
+            if (runtime.Register[runtime.A] == 5)
+            {
+                string text = Console.ReadLine();
+
+                byte[] data = Encoding.UTF8.GetBytes(text);
+
+                byte[] result = new byte[data.Length + 4];
+
+                Array.Copy(data, 0, result, 4, data.Length);
+
+                byte[] length = BitConverter.GetBytes(data.Length);
+
+                Array.Copy(length, 0, result, 0, 4);
+
+                runtime.AddObjectToMemory(result, out uint adresse);
+
+                runtime.Register[12] = adresse;
+
+                return true;
+            }
 
             return true;
         }

@@ -39,6 +39,18 @@
                 "mov r12, #2",
                 "exec r12"
                 ]
+            },
+            {
+                "Name": "Console",
+                "Mode": "ReadText",
+                "Description": "Read Text",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "mov r12, #5",
+                "exec r12"
+                ]
             }
        ],
         "AdvancedKeyReplaces": [

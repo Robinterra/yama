@@ -104,6 +104,14 @@ namespace Yama.Debug
 
         // -----------------------------------------------
 
+        public bool IsDebug
+        {
+            get;
+            set;
+        } = true;
+
+        // -----------------------------------------------
+
         public byte[] Memory
         {
             get;
@@ -148,6 +156,14 @@ namespace Yama.Debug
             get;
             set;
         } = new List<uint>();
+
+        // -----------------------------------------------
+
+        public uint CurrentInterupt
+        {
+            get;
+            set;
+        }
 
         // -----------------------------------------------
 
@@ -204,15 +220,17 @@ namespace Yama.Debug
 
             this.IsRun = true;
 
-            this.DebugReader();
+            if (this.IsDebug) this.DebugReader();
 
             while (this.IsRun)
             {
                 this.MakeCommand();
 
-                this.DebugEvent();
+                if (this.IsDebug) this.DebugEvent();
 
                 this.RunCommand();
+
+                if (this.CurrentInterupt != 0) this.InteruptPahse();
 
                 this.EndPhase();
             }
@@ -222,6 +240,102 @@ namespace Yama.Debug
 
             return true;
         }
+
+        // -----------------------------------------------
+
+        public bool AddObjectToMemory(byte[] data, out uint adresse)
+        {
+            adresse = this.Malloc(data.Length);
+            if (adresse == 0) return this.WriteError("Out of Memory");
+
+            Array.Copy(data, 0, this.Memory, adresse, data.Length);
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public uint Malloc(int size)
+        {
+            uint start = this.Register[0];
+
+            uint currentadress;
+            int currentBlockState;
+            uint currentBlockSize;
+            uint nextAdress = start;
+
+            while ( true )
+            {
+                currentadress = nextAdress;
+
+                currentBlockSize = this.Memory[currentadress + 4];
+
+                nextAdress = currentadress + currentBlockSize + 8;
+
+                if (this.Memory[currentadress] == 2) continue;
+
+                if (size <= currentBlockSize) break;
+
+                if (this.Memory[currentadress] == 1) return 0;
+            }
+
+            currentBlockState = this.Memory[currentadress];
+
+            return this.ReservedNewBlock ( currentadress, size, currentBlockState, (int)currentBlockSize );
+        }
+
+        // -----------------------------------------------
+
+        private uint ReservedNewBlock(uint currentadress, int size, int nextBlockState, int currentBlockSize)
+        {
+            this.CreateBlock ( currentadress, 2, size );
+
+            currentadress = currentadress + 8;
+
+            if (nextBlockState == 0) return (uint)currentadress;
+
+            uint nextAdress = currentadress + (uint)size;
+
+            size = size + 8;
+
+            size = currentBlockSize - size;
+
+            this.CreateBlock ( nextAdress, 1, size );
+
+            return (uint)currentadress;
+        }
+
+        // -----------------------------------------------
+
+        private bool CreateBlock(uint adress, int blockState, int size)
+        {
+
+            this.Memory[adress] = (byte)blockState;
+            this.Memory[adress + 1] = 0;
+            this.Memory[adress + 2] = 0;
+            this.Memory[adress + 3] = 0;
+
+            byte[] length = BitConverter.GetBytes(size);
+            this.Memory[adress + 4] = length[0];
+            this.Memory[adress + 5] = length[1];
+            this.Memory[adress + 6] = length[2];
+            this.Memory[adress + 7] = length[3];
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool InteruptPahse()
+        {
+            this.Register[14] = this.Register[15];
+            this.Register[15] = this.CurrentInterupt;
+            this.CurrentInterupt = 0;
+
+            return true;
+        }
+
+        // -----------------------------------------------
 
         private bool ReadFile()
         {

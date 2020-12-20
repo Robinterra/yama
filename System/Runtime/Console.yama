@@ -42,6 +42,16 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        /**
+         * Read int
+         */
+        public static int ReadText (  )
+        {
+            return #defalgo Console,ReadText:;
+        }
+
+        // -----------------------------------------------
+
         #endregion methods
 
         // -----------------------------------------------
