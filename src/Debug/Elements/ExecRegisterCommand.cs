@@ -80,6 +80,8 @@ namespace Yama.Debug
                 return true;
             }
 
+            if (runtime.Register[runtime.A] == 6) return WindowsFormsMapper.Instance.Execute(runtime);
+
             return true;
         }
 
