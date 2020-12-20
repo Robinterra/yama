@@ -15,6 +15,18 @@ namespace Yama.Debug
             set;
         } = 0xFF;
 
+        public List<IMapper> Mappers
+        {
+            get;
+            set;
+        } = new List<IMapper>();
+
+        public ExecRegisterCommand()
+        {
+            this.Mappers.Add(new InputOutputMapper());
+            this.Mappers.Add(new GuiMapper());
+        }
+
         public bool Execute(Runtime runtime)
         {
 
@@ -49,11 +61,7 @@ namespace Yama.Debug
 
             if (runtime.Register[runtime.A] == 4)
             {
-                uint adresse = runtime.Register[1];
-
-                uint length = BitConverter.ToUInt32(runtime.Memory, (int)adresse);
-
-                string printtext = Encoding.UTF8.GetString(runtime.Memory, (int)adresse + 4, (int)length);
+                string printtext = runtime.GetStringFromRegister(1);
 
                 Console.Write(printtext);
 
@@ -80,7 +88,14 @@ namespace Yama.Debug
                 return true;
             }
 
-            if (runtime.Register[runtime.A] == 6) return WindowsFormsMapper.Instance.Execute(runtime);
+            uint id = runtime.Register[runtime.A];
+
+            foreach (IMapper mapper in this.Mappers)
+            {
+                if (mapper.Id != id) continue;
+
+                return mapper.Execute(runtime);
+            }
 
             return true;
         }

@@ -1,0 +1,82 @@
+namespace "System.Runtime.IO"
+{
+    using "System";
+
+    public static class InputOutput
+    {
+
+        // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
+        public static int ExecWith2Args ( int cmd, int argone, int argtwo, int guide )
+        {
+            #defalgo Exec,Call: = guide;
+        }
+
+        // -----------------------------------------------
+
+        public static int ExecWith1Arg ( int cmd, int argone, int guide )
+        {
+            #defalgo Exec,Call: = guide;
+        }
+
+        // -----------------------------------------------
+
+        /**
+         * Print int
+         */
+        public static bool WriteFileData ( int filename, int data )
+        {
+            InputOutput.ExecWith2Args ( 2, filename, data, 6 );
+        }
+
+        // -----------------------------------------------
+
+        /**
+         * Print int
+         */
+        public static bool WriteFileObject ( int filename, int data )
+        {
+            InputOutput.ExecWith2Args ( 1, filename, data, 6 );
+        }
+
+        // -----------------------------------------------
+
+        /**
+         * Print int
+         */
+        public static int ReadFileObject ( int filename )
+        {
+            InputOutput.ExecWith1Arg ( 3, filename, 6 );
+        }
+
+        // -----------------------------------------------
+
+        /**
+         * Print int
+         */
+        public static int ReadFileData ( int filename )
+        {
+            InputOutput.ExecWith1Arg ( 4, filename, 6 );
+        }
+
+        // -----------------------------------------------
+
+        public static bool Exist ( int filename )
+        {
+            InputOutput.ExecWith1Arg ( 5, filename, 6 );
+        }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
+
+    }
+}
+
+// --[EOF]--

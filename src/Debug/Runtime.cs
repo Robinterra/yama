@@ -214,6 +214,17 @@ namespace Yama.Debug
 
         // -----------------------------------------------
 
+        public string GetStringFromRegister(int register)
+        {
+            uint adresse = this.Register[register];
+
+            uint length = BitConverter.ToUInt32(this.Memory, (int)adresse);
+
+            return Encoding.UTF8.GetString(this.Memory, (int)adresse + 4, (int)length);
+        }
+
+        // -----------------------------------------------
+
         public bool Execute ()
         {
             this.ReadFile();
@@ -400,10 +411,8 @@ namespace Yama.Debug
 
         private bool PrintCmdFromSequence(uint index)
         {
-            if (this.Sequence.Count <= index) return this.WriteError("Out of bounds");
-
             IParseTreeNode node = this.FindSequence((int)index);
-            if (node == null) return true;
+            if (node == null) return this.WriteError("Out of bounds");;
 
             Console.Write("{0}: {1} ", node.Token.Line, node.Token.Text);
 
