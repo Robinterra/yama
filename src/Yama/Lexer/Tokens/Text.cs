@@ -80,7 +80,7 @@ namespace Yama.Lexer
             {
                 if ( this.Ende.CheckChar ( lexer ) == TokenStatus.Complete ) return TokenStatus.Complete;
 
-                this.Escape.CheckChar ( lexer );
+                if ( this.Escape.CheckChar ( lexer ) == TokenStatus.Complete ) continue;
 
                 lexer.NextByte (  );
 
