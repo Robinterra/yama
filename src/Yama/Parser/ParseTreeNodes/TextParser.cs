@@ -67,6 +67,9 @@ namespace Yama.Parser
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
             CompileData compile = new CompileData();
+            compile.Data = new DataObject();
+            compile.Data.Mode = DataMode.Text;
+            compile.Data.Text = this.Token.Text;
             compile.Compile(compiler, this);
 
             CompileReferenceCall referenceCall = new CompileReferenceCall();

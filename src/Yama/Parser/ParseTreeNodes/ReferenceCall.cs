@@ -110,7 +110,11 @@ namespace Yama.Parser
             if (mode == "set") moderesult = mode;
             if (mode == "point") moderesult = mode;
             if (mode == "setpoint") moderesult = mode;
-            if (this.Reference.Deklaration is IndexMethodDeklaration) moderesult = "methode";
+            if (this.Reference.Deklaration is IndexMethodDeklaration dek)
+            {
+                if (dek.Klasse.IsMethodsReferenceMode && dek.Klasse.Methods.Contains(dek)) return this.RefNameCall(compiler, dek);
+                moderesult = "methode";
+            }
             if (this.Reference.Deklaration is IndexEnumEntryDeklaration ed) return this.CompileEnumEntry(compiler, ed);
             if (this.Reference.Deklaration is IndexEnumDeklaration) return true;
             if (this.Reference.Deklaration is IndexVektorDeklaration) moderesult = mode;
@@ -124,6 +128,17 @@ namespace Yama.Parser
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
             return compileReference.Compile(compiler, this, moderesult);
+        }
+
+        private bool RefNameCall(Compiler.Compiler compiler, IndexMethodDeklaration dek)
+        {
+            CompileReferenceCall compileReference = new CompileReferenceCall();
+
+            compileReference.CompilePoint0(compiler);
+
+            compileReference = new CompileReferenceCall();
+
+            return compileReference.Compile(compiler, this, "funcref");
         }
 
         private bool CompileEnumEntry(Compiler.Compiler compiler, IndexEnumEntryDeklaration dek)

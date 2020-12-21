@@ -214,6 +214,8 @@ namespace Yama.Compiler.Definition
             if (query.Key.Values == null) query.Key.Values = new List<string>();
 
             if (query.Key.Name == "[VAR]") return this.VarQuery(query);
+            if (query.Kategorie == "funcref") return this.FuncRef(query);
+            if (query.Kategorie == "point0") return this.Point0(query);
             if (query.Key.Name == "[REG]") return this.RegisterQuery(query);
             if (query.Key.Name == "[NAME]") return this.NameQuery(query);
             if (query.Key.Name == "[REGPOP]") return this.MethodeRegPop(query);
@@ -223,6 +225,54 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[PROPERTY]") return this.PropertyQuery(query);
 
             return this.MakeAdvanedKeyReplaces(query);
+        }
+
+        private Dictionary<string, string> Point0(IRegisterQuery query)
+        {
+            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
+            string keypattern = "[PROPERTY[{0}]]";
+            Dictionary<string, string> result = new Dictionary<string, string>();
+
+            result.Add( string.Format(keypattern, 0), string.Format(keyPattern.Pattern, 0) );
+
+            return result;
+        }
+
+        private Dictionary<string, string> FuncRef(IRegisterQuery query)
+        {
+            string keypattern = "[PROPERTY[{0}]]";
+            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            Dictionary<string,string> result = new Dictionary<string,string>();
+            int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
+            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
+
+            int counter = 0;
+
+            if (!(query.Value is IndexMethodDeklaration dek)) return null;
+
+            foreach (IParent a in dek.Klasse.Methods)
+            {
+                if (!(a is IndexMethodDeklaration vardek)) continue;
+
+                counter++;
+
+                if (a.Name != dek.Name) continue;
+
+                counter = counter - 1;
+                counter = counter * bytes;
+
+                for (int i = 0; i < duration; i++ )
+                {
+                    result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i) );
+                }
+
+                return  result;
+            }
+
+            return null;
         }
 
         // -----------------------------------------------
@@ -289,6 +339,8 @@ namespace Yama.Compiler.Definition
             int counter = 0;
 
             if (!(query.Value is IndexPropertyDeklaration dek)) return null;
+
+            if (dek.Klasse.IsMethodsReferenceMode) counter += 1;
 
             foreach (IParent a in dek.Klasse.IndexProperties)
             {

@@ -29,6 +29,12 @@ namespace Yama.Compiler
         } = new List<ICompileRoot>();
         public string JumpPointName { get; set; }
 
+        public DataObject Data
+        {
+            get;
+            set;
+        }
+
         public List<string> AssemblyCommands
         {
             get;
@@ -70,7 +76,7 @@ namespace Yama.Compiler
         {
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName }, {"[DATA]", this.Node.Token.Text} }));
+                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName }, {"[DATA]", this.Data.GetData()} }));
             }
 
             return true;
