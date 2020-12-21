@@ -4,8 +4,8 @@
     "AdressBytes": 4,
     "WorkingRegisterStart": 1,
     "PlaceToKeepRegisterStart": 1,
-    "WorkingRegisterLast": 10,
-    "PlaceToKeepRegisterLast": 10,
+    "WorkingRegisterLast": 11,
+    "PlaceToKeepRegisterLast": 11,
     "Algos": [
       {
         "Name": "ReferenceCall",
