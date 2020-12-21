@@ -541,6 +541,21 @@ namespace Yama.Parser
             CompileReferenceCall a = new CompileReferenceCall();
             a.CompileDek(compiler, dek, "set");
 
+            if (this.Deklaration.Klasse.IsMethodsReferenceMode)
+            {
+                CompileReferenceCall referenceCall = new CompileReferenceCall();
+                referenceCall.CompileData(compiler, this, this.Deklaration.Klasse.DataRef.JumpPointName);
+
+                movResultRight = new CompileMovResult();
+                movResultRight.Compile(compiler, null, "default");
+
+                CompileReferenceCall compileReference = new CompileReferenceCall();
+                compileReference.CompileDek(compiler, dek);
+
+                compileReference = new CompileReferenceCall();
+                compileReference.CompilePoint0(compiler, "setpoint");
+            }
+
             return compiler.Definition.ParaClean();
         }
 

@@ -6,7 +6,7 @@ using Yama.Parser;
 
 namespace Yama.Assembler.Runtime
 {
-    public class CommandData : ICommand
+    public class CommandDataList : ICommand
     {
 
         #region get/set
@@ -53,12 +53,12 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public CommandData()
+        public CommandDataList()
         {
 
         }
 
-        public CommandData(CommandData t, IParseTreeNode node, List<byte> bytes)
+        public CommandDataList(CommandDataList t, IParseTreeNode node, List<byte> bytes)
         {
             this.Key = t.Key;
             this.Format = t.Format;
@@ -75,11 +75,14 @@ namespace Yama.Assembler.Runtime
             if (!(request.Node is DataNode t)) return false;
 
             List<byte> daten = new List<byte>();
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
-            daten.AddRange(BitConverter.GetBytes(data.Length));
-            daten.AddRange(data);
 
-            if (request.WithMapper) request.Result.Add(new CommandData(this, request.Node, daten));
+            foreach (Lexer.IdentifierToken token in t.Arguments)
+            {
+                JumpPointMapper map = request.Assembler.GetJumpPoint(token.Text);
+                daten.AddRange(BitConverter.GetBytes(map.Adresse - 4));
+            }
+
+            if (request.WithMapper) request.Result.Add(new CommandDataList(this, request.Node, daten));
             request.Stream.Write(daten.ToArray());
 
             return true;
@@ -88,10 +91,9 @@ namespace Yama.Assembler.Runtime
         public bool Identify(RequestIdentify request)
         {
             if (!(request.Node is DataNode t)) return false;
-            if (t.SupportTokens[0].Text != ".data") return false;
+            if (t.SupportTokens[0].Text != ".datalist") return false;
 
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
-            this.Size = data.Length + 4;
+            this.Size = t.Arguments.Count << 2;
             request.IsData = true;
 
             return true;

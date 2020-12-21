@@ -17,8 +17,6 @@ namespace "System.Runtime"
         public static bool Print ( int input )
         {
             #defalgo Console,Print: = input;
-
-            return true;
         }
 
         // -----------------------------------------------
@@ -26,8 +24,13 @@ namespace "System.Runtime"
         public static bool PrintText ( int input )
         {
             #defalgo Console,PrintText: = input;
+        }
 
-            return true;
+        // -----------------------------------------------
+
+        public static bool PrintLine (  )
+        {
+            Console.PrintText ( "\n" );
         }
 
         // -----------------------------------------------
@@ -37,7 +40,7 @@ namespace "System.Runtime"
          */
         public static int Read (  )
         {
-            return #defalgo Console,Read:;
+            #defalgo Console,Read:;
         }
 
         // -----------------------------------------------
@@ -47,7 +50,7 @@ namespace "System.Runtime"
          */
         public static int ReadText (  )
         {
-            return #defalgo Console,ReadText:;
+            #defalgo Console,ReadText:;
         }
 
         // -----------------------------------------------

@@ -257,7 +257,12 @@ namespace Yama.Debug
         public bool AddObjectToMemory(byte[] data, out uint adresse)
         {
             adresse = this.Malloc(data.Length);
-            if (adresse == 0) return this.WriteError("Out of Memory");
+            if (adresse == 0)
+            {
+                this.WriteError(string.Format( "Out of Memory... Memory Size: {0:x}, Data Size: {1:x}", this.Memory.Length, data.Length));
+                Environment.Exit(1);
+                return false;
+            }
 
             Array.Copy(data, 0, this.Memory, adresse, data.Length);
 
@@ -279,7 +284,7 @@ namespace Yama.Debug
             {
                 currentadress = nextAdress;
 
-                currentBlockSize = this.Memory[currentadress + 4];
+                currentBlockSize = BitConverter.ToUInt32(this.Memory, (int)currentadress + 4);
 
                 nextAdress = currentadress + currentBlockSize + 8;
 
@@ -287,7 +292,8 @@ namespace Yama.Debug
 
                 if (size <= currentBlockSize) break;
 
-                if (this.Memory[currentadress] == 1) return 0;
+                if (this.Memory[currentadress] == 1)
+                    return 0;
             }
 
             currentBlockState = this.Memory[currentadress];

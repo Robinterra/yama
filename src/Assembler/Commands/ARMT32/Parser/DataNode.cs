@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yama.Index;
 using Yama.Lexer;
@@ -27,6 +28,7 @@ namespace Yama.Assembler.ARMT32
             set;
         } = new List<IdentifierToken>();
         public IdentifierToken Data { get; private set; }
+        public List<IdentifierToken> Arguments { get; set; } = new List<IdentifierToken>();
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
@@ -56,18 +58,48 @@ namespace Yama.Assembler.ARMT32
             node.SupportTokens.Add(token);
 
             token = parser.Peek(token, 1);
-            if (token.Kind != IdentifierKind.Text) return null;
-            node.Data = token;
+            if (token.Kind == IdentifierKind.Text) node.Data = token;
+            else if (!this.TryParseList(parser, token, node)) return null;
 
             return this.CleanUp(node);
+        }
+
+        private bool TryParseList(Parser.Parser parser, IdentifierToken token, DataNode deklaration)
+        {
+            if (token.Kind != IdentifierKind.BeginContainer) return false;
+            deklaration.SupportTokens.Add(token);
+            token = parser.Peek(token, 1);
+
+            while (token.Kind == IdentifierKind.Word)
+            {
+                deklaration.Arguments.Add(token);
+
+                token = parser.Peek(token, 1);
+
+                if (token.Kind != IdentifierKind.Comma) continue;
+
+                deklaration.SupportTokens.Add(token);
+
+                token = parser.Peek(token, 1);
+            }
+
+            if (token.Kind != IdentifierKind.CloseContainer) return false;
+            deklaration.SupportTokens.Add(token);
+
+            return true;
         }
 
         private IParseTreeNode CleanUp(DataNode node)
         {
             node.Token.Node = node;
-            node.Data.Node = node;
+            if (node.Data != null) node.Data.Node = node;
 
             foreach (IdentifierToken token in node.SupportTokens)
+            {
+                token.Node = node;
+            }
+
+            foreach (IdentifierToken token in node.Arguments)
             {
                 token.Node = node;
             }

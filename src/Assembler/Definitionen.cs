@@ -95,6 +95,7 @@ namespace Yama.Assembler
             rules.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new KeyWord ( ".data", IdentifierKind.Base ) );
+            rules.Add ( new KeyWord ( ".datalist", IdentifierKind.Base ) );
             rules.Add ( new Comment ( new ZeichenKette ( "." ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), IdentifierKind.OpenBracket ) );
@@ -168,6 +169,9 @@ namespace Yama.Assembler
             definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T3LdrRegister", 0xF8C, 4, 0xe, 1));
 
             definition.Commands.Add(new T2RegisterImmediateCommand("mov", "T3Immediate", 0xF04, 4));
+
+            definition.Commands.Add(new CommandData());
+            definition.Commands.Add(new CommandDataList());
 
             return true;
         }
@@ -378,6 +382,7 @@ namespace Yama.Assembler
             definition.Commands.Add(new CommandJumpPoint("ble", "Format3", 0x32, 4, 0x1FFFF, 6));
 
             definition.Commands.Add(new CommandData());
+            definition.Commands.Add(new CommandDataList());
 
             return true;
         }

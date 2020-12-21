@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Yama.Compiler;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -107,11 +108,24 @@ namespace Yama.Index
 
         public ValidUses ParentUsesSet { get;
         set; }
+
+        public bool IsMethodsReferenceMode
+        {
+            get
+            {
+                if (this.InheritanceChilds.Count != 0) return true;
+
+                return this.InheritanceBase != null;
+            }
+        }
+
         public int GetNonStaticPropCount
         {
             get
             {
                 int count = 0;
+
+                if (this.IsMethodsReferenceMode) count += 1;
 
                 foreach (IndexPropertyDeklaration dek in this.IndexProperties)
                 {
@@ -122,7 +136,17 @@ namespace Yama.Index
             }
         }
 
-        public IndexVariabelnReference InheritanceBase { get; internal set; }
+        public IndexVariabelnReference InheritanceBase
+        {
+            get;
+            set;
+        }
+
+        public List<IndexKlassenDeklaration> InheritanceChilds
+        {
+            get;
+            set;
+        } = new List<IndexKlassenDeklaration>();
 
         private bool IsMapped
         {
@@ -130,6 +154,7 @@ namespace Yama.Index
             set;
         }
         public IndexVariabelnDeklaration BaseVar { get; private set; }
+        public CompileData DataRef { get; set; }
 
         #endregion get/set
 
@@ -162,6 +187,8 @@ namespace Yama.Index
 
             if (!(this.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return true;
 
+            dek.InheritanceChilds.Add(this);
+
             this.Methods.AddRange(dek.Methods.Where(t=>!this.Methods.Any(q=>q.Name == t.Name)));
             this.StaticMethods.AddRange(dek.StaticMethods.Where(t=>!this.StaticMethods.Any(q=>q.Name == t.Name)));
             this.Operators.AddRange(dek.Operators.Where(t=>!this.Operators.Any(q=>q.Name == t.Name)));
@@ -174,7 +201,19 @@ namespace Yama.Index
 
             deks.AddRange(this.IndexProperties.Where(t=>!dek.IndexProperties.Any(q=>q.Name == t.Name)));
 
+            List<IndexMethodDeklaration> sortMethods = new List<IndexMethodDeklaration>();
+            foreach (IndexMethodDeklaration met in dek.Methods)
+            {
+                IndexMethodDeklaration setmet = this.Methods.FirstOrDefault(q=>q.Name == met.Name);
+                if (setmet == null) setmet = met;
+
+                sortMethods.Add(setmet);
+            }
+
+            sortMethods.AddRange(this.Methods.Where(t=>!sortMethods.Any(q=>q.Name == t.Name)));
+
             this.IndexProperties = deks;
+            this.Methods = sortMethods;
 
             return true;
         }

@@ -49,6 +49,14 @@ namespace Yama.Compiler
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
+            if (mode == "point0")
+            {
+                if (query.Key.Name != "[PROPERTY]") mode = string.Empty;
+
+                query.Kategorie = mode;
+
+                return query;
+            }
 
             string printmode = mode;
             if ("vektorcall" == mode || mode == "setvektorcall") printmode = "methode";
@@ -158,6 +166,7 @@ namespace Yama.Compiler
 
             string printmode = mode;
             if ("vektorcall" == mode || mode == "setvektorcall") printmode = "methode";
+            if ("funcref" == mode) printmode = "point";
             if (node.Deklaration is IndexPropertyGetSetDeklaration) printmode = "methode";
 
             this.Algo = compiler.GetAlgo(this.AlgoName, printmode);
@@ -186,6 +195,30 @@ namespace Yama.Compiler
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys));
+            }
+
+            return true;
+        }
+
+        public bool CompilePoint0(Compiler compiler, string mode = "point")
+        {
+            compiler.AssemblerSequence.Add(this);
+
+            this.Algo = compiler.GetAlgo(this.AlgoName, mode);
+
+            this.PrimaryKeys = new Dictionary<string, string>();
+
+            foreach (AlgoKeyCall key in this.Algo.Keys)
+            {
+                DefaultRegisterQuery query = this.BuildQuery(null, key, "point0");
+
+                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+
+                foreach (KeyValuePair<string, string> pair in result)
+                {
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
+                }
             }
 
             return true;

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
+using Yama.Compiler;
 
 namespace Yama.Parser
 {
@@ -275,6 +276,16 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            CompileData compile = new CompileData();
+
+            if (this.Deklaration.IsMethodsReferenceMode)
+            {
+                this.Deklaration.DataRef = compile;
+                compile.Data = new DataObject();
+                compile.Data.Mode = DataMode.JumpPointListe;
+                compile.Compile(compiler, this, "datalist");
+            }
+
             foreach(IndexMethodDeklaration m in this.Deklaration.StaticMethods)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
@@ -292,6 +303,8 @@ namespace Yama.Parser
             foreach(IndexMethodDeklaration m in this.Deklaration.Methods)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
+
+                if (this.Deklaration.IsMethodsReferenceMode) compile.Data.JumpPoints.Add(m.AssemblyName);
 
                 m.Use.Compile(compiler, mode);
             }
