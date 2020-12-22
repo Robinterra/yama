@@ -1,0 +1,10 @@
+namespace "System"
+{
+    /**
+    * Pointer
+    */
+    public class Pointer
+    {
+        public int Value;
+    }
+}

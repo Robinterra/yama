@@ -1,0 +1,94 @@
+namespace "System.Collections"
+{
+    using "System";
+    using "System.IO";
+
+    /**
+    * Array
+    */
+    public class ByteArray
+    {
+        #region vars
+
+        private int size;
+
+        private int data;
+
+        #endregion vars
+
+        #region get/set
+
+        public int Size
+        {
+            get
+            {
+                return this.size;
+            }
+            set{}
+        }
+
+        public int Data[int index]
+        {
+            get
+            {
+                if (index > this.size) return 0;
+
+                int clean = index + this.data;
+                int bits = index & 0x3;
+                Pointer pointer = clean ^ bits;
+
+                bits = 0xff << (bits << 0x3)
+
+                return pointer.Value & bits;
+            }
+            set
+            {
+                if (index > this.size) return 0;
+
+                invalue = invalue & 0xff;
+
+                int clean = index + this.data;
+                int bits = index & 0x3;
+                Pointer pointer = clean ^ bits;
+
+                bits = bits << 0x3;
+                invalue = invalue << bits;
+                bits = 0xff << bits;
+
+                pointer.Value = bits ^ (pointer.Value | bits);
+                pointer.Value = pointer.Value | invalue;
+            }
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public static ByteArray New[int size]
+        {
+            get
+            {
+                int orgSize = size;
+                size = size + 4;
+                if (size & 0x3)
+                {
+                    size = size | 0x3;
+                    size = 4 + (size ^ 0x3);
+                }
+
+                ByteArray array = Malloc ( size );
+                array.size = orgSize;
+
+                return array;
+            }
+            set {}
+        }
+
+        public this ~()
+        {
+
+        }
+
+        #endregion ctor
+    }
+}

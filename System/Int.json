@@ -501,6 +501,28 @@
             },
             {
                 "Name": "IntArimetics",
+                "Mode": "BinaryLeftShift",
+                "Description": "BinaryLeftShift",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "lsl r12,r1,r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "BinaryRightShift",
+                "Description": "BinaryRightShift",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "asr r12,r1,r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
                 "Mode": "BinaryNegation",
                 "Description": "BinaryNegation",
                 "Keys": [

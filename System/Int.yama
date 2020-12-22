@@ -174,6 +174,36 @@ namespace "System"
 
         // -----------------------------------------------
 
+        /**
+        * Binary Xor of 2 Values
+        *
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
+        *
+        * @return (int) Result
+        */
+        copy operator int <<(int a, int b)
+        {
+            #defalgo IntArimetics,BinaryLeftShift:;
+        }
+
+        // -----------------------------------------------
+        
+        /**
+        * Binary Xor of 2 Values
+        *
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
+        *
+        * @return (int) Result
+        */
+        copy operator int >>(int a, int b)
+        {
+            #defalgo IntArimetics,BinaryRightShift:;
+        }
+
+        // -----------------------------------------------
+
         #endregion BitOperations
 
         // -----------------------------------------------

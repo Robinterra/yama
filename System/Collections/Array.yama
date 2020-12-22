@@ -1,0 +1,80 @@
+namespace "System.Collections"
+{
+    using "System";
+    using "System.IO";
+
+    /**
+    * Array
+    */
+    public class Array
+    {
+        #region vars
+
+        private int size;
+
+        private int data;
+
+        #endregion vars
+
+        #region get/set
+
+        public int Size
+        {
+            get
+            {
+                return this.size >> 2;
+            }
+            set{}
+        }
+
+        public int Data[int index]
+        {
+            get
+            {
+                index = index << 2;
+
+                if (index > this.size) return 0;
+
+                Pointer pointer = this.data + index;
+
+                return pointer.Value;
+            }
+            set
+            {
+                index = index << 2;
+
+                if (index > this.size) return 0;
+
+                Pointer pointer = this.data + index;
+
+                pointer.Value = invalue;
+            }
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public static Array New[int size]
+        {
+            get
+            {
+                int orgSize = size << 2;
+                size = orgSize + 4;
+
+                Array array = Malloc ( size );
+                array.size = orgSize;
+
+                return array;
+            }
+            set {}
+        }
+
+        public this ~()
+        {
+
+        }
+
+        #endregion ctor
+    }
+}
