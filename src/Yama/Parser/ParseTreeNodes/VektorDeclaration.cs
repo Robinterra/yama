@@ -457,7 +457,7 @@ namespace Yama.Parser
                 if (node.Name == "invalue") continue;
 
                 CompileUsePara usePara = new CompileUsePara();
-
+                usePara.Uses = this.Deklaration.GetContainer.ThisUses;
                 usePara.CompileIndexNode(compiler, node, "get");
             }
 

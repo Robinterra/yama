@@ -12,8 +12,6 @@ namespace "System.Collections"
 
         private int size;
 
-        private int data;
-
         #endregion vars
 
         #region get/set
@@ -35,7 +33,8 @@ namespace "System.Collections"
 
                 if (index > this.size) return 0;
 
-                Pointer pointer = this.data + index;
+                index = 4 + index;
+                Pointer pointer = index + this;
 
                 return pointer.Value;
             }
@@ -45,7 +44,8 @@ namespace "System.Collections"
 
                 if (index > this.size) return 0;
 
-                Pointer pointer = this.data + index;
+                index = 4 + index;
+                Pointer pointer = index + this;
 
                 pointer.Value = invalue;
             }
@@ -62,7 +62,7 @@ namespace "System.Collections"
                 int orgSize = size << 2;
                 size = orgSize + 4;
 
-                Array array = Malloc ( size );
+                Array array = MemoryManager.Malloc ( size );
                 array.size = orgSize;
 
                 return array;

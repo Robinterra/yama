@@ -12,8 +12,6 @@ namespace "System.Collections"
 
         private int size;
 
-        private int data;
-
         #endregion vars
 
         #region get/set
@@ -31,15 +29,18 @@ namespace "System.Collections"
         {
             get
             {
-                if (index > this.size) return 0;
+                if (index > this.size) return 1;
 
-                int clean = index + this.data;
-                int bits = index & 0x3;
+                int clean = 4 + index + this;
+                int bits = clean & 0x3;
                 Pointer pointer = clean ^ bits;
 
-                bits = 0xff << (bits << 0x3)
+                bits = index & 0x3;
 
-                return pointer.Value & bits;
+                clean = pointer.Value;
+                clean = clean >> (bits << 0x3);
+
+                return clean & 0xFF;
             }
             set
             {
@@ -47,8 +48,8 @@ namespace "System.Collections"
 
                 invalue = invalue & 0xff;
 
-                int clean = index + this.data;
-                int bits = index & 0x3;
+                int clean = 4 + index + this;
+                int bits = clean & 0x3;
                 Pointer pointer = clean ^ bits;
 
                 bits = bits << 0x3;
@@ -76,7 +77,7 @@ namespace "System.Collections"
                     size = 4 + (size ^ 0x3);
                 }
 
-                ByteArray array = Malloc ( size );
+                ByteArray array = MemoryManager.Malloc ( size );
                 array.size = orgSize;
 
                 return array;

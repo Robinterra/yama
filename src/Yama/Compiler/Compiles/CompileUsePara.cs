@@ -44,6 +44,7 @@ namespace Yama.Compiler
             get;
             set;
         }
+        public ValidUses Uses { get; set; }
 
         #endregion get/set
 
@@ -59,6 +60,9 @@ namespace Yama.Compiler
                 query.Uses = node.ThisUses;
                 query.Value = node.Name;
             }
+
+            if (this.Uses != null)
+                query.Uses = this.Uses;
 
             return query;
         }

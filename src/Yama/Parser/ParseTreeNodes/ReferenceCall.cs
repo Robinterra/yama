@@ -125,16 +125,32 @@ namespace Yama.Parser
                 if (mode == "setvektorcall") moderesult = "setpoint";
             }
 
+            compiler.LastVariableCall = this.Token.Text;
+
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
+            if (this.CheckAndCompileBase(compiler, compileReference, moderesult)) return true;
+
             return compileReference.Compile(compiler, this, moderesult);
+        }
+
+        private bool CheckAndCompileBase(Compiler.Compiler compiler, CompileReferenceCall compileReference, string moderesult)
+        {
+            if (compiler.LastVariableCall != "base") return false;
+            if (!(this.Reference.Deklaration is IndexVariabelnDeklaration t)) return false;
+            if (!(t.Type.Deklaration is IndexKlassenDeklaration u)) return false;
+            if (!u.IsMethodsReferenceMode) return false;
+
+
+            return compileReference.CompileDek(compiler, compiler.CurrentThis, moderesult);
         }
 
         private bool RefNameCall(Compiler.Compiler compiler, IndexMethodDeklaration dek)
         {
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
-            compileReference.CompilePoint0(compiler);
+            if (compiler.LastVariableCall != "base") compileReference.CompilePoint0(compiler);
+            else compileReference.CompileDek(compiler, compiler.CurrentBase, "default");
 
             compileReference = new CompileReferenceCall();
 

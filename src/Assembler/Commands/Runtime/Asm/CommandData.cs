@@ -37,6 +37,7 @@ namespace Yama.Assembler.Runtime
             get;
             set;
         }
+
         public int Size
         {
             get;
@@ -76,7 +77,22 @@ namespace Yama.Assembler.Runtime
 
             List<byte> daten = new List<byte>();
             byte[] data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
-            daten.AddRange(BitConverter.GetBytes(data.Length));
+
+            int orgsize = data.Length;
+
+            this.Size = data.Length + 4;
+            int temp = this.Size & 0x3;
+            if (temp > 0) this.Size = this.Size + 4;
+            this.Size = this.Size ^ temp;
+
+            for (int i = 0; i < 4 - (temp == 0 ? 4 : temp); i++)
+            {
+                t.Data.Value = t.Data.Value.ToString() + "\0";
+            }
+
+            data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
+
+            daten.AddRange(BitConverter.GetBytes(orgsize));
             daten.AddRange(data);
 
             if (request.WithMapper) request.Result.Add(new CommandData(this, request.Node, daten));
@@ -91,7 +107,12 @@ namespace Yama.Assembler.Runtime
             if (t.SupportTokens[0].Text != ".data") return false;
 
             byte[] data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
+
             this.Size = data.Length + 4;
+            int temp = this.Size & 0x3;
+            if (temp > 0) this.Size = this.Size + 4;
+            this.Size = this.Size ^ temp;
+
             request.IsData = true;
 
             return true;

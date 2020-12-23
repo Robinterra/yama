@@ -466,11 +466,9 @@ namespace Yama.Parser
                     if (node.Name != "this") continue;
                     if (this.Deklaration.Klasse.InheritanceBase == null) continue;
 
-                    CompileReferenceCall compileReference = new CompileReferenceCall();
-                    compileReference.CompileDek(compiler, node, "default");
+                    compiler.CurrentThis = node;
 
-                    compileReference = new CompileReferenceCall();
-                    compileReference.CompileDek(compiler, this.Deklaration.Klasse.BaseVar, "set");
+                    bool v = this.BaseCompile(compiler);
                 }
 
                 compiler.Definition.ParaClean();
@@ -480,6 +478,22 @@ namespace Yama.Parser
             if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(compiler, mode);
 
             return this.CompileNormalFunktion(compiler, mode);
+        }
+
+        private bool BaseCompile(Compiler.Compiler compiler)
+        {
+            if (!this.Deklaration.Klasse.IsMethodsReferenceMode) return true;
+            if (!(this.Deklaration.Klasse.BaseVar.Type.Deklaration is IndexKlassenDeklaration t)) return true;
+
+            compiler.CurrentBase = this.Deklaration.Klasse.BaseVar;
+
+            CompileReferenceCall referenceCall = new CompileReferenceCall();
+            referenceCall.CompileData(compiler, this, t.DataRef.JumpPointName);
+
+            CompileReferenceCall compileReference = new CompileReferenceCall();
+            compileReference.CompileDek(compiler, this.Deklaration.Klasse.BaseVar, "set");
+
+            return true;
         }
 
         private bool CanCompile(Compiler.Compiler compiler)

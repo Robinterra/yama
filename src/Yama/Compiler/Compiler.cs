@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Yama.Index;
 using Yama.Parser;
 
 namespace Yama.Compiler
@@ -56,6 +57,9 @@ namespace Yama.Compiler
             set;
         }
         public List<ICompileRoot> DataSequence { get; internal set; } = new List<ICompileRoot>();
+        public string LastVariableCall { get; internal set; }
+        public IndexVariabelnDeklaration CurrentThis { get; internal set; }
+        public IndexVariabelnDeklaration CurrentBase { get; internal set; }
 
         #endregion get/set
 
