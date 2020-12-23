@@ -161,6 +161,8 @@ namespace "System.IO"
 
                 MemoryManager.CleanMerge2Blocks ( currentadress );
 
+                if (#defalgo Malloc,IsBlockEnde: = currentadress) return true;
+
                 nextAdress = #defalgo Malloc,GetNextAdress: = currentadress;
 
                 if (#defalgo Malloc,IsBlockInUse: = nextAdress) continue;
