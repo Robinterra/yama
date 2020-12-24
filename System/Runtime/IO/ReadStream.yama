@@ -55,9 +55,9 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
-        public ByteArray ReadNextBytes()
+        public ByteArray ReadNextBytes(int size)
         {
-            return InputOutput.ExecWith1Arg ( 7, this.filestream_id, 6 );
+            return InputOutput.ExecWith2Args ( 7, this.filestream_id, size, 6 );
         }
 
         // -----------------------------------------------

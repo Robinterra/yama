@@ -109,13 +109,14 @@ namespace Yama.Debug
         public bool ReadStream(Runtime runtime)
         {
             int id = (int)runtime.Register[2];
+            int size = (int)runtime.Register[3];
             if (id == 0 || !this.FileStreamMapper.ContainsKey(id))
             {
                 Console.WriteLine("Can not Read from stream");
                 runtime.Register[12] = 0;
                 return true;
             }
-            byte[] daten = new byte[100];
+            byte[] daten = new byte[size];
 
             FileStream stream = this.FileStreamMapper[id];
             int result = stream.Read(daten);
