@@ -273,6 +273,9 @@ namespace Yama.Debug
 
         public uint Malloc(int size)
         {
+            int test = size & 0x3;
+            if (test != 0) size = (size ^ test) + 4;
+
             uint start = this.Register[0];
 
             uint currentadress;
