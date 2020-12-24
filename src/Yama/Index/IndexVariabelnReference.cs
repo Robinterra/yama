@@ -243,12 +243,8 @@ namespace Yama.Index
 
         public bool Mappen(ValidUses uses)
         {
-            foreach (IndexVariabelnReference t in this.VariabelnReferences)
-            {
-                t.Owner = uses.GetIndex.CurrentMethode;
-            }
-
             this.Owner = uses.GetIndex.CurrentMethode;
+
             this.ParentUsesSet = uses;
 
             this.Deklaration = this.ParentUsesSet.Deklarationen.FirstOrDefault(t=>t.Name == this.Name);
@@ -256,6 +252,16 @@ namespace Yama.Index
             if (this.Deklaration == null) return uses.GetIndex.CreateError(this.Use, string.Format("no defintion in index found {0}", this.Name));
 
             if (this.ParentCall != null) this.ParentCall.Mappen(this);
+
+            foreach (IndexVariabelnReference t in this.VariabelnReferences)
+            {
+                t.Owner = uses.GetIndex.CurrentMethode;
+                if (t.Deklaration == null) t.Deklaration = this.Deklaration.ThisUses.Deklarationen.FirstOrDefault(u=>u.Name == t.Name);
+
+                if (t.Deklaration is IndexVektorDeklaration ivdu) { ivdu.References.Add(this); continue; }
+                if (t.Deklaration is IndexPropertyGetSetDeklaration pgsdu) { pgsdu.References.Add(this); continue; }
+                if (t.Deklaration is IndexMethodDeklaration mdu) { mdu.References.Add(this); continue; }
+            }
 
             if (this.Deklaration is IndexKlassenDeklaration kd) { kd.References.Add(this); return true; }
             if (this.Deklaration is IndexMethodDeklaration md) { md.References.Add(this); return true; }

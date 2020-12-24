@@ -193,7 +193,6 @@ namespace Yama.Index
             return true;
         }
 
-        
         public bool IsInUse (int depth)
         {
             if (depth > 10) return true;

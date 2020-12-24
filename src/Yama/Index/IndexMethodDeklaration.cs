@@ -130,6 +130,8 @@ namespace Yama.Index
         {
             if (depth > 10) return true;
             if (this.Name == "main") return true;
+            if (this.Name == "Malloc") return true;
+            if (this.Name == "Free") return true;
 
             depth += 1;
 
