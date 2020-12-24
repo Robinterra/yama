@@ -256,15 +256,22 @@ namespace Yama.Debug
 
         public bool AddObjectToMemory(byte[] data, out uint adresse)
         {
-            adresse = this.Malloc(data.Length);
+            return this.AddObjectToMemory(data, out adresse, data.Length);
+        }
+
+        // -----------------------------------------------
+
+        public bool AddObjectToMemory(byte[] data, out uint adresse, int length)
+        {
+            adresse = this.Malloc(length);
             if (adresse == 0)
             {
-                this.WriteError(string.Format( "Out of Memory... Memory Size: {0:x}, Data Size: {1:x}", this.Memory.Length, data.Length));
+                this.WriteError(string.Format( "Out of Memory... Memory Size: {0:x}, Data Size: {1:x}", this.Memory.Length, length));
                 Environment.Exit(1);
                 return false;
             }
 
-            Array.Copy(data, 0, this.Memory, adresse, data.Length);
+            Array.Copy(data, 0, this.Memory, adresse, length);
 
             return true;
         }

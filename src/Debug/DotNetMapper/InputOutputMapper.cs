@@ -12,6 +12,8 @@ namespace Yama.Debug
 
         #region vars
 
+        private int filemapId;
+
         #endregion vars
 
         #region get/set
@@ -22,6 +24,12 @@ namespace Yama.Debug
         {
             get;
         } = 6;
+
+        public Dictionary<int, FileStream> FileStreamMapper
+        {
+            get;
+            set;
+        } = new Dictionary<int, FileStream>();
 
         #region methods
 
@@ -79,6 +87,79 @@ namespace Yama.Debug
             return true;
         }
 
+        public bool OpenReadStream(Runtime runtime)
+        {
+            string path = runtime.GetStringFromRegister(2);
+
+            FileStream stream = null;
+            try
+            {
+                stream = File.OpenRead(path);
+            } catch { Console.WriteLine("Can not open Read stream"); runtime.Register[12] = 0; return true; }
+
+            this.filemapId = this.filemapId + 1;
+
+            this.FileStreamMapper.Add(this.filemapId, stream);
+
+            runtime.Register[12] = (uint)this.filemapId;
+
+            return true;
+        }
+
+        public bool ReadStream(Runtime runtime)
+        {
+            int id = (int)runtime.Register[2];
+            if (id == 0 || !this.FileStreamMapper.ContainsKey(id))
+            {
+                Console.WriteLine("Can not Read from stream");
+                runtime.Register[12] = 0;
+                return true;
+            }
+            byte[] daten = new byte[100];
+
+            FileStream stream = this.FileStreamMapper[id];
+            int result = stream.Read(daten);
+
+            if (result == 0)
+            {
+                runtime.Register[12] = 0;
+
+                return true;
+            }
+
+            if (!runtime.AddObjectToMemory(daten, out uint adresse, result))
+            {
+                runtime.Register[12] = 0;
+
+                return true;
+            }
+
+            runtime.Register[12] = adresse;
+
+            return true;
+        }
+
+        public bool CloseReadStream(Runtime runtime)
+        {
+            int id = (int)runtime.Register[2];
+            if (id == 0 || !this.FileStreamMapper.ContainsKey(id))
+            {
+                Console.WriteLine("Can not Read from stream");
+                runtime.Register[12] = 0;
+                return true;
+            }
+
+            FileStream stream = this.FileStreamMapper[id];
+            stream.Close();
+            stream.Dispose();
+
+            this.FileStreamMapper.Remove(id);
+
+            runtime.Register[12] = 0xff;
+
+            return true;
+        }
+
         public bool Execute (Runtime runtime)
         {
             if (runtime.Register[1] == 1) return this.WriteData(runtime.Register[3] - 4, runtime);
@@ -86,6 +167,9 @@ namespace Yama.Debug
             if (runtime.Register[1] == 3) return this.ReadObject(runtime);
             if (runtime.Register[1] == 4) return this.ReadData(runtime);
             if (runtime.Register[1] == 5) return this.Exist(runtime);
+            if (runtime.Register[1] == 6) return this.OpenReadStream(runtime);
+            if (runtime.Register[1] == 7) return this.ReadStream(runtime);
+            if (runtime.Register[1] == 8) return this.CloseReadStream(runtime);
 
             return true;
         }
