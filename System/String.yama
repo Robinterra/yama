@@ -1,0 +1,14 @@
+namespace "System"
+{
+    /**
+    * string
+    */
+    public class string
+    {
+        #region vars
+
+        public int Length;
+
+        #endregion vars
+    }
+}

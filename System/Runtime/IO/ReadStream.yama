@@ -1,6 +1,8 @@
 namespace "System.Runtime.IO"
 {
     using "System";
+    using "System.IO";
+    using "System.Collections";
 
     public static class ReadStream
     {
@@ -15,13 +17,48 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
+        //private string filepath;
+
+        // -----------------------------------------------
+
         #endregion vars
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public this new ( string filepath )
+        {
+            //this.filepath = filepath;
+
+            this.filestream_id = InputOutput.ExecWith1Arg ( 6, filepath, 6 );
+
+            return this;
+        }
+
+        // -----------------------------------------------
+
+        public this ~ (  )
+        {
+            InputOutput.ExecWith1Arg ( 8, this.filestream_id, 6 );
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
 
         // -----------------------------------------------
 
         #region methods
 
         // -----------------------------------------------
+
+        public ByteArray ReadNextBytes()
+        {
+            return InputOutput.ExecWith1Arg ( 7, this.filestream_id, 6 );
+        }
 
         // -----------------------------------------------
 

@@ -79,7 +79,9 @@ namespace Yama.Assembler.Runtime
             foreach (Lexer.IdentifierToken token in t.Arguments)
             {
                 JumpPointMapper map = request.Assembler.GetJumpPoint(token.Text);
-                daten.AddRange(BitConverter.GetBytes(map.Adresse - 4));
+                uint target = 4;
+                if (map != null) target = map.Adresse;
+                daten.AddRange(BitConverter.GetBytes(target - 4));
             }
 
             if (request.WithMapper) request.Result.Add(new CommandDataList(this, request.Node, daten));

@@ -127,7 +127,11 @@ namespace Yama.Debug
                 return true;
             }
 
-            if (!runtime.AddObjectToMemory(daten, out uint adresse, result))
+            byte[] target = new byte[result + 4];
+            Array.Copy(daten, 0, target, 4, result);
+            Array.Copy(BitConverter.GetBytes(result), 0, target, 0, 4);
+
+            if (!runtime.AddObjectToMemory(target, out uint adresse))
             {
                 runtime.Register[12] = 0;
 
