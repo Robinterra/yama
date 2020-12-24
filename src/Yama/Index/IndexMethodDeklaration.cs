@@ -126,6 +126,21 @@ namespace Yama.Index
 
         public bool IsMapped { get; private set; }
 
+        public bool IsInUse (int depth)
+        {
+            if (depth > 10) return true;
+            if (this.Name == "main") return true;
+
+            depth += 1;
+
+            foreach (IndexVariabelnReference reference in this.References)
+            {
+                if (reference.IsOwnerInUse(depth)) return true;
+            }
+
+            return false;
+        }
+
         public IndexMethodDeklaration (  )
         {
             this.References = new List<IndexVariabelnReference>();
@@ -136,6 +151,8 @@ namespace Yama.Index
         {
             if (this.IsMapped) return false;
 
+            this.ThisUses.GetIndex.CurrentMethode = this;
+
             this.Container.Mappen(this.ThisUses);
 
             return this.IsMapped = true;
@@ -144,6 +161,8 @@ namespace Yama.Index
         public bool PreMappen(ValidUses uses)
         {
             if (this.IsMapped) return false;
+
+            uses.GetIndex.CurrentMethode = this;
 
             this.ParentUsesSet = uses;
 

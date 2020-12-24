@@ -63,6 +63,7 @@ namespace Yama.Index
             get;
             set;
         }
+        public IParent CurrentMethode { get; set; }
 
         #endregion get/set
 

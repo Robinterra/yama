@@ -385,7 +385,7 @@ namespace Yama.Parser
         {
             if (compiler.OptimizeLevel != Optimize.Level1) return true;
 
-            return this.Deklaration.References.Count != 0;
+            return this.Deklaration.IsInUse(0);
         }
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")

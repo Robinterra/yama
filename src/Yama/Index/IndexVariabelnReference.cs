@@ -25,6 +25,13 @@ namespace Yama.Index
             get;
             set;
         }
+
+        public IParent Owner
+        {
+            get;
+            set;
+        }
+
         public List<IndexVariabelnReference> VariabelnReferences
         {
             get;
@@ -43,6 +50,20 @@ namespace Yama.Index
         {
             get;
             set;
+        }
+
+        public bool IsOwnerInUse(int depth)
+        {
+            if (this.Owner == null) return false;
+
+            return this.Owner.IsInUse(depth);
+        }
+
+        public bool IsInUse (int depth)
+        {
+            if (depth > 10) return true;
+
+            return this.IsOwnerInUse(depth + 1);
         }
 
         private IndexVariabelnReference parentCall;
@@ -222,6 +243,12 @@ namespace Yama.Index
 
         public bool Mappen(ValidUses uses)
         {
+            foreach (IndexVariabelnReference t in this.VariabelnReferences)
+            {
+                t.Owner = uses.GetIndex.CurrentMethode;
+            }
+
+            this.Owner = uses.GetIndex.CurrentMethode;
             this.ParentUsesSet = uses;
 
             this.Deklaration = this.ParentUsesSet.Deklarationen.FirstOrDefault(t=>t.Name == this.Name);

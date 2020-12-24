@@ -74,6 +74,12 @@ namespace Yama.Index
             this.Containers = new List<IndexContainer>();
         }
 
+        
+        public bool IsInUse (int depth)
+        {
+            return true;
+        }
+
         public bool Mappen(ValidUses thisUses)
         {
             this.ParentUsesSet = thisUses;

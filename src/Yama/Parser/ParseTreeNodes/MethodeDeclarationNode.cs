@@ -501,7 +501,7 @@ namespace Yama.Parser
             if (compiler.OptimizeLevel != Optimize.Level1) return true;
             if (this.Deklaration.Name == "main") return true;
 
-            return this.Deklaration.References.Count != 0;
+            return this.Deklaration.IsInUse(0);
         }
 
         private bool CompileDeCtor(Compiler.Compiler compiler, string mode)

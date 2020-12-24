@@ -45,5 +45,11 @@ namespace Yama.Index
 
         }
 
+        
+        public bool IsInUse (int depth)
+        {
+            return true;
+        }
+
     }
 }

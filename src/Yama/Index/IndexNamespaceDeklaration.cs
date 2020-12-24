@@ -84,6 +84,10 @@ namespace Yama.Index
             this.EnumDeklarationen = new List<IndexEnumDeklaration>();
         }
 
+        public bool IsInUse (int depth)
+        {
+            return true;
+        }
         private bool PreviusMappen()
         {
             //this.PreviusUsingsMappen(this.Usings, this.ThisUses);

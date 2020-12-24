@@ -57,6 +57,22 @@ namespace Yama.Index
             set;
         }
 
+        
+        public bool IsInUse (int depth)
+        {
+            if (depth > 10) return true;
+            if (this.Name == "main") return true;
+
+            depth += 1;
+
+            foreach (IndexVariabelnReference reference in this.References)
+            {
+                if (reference.IsOwnerInUse(depth)) return true;
+            }
+
+            return false;
+        }
+
         #endregion get/set
 
         #region ctor

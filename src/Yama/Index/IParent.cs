@@ -28,5 +28,6 @@ namespace Yama.Index
             get;
             set;
         }
+        bool IsInUse(int depth);
     }
 }

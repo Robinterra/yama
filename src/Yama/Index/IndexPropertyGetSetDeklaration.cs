@@ -164,6 +164,7 @@ namespace Yama.Index
         public bool Mappen()
         {
             if (this.IsMapped) return false;
+            this.ThisUses.GetIndex.CurrentMethode = this;
 
             this.SetContainer.Mappen(this.SetUses);
             this.GetContainer.Mappen(this.GetUses);
@@ -175,6 +176,7 @@ namespace Yama.Index
         {
             if (this.IsMapped) return false;
 
+            uses.GetIndex.CurrentMethode = this;
             this.ParentUsesSet = uses;
 
             this.ReturnValue.Mappen(this.ParentUsesSet);
@@ -189,6 +191,22 @@ namespace Yama.Index
             }
 
             return true;
+        }
+
+        
+        public bool IsInUse (int depth)
+        {
+            if (depth > 10) return true;
+            if (this.Name == "main") return true;
+
+            depth += 1;
+
+            foreach (IndexVariabelnReference reference in this.References)
+            {
+                if (reference.IsOwnerInUse(depth)) return true;
+            }
+
+            return false;
         }
     }
 }
