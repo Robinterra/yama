@@ -6,6 +6,7 @@
     "PlaceToKeepRegisterStart": 1,
     "WorkingRegisterLast": 11,
     "PlaceToKeepRegisterLast": 11,
+    "ResultRegister":12,
     "Algos": [
       {
         "Name": "ReferenceCall",

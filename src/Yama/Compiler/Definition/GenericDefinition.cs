@@ -73,6 +73,14 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
+        public int ResultRegister
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public List<CompileAlgo> Algos
         {
             get;
@@ -159,6 +167,15 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
+        [System.Text.Json.Serialization.JsonIgnore]
+        public RegisterAllocater Allocater
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -180,6 +197,13 @@ namespace Yama.Compiler.Definition
             this.CurrentWorkingRegister = this.WorkingRegisterStart;
             this.CurrentPlaceToKeepRegister = this.PlaceToKeepRegisterLast;
             this.RegisterUses = registersUses;
+            this.Allocater = new RegisterAllocater();
+            this.Allocater.ResultRegister = new RegisterMap(this.RegisterUses[this.ResultRegister], this.ResultRegister);
+
+            for (int i = this.PlaceToKeepRegisterLast; i >= this.PlaceToKeepRegisterStart; i -= 1)
+            {
+                this.Allocater.RegisterMaps.Add(new RegisterMap(this.RegisterUses[i], i));
+            }
 
             return true;
         }
