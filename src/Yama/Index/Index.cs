@@ -177,7 +177,12 @@ namespace Yama.Index
 
                 foreach (IndexKlassenDeklaration klasse in this.Register)
                 {
-                    bool isok = klasse.Mappen(this.RootValidUses);
+                    klasse.PreviusMappen(this.RootValidUses);
+                }
+
+                foreach (IndexKlassenDeklaration klasse in this.Register)
+                {
+                    bool isok = klasse.Mappen();
 
                     if (!isok)
                     {

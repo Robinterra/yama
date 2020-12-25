@@ -322,6 +322,17 @@
             },
             {
                 "Name": "IntArimetics",
+                "Mode": "Mul",
+                "Description": "mul",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "mul r12,r0,r1"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
                 "Mode": "Incremtation",
                 "Description": "Incremtation",
                 "Keys": [
@@ -564,6 +575,17 @@
                 "PostKeys": [],
                 "AssemblyCommands": [
                     "add r12,r1,r2"
+                ]
+            },
+            {
+                "Name": "IntArimetics",
+                "Mode": "Mul",
+                "Description": "mul",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "mul r12,r1,r2"
                 ]
             },
             {

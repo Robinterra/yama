@@ -233,8 +233,10 @@ namespace Yama.Index
             return true;
         }
 
-        private bool PreviusMappen()
+        public bool PreviusMappen(ValidUses rootValidUses)
         {
+            this.ParentUsesSet = rootValidUses;
+
             this.PreviusMethodeMappen(this.Methods, this.ThisUses);
             this.PreviusMethodeMappen(this.StaticMethods, this.ParentUsesSet);
             this.PreviusMethodeMappen(this.Operators, this.ParentUsesSet);
@@ -263,15 +265,13 @@ namespace Yama.Index
             return true;
         }
 
-        public bool Mappen(ValidUses rootValidUses)
+        public bool Mappen()
         {
             if (this.IsMapped) return true;
             if (this.InheritanceBase != null)
                 if (!((IndexKlassenDeklaration)this.InheritanceBase.Deklaration).IsMapped) return false;
 
-            this.ParentUsesSet = rootValidUses;
-
-            this.PreviusMappen();
+            //this.PreviusMappen();
 
             this.MethodeMappen(this.Methods, this.ThisUses);
             this.MethodeMappen(this.StaticMethods, this.ParentUsesSet);
