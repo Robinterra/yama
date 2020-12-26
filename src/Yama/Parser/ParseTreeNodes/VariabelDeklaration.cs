@@ -168,6 +168,7 @@ namespace Yama.Parser
             {
                 IndexVariabelnReference varref = new IndexVariabelnReference();
                 varref.Deklaration = this.Deklaration;
+                varref.Use = this;
                 varref.ParentUsesSet = this.Deklaration.ParentUsesSet;
 
                 this.Compilen.Compile(compiler, varref, mode);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Yama.Index;
 using Yama.Parser;
 
@@ -40,6 +41,7 @@ namespace Yama.Compiler
             get;
             set;
         }
+        public bool DoNotCompile { get; private set; }
 
         #endregion get/set
 
@@ -161,6 +163,8 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, IndexVariabelnReference node, string mode = "default")
         {
+            if (this.CheckRelevanz(compiler, node, mode)) return true;
+
             this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
 
@@ -190,8 +194,27 @@ namespace Yama.Compiler
             return true;
         }
 
+        private bool CheckRelevanz(Compiler compiler, IndexVariabelnReference node, string mode)
+        {
+            if (mode != "default") return false;
+            if (!(node.Deklaration is IndexVariabelnDeklaration t)) return false;
+
+            ICompileRoot root = compiler.AssemblerSequence.LastOrDefault();
+            if (!(root is CompileReferenceCall u)) return false;
+            if (root.Node == null) return false;
+            if (root.Node.Token.Text != node.Name) return false;
+            if (u.Algo.Mode != "set") return false;
+
+            if (t.References.Count != 1) return true;
+            u.DoNotCompile = true;
+
+            return true;
+        }
+
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.DoNotCompile) return true;
+
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys));

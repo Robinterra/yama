@@ -16,7 +16,7 @@ namespace Yama.Compiler.Definition
             set;
         }
 
-        public bool IsUsed
+        public RegisterUseMode IsUsed
         {
             get;
             set;
@@ -38,6 +38,7 @@ namespace Yama.Compiler.Definition
     {
         Free,
         Ablage,
+        Temp,
         Used
     }
 }

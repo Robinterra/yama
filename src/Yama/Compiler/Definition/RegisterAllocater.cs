@@ -39,5 +39,28 @@ namespace Yama.Compiler.Definition
         #endregion get/set
 
         // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
+        public RegisterMap GetNextFreeOrVariableUseRegister(string variablename)
+        {
+            for (int i = this.RegisterMaps.Count - 1; i >= 0; i -= 1)
+            {
+                RegisterMap map = this.RegisterMaps[i];
+                if (map.IsUsed == RegisterUseMode.Free) return map;
+                if (map.IsUsed != RegisterUseMode.Ablage) return null;
+                if (map.VariableName == variablename) return map;
+            }
+
+            return null;
+        }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
     }
 }
