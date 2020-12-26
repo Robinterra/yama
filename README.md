@@ -158,7 +158,7 @@ avrdude -F -e -v -p m328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:"out.h
 ```
 #### Translate to Binary and Assembler
 ```console
-./YamaCompiler build skip 0x80000 ao "out.S out "./out.bin" define SAM3X8E def arm-t32 ./iftest.yama
+./YamaCompiler build skip 0x80000 ao "out.S" out "./out.bin" define SAM3X8E def arm-t32 ./iftest.yama
 ```
 ## Authors
 

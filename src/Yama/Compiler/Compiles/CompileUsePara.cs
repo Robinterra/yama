@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
@@ -82,6 +84,8 @@ namespace Yama.Compiler
 
         public bool CompileIndexNode(Compiler compiler, IndexVariabelnDeklaration node, string mode = "default")
         {
+            if (this.CheckRelevanz(compiler, node, mode)) return true;
+
             if (node != null) this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
 
@@ -102,6 +106,21 @@ namespace Yama.Compiler
                     if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
                 }
             }
+
+            return true;
+        }
+
+        private bool CheckRelevanz(Compiler compiler, IndexVariabelnDeklaration node, string mode)
+        {
+            if (mode != "get") return false;
+
+            if (node.References.Count != 0) return false;
+            if (node.Name == "this") return false;
+            if (node.Name == "base") return false;
+
+            if (!(compiler.Definition is GenericDefinition t)) return false;
+
+            t.CurrentWorkingRegister += t.AdressBytes / t.CalculationBytes;
 
             return true;
         }

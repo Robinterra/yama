@@ -496,12 +496,21 @@ namespace Yama.Parser
             return true;
         }
 
-        private bool CanCompile(Compiler.Compiler compiler)
+        public bool CanCompile(Compiler.Compiler compiler)
         {
             if (compiler.OptimizeLevel != Optimize.Level1) return true;
             if (this.Deklaration.Name == "main") return true;
 
-            return this.Deklaration.IsInUse(0);
+            bool isused = this.Deklaration.IsInUse(0);
+            if (isused) return true;
+            if (this.Deklaration.Klasse.InheritanceBase == null) return false;
+            if (!(this.Deklaration.Klasse.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return false;
+            IndexMethodDeklaration parentMethods = dek.Methods.FirstOrDefault(u=>u.Name == this.Deklaration.Name);
+            if (parentMethods == null) return false;
+            if (!(parentMethods.Use is MethodeDeclarationNode t)) return false;
+            if (t.Equals(this)) return false;
+
+            return t.CanCompile(compiler);
         }
 
         private bool CompileDeCtor(Compiler.Compiler compiler, string mode)

@@ -141,7 +141,6 @@
         ],
         "AssemblyCommands": [
           "[NAME]:",
-          "mov r11, sp",
           "push {[PUSHREG]r11}",
           "push {lr}",
           "sub sp, sp, #[VARCOUNT]"
@@ -167,7 +166,6 @@
           "add sp, sp, #[VARCOUNT]",
           "pop {lr}",
           "pop {[POPREG]r11}",
-          "mov sp, r11",
           "bx lr"
         ]
       },
@@ -223,7 +221,7 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "ldr r12,=[NUMCONST[0]]"
+          "mov r12,#[NUMCONST[0]]"
         ]
       },
       {

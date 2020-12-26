@@ -196,8 +196,9 @@ namespace Yama.Compiler
 
         private bool CheckRelevanz(Compiler compiler, IndexVariabelnReference node, string mode)
         {
-            if (mode != "default") return false;
+            if (mode != "default" && mode != "set") return false;
             if (!(node.Deklaration is IndexVariabelnDeklaration t)) return false;
+            if (mode == "set") return t.References.Count == 0;
 
             ICompileRoot root = compiler.AssemblerSequence.LastOrDefault();
             if (!(root is CompileReferenceCall u)) return false;
@@ -213,7 +214,11 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
-            if (this.DoNotCompile) return true;
+            if (this.DoNotCompile)
+            {
+                compiler.toRemove.Add(this);
+                return true;
+            }
 
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {

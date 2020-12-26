@@ -24,6 +24,8 @@ namespace Yama.Compiler
             set;
         }
 
+        public List<ICompileRoot> toRemove = new List<ICompileRoot>();
+
         public FileInfo OutputFile
         {
             get;
@@ -138,6 +140,11 @@ namespace Yama.Compiler
             foreach (ICompileRoot root in this.AssemblerSequence)
             {
                 if (!root.InFileCompilen(this)) this.AddError("Beim Schreiben der Assemblersequence ist ein Fehler aufgetreten");
+            }
+
+            foreach (ICompileRoot root in this.toRemove )
+            {
+                this.AssemblerSequence.Remove(root);
             }
 
             if (this.OutputFile != null)
