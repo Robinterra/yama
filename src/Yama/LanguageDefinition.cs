@@ -497,6 +497,7 @@ namespace Yama
             compiler.Definition = this.Definition;
             compiler.MainFunction = main;
             compiler.Defines = this.Defines;
+            compiler.Definition.Compiler = compiler;
 
             if (!compiler.Definition.LoadExtensions(this.AllFilesInUse)) return false;
 

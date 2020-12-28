@@ -679,7 +679,12 @@ namespace Yama.Compiler.Definition
 
             GenericDefinition correctDefinition = definition.FirstOrDefault ( t=>t.Name == this.Name );
 
-            if (correctDefinition == null) return this.Compiler.AddError("Keine Extensionserweiterung für diese Definition verfügbar.");
+            if (correctDefinition == null)
+            {
+                if (this.Compiler != null) return this.Compiler.AddError("Keine Extensionserweiterung für diese Definition verfügbar.");
+                else return false;
+            }
+
 
             this.KeyPatterns.AddRange(correctDefinition.KeyPatterns);
 

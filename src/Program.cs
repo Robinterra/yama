@@ -64,7 +64,7 @@ namespace Yama
 
             ICommandLine firstCommand = commands[0];
 
-            if (firstCommand is FileExpression) return Program.RunSofort ( firstCommand.Value );
+            if (firstCommand is FileExpression) return Program.RunSofort ( firstCommand.Value, commands );
             System.Console.WriteLine("Remember Yama, old friend?");
             if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
             if (firstCommand is DebugExpression) return Program.Debug ( commands, defs );
@@ -81,7 +81,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static bool RunSofort(string value)
+        private static bool RunSofort(string value, List<ICommandLine> commands)
         {
             FileInfo file = new FileInfo(value);
             if (file.Extension != ".yexe") return false;
@@ -91,6 +91,14 @@ namespace Yama
             runtime.IsDebug = false;
             runtime.MemorySize = 0x2FAF080;
             runtime.Input = file;
+
+            bool isfirst = true;
+            foreach ( ICommandLine command in commands )
+            {
+                if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+                if (command is FileExpression && !isfirst) runtime.Arguments.Add(command.Value);
+                if (command is FileExpression && isfirst) isfirst = false;
+            }
 
             return runtime.Execute();
         }
@@ -110,6 +118,7 @@ namespace Yama
             foreach ( ICommandLine command in commands )
             {
                 if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+                if (command is FileExpression) runtime.Arguments.Add(command.Value);
             }
 
             return runtime.Execute();
@@ -121,10 +130,13 @@ namespace Yama
         {
             Runtime runtime = new Runtime();
 
+            bool isfirst = true;
             foreach ( ICommandLine command in commands )
             {
                 if (command is FileExpression) runtime.Input = new FileInfo ( command.Value );
                 if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+                if (command is FileExpression && !isfirst) runtime.Arguments.Add(command.Value);
+                if (command is FileExpression && isfirst) isfirst = false;
             }
 
             if (runtime.Input == null) return false;

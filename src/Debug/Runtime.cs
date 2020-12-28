@@ -167,6 +167,14 @@ namespace Yama.Debug
 
         // -----------------------------------------------
 
+        public List<string> Arguments
+        {
+            get;
+            set;
+        } = new List<string>();
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -369,12 +377,46 @@ namespace Yama.Debug
             this.Memory = new byte[this.MemorySize];
 
             Array.Copy(File.ReadAllBytes(this.Input.FullName), this.Memory, this.Input.Length);
+            uint length = this.MakeArguments();
 
             this.Register[15] = 0;
             this.Register[13] = this.MemorySize - 4;
-            this.Register[12] = (uint)this.Input.Length;
+            this.Register[12] = length;
 
             return true;
+        }
+
+        private uint MakeArguments()
+        {
+            if (this.Arguments.Count == 0) return (uint)this.Input.Length;
+
+            uint length = (uint)this.Input.Length;
+            uint adresseArgumentsArray = length;
+            this.Register[1] = adresseArgumentsArray;
+            uint count = (uint)this.Arguments.Count;
+            uint argumentAdresse = adresseArgumentsArray + 4 + count * 4;
+            byte[] argTemp = BitConverter.GetBytes(count << 2);
+            Array.Copy(argTemp, 0, this.Memory, adresseArgumentsArray, 4);
+            foreach (string arg in this.Arguments)
+            {
+                adresseArgumentsArray += 4;
+                argTemp = BitConverter.GetBytes(argumentAdresse);
+                Array.Copy(argTemp, 0, this.Memory, adresseArgumentsArray, 4);
+
+                byte[] argDaten = Encoding.UTF8.GetBytes(arg);
+                byte[] argDatenLength = BitConverter.GetBytes(argDaten.Length);
+                Array.Copy(argDatenLength, 0, this.Memory, argumentAdresse, 4);
+                argumentAdresse += 4;
+
+                Array.Copy(argDaten, 0, this.Memory, argumentAdresse, argDaten.Length);
+
+                uint size = (uint)argDaten.Length;
+                uint test = size & 0x3;
+                if (test != 0) size = (size ^ test) + 4;
+                argumentAdresse += size;
+            }
+
+            return argumentAdresse;
         }
 
         private bool DebugEvent()
