@@ -23,7 +23,7 @@ namespace "System.Time"
             {
                 #defalgo Wait,second:;
 
-                --seconds;
+                seconds = seconds - 1;
 
                 if ( seconds ) continue;
 
