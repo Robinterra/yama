@@ -388,8 +388,6 @@ namespace Yama.Debug
 
         private uint MakeArguments()
         {
-            if (this.Arguments.Count == 0) return (uint)this.Input.Length;
-
             uint length = (uint)this.Input.Length;
             uint adresseArgumentsArray = length;
             this.Register[1] = adresseArgumentsArray;
@@ -397,6 +395,9 @@ namespace Yama.Debug
             uint argumentAdresse = adresseArgumentsArray + 4 + count * 4;
             byte[] argTemp = BitConverter.GetBytes(count << 2);
             Array.Copy(argTemp, 0, this.Memory, adresseArgumentsArray, 4);
+
+            if (this.Arguments.Count == 0) return (uint)this.Input.Length;
+
             foreach (string arg in this.Arguments)
             {
                 adresseArgumentsArray += 4;
