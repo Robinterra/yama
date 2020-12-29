@@ -106,6 +106,50 @@ namespace Yama.Debug
             return true;
         }
 
+        private bool OpenWriteStream(Runtime runtime)
+        {
+            string path = runtime.GetStringFromRegister(2);
+
+            FileStream stream = null;
+            try
+            {
+                if (File.Exists(path)) File.Delete(path);
+                stream = File.OpenWrite(path);
+            } catch { Console.WriteLine("Can not open Write stream"); runtime.Register[12] = 0; return true; }
+
+            this.filemapId = this.filemapId + 1;
+
+            this.FileStreamMapper.Add(this.filemapId, stream);
+
+            runtime.Register[12] = (uint)this.filemapId;
+
+            return true;
+        }
+
+        private bool WriteStream(Runtime runtime)
+        {
+            int id = (int)runtime.Register[2];
+            uint adresse = runtime.Register[3];
+            if (id == 0 || !this.FileStreamMapper.ContainsKey(id))
+            {
+                Console.WriteLine("Can not Write from stream");
+                runtime.Register[12] = 0;
+                return true;
+            }
+
+            uint length = BitConverter.ToUInt32(runtime.Memory, (int)adresse);
+            byte[] data = new byte[length];
+
+            Array.Copy(runtime.Memory, adresse + 4, data, 0, data.Length);
+
+            FileStream stream = this.FileStreamMapper[id];
+            stream.Write(data);
+
+            runtime.Register[12] = 1;
+
+            return true;
+        }
+
         public bool ReadStream(Runtime runtime)
         {
             int id = (int)runtime.Register[2];
@@ -175,6 +219,8 @@ namespace Yama.Debug
             if (runtime.Register[1] == 6) return this.OpenReadStream(runtime);
             if (runtime.Register[1] == 7) return this.ReadStream(runtime);
             if (runtime.Register[1] == 8) return this.CloseReadStream(runtime);
+            if (runtime.Register[1] == 9) return this.OpenWriteStream(runtime);
+            if (runtime.Register[1] == 10) return this.WriteStream(runtime);
 
             return true;
         }
