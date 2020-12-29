@@ -429,8 +429,13 @@ namespace Yama.Parser
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
                 CompileUsePara usePara = new CompileUsePara();
+                usePara.Uses = this.Deklaration.SetContainer.ThisUses;
 
-                usePara.CompileIndexNode(compiler, node, "get");
+                IParent tp = this.Deklaration.SetUses.Deklarationen.FirstOrDefault(t=>t.Name == node.Name);
+                IndexVariabelnDeklaration target = node;
+                if (tp is IndexVariabelnDeklaration u) target = u;
+
+                usePara.CompileIndexNode(compiler, target, "get");
             }
 
             compiler.Definition.ParaClean();

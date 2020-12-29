@@ -149,15 +149,22 @@ namespace Yama.Parser
         {
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
-            IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
-            container.VariabelnDeklarations.Add(reference);
-            this.TypeDefinition.Indezieren(index, parent);
-            IndexVariabelnReference type = container.VariabelnReferences.Last();
-            reference.Type = type;
+            IndexVariabelnDeklaration reference = this.Deklaration;
 
-            this.Deklaration = reference;
+            if (reference == null)
+            {
+                reference = new IndexVariabelnDeklaration();
+                reference.Use = this;
+                reference.Name = this.Token.Text;
+
+                this.TypeDefinition.Indezieren(index, parent);
+                IndexVariabelnReference type = container.VariabelnReferences.Last();
+                reference.Type = type;
+
+                this.Deklaration = reference;
+            }
+
+            container.VariabelnDeklarations.Add(reference);
 
             return true;
         }
