@@ -204,7 +204,7 @@ namespace Yama.Index
 
             dek.InheritanceChilds.Add(this);
 
-            this.Methods.AddRange(dek.Methods.Where(t=>!this.Methods.Any(q=>q.Name == t.Name)));
+            //this.Methods.AddRange(dek.Methods.Where(t=>!this.Methods.Any(q=>q.Name == t.Name)));
             this.StaticMethods.AddRange(dek.StaticMethods.Where(t=>!this.StaticMethods.Any(q=>q.Name == t.Name)));
             this.Operators.AddRange(dek.Operators.Where(t=>!this.Operators.Any(q=>q.Name == t.Name)));
             this.Ctors.AddRange(dek.Ctors.Where(t=>this.Ctors.Count == 0));

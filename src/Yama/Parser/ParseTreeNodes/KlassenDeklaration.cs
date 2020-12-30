@@ -302,9 +302,9 @@ namespace Yama.Parser
 
             foreach(IndexMethodDeklaration m in this.Deklaration.Methods)
             {
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
-
                 if (this.Deklaration.IsMethodsReferenceMode) compile.Data.JumpPoints.Add(m.AssemblyName);
+
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(compiler, mode);
             }
