@@ -128,7 +128,7 @@ namespace Yama.Index
 
         public bool IsInUse (int depth)
         {
-            if (depth > 10) return true;
+            if (depth > 20) return true;
             if (this.Name == "main") return true;
             if (this.Name == "Malloc") return true;
             if (this.Name == "Free") return true;
@@ -140,7 +140,14 @@ namespace Yama.Index
                 if (reference.IsOwnerInUse(depth)) return true;
             }
 
-            return false;
+            if (this.Klasse.InheritanceBase == null) return false;
+            if (!(this.Klasse.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return false;
+            IndexMethodDeklaration parentMethods = dek.Methods.FirstOrDefault(u=>u.Name == this.Name);
+            if (parentMethods == null) return false;
+            if (!(parentMethods.Use is MethodeDeclarationNode t)) return false;
+            if (t.Equals(this)) return false;
+
+            return t.CanCompile();
         }
 
         public IndexMethodDeklaration (  )

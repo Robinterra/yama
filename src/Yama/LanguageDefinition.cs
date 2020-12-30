@@ -499,7 +499,15 @@ namespace Yama
             compiler.Defines = this.Defines;
             compiler.Definition.Compiler = compiler;
 
-            if (!compiler.Definition.LoadExtensions(this.AllFilesInUse)) return false;
+            if (!compiler.Definition.LoadExtensions(this.AllFilesInUse))
+            {
+                foreach (CompilerError error in compiler.Errors)
+                {
+                    this.PrintSimpleError(error.Msg);
+                }
+
+                return false;
+            }
 
             if (compiler.Compilen(nodes))
             {

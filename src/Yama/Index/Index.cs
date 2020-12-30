@@ -175,6 +175,8 @@ namespace Yama.Index
             {
                 isnotallmapped = false;
 
+                if (this.Errors.Count != 0) return false;
+
                 foreach (IndexKlassenDeklaration klasse in this.Register)
                 {
                     klasse.PreviusMappen(this.RootValidUses);
@@ -190,6 +192,9 @@ namespace Yama.Index
 
                         continue;
                     }
+
+                    if (this.ZuCompilenNodes.Contains(klasse.Use)) continue;
+
                     this.ZuCompilenNodes.Add(klasse.Use);
                 }
             }

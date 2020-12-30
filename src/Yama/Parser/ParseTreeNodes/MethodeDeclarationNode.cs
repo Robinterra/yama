@@ -499,6 +499,12 @@ namespace Yama.Parser
         public bool CanCompile(Compiler.Compiler compiler)
         {
             if (compiler.OptimizeLevel != Optimize.Level1) return true;
+
+            return this.CanCompile();
+        }
+
+        public bool CanCompile()
+        {
             if (this.Deklaration.Name == "main") return true;
 
             bool isused = this.Deklaration.IsInUse(0);
@@ -510,7 +516,7 @@ namespace Yama.Parser
             if (!(parentMethods.Use is MethodeDeclarationNode t)) return false;
             if (t.Equals(this)) return false;
 
-            return t.CanCompile(compiler);
+            return t.CanCompile();
         }
 
         private bool CompileDeCtor(Compiler.Compiler compiler, string mode)
