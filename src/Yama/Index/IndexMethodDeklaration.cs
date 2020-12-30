@@ -147,7 +147,7 @@ namespace Yama.Index
             if (!(parentMethods.Use is MethodeDeclarationNode t)) return false;
             if (t.Equals(this)) return false;
 
-            return t.CanCompile();
+            return t.CanCompile(depth);
         }
 
         public IndexMethodDeklaration (  )

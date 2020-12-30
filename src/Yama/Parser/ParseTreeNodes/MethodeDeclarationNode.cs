@@ -503,11 +503,11 @@ namespace Yama.Parser
             return this.CanCompile();
         }
 
-        public bool CanCompile()
+        public bool CanCompile(int depth = 0)
         {
             if (this.Deklaration.Name == "main") return true;
 
-            bool isused = this.Deklaration.IsInUse(0);
+            bool isused = this.Deklaration.IsInUse(depth);
             if (isused) return true;
             if (this.Deklaration.Klasse.InheritanceBase == null) return false;
             if (!(this.Deklaration.Klasse.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return false;
