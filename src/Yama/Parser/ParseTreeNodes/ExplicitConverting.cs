@@ -161,7 +161,7 @@ namespace Yama.Parser
             CompileReferenceCall compileReference = new CompileReferenceCall();
             ReferenceCall call = new ReferenceCall();
             call.Token = this.ReferenceDeklaration;
-            call.Reference = new IndexVariabelnReference { Deklaration = this.Deklaration, Name = this.Deklaration.Name };
+            call.Reference = new IndexVariabelnReference { Deklaration = this.Deklaration, Name = this.Deklaration.Name, Use = this, ParentUsesSet = this.BooleascherReturn.ThisUses };
             compileReference.Compile(compiler, call, "set");
 
             compileReference = new CompileReferenceCall();
