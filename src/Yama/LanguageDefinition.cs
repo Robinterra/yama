@@ -518,7 +518,7 @@ namespace Yama
 
             foreach (CompilerError error in compiler.Errors)
             {
-                this.PrintSimpleError(error.Msg);
+                this.PrintCompilerError(error);
             }
 
             return false;
@@ -597,6 +597,17 @@ namespace Yama
         // -----------------------------------------------
 
         #region PrintErrors
+
+        // -----------------------------------------------
+
+        private bool PrintCompilerError(CompilerError error)
+        {
+            if (error.Use == null) return this.PrintSimpleError(error.Msg);
+
+            this.PrintSyntaxError(error.Use.Token, error.Msg, "Compiler error");
+
+            return false;
+        }
 
         // -----------------------------------------------
 

@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
+using Yama.Compiler;
 
 namespace Yama.Parser
 {
-    public class ExplicitConverting : IParseTreeNode, IPriority
+    public class ExplicitConverting : IParseTreeNode
     {
 
         #region get/set
 
-        public IndexMethodReference Reference
+        public IndexVariabelnReference Reference
         {
             get;
             set;
@@ -70,6 +71,7 @@ namespace Yama.Parser
             set;
         }
         public IndexVariabelnDeklaration Deklaration { get; private set; }
+        public IndexVariabelnReference EqualsReference { get; set; }
 
         #endregion get/set
 
@@ -89,13 +91,6 @@ namespace Yama.Parser
             if (token == null) return false;
 
             if (token.Kind == IdentifierKind.Word) return true;
-            if (token.Kind == IdentifierKind.Int32Bit) return true;
-            if (token.Kind == IdentifierKind.Boolean) return true;
-            if (token.Kind == IdentifierKind.Char) return true;
-            if (token.Kind == IdentifierKind.Byte) return true;
-            if (token.Kind == IdentifierKind.Int16Bit) return true;
-            if (token.Kind == IdentifierKind.Int64Bit) return true;
-            if (token.Kind == IdentifierKind.Float32Bit) return true;
 
             return false;
         }
@@ -127,15 +122,28 @@ namespace Yama.Parser
         {
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
+            this.LeftNode.Indezieren(index, parent);
+
+            IndexVariabelnReference equalsReference = new IndexVariabelnReference();
+            equalsReference.Use = this;
+            equalsReference.Name = "==";
+            this.EqualsReference = equalsReference;
+            IndexVariabelnReference varref = new IndexVariabelnReference();
+            varref.ParentCall = equalsReference;
+            varref.VariabelnReferences.Add(equalsReference);
+            varref.Use = this;
+            varref.Name = "int";
+            container.VariabelnReferences.Add(varref);
+
             IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration();
             reference.Use = this;
             reference.Name = this.ReferenceDeklaration.Text;
             container.VariabelnDeklarations.Add(reference);
             IndexVariabelnReference type = new IndexVariabelnReference { Name = this.RightToken.Text, Use = this };
             reference.Type = type;
-
             container.VariabelnReferences.Add(type);
-            this.BooleascherReturn = new IndexVariabelnReference { Name = "Bool", Use = this };
+
+            this.BooleascherReturn = new IndexVariabelnReference { Name = "bool", Use = this };
             container.VariabelnReferences.Add(this.BooleascherReturn);
 
             this.Deklaration = reference;
@@ -145,7 +153,42 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            return true;
+            if (!(this.Deklaration.Type.Deklaration is IndexKlassenDeklaration t)) return false;
+            if (t.InheritanceBase == null && t.InheritanceChilds.Count == 0) return compiler.AddError("The Is Keyword works only with inheritance.", this);
+
+            this.LeftNode.Compile(compiler, mode);
+
+            CompileReferenceCall compileReference = new CompileReferenceCall();
+            ReferenceCall call = new ReferenceCall();
+            call.Token = this.ReferenceDeklaration;
+            call.Reference = new IndexVariabelnReference { Deklaration = this.Deklaration, Name = this.Deklaration.Name };
+            compileReference.Compile(compiler, call, "set");
+
+            compileReference = new CompileReferenceCall();
+            compileReference.CompilePoint0(compiler);
+
+            CompileMovResult movResultRight = new CompileMovResult();
+            movResultRight.Compile(compiler, null, "default");
+
+            CompileReferenceCall referenceCall = new CompileReferenceCall();
+            referenceCall.CompileData(compiler, this, t.DataRef.JumpPointName);
+
+            movResultRight = new CompileMovResult();
+            movResultRight.Compile(compiler, null, "default");
+
+            CompileReferenceCall operatorCall = new CompileReferenceCall();
+            operatorCall.Compile(compiler, this.EqualsReference, "methode");
+
+            CompileUsePara usePara = new CompileUsePara();
+            usePara.Compile(compiler);
+
+            usePara = new CompileUsePara();
+            usePara.Compile(compiler);
+
+            CompileExecuteCall functionExecute = new CompileExecuteCall();
+            functionExecute.Compile(compiler, null, mode);
+
+            return compiler.Definition.ParaClean();
         }
 
         #endregion methods

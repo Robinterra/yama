@@ -162,7 +162,7 @@ namespace Yama.Parser
             reference.Use = this;
             reference.Name = this.Token.Text;
             this.ChildNode.Indezieren(index, parent);
-            IndexVariabelnReference varref = container.VariabelnReferences.Last();
+            IndexVariabelnReference varref = container.VariabelnReferences.LastOrDefault();
 
             this.VariabelReference = reference;
             //container.VariabelnReferences.Add(reference);
