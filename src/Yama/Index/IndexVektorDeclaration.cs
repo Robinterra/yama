@@ -152,7 +152,7 @@ namespace Yama.Index
         public bool IsMapped
         {
             get;
-            private set;
+            set;
         }
 
         public IndexVektorDeklaration (  )

@@ -68,8 +68,17 @@ namespace Yama.Index
             set;
         }
 
-        public ValidUses ParentUsesSet { get;
-        set; }
+        public ValidUses ParentUsesSet
+        {
+            get;
+            set;
+        }
+
+        public bool IsMapped
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
@@ -88,10 +97,9 @@ namespace Yama.Index
         {
             return true;
         }
-        private bool PreviusMappen()
-        {
-            //this.PreviusUsingsMappen(this.Usings, this.ThisUses);
 
+        public bool PreMappen(ValidUses uses)
+        {
             return true;
         }
 

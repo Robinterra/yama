@@ -52,6 +52,12 @@ namespace Yama.Index
             set;
         }
 
+        public bool IsMapped
+        {
+            get;
+            set;
+        }
+
         public bool IsOwnerInUse(int depth)
         {
             if (this.Owner == null) return false;
@@ -239,6 +245,11 @@ namespace Yama.Index
             if (md != null) { md.References.Add(this); return md; }
 
             return null;
+        }
+
+        public bool PreMappen(ValidUses uses)
+        {
+            return true;
         }
 
         public bool Mappen(ValidUses uses)

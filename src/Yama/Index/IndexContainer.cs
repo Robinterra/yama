@@ -53,14 +53,23 @@ namespace Yama.Index
             }
         }
 
-        public ValidUses ParentUsesSet { get;
-        set; }
+        public ValidUses ParentUsesSet
+        {
+            get;
+            set;
+        }
         public string Name
         {
             get;
             set;
         }
         public IParseTreeNode Use
+        {
+            get;
+            set;
+        }
+
+        public bool IsMapped
         {
             get;
             set;
@@ -76,6 +85,11 @@ namespace Yama.Index
 
         
         public bool IsInUse (int depth)
+        {
+            return true;
+        }
+
+        public bool PreMappen(ValidUses uses)
         {
             return true;
         }

@@ -124,7 +124,11 @@ namespace Yama.Index
             }
         }
 
-        public bool IsMapped { get; private set; }
+        public bool IsMapped
+        {
+            get;
+            set;
+        }
 
         public bool IsInUse (int depth)
         {

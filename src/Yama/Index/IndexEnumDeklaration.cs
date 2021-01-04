@@ -48,10 +48,13 @@ namespace Yama.Index
             }
         }
 
-        public ValidUses ParentUsesSet { get;
-        set; }
+        public ValidUses ParentUsesSet
+        {
+            get;
+            set;
+        }
 
-        private bool IsMapped
+        public bool IsMapped
         {
             get;
             set;
@@ -86,6 +89,11 @@ namespace Yama.Index
         #endregion ctor
 
         #region methods
+
+        public bool PreMappen(ValidUses uses)
+        {
+            return true;
+        }
 
         #endregion methods
     }

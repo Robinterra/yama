@@ -103,7 +103,11 @@ namespace Yama.Index
         public ValidUses ParentUsesSet { get;
         set; }
         public IndexKlassenDeklaration Klasse { get; set; }
-        public bool IsMapped { get; private set; }
+        public bool IsMapped
+        {
+            get;
+            set;
+        }
 
         public IndexPropertyDeklaration (  )
         {

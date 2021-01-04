@@ -366,7 +366,8 @@ namespace Yama.Parser
 
         private bool AddMethode(IndexKlassenDeklaration klasse, IndexVektorDeklaration deklaration)
         {
-            klasse.VektorDeclaration.Add(deklaration);
+            if (deklaration.Type == MethodeType.VektorStatic) klasse.StaticMethods.Add(deklaration);
+            else klasse.Methods.Add(deklaration);
 
             return true;
         }
