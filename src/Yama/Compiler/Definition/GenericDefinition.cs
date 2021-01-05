@@ -275,13 +275,13 @@ namespace Yama.Compiler.Definition
 
             int counter = 0;
 
-            if (!(query.Value is IndexMethodDeklaration dek)) return null;
+            if (!(query.Value is IMethode dek)) return null;
 
-            foreach (IParent a in dek.Klasse.Methods)
+            foreach (IMethode a in dek.Klasse.Methods)
             {
-                if (!(a is IndexMethodDeklaration vardek)) continue;
-
-                counter++;
+                if (a is IndexMethodDeklaration vardek) counter++;
+                if (a is IndexVektorDeklaration vekdek) counter += 2;
+                if (a is IndexPropertyGetSetDeklaration getsetdek) counter += 2;
 
                 if (a.Name != dek.Name) continue;
 

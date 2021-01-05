@@ -110,7 +110,7 @@ namespace Yama.Parser
             if (mode == "set") moderesult = mode;
             if (mode == "point") moderesult = mode;
             if (mode == "setpoint") moderesult = mode;
-            if (this.Reference.Deklaration is IndexMethodDeklaration dek)
+            if (this.Reference.Deklaration is IMethode dek)
             {
                 if (dek.Klasse.IsMethodsReferenceMode && dek.Klasse.Methods.Contains(dek)) return this.RefNameCall(compiler, dek);
                 moderesult = "methode";
@@ -145,7 +145,7 @@ namespace Yama.Parser
             return compileReference.CompileDek(compiler, compiler.CurrentThis, moderesult);
         }
 
-        private bool RefNameCall(Compiler.Compiler compiler, IndexMethodDeklaration dek)
+        private bool RefNameCall(Compiler.Compiler compiler, IMethode dek)
         {
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
