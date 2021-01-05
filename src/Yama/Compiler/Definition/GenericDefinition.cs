@@ -239,6 +239,7 @@ namespace Yama.Compiler.Definition
 
             if (query.Key.Name == "[VAR]") return this.VarQuery(query);
             if (query.Kategorie == "funcref") return this.FuncRef(query);
+            if (query.Kategorie == "setref") return this.FuncRef(query);
             if (query.Kategorie == "point0") return this.Point0(query);
             if (query.Key.Name == "[REG]") return this.RegisterQuery(query);
             if (query.Key.Name == "[NAME]") return this.NameQuery(query);
@@ -267,6 +268,7 @@ namespace Yama.Compiler.Definition
         private Dictionary<string, string> FuncRef(IRegisterQuery query)
         {
             string keypattern = "[PROPERTY[{0}]]";
+            bool isset = query.Kategorie == "setref";
             GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
             if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
             Dictionary<string,string> result = new Dictionary<string,string>();
@@ -274,18 +276,22 @@ namespace Yama.Compiler.Definition
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
             int counter = 0;
+            int count = 0;
 
             if (!(query.Value is IMethode dek)) return null;
 
             foreach (IMethode a in dek.Klasse.Methods)
             {
-                if (a is IndexMethodDeklaration vardek) counter++;
-                if (a is IndexVektorDeklaration vekdek) counter += 2;
-                if (a is IndexPropertyGetSetDeklaration getsetdek) counter += 2;
+                if (a is IndexMethodDeklaration vardek) count = 1;
+                if (a is IndexVektorDeklaration vekdek) count = 2;
+                if (a is IndexPropertyGetSetDeklaration getsetdek) count = 2;
+
+                counter += count;
 
                 if (a.Name != dek.Name) continue;
+                if (isset) count = 1;
 
-                counter = counter - 1;
+                counter = counter - count;
                 counter = counter * bytes;
 
                 for (int i = 0; i < duration; i++ )
