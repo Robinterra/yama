@@ -28,6 +28,14 @@ namespace Yama.Index
             get;
             set;
         }
+
+        bool IsMapped
+        {
+            get;
+            set;
+        }
         bool IsInUse(int depth);
+
+        bool PreMappen(ValidUses uses);
     }
 }

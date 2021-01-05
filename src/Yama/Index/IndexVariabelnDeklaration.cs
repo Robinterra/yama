@@ -39,6 +39,12 @@ namespace Yama.Index
             }
         }
 
+        public bool IsMapped
+        {
+            get;
+            set;
+        }
+
         public ValidUses ParentUsesSet { get; set; }
         public ValidUses BaseUsesSet { get; internal set; }
 
@@ -49,6 +55,7 @@ namespace Yama.Index
             this.References = new List<IndexVariabelnReference>();
             
         }
+        public bool PreMappen(ValidUses uses){return true;}
 
         public bool Mappen(ValidUses uses)
         {

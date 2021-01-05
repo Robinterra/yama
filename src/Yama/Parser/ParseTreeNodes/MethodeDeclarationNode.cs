@@ -511,7 +511,7 @@ namespace Yama.Parser
             if (isused) return true;
             if (this.Deklaration.Klasse.InheritanceBase == null) return false;
             if (!(this.Deklaration.Klasse.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return false;
-            IndexMethodDeklaration parentMethods = dek.Methods.FirstOrDefault(u=>u.Name == this.Deklaration.Name);
+            IMethode parentMethods = dek.Methods.FirstOrDefault(u=>u.Name == this.Deklaration.Name);
             if (parentMethods == null) return false;
             if (!(parentMethods.Use is MethodeDeclarationNode t)) return false;
             if (t.Equals(this)) return false;

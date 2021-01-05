@@ -71,6 +71,12 @@ namespace Yama.Index
             return false;
         }
 
+        public bool IsMapped
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -83,6 +89,11 @@ namespace Yama.Index
         #endregion ctor
 
         #region methods
+
+        public bool PreMappen(ValidUses uses)
+        {
+            return true;
+        }
 
         #endregion methods
     }

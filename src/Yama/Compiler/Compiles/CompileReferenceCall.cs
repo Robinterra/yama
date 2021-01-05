@@ -63,6 +63,8 @@ namespace Yama.Compiler
             string printmode = mode;
             if ("vektorcall" == mode || mode == "setvektorcall") printmode = "methode";
             if (node.Deklaration is IndexPropertyGetSetDeklaration) printmode = "methode";
+            if (mode == "funcref") printmode = mode;
+            if (mode == "setref") printmode = mode;
 
             query.Kategorie = printmode;
             query.Uses = node.ThisUses;
@@ -170,8 +172,9 @@ namespace Yama.Compiler
 
             string printmode = mode;
             if ("vektorcall" == mode || mode == "setvektorcall") printmode = "methode";
-            if ("funcref" == mode) printmode = "point";
             if (node.Deklaration is IndexPropertyGetSetDeklaration) printmode = "methode";
+            if ("funcref" == mode) printmode = "point";
+            if ("setref" == mode) printmode = "point";
 
             this.Algo = compiler.GetAlgo(this.AlgoName, printmode);
             if (this.Algo == null) return false;

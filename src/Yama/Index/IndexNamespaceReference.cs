@@ -40,12 +40,18 @@ namespace Yama.Index
             set;
         }
 
+        public bool IsMapped
+        {
+            get;
+            set;
+        }
+
         public IndexNamespaceReference (  )
         {
 
         }
 
-        
+        public bool PreMappen(ValidUses uses) {return true;}
         public bool IsInUse (int depth)
         {
             return true;

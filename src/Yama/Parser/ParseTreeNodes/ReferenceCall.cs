@@ -110,9 +110,9 @@ namespace Yama.Parser
             if (mode == "set") moderesult = mode;
             if (mode == "point") moderesult = mode;
             if (mode == "setpoint") moderesult = mode;
-            if (this.Reference.Deklaration is IndexMethodDeklaration dek)
+            if (this.Reference.Deklaration is IMethode dek)
             {
-                if (dek.Klasse.IsMethodsReferenceMode && dek.Klasse.Methods.Contains(dek)) return this.RefNameCall(compiler, dek);
+                if (dek.Klasse.IsMethodsReferenceMode && dek.Klasse.Methods.Contains(dek)) return this.RefNameCall(compiler, dek, mode);
                 moderesult = "methode";
             }
             if (this.Reference.Deklaration is IndexEnumEntryDeklaration ed) return this.CompileEnumEntry(compiler, ed);
@@ -145,7 +145,7 @@ namespace Yama.Parser
             return compileReference.CompileDek(compiler, compiler.CurrentThis, moderesult);
         }
 
-        private bool RefNameCall(Compiler.Compiler compiler, IndexMethodDeklaration dek)
+        private bool RefNameCall(Compiler.Compiler compiler, IMethode dek, string mode)
         {
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
@@ -154,7 +154,12 @@ namespace Yama.Parser
 
             compileReference = new CompileReferenceCall();
 
-            return compileReference.Compile(compiler, this, "funcref");
+            string resultMode = "funcref";
+            if (mode == "setvektorcall") resultMode = "setref";
+            if (mode == "set") resultMode = "setref";
+            if (mode == "setpoint") resultMode = "setref";
+
+            return compileReference.Compile(compiler, this, resultMode);
         }
 
         private bool CompileEnumEntry(Compiler.Compiler compiler, IndexEnumEntryDeklaration dek)

@@ -366,7 +366,8 @@ namespace Yama.Parser
 
         private bool AddMethode(IndexKlassenDeklaration klasse, IndexVektorDeklaration deklaration)
         {
-            klasse.VektorDeclaration.Add(deklaration);
+            if (deklaration.Type == MethodeType.VektorStatic) klasse.StaticMethods.Add(deklaration);
+            else klasse.Methods.Add(deklaration);
 
             return true;
         }
@@ -410,7 +411,23 @@ namespace Yama.Parser
         {
             if (compiler.OptimizeLevel != Optimize.Level1) return true;
 
-            return this.Deklaration.IsInUse(0);
+            return this.CanCompile();
+        }
+
+        public bool CanCompile(int depth = 0)
+        {
+            if (this.Deklaration.Name == "main") return true;
+
+            bool isused = this.Deklaration.IsInUse(depth);
+            if (isused) return true;
+            if (this.Deklaration.Klasse.InheritanceBase == null) return false;
+            if (!(this.Deklaration.Klasse.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return false;
+            IMethode parentMethods = dek.Methods.FirstOrDefault(u=>u.Name == this.Deklaration.Name);
+            if (parentMethods == null) return false;
+            if (!(parentMethods.Use is VektorDeclaration t)) return false;
+            if (t.Equals(this)) return false;
+
+            return t.CanCompile();
         }
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")

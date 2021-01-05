@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
 using Yama.Compiler;
+using System;
 
 namespace Yama.Parser
 {
@@ -286,7 +287,7 @@ namespace Yama.Parser
                 compile.Compile(compiler, this, "datalist");
             }
 
-            foreach(IndexMethodDeklaration m in this.Deklaration.StaticMethods)
+            foreach(IMethode m in this.Deklaration.StaticMethods)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
@@ -300,9 +301,9 @@ namespace Yama.Parser
                 m.Use.Compile(compiler, mode);
             }
 
-            foreach(IndexMethodDeklaration m in this.Deklaration.Methods)
+            foreach(IMethode m in this.Deklaration.Methods)
             {
-                if (this.Deklaration.IsMethodsReferenceMode) compile.Data.JumpPoints.Add(m.AssemblyName);
+                if (this.Deklaration.IsMethodsReferenceMode) this.AddAssemblyName(compile, m);
 
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
@@ -330,18 +331,21 @@ namespace Yama.Parser
                 m.Use.Compile(compiler, mode);
             }
 
-            foreach(IndexVektorDeklaration m in this.Deklaration.VektorDeclaration)
-            {
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
+            return true;
+        }
 
-                m.Use.Compile(compiler, mode);
+        private bool AddAssemblyName(CompileData compile, IMethode m)
+        {
+            if (m is IndexMethodDeklaration md) compile.Data.JumpPoints.Add(md.AssemblyName);
+            if (m is IndexPropertyGetSetDeklaration pgsd)
+            {
+                compile.Data.JumpPoints.Add(pgsd.AssemblyNameGetMethode);
+                compile.Data.JumpPoints.Add(pgsd.AssemblyNameSetMethode);
             }
-
-            foreach(IndexPropertyGetSetDeklaration m in this.Deklaration.PropertyGetSetDeclaration)
+            if (m is IndexVektorDeklaration vd)
             {
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
-
-                m.Use.Compile(compiler, mode);
+                compile.Data.JumpPoints.Add(vd.AssemblyNameGetMethode);
+                compile.Data.JumpPoints.Add(vd.AssemblyNameSetMethode);
             }
 
             return true;
