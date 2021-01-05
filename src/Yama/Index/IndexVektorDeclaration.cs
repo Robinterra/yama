@@ -6,7 +6,7 @@ using Yama.Parser;
 
 namespace Yama.Index
 {
-    public class IndexVektorDeklaration : IParent
+    public class IndexVektorDeklaration : IParent, IMethode
     {
 
         public IParseTreeNode Use

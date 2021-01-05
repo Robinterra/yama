@@ -330,20 +330,6 @@ namespace Yama.Parser
                 m.Use.Compile(compiler, mode);
             }
 
-            foreach(IndexVektorDeklaration m in this.Deklaration.VektorDeclaration)
-            {
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
-
-                m.Use.Compile(compiler, mode);
-            }
-
-            foreach(IndexPropertyGetSetDeklaration m in this.Deklaration.PropertyGetSetDeclaration)
-            {
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
-
-                m.Use.Compile(compiler, mode);
-            }
-
             return true;
         }
 

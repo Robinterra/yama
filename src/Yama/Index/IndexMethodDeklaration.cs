@@ -6,7 +6,7 @@ using Yama.Parser;
 
 namespace Yama.Index
 {
-    public class IndexMethodDeklaration : IParent
+    public class IndexMethodDeklaration : IParent, IMethode
     {
 
         public IParseTreeNode Use
@@ -146,7 +146,7 @@ namespace Yama.Index
 
             if (this.Klasse.InheritanceBase == null) return false;
             if (!(this.Klasse.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return false;
-            IndexMethodDeklaration parentMethods = dek.Methods.FirstOrDefault(u=>u.Name == this.Name);
+            IMethode parentMethods = dek.Methods.FirstOrDefault(u=>u.Name == this.Name);
             if (parentMethods == null) return false;
             if (!(parentMethods.Use is MethodeDeclarationNode t)) return false;
             if (t.Equals(this)) return false;

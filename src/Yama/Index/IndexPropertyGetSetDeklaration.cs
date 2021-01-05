@@ -6,7 +6,7 @@ using Yama.Parser;
 
 namespace Yama.Index
 {
-    public class IndexPropertyGetSetDeklaration : IParent
+    public class IndexPropertyGetSetDeklaration : IParent, IMethode
     {
 
         public IParseTreeNode Use
