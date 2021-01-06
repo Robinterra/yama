@@ -62,20 +62,20 @@ namespace Yama.Compiler
 
             string printmode = mode;
             if ("vektorcall" == mode || mode == "setvektorcall") printmode = "methode";
-            if (node.Deklaration is IndexPropertyGetSetDeklaration) printmode = "methode";
+            if (node != null) if (node.Deklaration is IndexPropertyGetSetDeklaration) printmode = "methode";
             if (mode == "funcref") printmode = mode;
             if (mode == "setref") printmode = mode;
 
             query.Kategorie = printmode;
-            query.Uses = node.ThisUses;
+            if (node != null) query.Uses = node.ThisUses;
 
-            string assemblyName = node.AssemblyName;
-            if (node.Deklaration is IndexVektorDeklaration dek)
+            string assemblyName = node == null ? string.Empty : node.AssemblyName;
+            if (node != null) if (node.Deklaration is IndexVektorDeklaration dek)
             {
                 if ("vektorcall" == mode) assemblyName = dek.AssemblyNameGetMethode;
                 if (mode == "setvektorcall") assemblyName = dek.AssemblyNameSetMethode;
             }
-            if (node.Deklaration is IndexPropertyGetSetDeklaration pdek)
+            if (node != null) if (node.Deklaration is IndexPropertyGetSetDeklaration pdek)
             {
                 if ("point" == mode) assemblyName = pdek.AssemblyNameGetMethode;
                 if (mode == "setpoint") assemblyName = pdek.AssemblyNameSetMethode;
@@ -83,7 +83,7 @@ namespace Yama.Compiler
 
             object queryValue = assemblyName;
             if ("[REG]" == key.Name) queryValue = 1;
-            if ("[PROPERTY]" == key.Name) queryValue = node.Deklaration;
+            if (node != null) if ("[PROPERTY]" == key.Name) queryValue = node.Deklaration;
             //if ("setpoint" == mode) queryValue = node.Deklaration;
 
             query.Value = queryValue;
@@ -106,15 +106,21 @@ namespace Yama.Compiler
             if (this.Algo == null) return false;
 
             this.PrimaryKeys = new Dictionary<string, string>();
+            this.PrimaryKeys.Add("[NAME]", adressPorint);
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                Dictionary<string, string> result = new Dictionary<string, string>();
-                result.Add("[NAME]", adressPorint);
+                if (key.Name == "[NAME]") continue;
+
+                DefaultRegisterQuery query = this.BuildQuery(null, key, "default");
+
+                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
-                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value ))
+                        return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
                 }
             }
 
