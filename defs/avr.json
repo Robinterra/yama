@@ -413,6 +413,44 @@
       "AssemblyCommands": [
         "[NAME]:"
       ]
+    },
+    {
+      "Name": "Data",
+      "Mode": "default",
+      "Description": "Datensatz",
+      "Keys": [
+        {
+          "Name": "[NAME]",
+          "Values": null
+        },
+        {
+          "Name": "[DATA]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        ".data [NAME]=[DATA]"
+      ]
+    },
+    {
+      "Name": "Data",
+      "Mode": "datalist",
+      "Description": "Datensatz",
+      "Keys": [
+        {
+          "Name": "[NAME]",
+          "Values": null
+        },
+        {
+          "Name": "[DATA]",
+          "Values": null
+        }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+        ".datalist [NAME]={[DATA]}"
+      ]
     }
   ],
   "ZuweisungsRegister": 0,

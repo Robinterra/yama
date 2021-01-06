@@ -467,6 +467,7 @@ namespace Yama
 
             string def = this.Definition.Name;
             if (this.Defines.Contains("runtime")) def = "runtime";
+            if (def == "avr") return true;
 
             Assembler.Assembler assembler = new Assembler.Assembler();
             Assembler.Definitionen definitionen = new Assembler.Definitionen();
