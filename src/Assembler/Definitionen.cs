@@ -160,9 +160,9 @@ namespace Yama.Assembler
 
             definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T2LdrSp", 0x13, 2, 0x7, 4, true));
             definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T1InputOutputSmall", 0xD, 2, 0x7, 4));
-            definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T3LdrRegister", 0xF8D, 4, 0xe, 1));
-            definition.Commands.Add(new T2LdrConstCommand("ldr", "T3LdrRegister", 0xF85, 9));
-            definition.Commands.Add(new T2LdrJumpCommand("ldr", "T3LdrRegister", 0xF85, 9));
+            definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T3LdrRegister", 0xF8D, 4, 0xf, 1));
+            definition.Commands.Add(new T2LdrConstCommand("ldr", "T3LdrRegister", 0xF8D, 10));
+            definition.Commands.Add(new T2LdrJumpCommand("ldr", "T3LdrRegister", 0xF8D, 10));
 
             definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T2LdrSp", 0x12, 2, 0x7, 4, true));
             definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T1InputOutputSmall", 0xC, 2, 0x7, 4));

@@ -262,12 +262,22 @@
           {
             "Name": "[RAMENDE]",
             "Values": null
+          },
+          {
+            "Name": "[RCC]",
+            "Values": null
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
           ".syntax unified",
           ".thumb",
+          "ldr r0,=[RCC]",
+          "ldr r2, [r0]",
+          "mov r1, #0xf",
+          "lsl r1, r1, #0x10",
+          "orr r1,r1,r2"
+          "str r1,[r0]",
           "ldr sp,=[RAMENDE]",
           "ldr r10,=[RAMBEGIN]",
           "ldr r11,=0x1",
@@ -362,6 +372,13 @@
         ]
       },
       {
+        "Key": "[RCC]",
+        "Value": "0x40021014",
+        "Defines": [
+          "STM32F401"
+        ]
+      },
+      {
         "Key": "[RAMENDE]",
         "Value": "0x2000FFFF",
         "Defines": [
@@ -373,6 +390,27 @@
         "Value": "0x20000000",
         "Defines": [
           "STM32F401"
+        ]
+      },
+      {
+        "Key": "[RCC]",
+        "Value": "0x40021000",
+        "Defines": [
+          "STM32F303"
+        ]
+      },
+      {
+        "Key": "[RAMENDE]",
+        "Value": "0x20009FFF",
+        "Defines": [
+          "STM32F303"
+        ]
+      },
+      {
+        "Key": "[RAMBEGIN]",
+        "Value": "0x20000000",
+        "Defines": [
+          "STM32F303"
         ]
       }
     ],

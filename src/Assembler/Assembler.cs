@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Yama.Assembler.ARMT32;
 using Yama.Compiler;
+using Yama.Lexer;
 using Yama.Parser;
 
 namespace Yama.Assembler
@@ -107,7 +108,7 @@ namespace Yama.Assembler
 
             ParserLayer startlayer = this.Parser.ParserLayers.FirstOrDefault(t=>t.Name == "main");
 
-            if (!this.Parse(startlayer, request)) return this.PrintErrors();
+            if (!this.Parse(startlayer, request)) return this.PrintParserErrors();
 
             if (request.IsSkipper) this.Skipper();
 
@@ -201,6 +202,19 @@ namespace Yama.Assembler
             foreach (IParseTreeNode node in this.Errors)
             {
                 this.Parser.PrintSyntaxError(node.Token, "Assembler error", "Assembler error");
+            }
+
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        
+        private bool PrintParserErrors()
+        {
+            foreach (IParseTreeNode node in this.Parser.ParserErrors)
+            {
+                this.Parser.PrintSyntaxError(node.Token, "Parser error", "Assembler error");
             }
 
             return false;
