@@ -88,16 +88,19 @@ namespace Yama.Assembler.ARMT32
             IFormat branch = request.Assembler.GetFormat("T2BranchImmediate");
             IFormat constFormat = request.Assembler.GetFormat("Const");
 
+            uint valuePosition = (request.Position & 0x3) == 0 ? (uint)2 : 4;
+            uint valueSkip = request.Assembler.BuildJumpSkipper(request.Position + 4, request.Position + 4 + 2 + 4, 2);
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
             assembleFormat.Arguments.Add(0xF);
-            assembleFormat.Arguments.Add(0x2);
+            assembleFormat.Arguments.Add(valuePosition);
 
             RequestAssembleFormat assembleFormatBranch = new RequestAssembleFormat();
             assembleFormatBranch.Command = 0x1C;
             assembleFormatBranch.Result = assembleFormat.Result;
-            assembleFormatBranch.Arguments.Add(0x1);
+            assembleFormatBranch.Arguments.Add(valueSkip);
 
             RequestAssembleFormat assembleFormatConst = new RequestAssembleFormat();
             assembleFormatConst.Command = map.Adresse;

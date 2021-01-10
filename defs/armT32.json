@@ -276,7 +276,7 @@
           "ldr r2, [r0]",
           "mov r1, #0xf",
           "lsl r1, r1, #0x10",
-          "orr r1,r1,r2"
+          "orr r1,r1,r2",
           "str r1,[r0]",
           "ldr sp,=[RAMENDE]",
           "ldr r10,=[RAMBEGIN]",

@@ -20,11 +20,11 @@ namespace Yama.Assembler.ARMT32
             uint firstFragment = ( request.Command << 4 ) & 0xFFF0;
             firstFragment |= 0x000F;
 
-            uint secondFragment = ( request.Arguments[0] << 8 ) & 0x0F00;
+            uint secondFragment = ( request.Arguments[1] << 8 ) & 0x0F00;
             secondFragment |= request.Arguments[0] << 4;
-            secondFragment |= ( request.Arguments[1] ) & 0x000F;
-            secondFragment |= ( request.Arguments[2] << 10 ) & 0x7000;
-            secondFragment |= ( request.Arguments[2] << 6 ) & 0x00C0;
+            secondFragment |= ( request.Arguments[2] ) & 0x000F;
+            secondFragment |= ( request.Arguments[3] << 10 ) & 0x7000;
+            secondFragment |= ( request.Arguments[3] << 6 ) & 0x00C0;
 
             byte[] tmp = BitConverter.GetBytes ( firstFragment );
             request.Result.Add ( tmp[0] );

@@ -529,7 +529,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "asr r12,r1,r2"
+                "lsr r12,r1,r2"
                 ]
             },
             {
