@@ -116,7 +116,8 @@
         "Keys": [],
         "PostKeys": [],
         "AssemblyCommands": [
-          "blx r12"
+          "mov r11, pc",
+          "mov pc, r12"
         ]
       },
       {
@@ -141,8 +142,7 @@
         ],
         "AssemblyCommands": [
           "[NAME]:",
-          "push {[PUSHREG]r11}",
-          "push {lr}",
+          "push {r0,[PUSHREG]r11}",
           "sub sp, sp, #[VARCOUNT]"
         ]
       },
@@ -164,9 +164,8 @@
         ],
         "AssemblyCommands": [
           "add sp, sp, #[VARCOUNT]",
-          "pop {lr}",
-          "pop {[POPREG]r11}",
-          "bx lr"
+          "pop {r0,[POPREG]r11}",
+          "mov pc,r11"
         ]
       },
       {
@@ -247,7 +246,7 @@
         "Keys": [ ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "bx lr"
+          "mov pc,r11"
         ]
       },
       {
@@ -380,7 +379,7 @@
       },
       {
         "Key": "[RAMENDE]",
-        "Value": "0x2000FFFF",
+        "Value": "0x2000FFF8",
         "Defines": [
           "STM32F401"
         ]
@@ -394,14 +393,14 @@
       },
       {
         "Key": "[RCC]",
-        "Value": "0x40021000",
+        "Value": "0x40021014",
         "Defines": [
           "STM32F303"
         ]
       },
       {
         "Key": "[RAMENDE]",
-        "Value": "0x20009FFF",
+        "Value": "0x20009FF8",
         "Defines": [
           "STM32F303"
         ]

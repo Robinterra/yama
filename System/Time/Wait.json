@@ -104,6 +104,7 @@
                     "ldr r12, =0x2625A0",
                     "[JUMPTO[0]]:",
                     "sub r12, r12, #1",
+                    "cmp r12, #0",
                     "bne [JUMPTO[0]]"
                 ]
             },
