@@ -26,6 +26,8 @@ namespace Yama.Assembler
             layer.ParserMembers.Add(new JumpPointMarker());
             layer.ParserMembers.Add(new CommandWithList());
             layer.ParserMembers.Add(new DataNode());
+            layer.ParserMembers.Add(new WordNode());
+            layer.ParserMembers.Add(new SpaceNode());
             layer.ParserMembers.Add(new CommandWith3ArgsNode(argumentLayer));
             layer.ParserMembers.Add(new CommandWith2ArgsNode(argumentLayer));
             layer.ParserMembers.Add(new CommandWith1ArgNode(argumentLayer));
@@ -96,6 +98,8 @@ namespace Yama.Assembler
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new KeyWord ( ".data", IdentifierKind.Base ) );
             rules.Add ( new KeyWord ( ".datalist", IdentifierKind.Base ) );
+            rules.Add ( new KeyWord ( ".word", IdentifierKind.Base ) );
+            rules.Add ( new KeyWord ( ".space", IdentifierKind.Base ) );
             rules.Add ( new Comment ( new ZeichenKette ( "." ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new Digit (  ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "(" ), IdentifierKind.OpenBracket ) );
@@ -171,6 +175,8 @@ namespace Yama.Assembler
             definition.Commands.Add(new T2RegisterImmediateCommand("mov", "T3Immediate", 0xF04, 4));
 
             definition.Commands.Add(new CommandData());
+            definition.Commands.Add(new CommandWord());
+            definition.Commands.Add(new CommandSpace());
             definition.Commands.Add(new CommandDataList());
 
             return true;

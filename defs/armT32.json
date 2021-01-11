@@ -271,6 +271,9 @@
         "AssemblyCommands": [
           ".syntax unified",
           ".thumb",
+          ".word [RAMENDE]",
+          ".word 0x80000ed",
+          ".space 0xe4",
           "ldr r0,=[RCC]",
           "ldr r2, [r0]",
           "mov r1, #0xf",
