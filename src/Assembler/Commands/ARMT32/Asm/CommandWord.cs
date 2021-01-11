@@ -79,7 +79,7 @@ namespace Yama.Assembler.ARMT32
 
             this.Size = 4;
 
-            byte[] data = BitConverter.GetBytes((uint)t.Data.Value);
+            byte[] data = BitConverter.GetBytes(Convert.ToUInt32(t.Data.Value));
 
             daten.AddRange(data);
 

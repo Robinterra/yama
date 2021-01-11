@@ -76,7 +76,7 @@ namespace Yama.Assembler.ARMT32
             if (!(request.Node is SpaceNode t)) return false;
 
             List<byte> daten = new List<byte>();
-            this.Size = (int)t.Data.Value;
+            this.Size = Convert.ToInt32(t.Data.Value);
 
             byte[] data = new byte[this.Size];
             daten.AddRange(data);
@@ -91,7 +91,7 @@ namespace Yama.Assembler.ARMT32
         {
             if (!(request.Node is SpaceNode t)) return false;
 
-            this.Size = (int)t.Data.Value;
+            this.Size = Convert.ToInt32(t.Data.Value);
 
             return true;
         }

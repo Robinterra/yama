@@ -47,11 +47,10 @@ namespace Yama.Assembler.ARMT32
 
             SpaceNode node = new SpaceNode();
             node.SupportTokens.Add(token);
+            node.Token = token;
 
             token = parser.Peek(token, 1);
             if (token == null) return null;
-
-            token = parser.Peek(token, 1);
             if (token.Kind != IdentifierKind.NumberToken) return null;
 
             node.Data = token;
@@ -65,11 +64,6 @@ namespace Yama.Assembler.ARMT32
             if (node.Data != null) node.Data.Node = node;
 
             foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            foreach (IdentifierToken token in node.Arguments)
             {
                 token.Node = node;
             }
