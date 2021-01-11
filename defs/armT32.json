@@ -265,6 +265,10 @@
           {
             "Name": "[RCC]",
             "Values": null
+          },
+          {
+            "Name": "[RCC_SKIP]",
+            "Values": null
           }
         ],
         "PostKeys": [],
@@ -274,7 +278,7 @@
           "ldr r0,=[RCC]",
           "ldr r2, [r0]",
           "mov r1, #0xf",
-          "lsl r1, r1, #0x10",
+          "lsl r1, r1, #[RCC_SKIP]",
           "orr r1,r1,r2",
           "str r1,[r0]",
           "ldr sp,=[RAMENDE]",
@@ -371,13 +375,6 @@
         ]
       },
       {
-        "Key": "[RCC]",
-        "Value": "0x40021014",
-        "Defines": [
-          "STM32F401"
-        ]
-      },
-      {
         "Key": "[RAMENDE]",
         "Value": "0x2000FFF8",
         "Defines": [
@@ -393,7 +390,28 @@
       },
       {
         "Key": "[RCC]",
+        "Value": "0x40023830",
+        "Defines": [
+          "STM32F401"
+        ]
+      },
+      {
+        "Key": "[RCC_SKIP]",
+        "Value": "0x0",
+        "Defines": [
+          "STM32F401"
+        ]
+      },
+      {
+        "Key": "[RCC]",
         "Value": "0x40021014",
+        "Defines": [
+          "STM32F303"
+        ]
+      },
+      {
+        "Key": "[RCC_SKIP]",
+        "Value": "0x10",
         "Defines": [
           "STM32F303"
         ]
