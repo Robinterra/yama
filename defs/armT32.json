@@ -269,13 +269,17 @@
           {
             "Name": "[RCC_SKIP]",
             "Values": null
+          },
+          {
+            "Name":"[SPBEGIN]",
+            "Values": null
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
           ".syntax unified",
           ".thumb",
-          ".word [RAMENDE]",
+          ".word [SPBEGIN]",
           ".word 0x80000ed",
           ".space 0xe4",
           "ldr r0,=[RCC]",
@@ -284,10 +288,10 @@
           "lsl r1, r1, #[RCC_SKIP]",
           "orr r1,r1,r2",
           "str r1,[r0]",
-          "ldr sp,=[RAMENDE]",
+          "ldr r12,=[RAMENDE]",
           "ldr r10,=[RAMBEGIN]",
           "ldr r11,=0x1",
-          "sub r12,sp,r10",
+          "sub r12,r12,r10",
           "str r11,[r10,#0]",
           "str r12,[r10,#4]",
           "b main"
@@ -371,6 +375,13 @@
         ]
       },
       {
+        "Key": "[SPBEGIN]",
+        "Value": "0x20087D00",
+        "Defines": [
+          "SAM3X8E"
+        ]
+      },
+      {
         "Key": "[RAMBEGIN]",
         "Value": "0x20000000",
         "Defines": [
@@ -379,6 +390,13 @@
       },
       {
         "Key": "[RAMENDE]",
+        "Value": "0x2000FFF8",
+        "Defines": [
+          "STM32F401"
+        ]
+      },
+      {
+        "Key": "[SPBEGIN]",
         "Value": "0x2000FFF8",
         "Defines": [
           "STM32F401"
@@ -421,6 +439,13 @@
       },
       {
         "Key": "[RAMENDE]",
+        "Value": "0x20009FF8",
+        "Defines": [
+          "STM32F303"
+        ]
+      },
+      {
+        "Key": "[SPBEGIN]",
         "Value": "0x20009FF8",
         "Defines": [
           "STM32F303"
