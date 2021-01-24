@@ -53,7 +53,7 @@ namespace Yama.Assembler.ARMT32
 
             token = parser.Peek(token, 1);
 
-            if (token.Kind == IdentifierKind.Word) return null;
+            if (token.Kind != IdentifierKind.Word) return null;
 
             deklaration.Token = token;
 

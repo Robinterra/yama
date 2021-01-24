@@ -43,6 +43,7 @@ namespace Yama.Assembler
 
             //layer.ParserMembers.Add(new BedingtesAssemblen());
             layer.ParserMembers.Add(new ArgumentNode());
+            layer.ParserMembers.Add(new PointerNode());
             layer.ParserMembers.Add(new SquareArgumentNode());
 
             return layer;
@@ -71,6 +72,8 @@ namespace Yama.Assembler
 
             return p;
         }
+
+        // -----------------------------------------------
 
         #endregion ParserDefinition
 
@@ -163,6 +166,8 @@ namespace Yama.Assembler
             definition.Commands.Add(new T3ImmediateCommand("eor", "T3Immediate", 0xF08, 4));
             definition.Commands.Add(new T3ImmediateCommand("orr", "T3Immediate", 0xF04, 4));
 
+            definition.Commands.Add(new T2LdrPointerCommand("ldr", "T1InputOutputSmall", 0xD, 2, 0x7, 4));
+            definition.Commands.Add(new T2LdrPointerCommand("ldr", "T3LdrRegister", 0xF8D, 4, 0xf, 1));
             definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T2LdrSp", 0x13, 2, 0x7, 4, true));
             definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T1InputOutputSmall", 0xD, 2, 0x7, 4));
             definition.Commands.Add(new T2LdrArrayRegisterCommand("ldr", "T3LdrRegister", 0xF8D, 4, 0xf, 1));
