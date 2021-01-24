@@ -79,7 +79,9 @@ namespace Yama.Assembler.ARMT32
 
             this.Size = 4;
 
-            byte[] data = BitConverter.GetBytes(Convert.ToUInt32(t.Data.Value));
+            uint datenValue = this.GetDatenValue(request, t);
+
+            byte[] data = BitConverter.GetBytes(datenValue);
 
             daten.AddRange(data);
 
@@ -87,6 +89,19 @@ namespace Yama.Assembler.ARMT32
             request.Stream.Write(daten.ToArray());
 
             return true;
+        }
+
+        private uint GetDatenValue(RequestAssembleCommand request, WordNode t)
+        {
+            if (t.Data.Kind == Lexer.IdentifierKind.NumberToken) return Convert.ToUInt32(t.Data.Value);
+            if (t.Data.Kind != Lexer.IdentifierKind.Word) return 0;
+
+            JumpPointMapper map = request.Assembler.GetJumpPoint(t.Data.Value.ToString());
+            if (map != null) return map.Adresse;
+
+            request.Assembler.Errors.Add(request.Node);
+
+            return 0;
         }
 
         public bool Identify(RequestIdentify request)

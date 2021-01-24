@@ -82,7 +82,7 @@ namespace Yama.Assembler.ARMT32
             if (deklaration.Argument0 == null) return null;
             token = ((IContainer)deklaration.Argument0).Ende;
 
-            token = parser.Peek(token ,1);
+            token = parser.Peek(token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Comma) return null;
             deklaration.SupportTokens.Add(token);

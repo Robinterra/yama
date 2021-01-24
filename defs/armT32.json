@@ -275,8 +275,10 @@
             "Values": null
           },
           {
-            "Name":"[PCBEGIN]",
-            "Values":null
+            "Name": "[JUMPTO]",
+            "Values": [
+            "1"
+            ]
           }
         ],
         "PostKeys": [],
@@ -284,8 +286,9 @@
           ".syntax unified",
           ".thumb",
           ".word [SPBEGIN]",
-          ".word [PCBEGIN]",
+          ".word [JUMPTO[0]]",
           ".space 0xe4",
+          "[JUMPTO[0]]:",
           "ldr r0,=[RCC]",
           "ldr r2, [r0]",
           "mov r1, #0xf",
@@ -407,13 +410,6 @@
         ]
       },
       {
-        "Key": "[PCBEGIN]",
-        "Value": "0x000800ed",
-        "Defines": [
-          "SAM3X8E"
-        ]
-      },
-      {
         "Key": "[RAMENDE]",
         "Value": "0x2000FFF8",
         "Defines": [
@@ -449,13 +445,6 @@
         ]
       },
       {
-        "Key": "[PCBEGIN]",
-        "Value": "0x80000ed",
-        "Defines": [
-          "STM32F401"
-        ]
-      },
-      {
         "Key": "[RCC]",
         "Value": "0x40021014",
         "Defines": [
@@ -486,13 +475,6 @@
       {
         "Key": "[RAMBEGIN]",
         "Value": "0x20000000",
-        "Defines": [
-          "STM32F303"
-        ]
-      },
-      {
-        "Key": "[PCBEGIN]",
-        "Value": "0x80000ed",
         "Defines": [
           "STM32F303"
         ]
