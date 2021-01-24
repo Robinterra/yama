@@ -51,9 +51,10 @@ namespace Yama.Assembler.ARMT32
 
             token = parser.Peek(token, 1);
             if (token == null) return null;
-            if (token.Kind != IdentifierKind.NumberToken) return null;
+            if (token.Kind == IdentifierKind.NumberToken) node.Data = token;
+            if (token.Kind == IdentifierKind.Word) node.Data = token;
 
-            node.Data = token;
+            if (node.Data == null) return null;
 
             return this.CleanUp(node);
         }

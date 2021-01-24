@@ -192,7 +192,12 @@ namespace Yama.Assembler
 
         public JumpPointMapper GetJumpPoint(string key)
         {
-            return this.Mapper.FirstOrDefault(t=>t.Key == key);
+            JumpPointMapper map = this.Mapper.FirstOrDefault(t=>t.Key == key);
+            if (map == null) return null;
+
+            if (map.Key == "__start") map.Adresse = map.Adresse | 0x1;
+
+            return map;
         }
 
         // -----------------------------------------------

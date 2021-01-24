@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Yama.Compiler
@@ -25,5 +26,9 @@ namespace Yama.Compiler
             set;
         } = new Stack<CompileContainer>();
 
+        public string AddDataCall(string jumpPoint, Compiler compiler)
+        {
+            return this.CurrentContainer.AddDataCall(jumpPoint, compiler);
+        }
     }
 }

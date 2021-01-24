@@ -80,7 +80,8 @@ namespace Yama.Assembler.ARMT32
 
             parser.VorherigesLayer();
             if (deklaration.Argument0 == null) return null;
-            token = ((IContainer)deklaration.Argument0).Ende;
+            if (!(deklaration.Argument0 is IContainer ic)) return null;
+            token = ic.Ende;
 
             token = parser.Peek(token, 1);
             if (token == null) return null;

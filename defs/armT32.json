@@ -151,6 +151,10 @@
         "Mode": "default",
         "Description": "Das ende einer Funktion",
         "Keys": [
+          {
+            "Name": "[DATACONTAINER]",
+            "Values": null
+          }
         ],
         "PostKeys": [
           {
@@ -165,7 +169,8 @@
         "AssemblyCommands": [
           "add sp, sp, #[VARCOUNT]",
           "pop {r0,[POPREG]r11}",
-          "mov pc,r11"
+          "mov pc,r11",
+          "[DATACONTAINER]"
         ]
       },
       {
@@ -273,12 +278,6 @@
           {
             "Name":"[SPBEGIN]",
             "Values": null
-          },
-          {
-            "Name": "[JUMPTO]",
-            "Values": [
-            "1"
-            ]
           }
         ],
         "PostKeys": [],
@@ -286,22 +285,25 @@
           ".syntax unified",
           ".thumb",
           ".word [SPBEGIN]",
-          ".word [JUMPTO[0]]",
+          ".word __start",
           ".space 0xe4",
-          "[JUMPTO[0]]:",
-          "ldr r0,=[RCC]",
+          "__start:",
+          "ldr r0,*RCC",
           "ldr r2, [r0]",
           "mov r1, #0xf",
           "lsl r1, r1, #[RCC_SKIP]",
           "orr r1,r1,r2",
           "str r1,[r0]",
-          "ldr r12,=[RAMENDE]",
-          "ldr r10,=[RAMBEGIN]",
-          "ldr r11,=0x1",
+          "ldr r12,*RAMENDE",
+          "ldr r10,*RAMBEGIN",
+          "mov r11,#0x1",
           "sub r12,r12,r10",
           "str r11,[r10,#0]",
           "str r12,[r10,#4]",
-          "b main"
+          "b main",
+          "RCC: .word [RCC]",
+          "RAMENDE: .word [RAMENDE]",
+          "RAMBEGIN: .word [RAMBEGIN]"
         ]
       },
       {
@@ -317,6 +319,44 @@
         "PostKeys": [],
         "AssemblyCommands": [
           "b [JUMPTO]"
+        ]
+      },
+      {
+        "Name": "wordMarker",
+        "Mode": "default",
+        "Description": "Zum Setzen von word data am ende einer methods",
+        "Keys": [
+          {
+            "Name": "[JUMPTO]",
+            "Values": null
+          },
+          {
+            "Name": "[DATA]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "[JUMPTO]: .word [DATA]"
+        ]
+      },
+      {
+        "Name": "Data",
+        "Mode": "datalist",
+        "Description": "Datensatz",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          },
+          {
+            "Name": "[DATA]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          ".datalist [NAME]={[DATA]}"
         ]
       },
       {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Yama.Index;
 using System.IO;
 using System.Text.Json;
+using System.Text;
 
 namespace Yama.Compiler.Definition
 {
@@ -248,9 +249,54 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[NUMCONST]") return this.MethodeNumConst(query);
             if (query.Key.Name == "[JUMPTO]") return this.JumpToQuery(query);
             if (query.Key.Name == "[PROPERTY]") return this.PropertyQuery(query);
+            if (query.Key.Name == "[NAMEDATACALL]") return this.NameCallQuery(query);
+            if (query.Key.Name == "[DATACONTAINER]") return this.DataContainerQuery(query);
 
             return this.MakeAdvanedKeyReplaces(query);
         }
+
+        // -----------------------------------------------
+
+        private Dictionary<string, string> DataContainerQuery(IRegisterQuery query)
+        {
+            List<DataHold> dataHolds = this.Compiler.CurrentContainer.CurrentContainer.DataHolds;
+
+            StringBuilder builder = new StringBuilder();
+
+            CompileAlgo algo = this.Compiler.GetAlgo("wordMarker", "default");
+            if (algo == null) return null;
+
+            bool isfirst = true;
+
+            foreach (DataHold dataHold in dataHolds)
+            {
+                if (!isfirst) builder.AppendLine();
+
+                string cmd = algo.AssemblyCommands.FirstOrDefault();
+
+                cmd = cmd.Replace("[JUMPTO]", dataHold.JumpPoint);
+                cmd = cmd.Replace("[DATA]", dataHold.DatenValue);
+
+                builder.Append(cmd);
+
+                isfirst = false;
+            }
+
+            return new Dictionary<string, string> { { query.Key.Name, builder.ToString() }};
+        }
+
+        // -----------------------------------------------
+
+        private Dictionary<string, string> NameCallQuery(IRegisterQuery query)
+        {
+            Index.Index index = query.Uses.GetIndex;
+
+            string pointer = this.Compiler.CurrentContainer.AddDataCall(query.Value.ToString(), this.Compiler);
+
+            return new Dictionary<string, string> { { query.Key.Name, pointer }};
+        }
+
+        // -----------------------------------------------
 
         private Dictionary<string, string> Point0(IRegisterQuery query)
         {

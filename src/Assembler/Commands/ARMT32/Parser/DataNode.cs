@@ -54,6 +54,7 @@ namespace Yama.Assembler.ARMT32
             node.Token = token;
             token = parser.Peek(token, 1);
 
+            if (token == null) return null;
             if (token.Kind != IdentifierKind.Gleich) return null;
             node.SupportTokens.Add(token);
 

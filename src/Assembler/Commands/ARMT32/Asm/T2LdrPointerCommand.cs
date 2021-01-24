@@ -86,6 +86,7 @@ namespace Yama.Assembler.ARMT32
             if (request.Assembler.GetRegister(t.Argument0.Token.Text) > this.MaxRegister) return false;
             JumpPointMapper map = request.Assembler.GetJumpPoint(s.Token.Value.ToString());
 
+            if (map == null) return false;
             uint target = request.Assembler.BuildJumpSkipper(request.Position, map.Adresse, (uint)this.Size, true);
             if ((request.Position & 0x3) != 0 && target == 2) target = 4;
 
@@ -95,8 +96,6 @@ namespace Yama.Assembler.ARMT32
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
             assembleFormat.Arguments.Add(request.Assembler.GetRegister("pc"));
             assembleFormat.Arguments.Add(target);
-
-            
 
             if (!format.Assemble(assembleFormat))
                 return false;

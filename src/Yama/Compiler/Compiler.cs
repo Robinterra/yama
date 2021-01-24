@@ -185,7 +185,11 @@ namespace Yama.Compiler
 
         public bool PopContainer()
         {
-            this.CurrentContainer.ContainerStack.Pop();
+            CompileContainer container = this.CurrentContainer.ContainerStack.Pop();
+
+            if (this.CurrentContainer.CurrentContainer == null) return true;
+
+            this.CurrentContainer.CurrentContainer.DataHolds.AddRange(container.DataHolds);
 
             return true;
         }
