@@ -149,7 +149,7 @@ namespace Yama.Parser
 
             this.ElseStatement.Compile(compiler, mode);
 
-            afterIfStatement.Compile(compiler, this, mode);
+            afterElseStatement.Compile(compiler, this, mode);
 
             return true;
         }
