@@ -389,10 +389,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
+                "mov r12, #0xff",
                 "cmp r0,r1",
-                "ldr r12, =0xff",
                 "beq [JUMPTO[0]]",
-                "ldr r12, =0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -410,10 +410,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
+                "mov r12, #0xff",
                 "cmp r0,r1",
-                "ldr r12, =0xff",
                 "bne [JUMPTO[0]]",
-                "ldr r12, =0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -431,10 +431,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
+                "mov r12, #0xff",
                 "cmp r0,r1",
-                "ldr r12, =0xff",
                 "blt [JUMPTO[0]]",
-                "ldr r12, =0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -452,10 +452,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
+                "mov r12, #0xff",
                 "cmp r0,r1",
-                "ldr r12, =0xff",
                 "ble [JUMPTO[0]]",
-                "ldr r12, =0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -473,10 +473,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
+                "mov r12, #0xff",
                 "cmp r0,r1",
-                "ldr r12, =0xff",
                 "bgt [JUMPTO[0]]",
-                "ldr r12, =0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -494,10 +494,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
+                "mov r12, #0xff",
                 "cmp r0,r1",
-                "ldr r12, =0xff",
                 "bge [JUMPTO[0]]",
-                "ldr r12, =0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:"
                 ]
             }
