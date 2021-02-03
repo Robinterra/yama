@@ -118,8 +118,9 @@ namespace Yama.Assembler.ARMT32
             deklaration.Argument2 = parser.ParseCleanToken(token);
 
             parser.VorherigesLayer();
-            if (deklaration.Argument2 == null) return null;
-            token = ((IContainer)deklaration.Argument2).Ende;
+            if (!(deklaration.Argument2 is IContainer ic)) return null;
+
+            token = ic.Ende;
 
             return this.CleanUp(deklaration);
         }

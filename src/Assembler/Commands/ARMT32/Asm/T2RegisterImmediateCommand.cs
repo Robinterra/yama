@@ -47,16 +47,23 @@ namespace Yama.Assembler.ARMT32
             set;
         }
 
+        public int Max
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public T2RegisterImmediateCommand(string key, string format, uint id, int size)
+        public T2RegisterImmediateCommand(string key, string format, uint id, int size, int max)
         {
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
+            this.Max = max;
         }
 
         public T2RegisterImmediateCommand(T2RegisterImmediateCommand t, IParseTreeNode node, List<byte> bytes)
@@ -100,6 +107,7 @@ namespace Yama.Assembler.ARMT32
             if (!(request.Node is CommandWith2ArgsNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
+            if (Convert.ToInt32(t.Argument1.Token.Value) > this.Max) return false;
 
             return true;
         }

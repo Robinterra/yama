@@ -162,7 +162,7 @@ namespace Yama.Assembler
             definition.Commands.Add(new T3ImmediateCommand ("sbc", "T3Immediate", 0xF16, 4));
             //definition.Commands.Add(new T3ImmediateCommand ("mul", "T3Immediate", 0xFB0, 4));
             definition.Commands.Add(new T3ImmediateCommand ("and", "T3Immediate", 0xF00, 4));
-            definition.Commands.Add(new T2RegisterImmediateCommand("cmp", "T3Immediate", 0xF1B, 4));
+            definition.Commands.Add(new T2RegisterImmediateCommand("cmp", "T3Immediate", 0xF1B, 4, 0x7ff));
             definition.Commands.Add(new T3ImmediateCommand("eor", "T3Immediate", 0xF08, 4));
             definition.Commands.Add(new T3ImmediateCommand("orr", "T3Immediate", 0xF04, 4));
 
@@ -177,7 +177,8 @@ namespace Yama.Assembler
             definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T1InputOutputSmall", 0xC, 2, 0x7, 4));
             definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T3LdrRegister", 0xF8C, 4, 0xe, 1));
 
-            definition.Commands.Add(new T2RegisterImmediateCommand("mov", "T3Immediate", 0xF04, 4));
+            definition.Commands.Add(new T2RegisterImmediateCommand("mov", "T3Immediate", 0xF04, 4, 0x7ff));
+            definition.Commands.Add(new T2LdrConstCommand("mov", "T3LdrRegister", 0xF8D, 10));
 
             definition.Commands.Add(new CommandData());
             definition.Commands.Add(new CommandWord());
