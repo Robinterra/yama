@@ -20,6 +20,17 @@ namespace Yama.Compiler
             set;
         }
 
+        bool IsUsed
+        {
+            get;
+        }
+
+        CompileAlgo Algo
+        {
+            get;
+            set;
+        }
+
         bool InFileCompilen(Compiler compiler);
     }
 

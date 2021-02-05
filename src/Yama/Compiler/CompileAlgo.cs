@@ -22,6 +22,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public bool CanBeDominatet
+        {
+            get;
+            set;
+        }
+
         public List<AlgoKeyCall> Keys
         {
             get;
