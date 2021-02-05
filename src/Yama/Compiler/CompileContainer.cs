@@ -26,6 +26,18 @@ namespace Yama.Compiler
             set;
         } = new List<DataHold>();
 
+        public List<SSACompileLine> Lines
+        {
+            get;
+            set;
+        } = new List<SSACompileLine>();
+
+        public Dictionary<string, SSAVariableMap> VarMapper
+        {
+            get;
+            set;
+        } = new Dictionary<string, SSAVariableMap>();
+
         public string AddDataCall(string jumpPoint, Compiler compiler)
         {
             DataHold dataHold = new DataHold();

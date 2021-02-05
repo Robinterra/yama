@@ -66,6 +66,8 @@ namespace Yama.Compiler
 
         bool BeginNewMethode(List<string> registersUses);
 
+        int GetNextFreeRegister();
+
         string PostKeyReplace(IRegisterQuery key);
 
         Dictionary<string,string> KeyMapping(IRegisterQuery query);
@@ -73,6 +75,7 @@ namespace Yama.Compiler
         bool ParaClean();
         string GenerateJumpPointName();
         bool LoadExtensions(List<FileInfo> allFilesinUse);
+        string GetRegister(int reg);
 
         #endregion methods
 

@@ -12,13 +12,7 @@ namespace Yama.Compiler
             set;
         }
 
-        public int VarConst
-        {
-            get;
-            set;
-        }
-
-        public string Order
+        public SSAVariableMap Variable
         {
             get;
             set;
@@ -29,39 +23,30 @@ namespace Yama.Compiler
             get;
             set;
         }
-        public ICompileRoot Root { get; internal set; }
+
+        public ICompileRoot Root
+        {
+            get;
+            set;
+        }
 
         public SSACompileArgument()
         {
-            
+
         }
 
         public SSACompileArgument(SSACompileLine line)
         {
-            this.Position = line;
-            this.Mode = SSACompileArgumentMode.Position;
-            this.Root = line.Compile;
-        }
-
-        public string GetText(Compiler compiler)
-        {
-            if (this.Mode == SSACompileArgumentMode.Position)
-            {
-                SSACompileLine line = compiler.GetLine(this.Position);
-
-                return string.Format("({0})", line.Line);
-            }
-            if (this.Mode == SSACompileArgumentMode.Order) return this.Order;
-
-            return string.Format("#{0}", this.VarConst);
+            this.Reference = line;
+            this.Mode = SSACompileArgumentMode.Reference;
+            this.Root = line.Owner;
         }
     }
 
     public enum SSACompileArgumentMode
     {
         None,
-        Const,
-        Reference,
-        Order
+        Variable,
+        Reference
     }
 }

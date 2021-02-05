@@ -69,10 +69,10 @@ namespace Yama.Compiler
             if (this.Algo == null) return false;
 
             if (this.Point == PointMode.Custom) this.Punkt = node;
-            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.CurrentContainer.CurrentContainer.Begin;
-            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.CurrentContainer.CurrentContainer.Ende;
-            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.CurrentContainer.RootContainer.Begin;
-            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.CurrentContainer.RootContainer.Ende;
+            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Begin;
+            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Ende;
+            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer.Begin;
+            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 

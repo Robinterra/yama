@@ -444,11 +444,10 @@ namespace Yama.Parser
             if (this.AccessDefinition != null)
                 if (this.AccessDefinition.Kind == IdentifierKind.Copy) return true;
 
-            compiler.Definition.BeginNewMethode(this.RegisterInUse);
-
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
-            compiler.SetNewContainer(this.CompileContainer);
+
+            compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, this.Deklaration.ThisUses);
 
             if (this.AccessDefinition != null)
                 if (this.AccessDefinition.Kind == IdentifierKind.Simple) mode = "simple";

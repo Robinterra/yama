@@ -193,6 +193,21 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
+        public int GetNextFreeRegister()
+        {
+            int result = this.CurrentPlaceToKeepRegister;
+
+            if (result < this.PlaceToKeepRegisterStart) return -1;
+
+            int bytes = this.AdressBytes / this.CalculationBytes;
+
+            this.CurrentPlaceToKeepRegister -= bytes;
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         public bool BeginNewMethode(List<string> registersUses)
         {
             this.CurrentWorkingRegister = this.WorkingRegisterStart;
@@ -259,7 +274,7 @@ namespace Yama.Compiler.Definition
 
         private Dictionary<string, string> DataContainerQuery(IRegisterQuery query)
         {
-            List<DataHold> dataHolds = this.Compiler.CurrentContainer.CurrentContainer.DataHolds;
+            List<DataHold> dataHolds = this.Compiler.ContainerMgmt.CurrentContainer.DataHolds;
 
             StringBuilder builder = new StringBuilder();
 
@@ -291,7 +306,7 @@ namespace Yama.Compiler.Definition
         {
             Index.Index index = query.Uses.GetIndex;
 
-            string pointer = this.Compiler.CurrentContainer.AddDataCall(query.Value.ToString(), this.Compiler);
+            string pointer = this.Compiler.ContainerMgmt.AddDataCall(query.Value.ToString(), this.Compiler);
 
             return new Dictionary<string, string> { { query.Key.Name, pointer }};
         }
@@ -745,6 +760,11 @@ namespace Yama.Compiler.Definition
             this.Algos.AddRange(correctDefinition.Algos);
 
             return true;
+        }
+
+        public string GetRegister(int reg)
+        {
+            return this.AviableRegisters[reg];
         }
 
         // -----------------------------------------------

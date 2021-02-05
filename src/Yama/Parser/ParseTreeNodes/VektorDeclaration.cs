@@ -374,13 +374,11 @@ namespace Yama.Parser
 
         public bool CompileSetMethode(Compiler.Compiler compiler, string mode = "default")
         {
-            compiler.Definition.BeginNewMethode(this.SetRegisterInUse);
-
             CompileContainer compileContainer = new CompileContainer();
-
             compileContainer.Begin = new CompileSprungPunkt();
             compileContainer.Ende = new CompileSprungPunkt();
-            compiler.SetNewContainer(compileContainer);
+
+            compiler.BeginNewMethode( this.SetRegisterInUse, compileContainer, this.Deklaration.SetUses );
 
             CompileFunktionsDeklaration dek = new CompileFunktionsDeklaration();
 
@@ -391,13 +389,11 @@ namespace Yama.Parser
 
         public bool CompileGetMethode(Compiler.Compiler compiler, string mode = "default")
         {
-            compiler.Definition.BeginNewMethode(this.GetRegisterInUse);
-
             CompileContainer compileContainer = new CompileContainer();
-
             compileContainer.Begin = new CompileSprungPunkt();
             compileContainer.Ende = new CompileSprungPunkt();
-            compiler.SetNewContainer(compileContainer);
+
+            compiler.BeginNewMethode( this.GetRegisterInUse, compileContainer, this.Deklaration.GetUses );
 
             CompileFunktionsDeklaration dek = new CompileFunktionsDeklaration();
 

@@ -18,7 +18,7 @@ namespace Yama.Compiler
             set;
         } = new CompileHeader();
 
-        public ContainerManagment CurrentContainer
+        public ContainerManagment ContainerMgmt
         {
             get;
             set;
@@ -62,6 +62,7 @@ namespace Yama.Compiler
         public string LastVariableCall { get; internal set; }
         public IndexVariabelnDeklaration CurrentThis { get; internal set; }
         public IndexVariabelnDeklaration CurrentBase { get; internal set; }
+        public List<CompileContainer> Containers { get; private set; } = new List<CompileContainer>();
 
         #endregion get/set
 
@@ -76,6 +77,72 @@ namespace Yama.Compiler
             this.AddError(string.Format("Der Algorithmus {0} mit dem Modus {1} konnte nicht gefunden werden!", algoName, mode));
 
             return null;
+        }
+
+        public SSACompileLine AddSSALine(SSACompileLine line)
+        {
+            if (!line.Algo.CanBeDominatet)
+            {
+                this.ContainerMgmt.CurrentContainer.Lines.Add(line);
+
+                return line;
+            }
+
+            foreach (SSACompileLine existLine in this.ContainerMgmt.CurrentContainer.Lines)
+            {
+                if (!existLine.Algo.Equals(line.Algo)) continue;
+                if (existLine.Arguments.Count != line.Arguments.Count) continue;
+                if (!this.CheckArgumentsEqual(existLine, line)) continue;
+
+                return existLine;
+            }
+
+            this.ContainerMgmt.CurrentContainer.Lines.Add(line);
+
+            return line;
+        }
+
+        private bool CheckArgumentsEqual(SSACompileLine existLine, SSACompileLine line)
+        {
+            int count = 0;
+            foreach (SSACompileArgument argNew in line.Arguments)
+            {
+                SSACompileArgument orgArg = existLine.Arguments[count];
+
+                if (argNew.Mode != orgArg.Mode) return false;
+                if (argNew.Mode == SSACompileArgumentMode.Reference)
+                    if (!argNew.Reference.Equals(orgArg.Reference)) return false;
+
+                if (argNew.Mode == SSACompileArgumentMode.Variable)
+                    if (!argNew.Variable.Equals(orgArg.Variable)) return false;
+            }
+
+            return true;
+        }
+
+        public bool BeginNewMethode(List<string> registerInUse, CompileContainer compileContainer, ValidUses uses)
+        {
+            this.Definition.BeginNewMethode(registerInUse);
+            this.SetNewContainer(compileContainer);
+
+            int varStackCounter = 0;
+            foreach (IParent parent in uses.Deklarationen)
+            {
+                if (!(parent is IndexVariabelnDeklaration t)) continue;
+
+                int reg = this.Definition.GetNextFreeRegister();
+                if (reg == -1) varStackCounter = varStackCounter + 1;
+                else registerInUse.Add(this.Definition.GetRegister(reg));
+
+                t.SSAMap = new SSAVariableMap();
+                t.SSAMap.Key = t.Name;
+                t.SSAMap.Typ = reg == -1 ? VariabelMapTyp.Stack : VariabelMapTyp.Register;
+                t.SSAMap.Position = reg == -1 ? varStackCounter : reg;
+
+                compileContainer.VarMapper.Add(t.Name, t.SSAMap);
+            }
+
+            return true;
         }
 
         public bool AddLine(RequestAddLine request)
@@ -166,10 +233,10 @@ namespace Yama.Compiler
 
         public bool SetNewContainer(CompileContainer compileContainer)
         {
-            this.CurrentContainer = new ContainerManagment();
+            this.ContainerMgmt = new ContainerManagment();
 
-            this.CurrentContainer.RootContainer = compileContainer;
-            this.CurrentContainer.ContainerStack.Push(compileContainer);
+            this.ContainerMgmt.RootContainer = compileContainer;
+            this.PushContainer(compileContainer);
 
             this.Definition.VariabelCounter = 0;
 
@@ -178,18 +245,20 @@ namespace Yama.Compiler
 
         public bool PushContainer(CompileContainer compileContainer)
         {
-            this.CurrentContainer.ContainerStack.Push(compileContainer);
+            this.ContainerMgmt.ContainerStack.Push(compileContainer);
+
+            this.Containers.Add(compileContainer);
 
             return true;
         }
 
         public bool PopContainer()
         {
-            CompileContainer container = this.CurrentContainer.ContainerStack.Pop();
+            CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
 
-            if (this.CurrentContainer.CurrentContainer == null) return true;
+            if (this.ContainerMgmt.CurrentContainer == null) return true;
 
-            this.CurrentContainer.CurrentContainer.DataHolds.AddRange(container.DataHolds);
+            this.ContainerMgmt.CurrentContainer.DataHolds.AddRange(container.DataHolds);
 
             return true;
         }

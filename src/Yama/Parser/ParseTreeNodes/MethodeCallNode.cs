@@ -171,9 +171,8 @@ namespace Yama.Parser
 
                 dek.Compile(compiler, mode);
 
-                CompileMovResult movResultRight = new CompileMovResult();
-
-                movResultRight.Compile(compiler, null, "default");
+                CompilePushResult compilePushResult = new CompilePushResult();
+                compilePushResult.Compile(compiler, null, "default");
 
                 parasCount++;
             }
@@ -183,12 +182,12 @@ namespace Yama.Parser
 
             if (op.IsANonStatic) parasCount++;
 
-            for (int i = 0; i < parasCount; i++)
+            /*for (int i = 0; i < parasCount; i++)
             {
                 CompileUsePara usePara = new CompileUsePara();
 
                 usePara.Compile(compiler, null);
-            }
+            }*/
 
             this.FunctionExecute.Compile(compiler, null, mode);
 

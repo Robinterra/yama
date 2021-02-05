@@ -7,7 +7,7 @@ using Yama.Parser;
 
 namespace Yama.Compiler
 {
-    public class SSAVariableMapper
+    public class SSAVariableMap
     {
 
         public string Key
@@ -16,7 +16,21 @@ namespace Yama.Compiler
             set;
         }
 
+        //Die Letzte Reference, bei dem die Variable gesetzt wurde
+        public SSACompileLine Reference
+        {
+            get;
+            set;
+        }
+
+        //Register or Stack position
         public int Position
+        {
+            get;
+            set;
+        }
+
+        public VariabelMapTyp Typ
         {
             get;
             set;
@@ -48,4 +62,12 @@ namespace Yama.Compiler
         }
 
     }
+
+    public enum VariabelMapTyp
+    {
+        None,
+        Register,
+        Stack
+    }
+
 }
