@@ -21,6 +21,7 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<string>();
+
         public IParseTreeNode Node
         {
             get;
@@ -37,6 +38,14 @@ namespace Yama.Compiler
         {
             get;
             set;
+        }
+
+        public bool IsUsed
+        {
+            get
+            {
+                return true;
+            }
         }
 
         #endregion get/set

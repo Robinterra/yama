@@ -27,7 +27,12 @@ namespace Yama.Compiler
             set;
         }
 
-        public MethodeDeclarationNode MethodNode { get; private set; }
+        public MethodeDeclarationNode MethodNode
+        {
+            get;
+            set;
+        }
+
         public CompileAlgo Algo
         {
             get;
@@ -46,6 +51,14 @@ namespace Yama.Compiler
 
         public PropertyGetSetDeklaration PGetNode { get; private set; }
         public PropertyGetSetDeklaration PSetNode { get; private set; }
+
+        public bool IsUsed
+        {
+            get
+            {
+                return true;
+            }
+        }
 
         #endregion get/set
 

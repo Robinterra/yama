@@ -18,7 +18,6 @@ namespace Yama.Compiler
             set;
         } = "ReferenceCall";
 
-
         public CompileAlgo Algo
         {
             get;
@@ -36,12 +35,26 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<string>();
+
         public IParseTreeNode Node
         {
             get;
             set;
         }
-        public bool DoNotCompile { get; private set; }
+
+        public bool DoNotCompile
+        {
+            get;
+            set;
+        }
+
+        public bool IsUsed
+        {
+            get
+            {
+                return true;
+            }
+        }
 
         #endregion get/set
 

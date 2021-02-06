@@ -259,7 +259,8 @@ namespace Yama.Compiler.Definition
             if (query.Kategorie == "point0") return this.Point0(query);
             if (query.Key.Name == "[REG]") return this.RegisterQuery(query);
             if (query.Key.Name == "[NAME]") return this.NameQuery(query);
-            if (query.Key.Name == "[REGPOP]") return this.MethodeRegPop(query);
+            if (query.Key.Name == "[SSAPOP]") return this.SsaPop(query);
+            if (query.Key.Name == "[SSAPUSH]") return this.SsaPush(query);
             if (query.Key.Name == "[PARA]") return this.MethodePara(query);
             if (query.Key.Name == "[NUMCONST]") return this.MethodeNumConst(query);
             if (query.Key.Name == "[JUMPTO]") return this.JumpToQuery(query);
@@ -268,6 +269,21 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[DATACONTAINER]") return this.DataContainerQuery(query);
 
             return this.MakeAdvanedKeyReplaces(query);
+        }
+
+        // -----------------------------------------------
+
+        private Dictionary<string, string> SsaPush(IRegisterQuery query)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+
+            if (!(query.Value is RequestSSAArgument request)) return result;
+
+            SSACompileArgument arg = new SSACompileArgument(request.Target);
+
+            this.Compiler.ContainerMgmt.StackArguments.Push(arg);
+
+            return result;
         }
 
         // -----------------------------------------------
@@ -554,28 +570,18 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string,string> MethodeRegPop(IRegisterQuery query)
+        private Dictionary<string,string> SsaPop(IRegisterQuery query)
         {
-            string keypattern = "[REGPOP[{0}]]";
             Dictionary<string, string> result = new Dictionary<string, string>();
 
-            int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
-            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : (this.AdressBytes / this.CalculationBytes);
+            if (!(query.Value is RequestSSAArgument request)) return result;
 
-            int einzelbyte = bytes / duration;
-
-            this.CurrentPlaceToKeepRegister += bytes + 1;
-            for (int i = 0; i < duration; i++ )
+            for (int i = 0; i < request.Count; i++)
             {
-                this.CurrentPlaceToKeepRegister -= einzelbyte;
-                int registerStart = this.CurrentPlaceToKeepRegister;
+                SSACompileArgument arg = this.Compiler.ContainerMgmt.StackArguments.Pop();
 
-                if (registerStart > this.PlaceToKeepRegisterLast)
-                    { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
-
-                result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
+                request.Arguments.Add(arg);
             }
-            this.CurrentPlaceToKeepRegister += bytes - 1;
 
             return result;
         }

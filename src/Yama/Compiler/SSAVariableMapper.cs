@@ -23,19 +23,6 @@ namespace Yama.Compiler
             set;
         }
 
-        //Register or Stack position
-        public int Position
-        {
-            get;
-            set;
-        }
-
-        public VariabelMapTyp Typ
-        {
-            get;
-            set;
-        }
-
         public bool IsChecked
         {
             get;
@@ -61,13 +48,11 @@ namespace Yama.Compiler
             }
         }
 
-    }
-
-    public enum VariabelMapTyp
-    {
-        None,
-        Register,
-        Stack
+        public IndexVariabelnDeklaration Deklaration
+        {
+            get;
+            set;
+        }
     }
 
 }

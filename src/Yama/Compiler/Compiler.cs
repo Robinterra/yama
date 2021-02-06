@@ -112,9 +112,6 @@ namespace Yama.Compiler
                 if (argNew.Mode != orgArg.Mode) return false;
                 if (argNew.Mode == SSACompileArgumentMode.Reference)
                     if (!argNew.Reference.Equals(orgArg.Reference)) return false;
-
-                if (argNew.Mode == SSACompileArgumentMode.Variable)
-                    if (!argNew.Variable.Equals(orgArg.Variable)) return false;
             }
 
             return true;
@@ -123,23 +120,18 @@ namespace Yama.Compiler
         public bool BeginNewMethode(List<string> registerInUse, CompileContainer compileContainer, ValidUses uses)
         {
             this.Definition.BeginNewMethode(registerInUse);
+            this.ContainerMgmt.AddNewMethode(compileContainer);
             this.SetNewContainer(compileContainer);
 
-            int varStackCounter = 0;
             foreach (IParent parent in uses.Deklarationen)
             {
-                if (!(parent is IndexVariabelnDeklaration t)) continue;
+                if (!(parent is IndexVariabelnDeklaration dek)) continue;
 
-                int reg = this.Definition.GetNextFreeRegister();
-                if (reg == -1) varStackCounter = varStackCounter + 1;
-                else registerInUse.Add(this.Definition.GetRegister(reg));
+                SSAVariableMap map = new SSAVariableMap();
+                map.Key = dek.Name;
+                map.Deklaration = dek;
 
-                t.SSAMap = new SSAVariableMap();
-                t.SSAMap.Key = t.Name;
-                t.SSAMap.Typ = reg == -1 ? VariabelMapTyp.Stack : VariabelMapTyp.Register;
-                t.SSAMap.Position = reg == -1 ? varStackCounter : reg;
-
-                compileContainer.VarMapper.Add(t.Name, t.SSAMap);
+                this.ContainerMgmt.CurrentMethod.VarMapper.Add(dek.Name, map);
             }
 
             return true;

@@ -38,6 +38,12 @@ namespace Yama.Compiler
             set;
         } = new Dictionary<string, SSAVariableMap>();
 
+        public List<CompileContainer> Containers
+        {
+            get;
+            set;
+        } = new List<CompileContainer>();
+
         public string AddDataCall(string jumpPoint, Compiler compiler)
         {
             DataHold dataHold = new DataHold();

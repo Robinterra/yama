@@ -10,27 +10,42 @@ namespace Yama.Compiler.Definition
             set;
         }
 
-        public string VariableName
+        public RegisterUseMode Mode
         {
             get;
             set;
         }
 
-        public RegisterUseMode IsUsed
+        public RegisterType Type
         {
             get;
             set;
         }
+
         public int RegisterId
         {
             get;
             set;
         }
 
-        public RegisterMap(string name, int id)
+        public SSACompileLine Line
+        {
+            get;
+            set;
+        }
+
+        public RegisterMap(RegisterType type, RegisterUseMode mode)
+        {
+            this.Type = type;
+            this.Mode = mode;
+        }
+
+        public RegisterMap(string name, int id, RegisterUseMode mode)
         {
             this.Name = name;
             this.RegisterId = id;
+            this.Type = RegisterType.Register;
+            this.Mode = mode;
         }
     }
 
@@ -38,7 +53,15 @@ namespace Yama.Compiler.Definition
     {
         Free,
         Ablage,
-        Temp,
+        UsedAblage,
         Used
+    }
+
+    public enum RegisterType
+    {
+        None,
+        Register,
+
+        Stack
     }
 }

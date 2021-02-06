@@ -27,7 +27,12 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<ICompileRoot>();
-        public string JumpPointName { get; set; }
+
+        public string JumpPointName
+        {
+            get;
+            set;
+        }
 
         public DataObject Data
         {
@@ -40,10 +45,19 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<string>();
+
         public IParseTreeNode Node
         {
             get;
             set;
+        }
+
+        public bool IsUsed
+        {
+            get
+            {
+                return true;
+            }
         }
 
         #endregion get/set

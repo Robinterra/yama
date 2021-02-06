@@ -18,6 +18,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public long Const
+        {
+            get;
+            set;
+        }
+
         public SSACompileArgumentMode Mode
         {
             get;
@@ -47,6 +53,7 @@ namespace Yama.Compiler
     {
         None,
         Variable,
-        Reference
+        Reference,
+        Const
     }
 }
