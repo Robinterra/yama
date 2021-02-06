@@ -86,8 +86,8 @@ namespace Yama.Compiler
             compiler.AddSSALine(line);
             map.Reference = line;
 
-            SSACompileArgument arg = new SSACompileArgument(line);
-            compiler.ContainerMgmt.StackArguments.Push(arg);
+            //SSACompileArgument arg = new SSACompileArgument(line);
+            //compiler.ContainerMgmt.StackArguments.Push(arg);
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -115,7 +115,7 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
-                query.Value = this.Position;
+                query.Value = this.Position + 1;
 
                 string value = compiler.Definition.PostKeyReplace(query);
 

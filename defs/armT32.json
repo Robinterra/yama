@@ -181,7 +181,7 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "push [SSAPOP[0]]"
+          "push { [SSAPOP[0]] }"
         ]
       },
       {
