@@ -22,7 +22,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new ContainerManagment();
 
         public List<ICompileRoot> toRemove = new List<ICompileRoot>();
 
@@ -89,7 +89,9 @@ namespace Yama.Compiler
         {
             if (!line.Algo.CanBeDominatet)
             {
-                this.ContainerMgmt.CurrentContainer.Lines.Add(line);
+                //this.ContainerMgmt.CurrentContainer.Lines.Add(line);
+                this.SSALines.Add(line);
+                this.ContainerMgmt.CurrentMethod.Lines.Add(line);
 
                 return line;
             }
@@ -103,7 +105,7 @@ namespace Yama.Compiler
                 return existLine;
             }
 
-            this.ContainerMgmt.CurrentContainer.Lines.Add(line);
+            this.ContainerMgmt.CurrentMethod.Lines.Add(line);
             this.SSALines.Add(line);
 
             return line;
@@ -175,6 +177,9 @@ namespace Yama.Compiler
         {
             if (this.Definition == null) return this.AddError("Keine definition zur Übersetzung in Assembler gesetzt");
             this.Definition.Compiler = this;
+
+            this.SetNewContainer(new CompileContainer());
+            this.ContainerMgmt.CurrentMethod = this.ContainerMgmt.CurrentContainer;
 
             this.Header.Compile(this, this.MainFunction);
 
@@ -252,8 +257,6 @@ namespace Yama.Compiler
 
         public bool SetNewContainer(CompileContainer compileContainer)
         {
-            this.ContainerMgmt = new ContainerManagment();
-
             this.ContainerMgmt.RootContainer = compileContainer;
             this.PushContainer(compileContainer);
 

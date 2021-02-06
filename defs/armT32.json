@@ -142,7 +142,46 @@
         "AssemblyCommands": [
           "mov r11, pc",
           "mov pc, r12",
-          "mov [SSAPOP], r12"
+          "mov [SSAPUSH], r12"
+        ]
+      },
+      {
+        "Name": "PopResult",
+        "Mode": "default",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [
+          {
+            "Name": "[stackpos]",
+            "Values": [
+            ]
+          }
+        ],
+        "AssemblyCommands": [
+          "ldr [SSAPUSH], [r12, #[stackpos]]"
+        ]
+      },
+      {
+        "Name": "PushResult",
+        "Mode": "default",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "push [SSAPOP[0]]"
         ]
       },
       {
@@ -159,15 +198,12 @@
           {
             "Name": "[PUSHREG]",
             "Values": null
-          },
-          {
-            "Name": "[VARCOUNT]",
-            "Values": null
           }
         ],
         "AssemblyCommands": [
           "[NAME]:",
-          "push {r0,[PUSHREG]r11}"
+          "mov r12, sp",
+          "push {[PUSHREG]r11}"
         ]
       },
       {
@@ -186,12 +222,13 @@
             "Values": null
           },
           {
-            "Name": "[VARCOUNT]",
+            "Name": "[stackcount]",
             "Values": null
           }
         ],
         "AssemblyCommands": [
-          "pop {r0,[POPREG]r11}",
+          "pop {[POPREG]r11}",
+          "add sp, sp, #[stackcount]",
           "mov pc,r11",
           "[DATACONTAINER]"
         ]
@@ -214,6 +251,28 @@
         "PostKeys": [],
         "AssemblyCommands": [
           "mov [SSAPUSH],#[NUMCONST[0]]"
+        ]
+      },
+      {
+        "Name": "MovReg",
+        "Mode": "default",
+        "Description": "Um den return einer einzelnen Variable zu ermöglichen",
+        "Keys": [
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "mov [SSAPUSH],[SSAPOP[0]]"
         ]
       },
       {

@@ -173,7 +173,7 @@ namespace Yama.Compiler.Definition
         {
             get;
             set;
-        }
+        } = new RegisterAllocater();
 
         // -----------------------------------------------
 
@@ -419,8 +419,26 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[PUSHREG]") return this.PushReg(query);
             if (query.Key.Name == "[POPREG]") return this.PopReg(query);
             if (query.Key.Name == "[VARCOUNT]") return this.VarCountQuery(query);
+            if (query.Key.Name == "[stackpos]") return this.StackPositionQuery(query);
+            if (query.Key.Name == "[stackcount]") return this.StackCountQuery(query);
 
             return null;
+        }
+
+        private string StackCountQuery(IRegisterQuery query)
+        {
+            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
+            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
+            return string.Format( keyPattern.Pattern, ((int)query.Value) * this.AdressBytes );
+        }
+
+        private string StackPositionQuery(IRegisterQuery query)
+        {
+            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
+            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
+            return string.Format( keyPattern.Pattern, ((int)query.Value) * this.AdressBytes );
         }
 
         // -----------------------------------------------
@@ -585,7 +603,7 @@ namespace Yama.Compiler.Definition
             {
                 SSACompileArgument arg = this.Compiler.ContainerMgmt.StackArguments.Pop();
 
-                request.Arguments.Add(arg);
+                request.Target.AddArgument(arg);
             }
 
             return result;

@@ -82,6 +82,12 @@ namespace Yama.Parser
         {
             this.Statement.Compile(compiler, mode);
 
+            if (this.Statement is ReferenceCall)
+            {
+                CompileMovReg movReg = new CompileMovReg();
+                movReg.Compile(compiler, this);
+            }
+
             this.JumpTo.Compile(compiler, null, mode);
 
             return true;

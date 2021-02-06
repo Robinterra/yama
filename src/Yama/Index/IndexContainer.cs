@@ -40,7 +40,7 @@ namespace Yama.Index
             {
                 if (this.thisUses != null) return this.thisUses;
 
-                this.thisUses = new ValidUses(this.ParentUsesSet);
+                this.thisUses = this.ParentUsesSet;
 
                 foreach (IndexVariabelnDeklaration dek in this.VariabelnDeklarations)
                 {

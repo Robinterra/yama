@@ -222,9 +222,9 @@ namespace Yama.Compiler
 
             if (mode == "set")
             {
-                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
+                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.AssemblyName)) return compiler.AddError("variable not in varmapper", node.Use);
 
-                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.AssemblyName];
                 SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
                 map.Reference = arg.Reference;
 
@@ -233,9 +233,11 @@ namespace Yama.Compiler
 
             if (mode == "default")
             {
-                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
+                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.AssemblyName)) return compiler.AddError("variable not in varmapper", node.Use);
 
-                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.AssemblyName];
+
+                if (map.Reference == null) return compiler.AddError("variable is not set!", node.Use);
 
                 SSACompileArgument arg = new SSACompileArgument(map.Reference);
                 compiler.ContainerMgmt.StackArguments.Push(arg);

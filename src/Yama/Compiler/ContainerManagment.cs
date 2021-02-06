@@ -36,7 +36,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new List<CompileContainer>();
 
         public CompileContainer CurrentMethod
         {

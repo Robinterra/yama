@@ -454,10 +454,14 @@ namespace Yama.Parser
 
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
 
+            int count = 0;
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
                 CompilePopResult compilePopResult = new CompilePopResult();
+                compilePopResult.Position = count;
                 compilePopResult.Compile(compiler, node, "default");
+
+                count++;
 
                 if (node.Name != "this") continue;
                 if (this.Deklaration.Klasse.InheritanceBase == null) continue;
@@ -470,7 +474,7 @@ namespace Yama.Parser
             if (this.Deklaration.Type == MethodeType.Ctor) this.CompileCtor(compiler, mode);
             if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(compiler, mode);
 
-            return this.CompileNormalFunktion(compiler, mode);
+            return this.CompileNormalFunktion(compiler, mode, count);
         }
 
         private bool BaseCompile(Compiler.Compiler compiler)
@@ -569,7 +573,7 @@ namespace Yama.Parser
             return compiler.Definition.ParaClean();
         }
 
-        private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode)
+        private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode, int count)
         {
             this.CompileContainer.Begin.Compile(compiler, this, "default");
 
@@ -577,6 +581,7 @@ namespace Yama.Parser
 
             this.CompileContainer.Ende.Compile(compiler, this, "default");
 
+            this.FunktionsEndeCompile.ArgsCount = count;
             this.FunktionsEndeCompile.Compile(compiler, this, mode);
 
             this.VariabelCounter = compiler.Definition.VariabelCounter;

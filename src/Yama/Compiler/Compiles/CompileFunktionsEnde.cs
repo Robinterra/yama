@@ -60,6 +60,12 @@ namespace Yama.Compiler
             }
         }
 
+        public int ArgsCount
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -232,7 +238,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
                 query.Value = registerInUse;
-                if (key.Name == "[VARCOUNT]") query.Value = varcount;
+                if (key.Name == "[stackcount]") query.Value = this.ArgsCount;
 
                 string value = compiler.Definition.PostKeyReplace(query);
 

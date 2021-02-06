@@ -439,6 +439,7 @@ namespace Yama.Parser
 
         private bool CompileNormalFunktionSet(Compiler.Compiler compiler, CompileContainer compileContainer)
         {
+            int count = 0;
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
                 IParent tp = this.Deklaration.SetUses.Deklarationen.FirstOrDefault(t=>t.Name == node.Name);
@@ -446,7 +447,10 @@ namespace Yama.Parser
                 if (tp is IndexVariabelnDeklaration u) target = u;
 
                 CompilePopResult compilePopResult = new CompilePopResult();
+                compilePopResult.Position = count;
                 compilePopResult.Compile(compiler, target, "default");
+
+                count++;
             }
 
             compiler.Definition.ParaClean();
@@ -458,7 +462,7 @@ namespace Yama.Parser
             compileContainer.Ende.Compile(compiler, this, "default");
 
             CompileFunktionsEnde ende = new CompileFunktionsEnde();
-
+            ende.ArgsCount = count;
             ende.Compile(compiler, this, "set");
 
             this.SetVariabelCounter = compiler.Definition.VariabelCounter;
@@ -468,12 +472,16 @@ namespace Yama.Parser
 
         private bool CompileNormalFunktionGet(Compiler.Compiler compiler, CompileContainer compileContainer)
         {
+            int count = 0;
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
                 if (node.Name == "invalue") continue;
 
                 CompilePopResult compilePopResult = new CompilePopResult();
+                compilePopResult.Position = count;
                 compilePopResult.Compile(compiler, node, "default");
+
+                count++;
             }
 
             compiler.Definition.ParaClean();
@@ -485,7 +493,7 @@ namespace Yama.Parser
             compileContainer.Ende.Compile(compiler, this, "default");
 
             CompileFunktionsEnde ende = new CompileFunktionsEnde();
-
+            ende.ArgsCount = count;
             ende.Compile(compiler, this, "get");
 
             this.GetVariabelCounter = compiler.Definition.VariabelCounter;

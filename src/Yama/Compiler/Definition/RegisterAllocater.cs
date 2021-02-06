@@ -47,9 +47,13 @@ namespace Yama.Compiler.Definition
 
         public bool Init(GenericDefinition def)
         {
+            this.RegisterMaps.Clear();
+
             for (int i = def.WorkingRegisterStart; i <= def.WorkingRegisterLast; i++)
             {
                 RegisterMap map = new RegisterMap(def.GetRegister(i), i, RegisterUseMode.Free);
+
+                this.RegisterMaps.Add(map);
             }
 
             /*for (int i = def.PlaceToKeepRegisterStart; i <= def.PlaceToKeepRegisterLast; i++)
