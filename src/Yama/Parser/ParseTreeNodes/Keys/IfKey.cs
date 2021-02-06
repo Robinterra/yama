@@ -128,9 +128,11 @@ namespace Yama.Parser
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
             CompileContainer ifcontainer = new CompileContainer();
+            ifcontainer.Begin = compiler.ContainerMgmt.CurrentContainer.Begin;
             ifcontainer.Ende = new CompileSprungPunkt();
 
             CompileContainer elsecontainer = new CompileContainer();
+            elsecontainer.Begin = compiler.ContainerMgmt.CurrentContainer.Begin;
             elsecontainer.Ende = new CompileSprungPunkt();
 
             CompileJumpTo jumpafterelse = new CompileJumpTo();

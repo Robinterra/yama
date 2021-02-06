@@ -284,15 +284,20 @@ namespace Yama.Compiler
 
             if (this.ContainerMgmt.CurrentContainer == null) return true;
 
+            this.ContainerMgmt.CurrentContainer.DataHolds.AddRange(container.DataHolds);
+
+            if (this.ContainerMgmt.CurrentMethod == null) return true;
+
             foreach (KeyValuePair<string, SSAVariableMap> orgMap in this.ContainerMgmt.CurrentMethod.VarMapper)
             {
+                if (containerMaps[orgMap.Key].Reference == null) continue;
+
                 if (containerMaps[orgMap.Key].Reference.Equals(orgMap.Value.Reference)) continue;
+
+                if (orgMap.Value.Reference == null) orgMap.Value.Reference = containerMaps[orgMap.Key].Reference;
 
                 orgMap.Value.Reference.PhiMap.AddRange(containerMaps[orgMap.Key].Reference.PhiMap);
             }
-
-
-            this.ContainerMgmt.CurrentContainer.DataHolds.AddRange(container.DataHolds);
 
             return true;
         }

@@ -496,7 +496,8 @@ namespace Yama.Compiler.Definition
         private Dictionary<string,string> JumpToQuery(IRegisterQuery query)
         {
             if (query.Key.Values != null && query.Key.Values.Count > 0) return this.JumpToQueryWithValues(query);
-            if (!(query.Value is CompileSprungPunkt t)) return null;
+            if (!(query.Value is CompileSprungPunkt t))
+                return null;
 
             t.Add(this.Compiler, t);
 
