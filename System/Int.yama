@@ -24,7 +24,7 @@ namespace "System"
         *
         * @return (bool) Wenn a kleiner ist dann true ansonsten false
         */
-        public operator bool <(int a, int b)
+        copy operator bool <(int a, int b)
         {
             #defalgo IntCompare,LessThan:;
         }
@@ -39,7 +39,7 @@ namespace "System"
         *
         * @return (bool) Wenn a kleiner ist dann true ansonsten false
         */
-        public operator bool >(int a, int b)
+        copy operator bool >(int a, int b)
         {
             #defalgo IntCompare,GreaterThan:;
         }
@@ -54,7 +54,7 @@ namespace "System"
         *
         * @return (bool) Wenn a kleiner ist dann true ansonsten false
         */
-        public operator bool >=(int a, int b)
+        copy operator bool >=(int a, int b)
         {
             #defalgo IntCompare,GreaterEqualsThan:;
         }
@@ -69,7 +69,7 @@ namespace "System"
         *
         * @return (bool) if equals or Less than then return true
         */
-        public operator bool <=(int a, int b)
+        copy operator bool <=(int a, int b)
         {
             #defalgo IntCompare,LessEqualsThan:;
         }
@@ -84,7 +84,7 @@ namespace "System"
         *
         * @return (bool) if equals then return true
         */
-        public operator bool ==(int a, int b)
+        copy operator bool ==(int a, int b)
         {
             #defalgo IntCompare,Equals:;
         }
@@ -99,7 +99,7 @@ namespace "System"
         *
         * @return (bool) if equals then return true
         */
-        public operator bool !=(int a, int b)
+        copy operator bool !=(int a, int b)
         {
             #defalgo IntCompare,NotEquals:;
         }
