@@ -31,6 +31,12 @@ namespace Yama.Compiler
             set;
         }
 
+        Dictionary<string, string> PrimaryKeys
+        {
+            get;
+            set;
+        }
+
         bool InFileCompilen(Compiler compiler);
     }
 

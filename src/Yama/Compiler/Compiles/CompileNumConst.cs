@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
@@ -52,12 +53,14 @@ namespace Yama.Compiler
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(Number node, AlgoKeyCall key, string mode)
+        private DefaultRegisterQuery BuildQuery(Number node, AlgoKeyCall key, string mode, SSACompileLine line)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
             query.Kategorie = mode;
             query.Value = node.Token.Value;
+
+            if (key.Name == "[SSAPOP]" || key.Name == "[SSAPUSH]") query.Value = new RequestSSAArgument(line);
 
             return query;
         }
@@ -70,11 +73,14 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
+                DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);

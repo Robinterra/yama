@@ -64,6 +64,12 @@ namespace Yama.Compiler
         public IndexVariabelnDeklaration CurrentBase { get; internal set; }
         public List<CompileContainer> Containers { get; private set; } = new List<CompileContainer>();
 
+        public List<SSACompileLine> SSALines
+        {
+            get;
+            set;
+        } = new List<SSACompileLine>();
+
         #endregion get/set
 
         #region methods
@@ -98,6 +104,7 @@ namespace Yama.Compiler
             }
 
             this.ContainerMgmt.CurrentContainer.Lines.Add(line);
+            this.SSALines.Add(line);
 
             return line;
         }
@@ -122,6 +129,7 @@ namespace Yama.Compiler
             this.Definition.BeginNewMethode(registerInUse);
             this.ContainerMgmt.AddNewMethode(compileContainer);
             this.SetNewContainer(compileContainer);
+            compileContainer.RegistersUses = registerInUse;
 
             foreach (IParent parent in uses.Deklarationen)
             {
@@ -177,9 +185,23 @@ namespace Yama.Compiler
 
             if (this.Errors.Count != 0) return false;
 
+            this.DoAllocate();
+
+            if (this.Errors.Count != 0) return false;
+
             this.RunAssmblerSequence();
 
             return this.Errors.Count == 0;
+        }
+
+        private bool DoAllocate()
+        {
+            foreach (CompileContainer methode in this.ContainerMgmt.Methods)
+            {
+                methode.DoAllocate(this);
+            }
+
+            return true;
         }
 
         private bool RunAssmblerSequence()
@@ -187,7 +209,7 @@ namespace Yama.Compiler
             if (this.OutputFile != null)
                 if (this.OutputFile.Exists) this.OutputFile.Delete();
 
-            this.AssemblerSequence.AddRange(this.DataSequence);
+            //this.AssemblerSequence.AddRange(this.DataSequence);
 
             try
             {
@@ -196,7 +218,12 @@ namespace Yama.Compiler
             }
             catch (Exception e) { return this.AddError(string.Format("Die Datei in der Assemblercode geschrieben werden sollte konnte nicht angelegt werden. {0}", e.Message)); }
 
-            foreach (ICompileRoot root in this.AssemblerSequence)
+            foreach (SSACompileLine line in this.SSALines)
+            {
+                if (!line.Owner.InFileCompilen(this)) this.AddError("Beim Schreiben der Assemblersequence ist ein Fehler aufgetreten");
+            }
+
+            foreach (ICompileRoot root in this.DataSequence)
             {
                 if (!root.InFileCompilen(this)) this.AddError("Beim Schreiben der Assemblersequence ist ein Fehler aufgetreten");
             }

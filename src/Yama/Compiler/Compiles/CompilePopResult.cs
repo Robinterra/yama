@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
 namespace Yama.Compiler
 {
 
-    public class CompileJumpTo : ICompileRoot
+    public class CompilePopResult : ICompile<VariabelDeklaration>
     {
 
         #region get/set
@@ -14,19 +15,14 @@ namespace Yama.Compiler
         {
             get;
             set;
-        } = "JumpTo";
-
-        public PointMode Point
-        {
-            get;
-            set;
-        }
+        } = "PopResult";
 
         public List<string> AssemblyCommands
         {
             get;
             set;
         } = new List<string>();
+
         public IParseTreeNode Node
         {
             get;
@@ -34,12 +30,6 @@ namespace Yama.Compiler
         }
 
         public CompileAlgo Algo
-        {
-            get;
-            set;
-        }
-
-        public CompileSprungPunkt Punkt
         {
             get;
             set;
@@ -63,36 +53,38 @@ namespace Yama.Compiler
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(CompileSprungPunkt node, AlgoKeyCall key, string mode)
+        private DefaultRegisterQuery BuildQuery(IParseTreeNode node, AlgoKeyCall key, string mode, SSACompileLine line)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
             query.Kategorie = mode;
             query.Value = node;
 
+            if (key.Name == "[SSAPOP]" || key.Name == "[SSAPUSH]") query.Value = new RequestSSAArgument(line);
+
             return query;
         }
 
-        public bool Compile(Compiler compiler, CompileSprungPunkt node, string mode = "default")
+        public bool Compile(Compiler compiler, IndexVariabelnDeklaration node, string mode = "default")
         {
-            if (node != null) this.Node = node.Node;
+            this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
 
-            this.Algo = compiler.GetAlgo(this.AlgoName, mode);
+            if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("Variable not found in mapper", node.Use);
+            SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
 
+            this.Algo = compiler.GetAlgo(this.AlgoName, "default");
             if (this.Algo == null) return false;
 
-            if (this.Point == PointMode.Custom) this.Punkt = node;
-            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Begin;
-            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Ende;
-            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer.Begin;
-            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+            map.Reference = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = this.BuildQuery(this.Punkt, key, mode);
+                DefaultRegisterQuery query = this.BuildQuery(node.Use, key, mode, line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
@@ -116,17 +108,13 @@ namespace Yama.Compiler
             return true;
         }
 
+        public bool Compile(Compiler compiler, VariabelDeklaration node, string mode = "default")
+        {
+            return compiler.AddError("this methods is not be allowed to call");
+        }
+
         #endregion methods
 
-    }
-
-    public enum PointMode
-    {
-        Custom,
-        RootBegin,
-        RootEnde,
-        CurrentBegin,
-        CurrentEnde
     }
 
 }

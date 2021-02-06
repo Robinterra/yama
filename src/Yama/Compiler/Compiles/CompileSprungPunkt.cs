@@ -54,6 +54,12 @@ namespace Yama.Compiler
             }
         }
 
+        public Dictionary<string, string> PrimaryKeys
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -74,6 +80,9 @@ namespace Yama.Compiler
 
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
+
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
 
             if (string.IsNullOrEmpty(this.JumpPointName)) this.JumpPointName = compiler.Definition.GenerateJumpPointName();
 

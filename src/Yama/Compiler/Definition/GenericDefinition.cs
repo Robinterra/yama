@@ -283,6 +283,8 @@ namespace Yama.Compiler.Definition
 
             this.Compiler.ContainerMgmt.StackArguments.Push(arg);
 
+            request.Target.HasReturn = true;
+
             return result;
         }
 
@@ -576,7 +578,10 @@ namespace Yama.Compiler.Definition
 
             if (!(query.Value is RequestSSAArgument request)) return result;
 
-            for (int i = 0; i < request.Count; i++)
+            string countStr = query.Key.Values.FirstOrDefault();
+            int count = Convert.ToInt32(countStr);
+
+            for (int i = 0; i < count; i++)
             {
                 SSACompileArgument arg = this.Compiler.ContainerMgmt.StackArguments.Pop();
 
@@ -767,6 +772,8 @@ namespace Yama.Compiler.Definition
 
             return true;
         }
+
+        // -----------------------------------------------
 
         public string GetRegister(int reg)
         {

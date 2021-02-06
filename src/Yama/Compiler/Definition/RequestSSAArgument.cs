@@ -22,5 +22,10 @@ namespace Yama.Compiler.Definition
             get;
             set;
         } = new List<SSACompileArgument>();
+
+        public RequestSSAArgument(SSACompileLine target)
+        {
+            this.Target = target;
+        }
     }
 }

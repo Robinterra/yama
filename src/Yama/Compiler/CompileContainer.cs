@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
@@ -38,6 +39,12 @@ namespace Yama.Compiler
             set;
         } = new Dictionary<string, SSAVariableMap>();
 
+        public List<string> RegistersUses
+        {
+            get;
+            set;
+        }
+
         public List<CompileContainer> Containers
         {
             get;
@@ -54,6 +61,19 @@ namespace Yama.Compiler
             this.DataHolds.Add(dataHold);
 
             return dataHold.JumpPoint;
+        }
+
+        public bool DoAllocate(Compiler compiler)
+        {
+            if (!(compiler.Definition is GenericDefinition t)) return false;
+            t.Allocater.Init(t);
+
+            foreach (SSACompileLine line in this.Lines)
+            {
+                line.DoAllocate(compiler, t, t.Allocater, this);
+            }
+
+            return true;
         }
     }
 

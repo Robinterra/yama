@@ -450,27 +450,21 @@ namespace Yama.Parser
             compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, this.Deklaration.ThisUses);
 
             if (this.AccessDefinition != null)
-                if (this.AccessDefinition.Kind == IdentifierKind.Simple) mode = "simple";
+                if (this.AccessDefinition.Kind == IdentifierKind.Simple) return compiler.AddError("simple keyword is not anymore supported!", this);
 
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
 
-            if (mode != "simple")
+            foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
-                foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
-                {
-                    CompileUsePara usePara = new CompileUsePara();
+                CompilePopResult compilePopResult = new CompilePopResult();
+                compilePopResult.Compile(compiler, node, "default");
 
-                    usePara.CompileIndexNode(compiler, node, "get");
+                if (node.Name != "this") continue;
+                if (this.Deklaration.Klasse.InheritanceBase == null) continue;
 
-                    if (node.Name != "this") continue;
-                    if (this.Deklaration.Klasse.InheritanceBase == null) continue;
+                compiler.CurrentThis = node;
 
-                    compiler.CurrentThis = node;
-
-                    bool v = this.BaseCompile(compiler);
-                }
-
-                compiler.Definition.ParaClean();
+                bool v = this.BaseCompile(compiler);
             }
 
             if (this.Deklaration.Type == MethodeType.Ctor) this.CompileCtor(compiler, mode);
@@ -528,11 +522,8 @@ namespace Yama.Parser
             CompileReferenceCall refCall = new CompileReferenceCall();
             refCall.CompileDek(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");
 
-            CompileMovResult movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, "default");
-
-            usePara = new CompileUsePara();
-            usePara.Compile(compiler, null);
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "default");
 
             refCall = new CompileReferenceCall();
             refCall.Compile(compiler, this.MallocFree.ParentCall, "methode");
@@ -550,20 +541,14 @@ namespace Yama.Parser
             CompileNumConst num = new CompileNumConst();
             num.Compile(compiler, new Number { Token = new IdentifierToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
 
-            CompileMovResult movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, "default");
-
-            CompileUsePara usePara = new CompileUsePara();
-            usePara.Compile(compiler, null);
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "default");
 
             CompileReferenceCall refCall = new CompileReferenceCall();
             refCall.Compile(compiler, this.Malloc.ParentCall, "methode");
 
             CompileExecuteCall executeCall = new CompileExecuteCall();
             executeCall.Compile(compiler, (MethodeDeclarationNode)this.Malloc.ParentCall.Deklaration.Use);
-
-            movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, "default");
 
             IndexVariabelnDeklaration dek = this.Deklaration.Parameters.FirstOrDefault(t=>t.Name == "this");
             CompileReferenceCall a = new CompileReferenceCall();
@@ -573,9 +558,6 @@ namespace Yama.Parser
             {
                 CompileReferenceCall referenceCall = new CompileReferenceCall();
                 referenceCall.CompileData(compiler, this, this.Deklaration.Klasse.DataRef.JumpPointName);
-
-                movResultRight = new CompileMovResult();
-                movResultRight.Compile(compiler, null, "default");
 
                 CompileReferenceCall compileReference = new CompileReferenceCall();
                 compileReference.CompileDek(compiler, dek);

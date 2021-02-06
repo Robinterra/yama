@@ -69,8 +69,10 @@ namespace Yama.Compiler
             compiler.AssemblerSequence.Add(this);
 
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
-
             if (this.Algo == null) return false;
+
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {

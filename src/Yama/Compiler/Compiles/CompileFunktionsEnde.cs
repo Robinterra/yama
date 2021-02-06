@@ -126,6 +126,9 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
@@ -154,6 +157,9 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
             if (this.Algo == null)  return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
@@ -181,6 +187,9 @@ namespace Yama.Compiler
             if (mode == "get") this.PGetNode = node;
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
             if (this.Algo == null)  return false;
+
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
 
             this.PrimaryKeys = new Dictionary<string, string>();
 

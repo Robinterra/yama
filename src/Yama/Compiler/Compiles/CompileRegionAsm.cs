@@ -42,6 +42,12 @@ namespace Yama.Compiler
             }
         }
 
+        public Dictionary<string, string> PrimaryKeys
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods

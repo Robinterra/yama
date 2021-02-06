@@ -416,14 +416,12 @@ namespace Yama.Parser
         {
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
-                CompileUsePara usePara = new CompileUsePara();
-                usePara.Uses = this.Deklaration.SetContainer.ThisUses;
-
                 IParent tp = this.Deklaration.SetUses.Deklarationen.FirstOrDefault(t=>t.Name == node.Name);
                 IndexVariabelnDeklaration target = node;
                 if (tp is IndexVariabelnDeklaration u) target = u;
 
-                usePara.CompileIndexNode(compiler, target, "get");
+                CompilePopResult compilePopResult = new CompilePopResult();
+                compilePopResult.Compile(compiler, target, "default");
             }
 
             compiler.Definition.ParaClean();
@@ -449,10 +447,8 @@ namespace Yama.Parser
             {
                 if (node.Name == "invalue") continue;
 
-                CompileUsePara usePara = new CompileUsePara();
-                usePara.Uses = this.Deklaration.GetContainer.ThisUses;
-
-                usePara.CompileIndexNode(compiler, node, "get");
+                CompilePopResult compilePopResult = new CompilePopResult();
+                compilePopResult.Compile(compiler, node, "default");
             }
 
             compiler.Definition.ParaClean();

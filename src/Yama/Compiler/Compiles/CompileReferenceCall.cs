@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
@@ -60,7 +61,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(IndexVariabelnReference node, AlgoKeyCall key, string mode)
+        private DefaultRegisterQuery BuildQuery(IndexVariabelnReference node, AlgoKeyCall key, string mode, SSACompileLine line)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
@@ -101,6 +102,8 @@ namespace Yama.Compiler
 
             query.Value = queryValue;
 
+            if (key.Name == "[SSAPOP]" || key.Name == "[SSAPUSH]") query.Value = new RequestSSAArgument(line);
+
             return query;
         }
 
@@ -118,6 +121,9 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, "methode");
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             this.PrimaryKeys = new Dictionary<string, string>();
             this.PrimaryKeys.Add("[NAME]", adressPorint);
 
@@ -125,7 +131,7 @@ namespace Yama.Compiler
             {
                 if (key.Name == "[NAME]") continue;
 
-                DefaultRegisterQuery query = this.BuildQuery(null, key, "default");
+                DefaultRegisterQuery query = this.BuildQuery(null, key, "default", line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
@@ -142,17 +148,43 @@ namespace Yama.Compiler
 
         public bool CompileDek(Compiler compiler, IndexVariabelnDeklaration node, string mode = "default")
         {
+            if (mode == "set")
+            {
+                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
+
+                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+                SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
+                map.Reference = arg.Reference;
+
+                return true;
+            }
+
+            if (mode == "default")
+            {
+                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
+
+                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+
+                SSACompileArgument arg = new SSACompileArgument(map.Reference);
+                compiler.ContainerMgmt.StackArguments.Push(arg);
+
+                return true;
+            }
+
             this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
 
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = this.BuildQueryDek(node, key, mode);
+                DefaultRegisterQuery query = this.BuildQueryDek(node, key, mode, line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
@@ -166,7 +198,7 @@ namespace Yama.Compiler
             return true;
         }
 
-        private DefaultRegisterQuery BuildQueryDek(IndexVariabelnDeklaration node, AlgoKeyCall key, string mode)
+        private DefaultRegisterQuery BuildQueryDek(IndexVariabelnDeklaration node, AlgoKeyCall key, string mode, SSACompileLine line)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
@@ -179,12 +211,37 @@ namespace Yama.Compiler
 
             query.Value = queryValue;
 
+            if (key.Name == "[SSAPOP]" || key.Name == "[SSAPUSH]") query.Value = new RequestSSAArgument(line);
+
             return query;
         }
 
         public bool Compile(Compiler compiler, IndexVariabelnReference node, string mode = "default")
         {
             if (this.CheckRelevanz(compiler, node, mode)) return true;
+
+            if (mode == "set")
+            {
+                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
+
+                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+                SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
+                map.Reference = arg.Reference;
+
+                return true;
+            }
+
+            if (mode == "default")
+            {
+                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
+
+                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+
+                SSACompileArgument arg = new SSACompileArgument(map.Reference);
+                compiler.ContainerMgmt.StackArguments.Push(arg);
+
+                return true;
+            }
 
             this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
@@ -198,11 +255,14 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, printmode);
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
+                DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
@@ -258,9 +318,12 @@ namespace Yama.Compiler
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = this.BuildQuery(null, key, "point0");
+                DefaultRegisterQuery query = this.BuildQuery(null, key, "point0", line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
