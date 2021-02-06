@@ -2,10 +2,10 @@
     "Name": "arm-t32",
     "CalculationBytes": 4,
     "AdressBytes": 4,
-    "WorkingRegisterStart": 0,
+    "WorkingRegisterStart": 2,
     "PlaceToKeepRegisterStart": 0,
     "WorkingRegisterLast": 10,
-    "PlaceToKeepRegisterLast": 10,
+    "PlaceToKeepRegisterLast": 1,
     "ResultRegister":12,
     "Algos": [
       {
@@ -17,11 +17,16 @@
             "Name": "[VAR]",
             "Values": [
             ]
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "ldr r12,[VAR[0]]"
+          "ldr [SSAPUSH],[VAR[0]]"
         ]
       },
       {
@@ -33,12 +38,23 @@
             "Name": "[PROPERTY]",
             "Values": [
             ]
+          },
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
           }
         ],
         "PostKeys": [
         ],
         "AssemblyCommands": [
-          "ldr r12,[r12,[PROPERTY[0]]]"
+          "ldr [SSAPUSH],[[SSAPOP[0]],[PROPERTY[0]]]"
         ]
       },
       {
@@ -52,7 +68,13 @@
             ]
           },
           {
-            "Name": "[REGPOP]",
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          },
+          {
+            "Name": "[SSAPUSH]",
             "Values": [
             ]
           }
@@ -60,7 +82,7 @@
         "PostKeys": [
         ],
         "AssemblyCommands": [
-          "str [REGPOP[0]],[r12,[PROPERTY[0]]]"
+          "str [SSAPUSH],[[SSAPOP[0]],[PROPERTY[0]]]"
         ]
       },
       {
@@ -71,11 +93,16 @@
           {
             "Name": "[NAME]",
             "Values": null
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "ldr r12, =[NAME]"
+          "ldr [SSAPUSH], =[NAME]"
         ]
       },
       {
@@ -87,37 +114,35 @@
             "Name": "[VAR]",
             "Values": [
             ]
-          }
-        ],
-        "PostKeys": [],
-        "AssemblyCommands": [
-          "str r12, [VAR[0]]"
-        ]
-      },
-      {
-        "Name": "MovResult",
-        "Mode": "default",
-        "Description": "Das verschieben eines Ergebnisses",
-        "Keys": [
+          },
           {
-            "Name": "[REG]",
-            "Values": [ ]
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "mov [REG[0]], r12"
+          "str [SSAPOP[0]], [VAR[0]]"
         ]
       },
       {
         "Name": "ExecuteCall",
         "Mode": "default",
         "Description": "Aufruf einer Funktion",
-        "Keys": [],
+        "Keys": [
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
         "PostKeys": [],
         "AssemblyCommands": [
           "mov r11, pc",
-          "mov pc, r12"
+          "mov pc, r12",
+          "mov [SSAPOP], r12"
         ]
       },
       {
@@ -142,8 +167,7 @@
         ],
         "AssemblyCommands": [
           "[NAME]:",
-          "push {r0,[PUSHREG]r11}",
-          "sub sp, sp, #[VARCOUNT]"
+          "push {r0,[PUSHREG]r11}"
         ]
       },
       {
@@ -167,50 +191,9 @@
           }
         ],
         "AssemblyCommands": [
-          "add sp, sp, #[VARCOUNT]",
           "pop {r0,[POPREG]r11}",
           "mov pc,r11",
           "[DATACONTAINER]"
-        ]
-      },
-      {
-        "Name": "UsePara",
-        "Mode": "default",
-        "Description": "Ein Registry Cache Entry als Parameter nutzen",
-        "Keys": [
-          {
-            "Name": "[REGPOP]",
-            "Values": []
-          },
-          {
-            "Name": "[PARA]",
-            "Values": []
-          }
-        ],
-        "PostKeys": [],
-        "AssemblyCommands": [
-          "mov [PARA[0]],[REGPOP[0]]"
-        ]
-      },
-      {
-        "Name": "UsePara",
-        "Mode": "get",
-        "Description": "Ein Parameter in seine Variabel laden",
-        "Keys": [
-          {
-            "Name": "[VAR]",
-            "Values": [
-            ]
-          },
-          {
-            "Name": "[PARA]",
-            "Values": [
-            ]
-          }
-        ],
-        "PostKeys": [],
-        "AssemblyCommands": [
-          "str [PARA[0]], [VAR[0]]"
         ]
       },
       {
@@ -221,37 +204,16 @@
           {
             "Name": "[NUMCONST]",
             "Values": []
-          }
-        ],
-        "PostKeys": [],
-        "AssemblyCommands": [
-          "mov r12,#[NUMCONST[0]]"
-        ]
-      },
-      {
-        "Name": "FunktionsDeklaration",
-        "Mode": "simple",
-        "Description": "Die Deklaration einer Funktion",
-        "Keys": [
+          },
           {
-            "Name": "[NAME]",
-            "Values": null
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
           }
         ],
-        "PostKeys": [
-        ],
-        "AssemblyCommands": [
-          "[NAME]:"
-        ]
-      },
-      {
-        "Name": "FunktionsEnde",
-        "Mode": "simple",
-        "Description": "Das ende einer Funktion",
-        "Keys": [ ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "mov pc,r11"
+          "mov [SSAPUSH],#[NUMCONST[0]]"
         ]
       },
       {
@@ -373,11 +335,17 @@
             "Values": [
             "1"
             ]
+          },
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
           }
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "cmp r12, #0",
+          "cmp [SSAPOP[0]], #0",
           "bne [JUMPTO[0]]",
           "b [JUMPTO]",
           "[JUMPTO[0]]:"

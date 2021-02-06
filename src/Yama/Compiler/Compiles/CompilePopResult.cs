@@ -80,6 +80,9 @@ namespace Yama.Compiler
             compiler.AddSSALine(line);
             map.Reference = line;
 
+            SSACompileArgument arg = new SSACompileArgument(line);
+            compiler.ContainerMgmt.StackArguments.Push(arg);
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)

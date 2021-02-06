@@ -242,10 +242,16 @@
                 "Mode": "default",
                 "Description": "Dynamic memory allocate free",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "sub r12, r12, #8",
+                "sub r12, [SSAPOP[0]], #8",
                 "mov r11, #0",
                 "str r11,[r12]"
                 ]
@@ -255,10 +261,21 @@
                 "Mode": "GetBlockState",
                 "Description": "Dynamic memory allocate GetBlockState",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "ldr r12, [r12]"
+                "ldr [SSAPUSH], [[SSAPOP[0]]]"
                 ]
             },
             {
@@ -266,10 +283,15 @@
                 "Mode": "HeaderSize",
                 "Description": "Dynamic memory allocate HeaderSize",
                 "Keys": [
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov r12, #0x8"
+                "mov [SSAPUSH], #0x8"
                 ]
             },
             {
@@ -277,10 +299,21 @@
                 "Mode": "GetBlockSize",
                 "Description": "Dynamic memory allocate GetBlockSize",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "ldr r12, [r12, #4]"
+                "ldr [SSAPUSH], [[SSAPOP[0]], #4]"
                 ]
             },
             {
@@ -288,12 +321,23 @@
                 "Mode": "GetNextAdress",
                 "Description": "Dynamic memory allocate GetBlockSize",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "ldr r11, [r12, #4]",
-                "add r12, r11, r12",
-                "add r12, r12, #8"
+                "ldr [SSAPUSH], [[SSAPOP[0]], #4]",
+                "add [SSAPUSH], [SSAPUSH], [SSAPOP[0]]",
+                "add [SSAPUSH], [SSAPUSH], #8"
                 ]
             },
             {
@@ -306,14 +350,25 @@
                         "Values": [
                         "1"
                         ]
-                    }
+                    },
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "ldr r12,[r12, #0]",
-                "cmp r12, #2",
+                "ldr [SSAPUSH],[[SSAPOP[0]], #0]",
+                "cmp [SSAPUSH], #2",
                 "beq [JUMPTO[0]]",
-                "mov r12, #0x0",
+                "mov [SSAPUSH], #0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -327,14 +382,25 @@
                         "Values": [
                         "1"
                         ]
-                    }
+                    },
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "ldr r12, [r12, #0]",
-                "cmp r12, #1",
+                "ldr [SSAPUSH], [[SSAPOP[0]], #0]",
+                "cmp [SSAPUSH], #1",
                 "beq [JUMPTO[0]]",
-                "mov r12, #0x0",
+                "mov [SSAPUSH], #0x0",
                 "[JUMPTO[0]]:"
                 ]
             },
@@ -343,10 +409,16 @@
                 "Mode": "SetBlockAdresse",
                 "Description": "Dynamic memory allocate SetBlockAdresse",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov lr, r12"
+                "mov lr, [SSAPOP[0]]"
                 ]
             },
             {
@@ -354,10 +426,16 @@
                 "Mode": "SetBlockState",
                 "Description": "Dynamic memory allocate SetBlockState",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "str r12, [lr, #0]"
+                "str [SSAPOP[0]], [lr, #0]"
                 ]
             },
             {
@@ -365,10 +443,21 @@
                 "Mode": "SetBlockSize",
                 "Description": "Dynamic memory allocate SetBlockSize",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "str r12, [lr, #4]"
+                "str [SSAPOP[0]], [lr, #4]"
                 ]
             },
             {
@@ -392,10 +481,15 @@
                 "Mode": "CurrentAdress",
                 "Description": "Dynamic memory allocate Init",
                 "Keys": [
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov r12, lr"
+                    "mov [SSAPUSH], lr"
                 ]
             },
             {
@@ -408,12 +502,18 @@
                         "Values": [
                         "1"
                         ]
-                    }
+                    },
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      }
                 ],
                 "PostKeys":[],
                 "AssemblyCommands":[
                     "push {r10}",
-                    "mov lr,r12",
+                    "mov lr,[SSAPOP[0]]",
                     "ldr r11,[lr,#0]",
                     "cmp r11, #0",
                     "bne [JUMPTO[0]]",
@@ -425,7 +525,7 @@
                     "beq [JUMPTO[0]]",
                     "ldr r11,[lr, #4]",
                     "add r11, r11, #8",
-                    "mov lr,r12",
+                    "mov lr,[SSAPOP[0]]",
                     "str r10,[lr,#0]",
                     "ldr r10,[lr, #4]",
                     "add r10, r10, r11",
