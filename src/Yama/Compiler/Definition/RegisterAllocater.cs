@@ -77,9 +77,9 @@ namespace Yama.Compiler.Definition
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
 
-                if (!line.Equals(map.Line)) continue;
+                if (!map.Line.FindEquals(line)) continue;
 
-                this.CheckToFreeRegister(map, from);
+                this.CheckToFreeRegister(map, line, from);
 
                 return map;
             }
@@ -87,15 +87,41 @@ namespace Yama.Compiler.Definition
             return null;
         }
 
+        public bool ExistAllocation(SSACompileLine line)
+        {
+            foreach (RegisterMap map in this.RegisterMaps)
+            {
+                if (map.Mode != RegisterUseMode.Used) continue;
+
+                if (map.Line.FindEquals(line)) return true;
+            }
+
+            return false;
+        }
+
         // -----------------------------------------------
 
-        private bool CheckToFreeRegister(RegisterMap map, SSACompileLine from)
+        private bool CheckToFreeRegister(RegisterMap map, SSACompileLine line, SSACompileLine from)
         {
-            for (int i = 0; i < map.Line.Calls.Count; i++)
-            {
-                if (!from.Equals(map.Line.Calls[i])) continue;
+            SSACompileLine checkCalls = map.Line;
+            if (!checkCalls.Equals(line)) checkCalls = line;
 
-                if (i == map.Line.Calls.Count - 1) map.Mode = RegisterUseMode.Free;
+            if (checkCalls.Equals(from))
+            {
+                if (checkCalls.Calls.Count == 0) map.Line.PhiMap.Remove(line);
+                if (map.Line.PhiMap.Count == 0) map.Mode = RegisterUseMode.Free;
+
+                return true;
+            }
+
+            for (int i = 0; i < checkCalls.Calls.Count; i++)
+            {
+                if (!from.Equals(checkCalls.Calls[i])) continue;
+
+                if (i != checkCalls.Calls.Count - 1) return true;
+
+                map.Line.PhiMap.Remove(line);
+                if (map.Line.PhiMap.Count == 0) map.Mode = RegisterUseMode.Free;
 
                 return true;
             }

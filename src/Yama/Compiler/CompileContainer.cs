@@ -35,9 +35,17 @@ namespace Yama.Compiler
 
         public Dictionary<string, SSAVariableMap> VarMapper
         {
+            get
+            {
+                return this.StackVarMapper.Peek();
+            }
+        }
+
+        public Stack<Dictionary<string, SSAVariableMap>> StackVarMapper
+        {
             get;
             set;
-        } = new Dictionary<string, SSAVariableMap>();
+        } = new Stack<Dictionary<string, SSAVariableMap>>();
 
         public List<string> RegistersUses
         {
@@ -74,6 +82,25 @@ namespace Yama.Compiler
             }
 
             return true;
+        }
+
+        public bool BeginNewContainerVars()
+        {
+            Dictionary<string, SSAVariableMap> copyMap = new Dictionary<string, SSAVariableMap>();
+
+            foreach (KeyValuePair<string, SSAVariableMap> orgMap in this.VarMapper)
+            {
+                copyMap.Add(orgMap.Key, new SSAVariableMap(orgMap.Value));
+            }
+
+            this.StackVarMapper.Push(copyMap);
+
+            return true;
+        }
+
+        public Dictionary<string, SSAVariableMap> PopVarMap()
+        {
+            return this.StackVarMapper.Pop();
         }
     }
 

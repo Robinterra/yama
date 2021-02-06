@@ -9,6 +9,7 @@ namespace Yama.Compiler
 {
     public class SSAVariableMap
     {
+        #region get/set
 
         public string Key
         {
@@ -53,6 +54,26 @@ namespace Yama.Compiler
             get;
             set;
         }
+
+        #endregion get/set
+
+        #region ctor
+
+        public SSAVariableMap()
+        {
+
+        }
+
+        public SSAVariableMap(SSAVariableMap value)
+        {
+            this.Key = value.Key;
+            this.Reference = value.Reference;
+            this.Calls = new List<ICompileRoot>();
+            this.Deklaration = value.Deklaration;
+            this.IsChecked = value.IsChecked;
+        }
+
+        #endregion ctor
     }
 
 }

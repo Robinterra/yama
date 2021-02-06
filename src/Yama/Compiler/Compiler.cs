@@ -130,6 +130,7 @@ namespace Yama.Compiler
         {
             this.Definition.BeginNewMethode(registerInUse);
             this.ContainerMgmt.AddNewMethode(compileContainer);
+            compileContainer.StackVarMapper.Push(new Dictionary<string, SSAVariableMap>());
             this.SetNewContainer(compileContainer);
             compileContainer.RegistersUses = registerInUse;
 
@@ -271,14 +272,25 @@ namespace Yama.Compiler
 
             this.Containers.Add(compileContainer);
 
+            if (this.ContainerMgmt.CurrentMethod != null) this.ContainerMgmt.CurrentMethod.BeginNewContainerVars();
+
             return true;
         }
 
         public bool PopContainer()
         {
             CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
+            Dictionary<string, SSAVariableMap> containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
 
             if (this.ContainerMgmt.CurrentContainer == null) return true;
+
+            foreach (KeyValuePair<string, SSAVariableMap> orgMap in this.ContainerMgmt.CurrentMethod.VarMapper)
+            {
+                if (containerMaps[orgMap.Key].Reference.Equals(orgMap.Value.Reference)) continue;
+
+                orgMap.Value.Reference.PhiMap.AddRange(containerMaps[orgMap.Key].Reference.PhiMap);
+            }
+
 
             this.ContainerMgmt.CurrentContainer.DataHolds.AddRange(container.DataHolds);
 

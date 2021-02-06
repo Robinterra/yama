@@ -29,6 +29,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public List<SSACompileLine> PhiMap
+        {
+            get;
+            set;
+        } = new List<SSACompileLine>();
+
         public List<SSACompileLine> Calls
         {
             get;
@@ -54,6 +60,7 @@ namespace Yama.Compiler
         public SSACompileLine(ICompileRoot compile)
         {
             this.Owner = compile;
+            this.PhiMap.Add(this);
         }
 
         #endregion ctor
@@ -87,6 +94,13 @@ namespace Yama.Compiler
             }
 
             if (!this.HasReturn) return true;
+            if (allocater.ExistAllocation(this))
+            {
+                RegisterMap map = allocater.GetReferenceRegister(this, this);
+
+                this.Owner.PrimaryKeys.Add("[SSAPUSH]", map.Name);
+                return true;
+            }
             if (this.Calls.Count == 0)
             {
                 this.Owner.PrimaryKeys.Add("[SSAPUSH]", genericDefinition.GetRegister(genericDefinition.ResultRegister));
@@ -98,12 +112,38 @@ namespace Yama.Compiler
 
             newMap.Mode = RegisterUseMode.Used;
             newMap.Line = this;
+            //newMap.Line.MakeAllRefs();
 
             this.Owner.PrimaryKeys.Add("[SSAPUSH]", newMap.Name);
 
             if (!container.RegistersUses.Contains(newMap.Name)) container.RegistersUses.Add(newMap.Name);
 
             return true;
+        }
+
+        private bool MakeAllRefs()
+        {
+            List<SSACompileLine> newCalls = new List<SSACompileLine>();
+
+            foreach (SSACompileLine phi in this.PhiMap)
+            {
+                newCalls.AddRange(phi.Calls);
+            }
+
+            newCalls.AddRange(this.Calls);
+            this.Calls = newCalls;
+
+            return true;
+        }
+
+        public bool FindEquals(SSACompileLine line)
+        {
+            foreach (SSACompileLine refLine in this.PhiMap)
+            {
+                if (line.Equals(refLine)) return true;
+            }
+
+            return false;
         }
 
         #endregion methods

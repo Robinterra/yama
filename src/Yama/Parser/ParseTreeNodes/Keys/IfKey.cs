@@ -127,9 +127,11 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            CompileSprungPunkt afterIfStatement = new CompileSprungPunkt();
+            CompileContainer ifcontainer = new CompileContainer();
+            ifcontainer.Ende = new CompileSprungPunkt();
 
-            CompileSprungPunkt afterElseStatement = new CompileSprungPunkt();
+            CompileContainer elsecontainer = new CompileContainer();
+            elsecontainer.Ende = new CompileSprungPunkt();
 
             CompileJumpTo jumpafterelse = new CompileJumpTo();
 
@@ -137,19 +139,27 @@ namespace Yama.Parser
 
             this.Condition.Compile(compiler, mode);
 
-            jumpWithCondition.Compile(compiler, afterIfStatement, "isZero");
+            jumpWithCondition.Compile(compiler, ifcontainer.Ende, "isZero");
+
+            compiler.PushContainer(ifcontainer);
 
             this.IfStatement.Compile(compiler, mode);
 
-            if (this.ElseStatement != null) jumpafterelse.Compile(compiler, afterElseStatement, mode);
+            compiler.PopContainer();
 
-            afterIfStatement.Compile(compiler, this, mode);
+            if (this.ElseStatement != null) jumpafterelse.Compile(compiler, elsecontainer.Ende, mode);
+
+            ifcontainer.Ende.Compile(compiler, this, mode);
 
             if (this.ElseStatement == null) return true;
 
+            compiler.PushContainer(elsecontainer);
+
             this.ElseStatement.Compile(compiler, mode);
 
-            afterElseStatement.Compile(compiler, this, mode);
+            compiler.PopContainer();
+
+            elsecontainer.Ende.Compile(compiler, this, mode);
 
             return true;
         }
