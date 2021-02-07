@@ -186,7 +186,7 @@ namespace Yama.Parser
             if (!isok) return false;
 
             CompilePushResult compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(compiler, null, "default");
+            compilePushResult.Compile(compiler, null, "copy");
 
             return true;
         }

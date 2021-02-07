@@ -123,6 +123,12 @@
         "Description": "Aufruf einer Funktion",
         "Keys": [
           {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          },
+          {
             "Name": "[SSAPUSH]",
             "Values": [
             ]
@@ -131,7 +137,7 @@
         "PostKeys": [],
         "AssemblyCommands": [
           "mov r11, pc",
-          "mov pc, r12",
+          "mov pc, [SSAPOP[0]]",
           "mov [SSAPUSH], r12"
         ]
       },

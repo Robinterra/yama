@@ -160,9 +160,6 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            if (this.LeftNode is Operator2Childs a) if (a.RightNode.Token.Text == "#defalgo Malloc,GetBlockSize:")
-                    System.Console.WriteLine("hier");
-
             this.RightNode.Compile(compiler, mode);
 
             if (this.Token.Text == "=")

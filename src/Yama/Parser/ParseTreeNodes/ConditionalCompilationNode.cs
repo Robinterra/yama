@@ -64,7 +64,7 @@ namespace Yama.Parser
             {
                 CompileRegionDefAlgo regionDefAlgo = new CompileRegionDefAlgo();
 
-                return regionDefAlgo.Compile(compiler, this, mode);;
+                return regionDefAlgo.Compile(compiler, this, mode);
             }
             if (this.Token.Text.Contains("#region asm")) return this.RegionAsm.Compile(compiler, this, mode);;
 

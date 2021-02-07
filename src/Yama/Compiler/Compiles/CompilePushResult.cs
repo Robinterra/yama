@@ -92,6 +92,12 @@ namespace Yama.Compiler
                 }
             }
 
+            if (mode == "copy")
+            {
+                SSACompileArgument arg = new SSACompileArgument(line.Arguments[0].Reference);
+                compiler.ContainerMgmt.StackArguments.Push(arg);
+            }
+
             return true;
         }
 
