@@ -70,19 +70,14 @@
           {
             "Name": "[SSAPOP]",
             "Values": [
-              "1"
-            ]
-          },
-          {
-            "Name": "[SSAPUSH]",
-            "Values": [
+              "2"
             ]
           }
         ],
         "PostKeys": [
         ],
         "AssemblyCommands": [
-          "str [SSAPUSH],[[SSAPOP[0]],[PROPERTY[0]]]"
+          "str [[SSAPOP[1]],[[SSAPOP[0]],[PROPERTY[0]]]"
         ]
       },
       {
@@ -108,13 +103,8 @@
       {
         "Name": "ReferenceCall",
         "Mode": "set",
-        "Description": "Das setzen einer ganz normalen Variabel",
+        "Description": "Kopieren einer variable bei bedarf",
         "Keys": [
-          {
-            "Name": "[VAR]",
-            "Values": [
-            ]
-          },
           {
             "Name": "[SSAPOP]",
             "Values": [
@@ -124,7 +114,7 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "str [SSAPOP[0]], [VAR[0]]"
+          "mov [SSAPUSH],[SSAPOP[0]]"
         ]
       },
       {
@@ -164,7 +154,7 @@
           }
         ],
         "AssemblyCommands": [
-          "ldr [SSAPUSH], [r12, #[stackpos]]"
+          "ldr [SSAPUSH], [r1, #[stackpos]]"
         ]
       },
       {
@@ -202,7 +192,7 @@
         ],
         "AssemblyCommands": [
           "[NAME]:",
-          "mov r12, sp",
+          "mov r1, sp",
           "push {[PUSHREG]r11}"
         ]
       },

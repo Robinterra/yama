@@ -30,7 +30,7 @@ namespace Yama.Parser
         {
             get;
             set;
-        } = new CompileJumpTo() { Point = PointMode.CurrentEnde };
+        } = new CompileJumpTo() { Point = PointMode.LoopEnde };
 
         #endregion get/set
 

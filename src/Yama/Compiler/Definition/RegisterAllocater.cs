@@ -73,6 +73,8 @@ namespace Yama.Compiler.Definition
 
         public RegisterMap GetReferenceRegister(SSACompileLine line, SSACompileLine from)
         {
+            line = this.GetOriginal(line);
+
             foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
@@ -85,6 +87,27 @@ namespace Yama.Compiler.Definition
             }
 
             return null;
+        }
+
+        public bool FreeLoops(CompileContainer loopContainer)
+        {
+            foreach (RegisterMap map in this.RegisterMaps)
+            {
+                if (map.Mode != RegisterUseMode.Used) continue;
+                if (map.Line.LoopContainer == null) continue;
+                if (!map.Line.LoopContainer.Equals(loopContainer)) continue;
+
+                map.Mode = RegisterUseMode.Free;
+            }
+
+            return true;
+        }
+
+        private SSACompileLine GetOriginal(SSACompileLine line)
+        {
+            if (line.ReplaceLine == null) return line;
+
+            return this.GetOriginal(line.ReplaceLine);
         }
 
         public bool ExistAllocation(SSACompileLine line)
@@ -103,6 +126,8 @@ namespace Yama.Compiler.Definition
 
         private bool CheckToFreeRegister(RegisterMap map, SSACompileLine line, SSACompileLine from)
         {
+            if (map.Line.LoopContainer != null) return true;
+
             SSACompileLine checkCalls = map.Line;
             if (!checkCalls.Equals(line)) checkCalls = line;
 

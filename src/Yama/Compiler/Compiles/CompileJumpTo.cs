@@ -82,11 +82,15 @@ namespace Yama.Compiler
 
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             if (this.Point == PointMode.Custom) this.Punkt = node;
             if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Begin;
             if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Ende;
             if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer.Begin;
             if (this.Point == PointMode.RootEnde) this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
+            if (this.Point == PointMode.LoopEnde) this.Punkt = compiler.ContainerMgmt.CurrentLoop.Ende;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -126,7 +130,8 @@ namespace Yama.Compiler
         RootBegin,
         RootEnde,
         CurrentBegin,
-        CurrentEnde
+        CurrentEnde,
+        LoopEnde
     }
 
 }

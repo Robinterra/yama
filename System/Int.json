@@ -521,11 +521,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov [SSAPUSH], #0xff",
+                "mov r1, #0xff",
                 "cmp [SSAPOP[1]], [SSAPOP[0]]",
                 "beq [JUMPTO[0]]",
-                "mov [SSAPUSH], #0x0",
-                "[JUMPTO[0]]:"
+                "mov r1, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -553,11 +554,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov [SSAPUSH], #0xff",
+                "mov r1, #0xff",
                 "cmp [SSAPOP[1]], [SSAPOP[0]]",
                 "bne [JUMPTO[0]]",
-                "mov [SSAPUSH], #0x0",
-                "[JUMPTO[0]]:"
+                "mov r1, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -585,11 +587,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov [SSAPUSH], #0xff",
-                "cmp [SSAPOP[1]], [SSAPOP[0]]",
+                "mov r1, #0xff",
+                "cmp [SSAPOP[0]], [SSAPOP[1]]",
                 "blt [JUMPTO[0]]",
-                "mov [SSAPUSH], #0x0",
-                "[JUMPTO[0]]:"
+                "mov r1, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -617,11 +620,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov [SSAPUSH], #0xff",
-                "cmp [SSAPOP[1]], [SSAPOP[0]]",
+                "mov r1, #0xff",
+                "cmp [SSAPOP[0]], [SSAPOP[1]]",
                 "ble [JUMPTO[0]]",
-                "mov [SSAPUSH], #0x0",
-                "[JUMPTO[0]]:"
+                "mov r1, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -649,11 +653,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov [SSAPUSH], #0xff",
-                "cmp [SSAPOP[1]], [SSAPOP[0]]",
+                "mov r1, #0xff",
+                "cmp [SSAPOP[0]], [SSAPOP[1]]",
                 "bgt [JUMPTO[0]]",
-                "mov [SSAPUSH], #0x0",
-                "[JUMPTO[0]]:"
+                "mov r1, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -681,11 +686,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov [SSAPUSH], #0xff",
-                "cmp [SSAPOP[1]], [SSAPOP[0]]",
-                "bge [JUMPTO[0]]",
-                "mov [SSAPUSH], #0x0",
-                "[JUMPTO[0]]:"
+                  "mov r1, #0xff",
+                  "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                  "bge [JUMPTO[0]]",
+                  "mov r1, #0x0",
+                  "[JUMPTO[0]]:",
+                  "mov [SSAPUSH], r1"
                 ]
             }
        ],
@@ -702,10 +708,21 @@
                 "Mode": "BinaryAnd",
                 "Description": "BinaryAnd",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "and r12,r1,r2"
+                    "and [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
                 ]
             },
             {
@@ -713,10 +730,21 @@
                 "Mode": "BinaryOr",
                 "Description": "BinaryOr",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "orr r12,r1,r2"
+                    "orr [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
                 ]
             },
             {
@@ -724,10 +752,21 @@
                 "Mode": "BinaryLeftShift",
                 "Description": "BinaryLeftShift",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "lsl r12,r1,r2"
+                    "lsl [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
                 ]
             },
             {
@@ -735,10 +774,21 @@
                 "Mode": "BinaryRightShift",
                 "Description": "BinaryRightShift",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "lsr r12,r1,r2"
+                    "lsr [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
                 ]
             },
             {
@@ -746,11 +796,22 @@
                 "Mode": "BinaryNegation",
                 "Description": "BinaryNegation",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "ldr r12, =0xffffffff",
-                "eor r12, r12, r1"
+                    "ldr r12, =0xffffffff",
+                    "eor [SSAPUSH], [SSAPOP[0]], r12"
                 ]
             },
             {
@@ -758,10 +819,21 @@
                 "Mode": "BinaryXor",
                 "Description": "BinaryXor",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "eor r12,r1,r2"
+                    "eor [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
                 ]
             },
             {
@@ -769,10 +841,21 @@
                 "Mode": "Subtraction",
                 "Description": "Subtraction",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "sub r12,r1,r2"
+                    "sub [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
                 ]
             },
             {
@@ -780,10 +863,21 @@
                 "Mode": "Addition",
                 "Description": "Addition",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "add r12,r1,r2"
+                    "add [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
                 ]
             },
             {
@@ -791,10 +885,21 @@
                 "Mode": "Mul",
                 "Description": "mul",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mul r12,r1,r2"
+                    "mul [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
                 ]
             },
             {
@@ -802,10 +907,21 @@
                 "Mode": "Incremtation",
                 "Description": "Incremtation",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "add r12, r1 , #1"
+                    "add [SSAPUSH], [SSAPOP[0]], #1"
                 ]
             },
             {
@@ -813,10 +929,21 @@
                 "Mode": "Decremtation",
                 "Description": "Decremtation",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "sub r12, r1 , #1"
+                    "sub [SSAPUSH], [SSAPOP[0]] , #1"
                 ]
             },
             {
@@ -829,15 +956,27 @@
                         "Values": [
                         "1"
                         ]
-                    }
+                    },
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "cmp r1,r2",
-                "mov r12, #0xff",
-                "beq [JUMPTO[0]]",
-                "mov r12, #0x0",
-                "[JUMPTO[0]]:"
+                    "mov r1, #0xff",
+                    "cmp [SSAPOP[1]], [SSAPOP[0]]",
+                    "beq [JUMPTO[0]]",
+                    "mov r1, #0x0",
+                    "[JUMPTO[0]]:",
+                    "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -850,15 +989,27 @@
                         "Values": [
                         "1"
                         ]
-                    }
+                    },
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "cmp r1,r2",
-                "mov r12, #0xff",
-                "bne [JUMPTO[0]]",
-                "mov r12, #0x0",
-                "[JUMPTO[0]]:"
+                    "mov r1, #0xff",
+                    "cmp [SSAPOP[1]], [SSAPOP[0]]",
+                    "bne [JUMPTO[0]]",
+                    "mov r1, #0x0",
+                    "[JUMPTO[0]]:",
+                    "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -871,15 +1022,27 @@
                         "Values": [
                         "1"
                         ]
-                    }
+                    },
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "cmp r1,r2",
-                "mov r12, #0xff",
-                "blt [JUMPTO[0]]",
-                "mov r12, #0x0",
-                "[JUMPTO[0]]:"
+                    "mov r1, #0xff",
+                    "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                    "blt [JUMPTO[0]]",
+                    "mov r1, #0x0",
+                    "[JUMPTO[0]]:",
+                    "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -892,15 +1055,27 @@
                         "Values": [
                         "1"
                         ]
-                    }
+                    },
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "cmp r1,r2",
-                "mov r12, #0xff",
-                "ble [JUMPTO[0]]",
-                "mov r12, #0x0",
-                "[JUMPTO[0]]:"
+                    "mov r1, #0xff",
+                    "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                    "ble [JUMPTO[0]]",
+                    "mov r1, #0x0",
+                    "[JUMPTO[0]]:",
+                    "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -913,15 +1088,27 @@
                         "Values": [
                         "1"
                         ]
-                    }
+                    },
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "cmp r1,r2",
-                "mov r12, #0xff",
-                "bgt [JUMPTO[0]]",
-                "mov r12, #0x0",
-                "[JUMPTO[0]]:"
+                    "mov r1, #0xff",
+                    "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                    "bgt [JUMPTO[0]]",
+                    "mov r1, #0x0",
+                    "[JUMPTO[0]]:",
+                    "mov [SSAPUSH], r1"
                 ]
             },
             {
@@ -934,15 +1121,27 @@
                         "Values": [
                         "1"
                         ]
-                    }
+                    },
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "cmp r1,r2",
-                "mov r12, #0xff",
-                "bge [JUMPTO[0]]",
-                "mov r12, #0x0",
-                "[JUMPTO[0]]:"
+                    "mov r1, #0xff",
+                    "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                    "bge [JUMPTO[0]]",
+                    "mov r1, #0x0",
+                    "[JUMPTO[0]]:",
+                    "mov [SSAPUSH], r1"
                 ]
             }
        ],

@@ -26,6 +26,12 @@ namespace Yama.Compiler
 
         public List<ICompileRoot> toRemove = new List<ICompileRoot>();
 
+        public bool IsLoopHeaderBegin
+        {
+            get;
+            set;
+        }
+
         public FileInfo OutputFile
         {
             get;
@@ -87,6 +93,17 @@ namespace Yama.Compiler
 
         public SSACompileLine AddSSALine(SSACompileLine line)
         {
+            if (line.Algo == null)
+            {
+                /*line.LoopContainer = this.ContainerMgmt.CurrentContainer;
+
+                //this.ContainerMgmt.CurrentContainer.Lines.Add(line);
+                this.SSALines.Add(line);
+                this.ContainerMgmt.CurrentMethod.Lines.Add(line);*/
+
+                return line;
+            }
+
             if (!line.Algo.CanBeDominatet)
             {
                 //this.ContainerMgmt.CurrentContainer.Lines.Add(line);
@@ -128,6 +145,8 @@ namespace Yama.Compiler
 
         public bool BeginNewMethode(List<string> registerInUse, CompileContainer compileContainer, ValidUses uses)
         {
+            if (this.ContainerMgmt.CurrentMethod != null) this.PopContainer();
+
             this.Definition.BeginNewMethode(registerInUse);
             this.ContainerMgmt.AddNewMethode(compileContainer);
             compileContainer.StackVarMapper.Push(new Dictionary<string, SSAVariableMap>());
@@ -144,6 +163,11 @@ namespace Yama.Compiler
 
                 this.ContainerMgmt.CurrentMethod.VarMapper.Add(dek.Name, map);
             }
+
+            CompileContainer container = new CompileContainer();
+            container.Begin = compileContainer.Begin;
+            container.Ende = compileContainer.Ende;
+            this.PushContainer(container);
 
             return true;
         }
@@ -234,6 +258,8 @@ namespace Yama.Compiler
                 if (!root.InFileCompilen(this)) this.AddError("Beim Schreiben der Assemblersequence ist ein Fehler aufgetreten");
             }
 
+            this.AssemblerSequence.AddRange(this.DataSequence);
+
             foreach (ICompileRoot root in this.toRemove )
             {
                 this.AssemblerSequence.Remove(root);
@@ -266,9 +292,10 @@ namespace Yama.Compiler
             return true;
         }
 
-        public bool PushContainer(CompileContainer compileContainer)
+        public bool PushContainer(CompileContainer compileContainer, bool isloop = false)
         {
             this.ContainerMgmt.ContainerStack.Push(compileContainer);
+            if (isloop) this.ContainerMgmt.LoopStack.Push(compileContainer);
 
             this.Containers.Add(compileContainer);
 
@@ -279,8 +306,13 @@ namespace Yama.Compiler
 
         public bool PopContainer()
         {
+            if (this.ContainerMgmt.ContainerStack.Count == 0) return true;
+
             CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
             Dictionary<string, SSAVariableMap> containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
+
+            CompileContainer loop = this.ContainerMgmt.CurrentLoop;
+            if (loop != null) if (loop.Equals(container)) this.ContainerMgmt.LoopStack.Pop();
 
             if (this.ContainerMgmt.CurrentContainer == null) return true;
 
@@ -288,15 +320,66 @@ namespace Yama.Compiler
 
             if (this.ContainerMgmt.CurrentMethod == null) return true;
 
+            if (containerMaps == null) return true;
+
             foreach (KeyValuePair<string, SSAVariableMap> orgMap in this.ContainerMgmt.CurrentMethod.VarMapper)
             {
                 if (containerMaps[orgMap.Key].Reference == null) continue;
 
                 if (containerMaps[orgMap.Key].Reference.Equals(orgMap.Value.Reference)) continue;
 
-                if (orgMap.Value.Reference == null) orgMap.Value.Reference = containerMaps[orgMap.Key].Reference;
+                if (orgMap.Value.Reference == null)
+                {
+                    orgMap.Value.Reference = containerMaps[orgMap.Key].Reference;
+
+                    continue;
+                }
+
+                //if (containerMaps[orgMap.Key].Reference.ReplaceLine != null) this.CheckForCopy(containerMaps[orgMap.Key].Reference);
 
                 orgMap.Value.Reference.PhiMap.AddRange(containerMaps[orgMap.Key].Reference.PhiMap);
+            }
+
+            foreach (SSACompileLine line in container.PhiSetNewVar)
+            {
+                if (line.ReplaceLine == null) continue;
+                if (line.ReplaceLine.PhiMap.Count == 1) continue;
+                if (!this.CheckPhiMaps(line, line.PhiMap)) continue;
+
+                line.ReplaceLine = null;
+                if (line.Owner is CompileReferenceCall t) t.IsUsed = true;
+                line.HasReturn = true;
+            }
+
+            foreach (SSACompileLine line in container.PhiSetNewVar)
+            {
+                if (line.ReplaceLine == null) continue;
+
+                line.ReplaceLine.PhiMap.Add(line);
+                line.ReplaceLine.Calls.AddRange(line.Calls);
+            }
+
+            return true;
+        }
+
+        public bool ComeLeftBeforeRight(SSACompileLine line, SSACompileLine right)
+        {
+            foreach (SSACompileLine alls in this.SSALines)
+            {
+                if (alls.Equals(line)) return true;
+                if (alls.Equals(right)) return false;
+            }
+
+            return false;
+        }
+
+        private bool CheckPhiMaps(SSACompileLine line, List<SSACompileLine> phiMap)
+        {
+            foreach (SSACompileLine mustcomebefore in phiMap)
+            {
+                if (this.ComeLeftBeforeRight(mustcomebefore, line)) continue;
+
+                return false;
             }
 
             return true;

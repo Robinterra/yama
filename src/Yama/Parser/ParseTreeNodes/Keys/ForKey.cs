@@ -133,7 +133,7 @@ namespace Yama.Parser
 
             this.Deklaration.Compile(compiler, mode);
 
-            compiler.PushContainer(this.CompileContainer);
+            compiler.PushContainer(this.CompileContainer, true);
 
             CompileJumpTo jumpbegin = new CompileJumpTo();
 

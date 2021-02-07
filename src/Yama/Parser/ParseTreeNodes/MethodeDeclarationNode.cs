@@ -457,9 +457,7 @@ namespace Yama.Parser
             int count = 0;
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
-                CompilePopResult compilePopResult = new CompilePopResult();
-                compilePopResult.Position = count;
-                compilePopResult.Compile(compiler, node, "default");
+                if (!this.MakeOneArgument(node, compiler, count)) continue;
 
                 count++;
 
@@ -475,6 +473,18 @@ namespace Yama.Parser
             if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(compiler, mode);
 
             return this.CompileNormalFunktion(compiler, mode, count);
+        }
+
+        private bool MakeOneArgument(IndexVariabelnDeklaration node, Compiler.Compiler compiler, int count)
+        {
+            if (this.Deklaration.Type == MethodeType.Ctor)
+                if (node.Name == "this") return false;
+
+            CompilePopResult compilePopResult = new CompilePopResult();
+            compilePopResult.Position = count;
+            compilePopResult.Compile(compiler, node, "default");
+
+            return true;
         }
 
         private bool BaseCompile(Compiler.Compiler compiler)
@@ -520,8 +530,9 @@ namespace Yama.Parser
         {
             if (this.Deklaration.Klasse.GetNonStaticPropCount == 0) return true;
 
-            CompileUsePara usePara = new CompileUsePara();
-            usePara.CompileIndexNode(compiler, this.Deklaration.Parameters.FirstOrDefault(), "get");
+            /*CompilePopResult compilePopResult = new CompilePopResult();
+            compilePopResult.Position = 0;
+            compilePopResult.Compile(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");*/
 
             CompileReferenceCall refCall = new CompileReferenceCall();
             refCall.CompileDek(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");

@@ -59,6 +59,12 @@ namespace Yama.Compiler
             set;
         } = new List<CompileContainer>();
 
+        public List<SSACompileLine> PhiSetNewVar
+        {
+            get;
+            set;
+        } = new List<SSACompileLine>();
+
         public string AddDataCall(string jumpPoint, Compiler compiler)
         {
             DataHold dataHold = new DataHold();
@@ -100,7 +106,27 @@ namespace Yama.Compiler
 
         public Dictionary<string, SSAVariableMap> PopVarMap()
         {
+            if (this.StackVarMapper.Count == 0) return null;
+
             return this.StackVarMapper.Pop();
+        }
+
+        public bool IsReferenceInVarsContains(SSACompileLine reference)
+        {
+            if (reference == null) return false;
+
+            foreach (KeyValuePair<string, SSAVariableMap> keyValuePair in this.VarMapper)
+            {
+                if (keyValuePair.Value.Reference == null) continue;
+
+                foreach (SSACompileLine line in keyValuePair.Value.Reference.PhiMap)
+                {
+                    if (reference.Equals(line)) return true;
+                }
+
+            }
+
+            return false;
         }
     }
 

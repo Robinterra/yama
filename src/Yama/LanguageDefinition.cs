@@ -504,6 +504,13 @@ namespace Yama
             {
                 foreach (CompilerError error in compiler.Errors)
                 {
+                    if (error.Use != null)
+                    {
+                        this.PrintCompilerError(error);
+
+                        continue;
+                    }
+
                     this.PrintSimpleError(error.Msg);
                 }
 

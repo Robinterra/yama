@@ -254,13 +254,13 @@ namespace Yama.Compiler.Definition
             if (query.Key.Values == null) query.Key.Values = new List<string>();
 
             if (query.Key.Name == "[VAR]") return this.VarQuery(query);
+            if (query.Key.Name == "[SSAPOP]") return this.SsaPop(query);
+            if (query.Key.Name == "[SSAPUSH]") return this.SsaPush(query);
             if (query.Kategorie == "funcref") return this.FuncRef(query);
             if (query.Kategorie == "setref") return this.FuncRef(query);
             if (query.Kategorie == "point0") return this.Point0(query);
             if (query.Key.Name == "[REG]") return this.RegisterQuery(query);
             if (query.Key.Name == "[NAME]") return this.NameQuery(query);
-            if (query.Key.Name == "[SSAPOP]") return this.SsaPop(query);
-            if (query.Key.Name == "[SSAPUSH]") return this.SsaPush(query);
             if (query.Key.Name == "[PARA]") return this.MethodePara(query);
             if (query.Key.Name == "[NUMCONST]") return this.MethodeNumConst(query);
             if (query.Key.Name == "[JUMPTO]") return this.JumpToQuery(query);
@@ -602,9 +602,16 @@ namespace Yama.Compiler.Definition
 
             for (int i = 0; i < count; i++)
             {
-                SSACompileArgument arg = this.Compiler.ContainerMgmt.StackArguments.Pop();
+                try
+                {
+                    SSACompileArgument arg = this.Compiler.ContainerMgmt.StackArguments.Pop();
 
-                request.Target.AddArgument(arg);
+                    request.Target.AddArgument(arg);
+                }
+                catch
+                {
+                    return result;
+                }
             }
 
             return result;
@@ -645,7 +652,9 @@ namespace Yama.Compiler.Definition
 
         private Dictionary<string,string> VarQuery(IRegisterQuery query)
         {
-            string keypattern = "[VAR[{0}]]";
+            return new Dictionary<string, string>();
+
+            /*string keypattern = "[VAR[{0}]]";
             GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
             if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
             Dictionary<string,string> result = new Dictionary<string,string>();
@@ -676,7 +685,7 @@ namespace Yama.Compiler.Definition
                 return  result;
             }
 
-            return null;
+            return null;*/
         }
 
         // -----------------------------------------------

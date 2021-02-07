@@ -22,9 +22,9 @@ namespace "System.IO"
         {
             #defalgo Malloc,Init:
 
-            int currentadress;
+            int currentadress = null;
             int currentBlockState;
-            int currentBlockSize;
+            int currentBlockSize = null;
             int nextAdress = #defalgo Malloc,CurrentAdress:;
 
             while ( true )

@@ -53,6 +53,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public CompileContainer LoopContainer
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -69,7 +75,7 @@ namespace Yama.Compiler
 
         public bool AddArgument(SSACompileArgument arg)
         {
-            if (arg.Reference.ReplaceLine != null) arg.Reference = arg.Reference.ReplaceLine;
+            //if (arg.Reference.ReplaceLine != null) arg.Reference = arg.Reference.ReplaceLine;
 
             this.Arguments.Add(arg);
 
@@ -82,11 +88,25 @@ namespace Yama.Compiler
 
         public bool DoAllocate(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
         {
+            if (this.Owner is CompileFreeLoop)
+            {
+                allocater.FreeLoops(this.LoopContainer);
+
+                return true;
+            }
+
             int counter = 0;
             foreach (SSACompileArgument arg in this.Arguments)
             {
                 RegisterMap map = allocater.GetReferenceRegister(arg.Reference, this);
-                if (map == null) return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
+                if (map == null)
+                {
+                    compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
+
+                    counter++;
+
+                    continue;
+                }
 
                 this.Owner.PrimaryKeys.Add(string.Format("[SSAPOP[{0}]]", counter), map.Name);
 

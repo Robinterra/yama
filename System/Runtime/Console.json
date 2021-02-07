@@ -7,10 +7,17 @@
                 "Mode": "Print",
                 "Description": "Print int",
                 "Keys": [
+
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov r1, r12",
+                "mov r1, [SSAPOP[0]]",
                 "mov r12, #1",
                 "exec r12"
                 ]
@@ -20,10 +27,16 @@
                 "Mode": "PrintText",
                 "Description": "Print Text",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov r1, r12",
+                "mov r1, [SSAPOP[0]]",
                 "mov r12, #4",
                 "exec r12"
                 ]

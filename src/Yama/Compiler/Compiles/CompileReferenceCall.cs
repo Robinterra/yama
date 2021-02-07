@@ -51,11 +51,9 @@ namespace Yama.Compiler
 
         public bool IsUsed
         {
-            get
-            {
-                return true;
-            }
-        }
+            get;
+            set;
+        } = true;
 
         #endregion get/set
 
@@ -70,6 +68,8 @@ namespace Yama.Compiler
                 if (query.Key.Name != "[PROPERTY]") mode = string.Empty;
 
                 query.Kategorie = mode;
+
+                if (key.Name == "[SSAPOP]" || key.Name == "[SSAPUSH]") query.Value = new RequestSSAArgument(line);
 
                 return query;
             }
@@ -134,7 +134,8 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(null, key, "default", line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                if (result == null)
+                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -148,28 +149,9 @@ namespace Yama.Compiler
 
         public bool CompileDek(Compiler compiler, IndexVariabelnDeklaration node, string mode = "default")
         {
-            if (mode == "set")
-            {
-                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
+            if (mode == "set") return this.SetVariableCompile(compiler, node);
 
-                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
-                SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
-                map.Reference = arg.Reference;
-
-                return true;
-            }
-
-            if (mode == "default")
-            {
-                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
-
-                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
-
-                SSACompileArgument arg = new SSACompileArgument(map.Reference);
-                compiler.ContainerMgmt.StackArguments.Push(arg);
-
-                return true;
-            }
+            if (mode == "default") return this.GetVariableCompile(compiler, node);
 
             this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
@@ -187,13 +169,65 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQueryDek(node, key, mode, line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                if (result == null)
+                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
                     if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
                 }
             }
+
+            return true;
+        }
+
+        private bool SetVariableCompile(Compiler compiler, IndexVariabelnDeklaration node)
+        {
+            if (node.Use == null) return compiler.AddError("Darf nicht null sein");
+
+            if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
+
+            this.Algo = compiler.GetAlgo(this.AlgoName, "set");
+            if (this.Algo == null) return false;
+
+            SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+            //SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
+
+            SSACompileLine lineset = new SSACompileLine(this);
+
+            this.PrimaryKeys = new Dictionary<string, string>();
+
+            foreach (AlgoKeyCall key in this.Algo.Keys)
+            {
+                DefaultRegisterQuery query = this.BuildQueryDek(node, key, "set", lineset);
+
+                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                if (result == null)
+                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+
+                foreach (KeyValuePair<string, string> pair in result)
+                {
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
+                }
+            }
+
+            SSACompileArgument arg = lineset.Arguments.FirstOrDefault();
+
+            if (!compiler.ContainerMgmt.CurrentMethod.IsReferenceInVarsContains(arg.Reference))
+            {
+                map.Reference = arg.Reference;
+
+                return true;
+            }
+
+            lineset.ReplaceLine = arg.Reference;
+            this.IsUsed = false;
+            compiler.AssemblerSequence.Add(this);
+            compiler.AddSSALine(lineset);
+
+            compiler.ContainerMgmt.CurrentContainer.PhiSetNewVar.Add(lineset);
+
+            map.Reference = lineset;
 
             return true;
         }
@@ -220,30 +254,9 @@ namespace Yama.Compiler
         {
             if (this.CheckRelevanz(compiler, node, mode)) return true;
 
-            if (mode == "set")
-            {
-                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.AssemblyName)) return compiler.AddError("variable not in varmapper", node.Use);
+            if (mode == "set") return this.SetVariableCompile(compiler, (IndexVariabelnDeklaration)node.Deklaration);
 
-                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.AssemblyName];
-                SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
-                map.Reference = arg.Reference;
-
-                return true;
-            }
-
-            if (mode == "default")
-            {
-                if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.AssemblyName)) return compiler.AddError("variable not in varmapper", node.Use);
-
-                SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.AssemblyName];
-
-                if (map.Reference == null) return compiler.AddError("variable is not set!", node.Use);
-
-                SSACompileArgument arg = new SSACompileArgument(map.Reference);
-                compiler.ContainerMgmt.StackArguments.Push(arg);
-
-                return true;
-            }
+            if (mode == "default") return this.GetVariableCompile(compiler, (IndexVariabelnDeklaration)node.Deklaration);
 
             this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
@@ -267,7 +280,8 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                if (result == null)
+                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -278,9 +292,25 @@ namespace Yama.Compiler
             return true;
         }
 
+        private bool GetVariableCompile(Compiler compiler, IndexVariabelnDeklaration deklaration)
+        {
+            if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(deklaration.Name)) return compiler.AddError("variable not in varmapper", deklaration.Use);
+
+            SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[deklaration.Name];
+
+            if (map.Reference == null) return compiler.AddError("variable is not set!", deklaration.Use);
+
+            SSACompileArgument arg = new SSACompileArgument(map.Reference);
+            compiler.ContainerMgmt.StackArguments.Push(arg);
+
+            return true;
+        }
+
         private bool CheckRelevanz(Compiler compiler, IndexVariabelnReference node, string mode)
         {
-            if (mode != "default" && mode != "set") return false;
+            return false;
+
+            /*if (mode != "default" && mode != "set") return false;
             if (!(node.Deklaration is IndexVariabelnDeklaration t)) return false;
             if (mode == "set") return t.References.Count == 0;
 
@@ -290,15 +320,15 @@ namespace Yama.Compiler
             if (root.Node.Token.Text != node.Name) return false;
             if (u.Algo.Mode != "set") return false;
 
-            if (t.References.Count != 1) return true;
-            u.DoNotCompile = true;
+            //if (t.References.Count != 1) return true;
+            //u.DoNotCompile = true;
 
-            return true;
+            return false;*/
         }
 
         public bool InFileCompilen(Compiler compiler)
         {
-            if (this.DoNotCompile)
+            if (this.DoNotCompile || !this.IsUsed)
             {
                 compiler.toRemove.Add(this);
                 return true;

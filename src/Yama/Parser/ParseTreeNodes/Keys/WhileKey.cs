@@ -109,7 +109,7 @@ namespace Yama.Parser
 
             this.CompileContainer.Ende = new CompileSprungPunkt();
 
-            compiler.PushContainer(this.CompileContainer);
+            compiler.PushContainer(this.CompileContainer, true);
 
             CompileJumpTo jumpbegin = new CompileJumpTo();
 
@@ -117,7 +117,11 @@ namespace Yama.Parser
 
             this.CompileContainer.Begin.Compile(compiler, this, mode);
 
+            //compiler.IsLoopHeaderBegin = true;
+
             this.Condition.Compile(compiler, mode);
+
+            //compiler.IsLoopHeaderBegin = false;
 
             jumpende.Compile(compiler, this.CompileContainer.Ende, "isZero");
 
@@ -126,6 +130,9 @@ namespace Yama.Parser
             jumpbegin.Compile(compiler, this.CompileContainer.Begin, mode);
 
             this.CompileContainer.Ende.Compile(compiler, this, mode);
+
+            //CompileFreeLoop freeLoop = new CompileFreeLoop();
+            //freeLoop.Compile(compiler, this, mode);
 
             compiler.PopContainer();
 
