@@ -196,7 +196,7 @@ namespace Yama.Parser
             if (methdek.Type == MethodeType.VektorStatic) return true;
 
             CompilePushResult compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(compiler, null, "default");
+            compilePushResult.Compile(compiler, null, "copy");
 
             return true;
         }
@@ -206,7 +206,7 @@ namespace Yama.Parser
             if (methdek.Type == MethodeType.PropertyStaticGetSet) return true;
 
             CompilePushResult compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(compiler, null, "default");
+            compilePushResult.Compile(compiler, null, "copy");
 
             return true;
         }
