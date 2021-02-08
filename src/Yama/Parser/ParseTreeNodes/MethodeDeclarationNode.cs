@@ -447,7 +447,7 @@ namespace Yama.Parser
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
 
-            compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, this.Deklaration.ThisUses);
+            compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, ((Container)this.Statement).IndexContainer.ThisUses);
 
             if (this.AccessDefinition != null)
                 if (this.AccessDefinition.Kind == IdentifierKind.Simple) return compiler.AddError("simple keyword is not anymore supported!", this);

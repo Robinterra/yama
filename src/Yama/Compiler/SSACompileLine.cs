@@ -90,7 +90,7 @@ namespace Yama.Compiler
         {
             if (this.Owner is CompileFreeLoop)
             {
-                allocater.FreeLoops(this.LoopContainer);
+                allocater.FreeLoops(this.LoopContainer, this);
 
                 return true;
             }

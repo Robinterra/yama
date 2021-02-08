@@ -150,24 +150,13 @@ namespace Yama.Compiler
             this.Definition.BeginNewMethode(registerInUse);
             this.ContainerMgmt.AddNewMethode(compileContainer);
             compileContainer.StackVarMapper.Push(new Dictionary<string, SSAVariableMap>());
-            this.SetNewContainer(compileContainer);
+            this.SetNewContainer(compileContainer, uses);
             compileContainer.RegistersUses = registerInUse;
-
-            foreach (IParent parent in uses.Deklarationen)
-            {
-                if (!(parent is IndexVariabelnDeklaration dek)) continue;
-
-                SSAVariableMap map = new SSAVariableMap();
-                map.Key = dek.Name;
-                map.Deklaration = dek;
-
-                this.ContainerMgmt.CurrentMethod.VarMapper.Add(dek.Name, map);
-            }
 
             CompileContainer container = new CompileContainer();
             container.Begin = compileContainer.Begin;
             container.Ende = compileContainer.Ende;
-            this.PushContainer(container);
+            this.PushContainer(container, null);
 
             return true;
         }
@@ -203,7 +192,7 @@ namespace Yama.Compiler
             if (this.Definition == null) return this.AddError("Keine definition zur Übersetzung in Assembler gesetzt");
             this.Definition.Compiler = this;
 
-            this.SetNewContainer(new CompileContainer());
+            this.SetNewContainer(new CompileContainer(), null);
             this.ContainerMgmt.CurrentMethod = this.ContainerMgmt.CurrentContainer;
 
             this.Header.Compile(this, this.MainFunction);
@@ -282,17 +271,17 @@ namespace Yama.Compiler
             return false;
         }
 
-        public bool SetNewContainer(CompileContainer compileContainer)
+        public bool SetNewContainer(CompileContainer compileContainer, ValidUses uses)
         {
             this.ContainerMgmt.RootContainer = compileContainer;
-            this.PushContainer(compileContainer);
+            this.PushContainer(compileContainer, uses);
 
             this.Definition.VariabelCounter = 0;
 
             return true;
         }
 
-        public bool PushContainer(CompileContainer compileContainer, bool isloop = false)
+        public bool PushContainer(CompileContainer compileContainer, ValidUses uses, bool isloop = false)
         {
             this.ContainerMgmt.ContainerStack.Push(compileContainer);
             if (isloop) this.ContainerMgmt.LoopStack.Push(compileContainer);
@@ -300,6 +289,20 @@ namespace Yama.Compiler
             this.Containers.Add(compileContainer);
 
             if (this.ContainerMgmt.CurrentMethod != null) this.ContainerMgmt.CurrentMethod.BeginNewContainerVars();
+
+            if (uses == null) return true;
+
+            foreach (IParent parent in uses.Deklarationen)
+            {
+                if (!(parent is IndexVariabelnDeklaration dek)) continue;
+                if (this.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(dek.Name)) continue;
+
+                SSAVariableMap map = new SSAVariableMap();
+                map.Key = dek.Name;
+                map.Deklaration = dek;
+
+                this.ContainerMgmt.CurrentMethod.VarMapper.Add(dek.Name, map);
+            }
 
             return true;
         }
@@ -311,8 +314,10 @@ namespace Yama.Compiler
             CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
             Dictionary<string, SSAVariableMap> containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
 
+            bool isloop = false;
+
             CompileContainer loop = this.ContainerMgmt.CurrentLoop;
-            if (loop != null) if (loop.Equals(container)) this.ContainerMgmt.LoopStack.Pop();
+            if (loop != null) if (isloop = loop.Equals(container)) this.ContainerMgmt.LoopStack.Pop();
 
             if (this.ContainerMgmt.CurrentContainer == null) return true;
 
@@ -322,22 +327,29 @@ namespace Yama.Compiler
 
             if (containerMaps == null) return true;
 
-            foreach (KeyValuePair<string, SSAVariableMap> orgMap in this.ContainerMgmt.CurrentMethod.VarMapper)
+            Dictionary<string, SSAVariableMap> parentVarMap = this.ContainerMgmt.CurrentMethod.VarMapper;
+
+            foreach (KeyValuePair<string, SSAVariableMap> conMap in containerMaps)
             {
-                if (containerMaps[orgMap.Key].Reference == null) continue;
+                if (!parentVarMap.ContainsKey(conMap.Key)) continue;
+                if (conMap.Value.Reference == null) continue;
 
-                if (containerMaps[orgMap.Key].Reference.Equals(orgMap.Value.Reference)) continue;
-
-                if (orgMap.Value.Reference == null)
+                if (isloop)
                 {
-                    orgMap.Value.Reference = containerMaps[orgMap.Key].Reference;
+                    conMap.Value.Reference.LoopContainer = loop;
+                    conMap.Value.Reference.Calls.Add(loop.LoopLine);
+                }
+
+                if (parentVarMap[conMap.Key].Reference == null || conMap.Value.Reference.Equals(parentVarMap[conMap.Key].Reference))
+                {
+                    parentVarMap[conMap.Key].Reference = conMap.Value.Reference;
 
                     continue;
                 }
 
                 //if (containerMaps[orgMap.Key].Reference.ReplaceLine != null) this.CheckForCopy(containerMaps[orgMap.Key].Reference);
 
-                orgMap.Value.Reference.PhiMap.AddRange(containerMaps[orgMap.Key].Reference.PhiMap);
+                parentVarMap[conMap.Key].Reference.PhiMap.AddRange(conMap.Value.Reference.PhiMap);
             }
 
             foreach (SSACompileLine line in container.PhiSetNewVar)

@@ -37,13 +37,13 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode GetStatement
+        public GetKey GetStatement
         {
             get;
             set;
         }
 
-        public IParseTreeNode SetStatement
+        public SetKey SetStatement
         {
             get;
             set;
@@ -247,8 +247,8 @@ namespace Yama.Parser
 
             container.Token.Node = deklaration;
 
-            deklaration.GetStatement = container.GetAllChilds[0];
-            deklaration.SetStatement = container.GetAllChilds[1];
+            if (container.GetAllChilds[0] is GetKey gk) deklaration.GetStatement = gk;
+            if (container.GetAllChilds[1] is SetKey sk) deklaration.SetStatement = sk;
 
             ab.Token.ParentNode = deklaration;
 
@@ -354,7 +354,7 @@ namespace Yama.Parser
             compileContainer.Begin = new CompileSprungPunkt();
             compileContainer.Ende = new CompileSprungPunkt();
 
-            compiler.BeginNewMethode( this.SetRegisterInUse, compileContainer, this.Deklaration.SetUses );
+            compiler.BeginNewMethode( this.SetRegisterInUse, compileContainer, this.SetStatement.Statement.IndexContainer.ThisUses );
 
             CompileFunktionsDeklaration dek = new CompileFunktionsDeklaration();
 
@@ -369,7 +369,7 @@ namespace Yama.Parser
             compileContainer.Begin = new CompileSprungPunkt();
             compileContainer.Ende = new CompileSprungPunkt();
 
-            compiler.BeginNewMethode( this.GetRegisterInUse, compileContainer, this.Deklaration.GetUses );
+            compiler.BeginNewMethode( this.GetRegisterInUse, compileContainer, this.GetStatement.Statement.IndexContainer.ThisUses );
 
             CompileFunktionsDeklaration dek = new CompileFunktionsDeklaration();
 

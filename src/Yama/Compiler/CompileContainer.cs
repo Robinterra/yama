@@ -65,6 +65,12 @@ namespace Yama.Compiler
             set;
         } = new List<SSACompileLine>();
 
+        public SSACompileLine LoopLine
+        {
+            get;
+            set;
+        }
+
         public string AddDataCall(string jumpPoint, Compiler compiler)
         {
             DataHold dataHold = new DataHold();

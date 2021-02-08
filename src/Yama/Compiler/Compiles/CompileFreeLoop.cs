@@ -65,6 +65,7 @@ namespace Yama.Compiler
 
             SSACompileLine line = new SSACompileLine(this);
             line.LoopContainer = compiler.ContainerMgmt.CurrentContainer;
+            line.LoopContainer.LoopLine = line;
             compiler.AddSSALine(line);
 
             return true;

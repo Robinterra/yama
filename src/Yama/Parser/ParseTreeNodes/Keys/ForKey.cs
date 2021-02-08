@@ -71,6 +71,12 @@ namespace Yama.Parser
             set;
         } = new CompileContainer();
 
+        public IndexContainer IndexContainer
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -115,7 +121,10 @@ namespace Yama.Parser
         {
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
+            this.IndexContainer = container;
+
             this.Statement.Indezieren(index, parent);
+            if (this.Statement is Container ec) this.IndexContainer = ec.IndexContainer;
             this.Inkrementation.Indezieren(index, parent);
             this.Condition.Indezieren(index, parent);
             this.Deklaration.Indezieren(index, parent);
@@ -133,7 +142,7 @@ namespace Yama.Parser
 
             this.Deklaration.Compile(compiler, mode);
 
-            compiler.PushContainer(this.CompileContainer, true);
+            compiler.PushContainer(this.CompileContainer, this.IndexContainer.ThisUses, true);
 
             CompileJumpTo jumpbegin = new CompileJumpTo();
 
@@ -158,6 +167,9 @@ namespace Yama.Parser
             jumpbegin.Compile(compiler, this.CompileContainer.Begin, mode);
 
             this.CompileContainer.Ende.Compile(compiler, this, mode);
+
+            CompileFreeLoop freeLoop = new CompileFreeLoop();
+            freeLoop.Compile(compiler, this, mode);
 
             compiler.PopContainer();
 

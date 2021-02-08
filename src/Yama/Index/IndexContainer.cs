@@ -32,6 +32,12 @@ namespace Yama.Index
             set;
         }
 
+        public bool FunktionContainer
+        {
+            get;
+            set;
+        }
+
         private ValidUses thisUses;
 
         public ValidUses ThisUses
@@ -40,7 +46,7 @@ namespace Yama.Index
             {
                 if (this.thisUses != null) return this.thisUses;
 
-                this.thisUses = this.ParentUsesSet;
+                this.thisUses = new ValidUses(this.ParentUsesSet);
 
                 foreach (IndexVariabelnDeklaration dek in this.VariabelnDeklarations)
                 {

@@ -89,7 +89,7 @@ namespace Yama.Compiler.Definition
             return null;
         }
 
-        public bool FreeLoops(CompileContainer loopContainer)
+        public bool FreeLoops(CompileContainer loopContainer, SSACompileLine line)
         {
             foreach (RegisterMap map in this.RegisterMaps)
             {
@@ -97,7 +97,24 @@ namespace Yama.Compiler.Definition
                 if (map.Line.LoopContainer == null) continue;
                 if (!map.Line.LoopContainer.Equals(loopContainer)) continue;
 
+                this.CheckLoopForFree(map, line);
                 map.Mode = RegisterUseMode.Free;
+            }
+
+            return true;
+        }
+
+        private bool CheckLoopForFree(RegisterMap map, SSACompileLine line)
+        {
+            for (int i = 0; i < map.Line.Calls.Count; i++)
+            {
+                if (!line.Equals(map.Line.Calls[i])) continue;
+
+                if (i != map.Line.Calls.Count - 1) return true;
+
+                map.Mode = RegisterUseMode.Free;
+
+                return true;
             }
 
             return true;

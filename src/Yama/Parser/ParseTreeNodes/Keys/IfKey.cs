@@ -62,6 +62,18 @@ namespace Yama.Parser
             }
         }
 
+        public IndexContainer IfContainer
+        {
+            get;
+            set;
+        }
+
+        public IndexContainer ElseContainer
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -116,9 +128,17 @@ namespace Yama.Parser
         {
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
-            if (this.ElseStatement != null) this.ElseStatement.Indezieren(index, parent);
+            this.IfContainer = container;
+            this.ElseContainer = container;
+
+            if (this.ElseStatement != null)
+            {
+                this.ElseStatement.Indezieren(index, parent);
+                if (this.ElseStatement is Container ec) this.ElseContainer = ec.IndexContainer;
+            }
 
             this.IfStatement.Indezieren(index, parent);
+            if (this.IfStatement is Container c) this.IfContainer = c.IndexContainer;
 
             this.Condition.Indezieren(index, parent);
 
@@ -143,7 +163,7 @@ namespace Yama.Parser
 
             jumpWithCondition.Compile(compiler, ifcontainer.Ende, "isZero");
 
-            compiler.PushContainer(ifcontainer);
+            compiler.PushContainer(ifcontainer, this.IfContainer.ThisUses);
 
             this.IfStatement.Compile(compiler, mode);
 
@@ -155,7 +175,7 @@ namespace Yama.Parser
 
             if (this.ElseStatement == null) return true;
 
-            compiler.PushContainer(elsecontainer);
+            compiler.PushContainer(elsecontainer, this.ElseContainer.ThisUses);
 
             this.ElseStatement.Compile(compiler, mode);
 
