@@ -164,6 +164,30 @@
         ]
       },
       {
+        "Name": "RefCallStack",
+        "Mode": "Set",
+        "Description": "Der setzen eines Property einer Instance",
+        "Keys": [
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "str [NAME],[sp,#[STACKVAR]]"
+        ]
+      },
+      {
+        "Name": "RefCallStack",
+        "Mode": "Get",
+        "Description": "Der setzen eines Property einer Instance",
+        "Keys": [
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "ldr [NAME],[sp,#[STACKVAR]]"
+        ]
+      },
+      {
         "Name": "PushResult",
         "Mode": "default",
         "Description": "Aufruf einer Funktion",
@@ -194,12 +218,17 @@
           {
             "Name": "[PUSHREG]",
             "Values": null
+          },
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
           }
         ],
         "AssemblyCommands": [
           "[NAME]:",
           "mov r1, sp",
-          "push {[PUSHREG]r11}"
+          "push {[PUSHREG]r11}",
+          "sub sp, sp, #[virtuelRegister]"
         ]
       },
       {
@@ -220,9 +249,14 @@
           {
             "Name": "[stackcount]",
             "Values": null
+          },
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
           }
         ],
         "AssemblyCommands": [
+          "add sp, sp, #[virtuelRegister]",
           "pop {[POPREG]r11}",
           "add sp, sp, #[stackcount]",
           "mov pc,r11",

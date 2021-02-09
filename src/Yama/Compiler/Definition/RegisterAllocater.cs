@@ -35,6 +35,24 @@ namespace Yama.Compiler.Definition
             set;
         }
 
+        public List<RegisterMap> VirtuellRegister
+        {
+            get;
+            set;
+        } = new List<RegisterMap>();
+
+        public bool LastVirtuell
+        {
+            get;
+            set;
+        }
+
+        public GenericDefinition Defintion
+        {
+            get;
+            set;
+        }
+
         // -----------------------------------------------
 
         #endregion get/set
@@ -47,7 +65,10 @@ namespace Yama.Compiler.Definition
 
         public bool Init(GenericDefinition def)
         {
+            this.Defintion = def;
             this.RegisterMaps.Clear();
+            this.VirtuellRegister = new List<RegisterMap>();
+            this.LastVirtuell = false;
 
             for (int i = def.WorkingRegisterStart; i <= def.WorkingRegisterLast; i++)
             {
@@ -83,8 +104,28 @@ namespace Yama.Compiler.Definition
 
                 this.CheckToFreeRegister(map, line, from);
 
+                this.LastVirtuell = false;
+
                 return map;
             }
+
+            foreach (RegisterMap map in this.VirtuellRegister)
+            {
+                if (map.Mode != RegisterUseMode.Used) continue;
+
+                if (!map.Line.FindEquals(line)) continue;
+
+                this.CheckToFreeRegister(map, line, from);
+
+                RegisterMap res = new RegisterMap(RegisterType.Stack, RegisterUseMode.UsedAblage);
+                res.Name = this.LastVirtuell ? this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterStart) : this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterLast);
+                res.RegisterId = map.RegisterId;
+                this.LastVirtuell = !this.LastVirtuell;
+
+                return map;
+            }
+
+            this.LastVirtuell = false;
 
             return null;
         }
@@ -175,12 +216,24 @@ namespace Yama.Compiler.Definition
 
         public RegisterMap GetNextFreeRegister()
         {
+            this.LastVirtuell = false;
+
             foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode == RegisterUseMode.Free) return map;
             }
 
-            return null;
+            foreach (RegisterMap map in this.VirtuellRegister)
+            {
+                if (map.Mode == RegisterUseMode.Free) return map;
+            }
+
+            RegisterMap mapneu = new RegisterMap(RegisterType.Stack, RegisterUseMode.Free);
+            mapneu.RegisterId = this.VirtuellRegister.Count + 1;
+            mapneu.Name = this.Defintion.GetRegister(this.Defintion.ResultRegister);
+            this.VirtuellRegister.Add(mapneu);
+
+            return mapneu;
         }
 
         // -----------------------------------------------

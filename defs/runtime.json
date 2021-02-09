@@ -2,10 +2,10 @@
     "Name": "runtime",
     "CalculationBytes": 4,
     "AdressBytes": 4,
-    "WorkingRegisterStart": 2,
-    "PlaceToKeepRegisterStart": 0,
+    "WorkingRegisterStart": 3,
+    "PlaceToKeepRegisterStart": 1,
     "WorkingRegisterLast": 11,
-    "PlaceToKeepRegisterLast": 1,
+    "PlaceToKeepRegisterLast": 2,
     "ResultRegister":12,
     "Algos": [
       {
@@ -78,6 +78,30 @@
         ],
         "AssemblyCommands": [
           "str [SSAPOP[1]],[[SSAPOP[0]],[PROPERTY[0]]]"
+        ]
+      },
+      {
+        "Name": "RefCallStack",
+        "Mode": "Set",
+        "Description": "Der setzen eines Property einer Instance",
+        "Keys": [
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "str [NAME],[sp,#[STACKVAR]]"
+        ]
+      },
+      {
+        "Name": "RefCallStack",
+        "Mode": "Get",
+        "Description": "Der setzen eines Property einer Instance",
+        "Keys": [
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "ldr [NAME],[sp,#[STACKVAR]]"
         ]
       },
       {
@@ -231,12 +255,17 @@
           {
             "Name": "[PUSHREG]",
             "Values": null
+          },
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
           }
         ],
         "AssemblyCommands": [
           "[NAME]:",
           "mov r1, sp",
-          "push {[PUSHREG]lr}"
+          "push {[PUSHREG]lr}",
+          "sub sp, sp, #[virtuelRegister]"
         ]
       },
       {
@@ -253,9 +282,14 @@
           {
             "Name": "[stackcount]",
             "Values": null
+          },
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
           }
         ],
         "AssemblyCommands": [
+          "add sp, sp, #[virtuelRegister]",
           "pop {[POPREG]lr}",
           "add sp, sp, #[stackcount]",
           "bx lr"

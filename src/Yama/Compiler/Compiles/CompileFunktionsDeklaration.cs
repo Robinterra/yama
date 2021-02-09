@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
@@ -53,6 +54,12 @@ namespace Yama.Compiler
                 return true;
             }
         }
+
+        public List<RegisterMap> VirtuellRegister
+        {
+            get;
+            set;
+        } = new List<RegisterMap>();
 
         #endregion get/set
 
@@ -228,6 +235,7 @@ namespace Yama.Compiler
                 query.Key = key;
                 query.Value = registerInUse;
                 if (key.Name == "[VARCOUNT]") query.Value = varcount;
+                if (key.Name == "[virtuelRegister]") query.Value = this.VirtuellRegister.Count;
 
                 string value = compiler.Definition.PostKeyReplace(query);
 

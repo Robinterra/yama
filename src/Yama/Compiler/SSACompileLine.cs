@@ -95,6 +95,16 @@ namespace Yama.Compiler
                 return true;
             }
 
+            if (this.Owner is CompileFunktionsDeklaration fd)
+            {
+                allocater.VirtuellRegister = fd.VirtuellRegister;
+            }
+
+            if (this.Owner is CompileFunktionsEnde fe)
+            {
+                fe.VirtuellRegister = allocater.VirtuellRegister;
+            }
+
             int counter = 0;
             foreach (SSACompileArgument arg in this.Arguments)
             {
@@ -111,6 +121,14 @@ namespace Yama.Compiler
                 this.Owner.PrimaryKeys.Add(string.Format("[SSAPOP[{0}]]", counter), map.Name);
 
                 counter++;
+
+                if (map.Type != RegisterType.Stack) continue;
+
+                List<string> assemblyCommands = new List<string>();
+                CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Get");
+                assemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * map.RegisterId).ToString()).Replace("[NAME]", map.Name));
+                assemblyCommands.AddRange(this.Owner.AssemblyCommands);
+                this.Owner.AssemblyCommands = assemblyCommands;
             }
 
             if (!this.HasReturn) return true;
@@ -119,6 +137,9 @@ namespace Yama.Compiler
                 RegisterMap map = allocater.GetReferenceRegister(this, this);
 
                 this.Owner.PrimaryKeys.Add("[SSAPUSH]", map.Name);
+
+                if (map.Type == RegisterType.Stack) this.HandleVirtuellSetRegister(compiler, map);
+
                 return true;
             }
             if (this.Calls.Count == 0)
@@ -136,7 +157,17 @@ namespace Yama.Compiler
 
             this.Owner.PrimaryKeys.Add("[SSAPUSH]", newMap.Name);
 
+            if (newMap.Type == RegisterType.Stack) return this.HandleVirtuellSetRegister(compiler, newMap);
+
             if (!container.RegistersUses.Contains(newMap.Name)) container.RegistersUses.Add(newMap.Name);
+
+            return true;
+        }
+
+        private bool HandleVirtuellSetRegister(Compiler compiler, RegisterMap map)
+        {
+            CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Set");
+            this.Owner.AssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * map.RegisterId).ToString()).Replace("[NAME]", map.Name));
 
             return true;
         }

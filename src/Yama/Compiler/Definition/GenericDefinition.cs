@@ -421,6 +421,9 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[VARCOUNT]") return this.VarCountQuery(query);
             if (query.Key.Name == "[stackpos]") return this.StackPositionQuery(query);
             if (query.Key.Name == "[stackcount]") return this.StackCountQuery(query);
+            if (query.Key.Name == "[virtuelRegister]") return this.StackCountQuery(query);
+
+            this.Compiler.AddError("Post Key not supported");
 
             return null;
         }
