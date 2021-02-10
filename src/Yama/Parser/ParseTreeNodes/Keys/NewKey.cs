@@ -152,7 +152,7 @@ namespace Yama.Parser
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
             List<IParseTreeNode> copylist = this.Parameters;
-            //copylist.Reverse();
+            copylist.Reverse();
             IParseTreeNode dek = null;
 
             int parasCount = 0;

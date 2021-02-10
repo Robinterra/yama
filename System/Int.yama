@@ -84,7 +84,7 @@ namespace "System"
         *
         * @return (bool) if equals then return true
         */
-        copy operator bool ==(int a, int b)
+        public operator bool ==(int a, int b)
         {
             #defalgo IntCompare,Equals:;
         }

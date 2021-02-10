@@ -206,6 +206,10 @@ namespace Yama.Compiler
 
             this.Header.Compile(this, this.MainFunction);
 
+            this.MakeInheritance(nodes);
+
+            if (this.Errors.Count != 0) return false;
+
             foreach (IParseTreeNode node in nodes)
             {
                 if (!node.Compile(this)) this.AddError("Beim assembelieren ist in einer Klasse ein Fehler aufgetreten", node);
@@ -220,6 +224,22 @@ namespace Yama.Compiler
             this.RunAssmblerSequence();
 
             return this.Errors.Count == 0;
+        }
+
+        private bool MakeInheritance(List<IParseTreeNode> nodes)
+        {
+            foreach (IParseTreeNode node in nodes)
+            {
+                if (!(node is KlassenDeklaration k)) continue;
+                if (!k.Deklaration.IsMethodsReferenceMode) continue;
+
+                k.Deklaration.DataRef = k.compile;
+                k.compile.Data = new DataObject();
+                k.compile.Data.Mode = DataMode.JumpPointListe;
+                k.compile.Compile(this, k, "datalist");
+            }
+
+            return true;
         }
 
         private bool DoAllocate()

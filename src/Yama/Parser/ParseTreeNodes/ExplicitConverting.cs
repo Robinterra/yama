@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
 using Yama.Compiler;
+using System.Linq;
 
 namespace Yama.Parser
 {

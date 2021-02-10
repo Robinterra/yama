@@ -212,7 +212,9 @@ namespace Yama.Compiler
             }
 
             SSACompileArgument arg = lineset.Arguments.FirstOrDefault();
+            if (arg == null) return compiler.AddError("variable is not set", this.Node);
 
+            compiler.ContainerMgmt.StackArguments.Push(new SSACompileArgument(arg.Reference));
             if (!compiler.ContainerMgmt.CurrentMethod.IsReferenceInVarsContains(arg.Reference))
             {
                 map.Reference = arg.Reference;
