@@ -44,6 +44,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public int OrderCounter
+        {
+            get;
+            set;
+        }
+
         public IProcessorDefinition Definition
         {
             get;
@@ -93,6 +99,9 @@ namespace Yama.Compiler
 
         public SSACompileLine AddSSALine(SSACompileLine line)
         {
+            line.Order = this.OrderCounter;
+            this.OrderCounter += 1;
+
             if (line.Algo == null)
             {
                 /*line.LoopContainer = this.ContainerMgmt.CurrentContainer;

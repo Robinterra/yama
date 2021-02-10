@@ -197,19 +197,24 @@ namespace Yama.Compiler.Definition
                 return true;
             }
 
+            int greatOrder = -1;
+
             for (int i = 0; i < checkCalls.Calls.Count; i++)
             {
-                if (!from.Equals(checkCalls.Calls[i])) continue;
+                if (greatOrder < checkCalls.Calls[i].Order) greatOrder = checkCalls.Calls[i].Order;
+                //if (!from.Equals(checkCalls.Calls[i])) continue;
 
-                if (i != checkCalls.Calls.Count - 1) return true;
+                //if (i != checkCalls.Calls.Count - 1) return true;
 
-                map.Line.PhiMap.Remove(line);
-                if (map.Line.PhiMap.Count == 0) map.Mode = RegisterUseMode.Free;
-
-                return true;
+                //map.Line.PhiMap.Remove(line);
+                //if (map.Line.PhiMap.Count == 0) map.Mode = RegisterUseMode.Free;
             }
 
-            return false;
+            if (greatOrder > from.Order) return true;
+
+            map.Mode = RegisterUseMode.Free;
+
+            return true;
         }
 
         // -----------------------------------------------

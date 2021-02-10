@@ -23,6 +23,12 @@ namespace Yama.Compiler
             }
         }
 
+        public int Order
+        {
+            get;
+            set;
+        }
+
         public ICompileRoot Owner
         {
             get;
