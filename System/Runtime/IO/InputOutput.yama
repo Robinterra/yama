@@ -13,7 +13,7 @@ namespace "System.Runtime.IO"
 
         public static int ExecWith2Args ( int cmd, int argone, int argtwo, int guide )
         {
-            #defalgo Exec,CallTwoArg: = guide;
+            #defalgo Exec,CallTwoArg:;
         }
 
         // -----------------------------------------------
