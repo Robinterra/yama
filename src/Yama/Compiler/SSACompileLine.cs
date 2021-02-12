@@ -94,22 +94,7 @@ namespace Yama.Compiler
 
         public bool DoAllocate(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
         {
-            if (this.Owner is CompileFreeLoop)
-            {
-                allocater.FreeLoops(this.LoopContainer, this);
-
-                return true;
-            }
-
-            if (this.Owner is CompileFunktionsDeklaration fd)
-            {
-                allocater.VirtuellRegister = fd.VirtuellRegister;
-            }
-
-            if (this.Owner is CompileFunktionsEnde fe)
-            {
-                fe.VirtuellRegister = allocater.VirtuellRegister;
-            }
+            if (this.SpecialRules(allocater)) return true;
 
             int counter = 0;
             foreach (SSACompileArgument arg in this.Arguments)
@@ -118,6 +103,7 @@ namespace Yama.Compiler
                 if (map == null)
                 {
                     compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
+                    map = allocater.GetReferenceRegister(arg.Reference, this);
 
                     counter++;
 
@@ -130,11 +116,8 @@ namespace Yama.Compiler
 
                 if (map.Type != RegisterType.Stack) continue;
 
-                List<string> assemblyCommands = new List<string>();
                 CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Get");
-                assemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * map.RegisterId).ToString()).Replace("[NAME]", map.Name));
-                assemblyCommands.AddRange(this.Owner.AssemblyCommands);
-                this.Owner.AssemblyCommands = assemblyCommands;
+                this.Owner.AssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * map.RegisterId).ToString()).Replace("[NAME]", map.Name));
             }
 
             if (!this.HasReturn) return true;
@@ -170,10 +153,32 @@ namespace Yama.Compiler
             return true;
         }
 
+        private bool SpecialRules(RegisterAllocater allocater)
+        {
+            if (this.Owner is CompileFreeLoop)
+            {
+                allocater.FreeLoops(this.LoopContainer, this);
+
+                return true;
+            }
+
+            if (this.Owner is CompileFunktionsDeklaration fd)
+            {
+                allocater.VirtuellRegister = fd.VirtuellRegister;
+            }
+
+            if (this.Owner is CompileFunktionsEnde fe)
+            {
+                fe.VirtuellRegister = allocater.VirtuellRegister;
+            }
+
+            return false;
+        }
+
         private bool HandleVirtuellSetRegister(Compiler compiler, RegisterMap map)
         {
             CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Set");
-            this.Owner.AssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * map.RegisterId).ToString()).Replace("[NAME]", map.Name));
+            this.Owner.PostAssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * map.RegisterId).ToString()).Replace("[NAME]", map.Name));
 
             return true;
         }

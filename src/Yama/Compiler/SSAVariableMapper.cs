@@ -17,6 +17,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public List<SSACompileLine> AllSets
+        {
+            get;
+            set;
+        } = new List<SSACompileLine>();
+
         //Die Letzte Reference, bei dem die Variable gesetzt wurde
         public SSACompileLine Reference
         {

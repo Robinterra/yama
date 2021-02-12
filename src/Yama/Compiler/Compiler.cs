@@ -191,7 +191,7 @@ namespace Yama.Compiler
             if (this.Writer != null)
                 this.Writer.WriteLine(request.AssemblyCode);
 
-            request.Root.AssemblyCommands.Add(request.AssemblyCode);
+            if (request.AddToList) request.Root.AssemblyCommands.Add(request.AssemblyCode);
 
             return true;
         }
@@ -378,7 +378,20 @@ namespace Yama.Compiler
 
                 //if (containerMaps[orgMap.Key].Reference.ReplaceLine != null) this.CheckForCopy(containerMaps[orgMap.Key].Reference);
 
-                parentVarMap[conMap.Key].Reference.PhiMap.AddRange(conMap.Value.Reference.PhiMap);
+                SSAVariableMap orig = parentVarMap[conMap.Key];
+                foreach (SSACompileLine line in conMap.Value.AllSets)
+                {
+                    orig.Reference.PhiMap.AddRange(line.PhiMap);
+                    line.PhiMap.AddRange(orig.Reference.PhiMap);
+                    foreach (SSACompileLine phi in line.PhiMap)
+                    {
+                        orig.Reference.Calls.AddRange(phi.Calls);
+                        phi.Calls.AddRange(orig.Reference.Calls);
+                    }
+                }
+
+                //
+                //orig.Reference.PhiMap.AddRange(conMap.Value.Reference.PhiMap);
             }
 
             foreach (SSACompileLine line in container.PhiSetNewVar)

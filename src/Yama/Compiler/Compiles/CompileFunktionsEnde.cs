@@ -73,6 +73,12 @@ namespace Yama.Compiler
             set;
         } = new List<RegisterMap>();
 
+        public List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+
         #endregion get/set
 
         #region methods
@@ -225,6 +231,11 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            foreach (string str in this.AssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str, false));
+            }
+
             Dictionary<string, string> postreplaces = new Dictionary<string, string>();
 
             int varcount = 0;
@@ -257,6 +268,11 @@ namespace Yama.Compiler
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys, postreplaces));
+            }
+
+            foreach (string str in this.PostAssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str));
             }
 
             return true;

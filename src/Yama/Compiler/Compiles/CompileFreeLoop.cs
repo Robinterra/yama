@@ -55,6 +55,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+
         #endregion get/set
 
         #region methods

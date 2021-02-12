@@ -14,6 +14,12 @@ namespace Yama.Compiler
             set;
         }
 
+        List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        }
+
         IParseTreeNode Node
         {
             get;

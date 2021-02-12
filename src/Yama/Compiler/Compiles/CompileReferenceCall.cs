@@ -55,6 +55,12 @@ namespace Yama.Compiler
             set;
         } = true;
 
+        public List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+
         #endregion get/set
 
         #region methods
@@ -217,6 +223,7 @@ namespace Yama.Compiler
             compiler.ContainerMgmt.StackArguments.Push(new SSACompileArgument(arg.Reference));
             if (!compiler.ContainerMgmt.CurrentMethod.IsReferenceInVarsContains(arg.Reference))
             {
+                if (map.Reference != null) map.AllSets.Add(arg.Reference);
                 map.Reference = arg.Reference;
 
                 return true;
@@ -229,6 +236,7 @@ namespace Yama.Compiler
 
             compiler.ContainerMgmt.CurrentContainer.PhiSetNewVar.Add(lineset);
 
+            if (map.Reference != null) map.AllSets.Add(lineset);
             map.Reference = lineset;
 
             return true;
@@ -330,6 +338,11 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            foreach (string str in this.AssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str, false));
+            }
+
             if (this.DoNotCompile || !this.IsUsed)
             {
                 compiler.toRemove.Add(this);
@@ -339,6 +352,11 @@ namespace Yama.Compiler
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys));
+            }
+
+            foreach (string str in this.PostAssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str));
             }
 
             return true;

@@ -29,6 +29,19 @@ namespace Yama.Compiler
             set;
         }
 
+        public bool AddToList
+        {
+            get;
+            set;
+        } = true;
+
+        public RequestAddLine(ICompileRoot rootm, string assemblyCode, bool addToList)
+        {
+            this.Root = rootm;
+            this.AssemblyCode = assemblyCode;
+            this.AddToList = addToList;
+        }
+
         public RequestAddLine(ICompileRoot root, string assemblyCode)
         {
             this.Root = root;

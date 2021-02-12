@@ -29,6 +29,12 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
+        public List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+
         public IParseTreeNode Node
         {
             get;
@@ -97,9 +103,20 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+
+            foreach (string str in this.AssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str, false));
+            }
+
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this,this.Algo.AssemblyCommands[i], this.PrimaryKeys));
+            }
+
+            foreach (string str in this.PostAssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str));
             }
 
             return true;
