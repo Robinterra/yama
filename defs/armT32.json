@@ -77,7 +77,7 @@
         "PostKeys": [
         ],
         "AssemblyCommands": [
-          "str [[SSAPOP[1]],[[SSAPOP[0]],[PROPERTY[0]]]"
+          "str [SSAPOP[1]],[[SSAPOP[0]],[PROPERTY[0]]]"
         ]
       },
       {
