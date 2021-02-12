@@ -521,12 +521,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov r1, #0xff",
+                "mov r12, #0xff",
                 "cmp [SSAPOP[1]], [SSAPOP[0]]",
                 "beq [JUMPTO[0]]",
-                "mov r1, #0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:",
-                "mov [SSAPUSH], r1"
+                "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -554,12 +554,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov r1, #0xff",
+                "mov r12, #0xff",
                 "cmp [SSAPOP[1]], [SSAPOP[0]]",
                 "bne [JUMPTO[0]]",
-                "mov r1, #0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:",
-                "mov [SSAPUSH], r1"
+                "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -587,12 +587,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov r1, #0xff",
+                "mov r12, #0xff",
                 "cmp [SSAPOP[0]], [SSAPOP[1]]",
                 "blt [JUMPTO[0]]",
-                "mov r1, #0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:",
-                "mov [SSAPUSH], r1"
+                "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -620,12 +620,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov r1, #0xff",
+                "mov r12, #0xff",
                 "cmp [SSAPOP[0]], [SSAPOP[1]]",
                 "ble [JUMPTO[0]]",
-                "mov r1, #0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:",
-                "mov [SSAPUSH], r1"
+                "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -653,12 +653,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov r1, #0xff",
+                "mov r12, #0xff",
                 "cmp [SSAPOP[0]], [SSAPOP[1]]",
                 "bgt [JUMPTO[0]]",
-                "mov r1, #0x0",
+                "mov r12, #0x0",
                 "[JUMPTO[0]]:",
-                "mov [SSAPUSH], r1"
+                "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -686,12 +686,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                  "mov r1, #0xff",
+                  "mov r12, #0xff",
                   "cmp [SSAPOP[0]], [SSAPOP[1]]",
                   "bge [JUMPTO[0]]",
-                  "mov r1, #0x0",
+                  "mov r12, #0x0",
                   "[JUMPTO[0]]:",
-                  "mov [SSAPUSH], r1"
+                  "mov [SSAPUSH], r12"
                 ]
             }
        ],
@@ -971,12 +971,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov r1, #0xff",
+                    "mov r12, #0xff",
                     "cmp [SSAPOP[1]], [SSAPOP[0]]",
                     "beq [JUMPTO[0]]",
-                    "mov r1, #0x0",
+                    "mov r12, #0x0",
                     "[JUMPTO[0]]:",
-                    "mov [SSAPUSH], r1"
+                    "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -1004,12 +1004,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov r1, #0xff",
+                    "mov r12, #0xff",
                     "cmp [SSAPOP[1]], [SSAPOP[0]]",
                     "bne [JUMPTO[0]]",
-                    "mov r1, #0x0",
+                    "mov r12, #0x0",
                     "[JUMPTO[0]]:",
-                    "mov [SSAPUSH], r1"
+                    "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -1037,12 +1037,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov r1, #0xff",
+                    "mov r12, #0xff",
                     "cmp [SSAPOP[0]], [SSAPOP[1]]",
                     "blt [JUMPTO[0]]",
-                    "mov r1, #0x0",
+                    "mov r12, #0x0",
                     "[JUMPTO[0]]:",
-                    "mov [SSAPUSH], r1"
+                    "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -1070,12 +1070,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov r1, #0xff",
+                    "mov r12, #0xff",
                     "cmp [SSAPOP[0]], [SSAPOP[1]]",
                     "ble [JUMPTO[0]]",
-                    "mov r1, #0x0",
+                    "mov r12, #0x0",
                     "[JUMPTO[0]]:",
-                    "mov [SSAPUSH], r1"
+                    "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -1103,12 +1103,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov r1, #0xff",
+                    "mov r12, #0xff",
                     "cmp [SSAPOP[0]], [SSAPOP[1]]",
                     "bgt [JUMPTO[0]]",
-                    "mov r1, #0x0",
+                    "mov r12, #0x0",
                     "[JUMPTO[0]]:",
-                    "mov [SSAPUSH], r1"
+                    "mov [SSAPUSH], r12"
                 ]
             },
             {
@@ -1136,12 +1136,12 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov r1, #0xff",
+                    "mov r12, #0xff",
                     "cmp [SSAPOP[0]], [SSAPOP[1]]",
                     "bge [JUMPTO[0]]",
-                    "mov r1, #0x0",
+                    "mov r12, #0x0",
                     "[JUMPTO[0]]:",
-                    "mov [SSAPUSH], r1"
+                    "mov [SSAPUSH], r12"
                 ]
             }
        ],
