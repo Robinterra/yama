@@ -120,6 +120,7 @@ namespace Yama.Compiler.Definition
                 RegisterMap res = new RegisterMap(RegisterType.Stack, RegisterUseMode.UsedAblage);
                 res.Name = this.LastVirtuell ? this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterStart) : this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterLast);
                 res.RegisterId = map.RegisterId;
+                res.Line = map.Line;
                 this.LastVirtuell = !this.LastVirtuell;
 
                 return res;
@@ -195,6 +196,13 @@ namespace Yama.Compiler.Definition
         public bool ExistAllocation(SSACompileLine line)
         {
             foreach (RegisterMap map in this.RegisterMaps)
+            {
+                if (map.Mode != RegisterUseMode.Used) continue;
+
+                if (map.Line.FindEquals(line)) return true;
+            }
+
+            foreach (RegisterMap map in this.VirtuellRegister)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
 
