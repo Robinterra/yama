@@ -2,7 +2,7 @@
     "Name": "arm-t32",
     "CalculationBytes": 4,
     "AdressBytes": 4,
-    "WorkingRegisterStart": 2,
+    "WorkingRegisterStart": 3,
     "PlaceToKeepRegisterStart": 0,
     "WorkingRegisterLast": 10,
     "PlaceToKeepRegisterLast": 1,
@@ -172,7 +172,7 @@
         "PostKeys": [
         ],
         "AssemblyCommands": [
-          "str [NAME],[sp,#[STACKVAR]]"
+          "str [NAME],[r2,#[STACKVAR]]"
         ]
       },
       {
@@ -184,7 +184,7 @@
         "PostKeys": [
         ],
         "AssemblyCommands": [
-          "ldr [NAME],[sp,#[STACKVAR]]"
+          "ldr [NAME],[r2,#[STACKVAR]]"
         ]
       },
       {
@@ -227,8 +227,9 @@
         "AssemblyCommands": [
           "[NAME]:",
           "mov r1, sp",
-          "push {[PUSHREG]r11}",
-          "sub sp, sp, #[virtuelRegister]"
+          "push {[PUSHREG]r2,r11}",
+          "sub sp, sp, #[virtuelRegister]",
+          "mov r2, sp"
         ]
       },
       {
@@ -257,7 +258,7 @@
         ],
         "AssemblyCommands": [
           "add sp, sp, #[virtuelRegister]",
-          "pop {[POPREG]r11}",
+          "pop {[POPREG]r2,r11}",
           "add sp, sp, #[stackcount]",
           "mov pc,r11",
           "[DATACONTAINER]"
