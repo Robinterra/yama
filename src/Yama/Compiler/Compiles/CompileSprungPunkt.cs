@@ -27,18 +27,44 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<ICompileRoot>();
-        public string JumpPointName { get; set; }
+
+        public string JumpPointName
+        {
+            get;
+            set;
+        }
 
         public List<string> AssemblyCommands
         {
             get;
             set;
         } = new List<string>();
+
         public IParseTreeNode Node
         {
             get;
             set;
         }
+
+        public bool IsUsed
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public Dictionary<string, string> PrimaryKeys
+        {
+            get;
+            set;
+        }
+
+        public List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
 
         #endregion get/set
 
@@ -61,6 +87,9 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             if (string.IsNullOrEmpty(this.JumpPointName)) this.JumpPointName = compiler.Definition.GenerateJumpPointName();
 
             return true;
@@ -70,9 +99,19 @@ namespace Yama.Compiler
         {
             if (this.Calls.Count == 0) return true;
 
+            foreach (string str in this.AssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str, false));
+            }
+
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName } }));
+            }
+
+            foreach (string str in this.PostAssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str));
             }
 
             return true;

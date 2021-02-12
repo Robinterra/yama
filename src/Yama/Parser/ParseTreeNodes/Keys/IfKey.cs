@@ -62,6 +62,18 @@ namespace Yama.Parser
             }
         }
 
+        public IndexContainer IfContainer
+        {
+            get;
+            set;
+        }
+
+        public IndexContainer ElseContainer
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -116,9 +128,17 @@ namespace Yama.Parser
         {
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
-            if (this.ElseStatement != null) this.ElseStatement.Indezieren(index, parent);
+            this.IfContainer = container;
+            this.ElseContainer = container;
+
+            if (this.ElseStatement != null)
+            {
+                this.ElseStatement.Indezieren(index, parent);
+                if (this.ElseStatement is Container ec) this.ElseContainer = ec.IndexContainer;
+            }
 
             this.IfStatement.Indezieren(index, parent);
+            if (this.IfStatement is Container c) this.IfContainer = c.IndexContainer;
 
             this.Condition.Indezieren(index, parent);
 
@@ -127,9 +147,13 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            CompileSprungPunkt afterIfStatement = new CompileSprungPunkt();
+            CompileContainer ifcontainer = new CompileContainer();
+            ifcontainer.Begin = compiler.ContainerMgmt.CurrentContainer.Begin;
+            ifcontainer.Ende = new CompileSprungPunkt();
 
-            CompileSprungPunkt afterElseStatement = new CompileSprungPunkt();
+            CompileContainer elsecontainer = new CompileContainer();
+            elsecontainer.Begin = compiler.ContainerMgmt.CurrentContainer.Begin;
+            elsecontainer.Ende = new CompileSprungPunkt();
 
             CompileJumpTo jumpafterelse = new CompileJumpTo();
 
@@ -137,19 +161,27 @@ namespace Yama.Parser
 
             this.Condition.Compile(compiler, mode);
 
-            jumpWithCondition.Compile(compiler, afterIfStatement, "isZero");
+            jumpWithCondition.Compile(compiler, ifcontainer.Ende, "isZero");
+
+            compiler.PushContainer(ifcontainer, this.IfContainer.ThisUses);
 
             this.IfStatement.Compile(compiler, mode);
 
-            if (this.ElseStatement != null) jumpafterelse.Compile(compiler, afterElseStatement, mode);
+            compiler.PopContainer();
 
-            afterIfStatement.Compile(compiler, this, mode);
+            if (this.ElseStatement != null) jumpafterelse.Compile(compiler, elsecontainer.Ende, mode);
+
+            ifcontainer.Ende.Compile(compiler, this, mode);
 
             if (this.ElseStatement == null) return true;
 
+            compiler.PushContainer(elsecontainer, this.ElseContainer.ThisUses);
+
             this.ElseStatement.Compile(compiler, mode);
 
-            afterElseStatement.Compile(compiler, this, mode);
+            compiler.PopContainer();
+
+            elsecontainer.Ende.Compile(compiler, this, mode);
 
             return true;
         }

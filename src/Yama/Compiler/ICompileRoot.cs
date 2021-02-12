@@ -14,7 +14,30 @@ namespace Yama.Compiler
             set;
         }
 
+        List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        }
+
         IParseTreeNode Node
+        {
+            get;
+            set;
+        }
+
+        bool IsUsed
+        {
+            get;
+        }
+
+        CompileAlgo Algo
+        {
+            get;
+            set;
+        }
+
+        Dictionary<string, string> PrimaryKeys
         {
             get;
             set;

@@ -32,6 +32,12 @@ namespace Yama.Index
             set;
         }
 
+        public bool FunktionContainer
+        {
+            get;
+            set;
+        }
+
         private ValidUses thisUses;
 
         public ValidUses ThisUses

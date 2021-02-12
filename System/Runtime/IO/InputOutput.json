@@ -4,13 +4,55 @@
         "Algos": [
             {
                 "Name": "Exec",
-                "Mode": "Call",
+                "Mode": "CallOneArg",
                 "Description": "Exec Call",
                 "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "3"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "exec r12"
+                "push { r2 }",
+                "mov r1, [SSAPOP[2]]",
+                "mov r2, [SSAPOP[1]]",
+                "exec [SSAPOP[0]]",
+                "pop { r2 }"
+                ]
+            },
+            {
+                "Name": "Exec",
+                "Mode": "CallTwoArg",
+                "Description": "Exec Call",
+                "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "4"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "push { r2, r3 }",
+                "mov r1, [SSAPOP[3]]",
+                "mov r2, [SSAPOP[2]]",
+                "mov r3, [SSAPOP[1]]",
+                "exec [SSAPOP[0]]",
+                "pop { r2, r3 }"
                 ]
             }
        ],

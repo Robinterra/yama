@@ -132,13 +132,11 @@ namespace Yama.Parser
                 if (rct.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
                     if (!this.CompileNonStaticCallt(compiler, mode, pgsdek)) return true;
 
-            if (mode == "set") { CompileMovResult movResultRight = new CompileMovResult(); movResultRight.Compile(compiler, null, "default"); }
-
             this.CompileLeftNodeIfNotStaticClass(compiler, mode);
 
             if (this.RightNode is ReferenceCall rctu)
                 if (rctu.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
-                    if (!this.CompileNonStaticCall(compiler, mode, pgsdek)) return true;
+                    this.CompileNonStaticCall(compiler, mode, pgsdek);
 
             string moderesult = "point";
             if (mode == "set") moderesult = "setpoint";
@@ -187,9 +185,8 @@ namespace Yama.Parser
             if (!isok) isok = methdek.Type == MethodeType.Property;
             if (!isok) return false;
 
-            CompileMovResult movResultRight = new CompileMovResult();
-
-            movResultRight.Compile(compiler, null, "default");
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "copy");
 
             return true;
         }
@@ -198,9 +195,8 @@ namespace Yama.Parser
         {
             if (methdek.Type == MethodeType.VektorStatic) return true;
 
-            CompileMovResult movResultRight = new CompileMovResult();
-
-            movResultRight.Compile(compiler, null, "default");
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "copy");
 
             return true;
         }
@@ -209,9 +205,8 @@ namespace Yama.Parser
         {
             if (methdek.Type == MethodeType.PropertyStaticGetSet) return true;
 
-            CompileMovResult movResultRight = new CompileMovResult();
-
-            movResultRight.Compile(compiler, null, "default");
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "copy");
 
             return true;
         }

@@ -44,7 +44,26 @@ namespace Yama.Compiler
             get;
             set;
         }
-        public Dictionary<string, string> PrimaryKeys { get; private set; }
+
+        public Dictionary<string, string> PrimaryKeys
+        {
+            get;
+            set;
+        }
+
+        public bool IsUsed
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
 
         #endregion get/set
 
@@ -69,11 +88,15 @@ namespace Yama.Compiler
 
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             if (this.Point == PointMode.Custom) this.Punkt = node;
-            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.CurrentContainer.CurrentContainer.Begin;
-            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.CurrentContainer.CurrentContainer.Ende;
-            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.CurrentContainer.RootContainer.Begin;
-            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.CurrentContainer.RootContainer.Ende;
+            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Begin;
+            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Ende;
+            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer.Begin;
+            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
+            if (this.Point == PointMode.LoopEnde) this.Punkt = compiler.ContainerMgmt.CurrentLoop.Ende;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -95,9 +118,19 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            foreach (string str in this.AssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str, false));
+            }
+
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys));
+            }
+
+            foreach (string str in this.PostAssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str));
             }
 
             return true;
@@ -113,7 +146,8 @@ namespace Yama.Compiler
         RootBegin,
         RootEnde,
         CurrentBegin,
-        CurrentEnde
+        CurrentEnde,
+        LoopEnde
     }
 
 }

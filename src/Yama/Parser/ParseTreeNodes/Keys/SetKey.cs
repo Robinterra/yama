@@ -10,7 +10,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IParseTreeNode Statement
+        public Container Statement
         {
             get;
             set;
@@ -74,7 +74,7 @@ namespace Yama.Parser
 
             IdentifierToken conditionkind = parser.Peek ( token, 1 );
 
-            key.Statement = parser.ParseCleanToken(conditionkind, this.layer);
+            if (parser.ParseCleanToken(conditionkind, this.layer) is Container container) key.Statement = container;
 
             if (key.Statement == null) return null;
 

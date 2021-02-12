@@ -247,7 +247,7 @@ namespace Yama.Debug
 
                 if (this.IsDebug) this.DebugEvent();
 
-                this.RunCommand();
+                if (!this.RunCommand()) if (!this.WriteError("error orrcurd", true)) return false;
 
                 if (this.CurrentInterupt != 0) this.InteruptPahse();
 
@@ -545,6 +545,8 @@ namespace Yama.Debug
                 if (cmd == "stat") this.StepPrint();
                 if (cmd.Contains("mem")) this.PrintMem(cmd);
                 if (cmd.Contains("edit")) this.EditMem(cmd);
+
+                if (cmd == "stop") return false;
             }
 
             return true;
@@ -604,9 +606,11 @@ namespace Yama.Debug
             return true;
         }
 
-        private bool WriteError(string v)
+        private bool WriteError(string v, bool showDebug = false)
         {
             Console.Error.WriteLine(v);
+
+            if (showDebug) if (this.DebugReader()) return true;
 
             return false;
         }
@@ -680,7 +684,14 @@ namespace Yama.Debug
             {
                 if (command.CommandId != cmd) continue;
 
-                return command.Execute(this);
+                try
+                {
+                    return command.Execute(this);
+                }
+                catch
+                {
+                    return false;
+                }
             }
 
             Console.WriteLine("Warning Command {0:x} not found", cmd);

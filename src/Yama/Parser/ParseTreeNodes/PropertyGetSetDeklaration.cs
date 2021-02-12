@@ -37,13 +37,13 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode GetStatement
+        public GetKey GetStatement
         {
             get;
             set;
         }
 
-        public IParseTreeNode SetStatement
+        public SetKey SetStatement
         {
             get;
             set;
@@ -247,8 +247,8 @@ namespace Yama.Parser
 
             container.Token.Node = deklaration;
 
-            deklaration.GetStatement = container.GetAllChilds[0];
-            deklaration.SetStatement = container.GetAllChilds[1];
+            if (container.GetAllChilds[0] is GetKey gk) deklaration.GetStatement = gk;
+            if (container.GetAllChilds[1] is SetKey sk) deklaration.SetStatement = sk;
 
             ab.Token.ParentNode = deklaration;
 
@@ -350,13 +350,11 @@ namespace Yama.Parser
 
         public bool CompileSetMethode(Compiler.Compiler compiler, string mode = "default")
         {
-            compiler.Definition.BeginNewMethode(this.SetRegisterInUse);
-
             CompileContainer compileContainer = new CompileContainer();
-
             compileContainer.Begin = new CompileSprungPunkt();
             compileContainer.Ende = new CompileSprungPunkt();
-            compiler.SetNewContainer(compileContainer);
+
+            compiler.BeginNewMethode( this.SetRegisterInUse, compileContainer, this.SetStatement.Statement.IndexContainer.ThisUses );
 
             CompileFunktionsDeklaration dek = new CompileFunktionsDeklaration();
 
@@ -367,13 +365,11 @@ namespace Yama.Parser
 
         public bool CompileGetMethode(Compiler.Compiler compiler, string mode = "default")
         {
-            compiler.Definition.BeginNewMethode(this.GetRegisterInUse);
-
             CompileContainer compileContainer = new CompileContainer();
-
             compileContainer.Begin = new CompileSprungPunkt();
             compileContainer.Ende = new CompileSprungPunkt();
-            compiler.SetNewContainer(compileContainer);
+
+            compiler.BeginNewMethode( this.GetRegisterInUse, compileContainer, this.GetStatement.Statement.IndexContainer.ThisUses );
 
             CompileFunktionsDeklaration dek = new CompileFunktionsDeklaration();
 
@@ -418,16 +414,19 @@ namespace Yama.Parser
 
         private bool CompileNormalFunktionSet(Compiler.Compiler compiler, CompileContainer compileContainer)
         {
+            int count = 0;
+
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
-                CompileUsePara usePara = new CompileUsePara();
-                usePara.Uses = this.Deklaration.SetContainer.ThisUses;
-
                 IParent tp = this.Deklaration.SetUses.Deklarationen.FirstOrDefault(t=>t.Name == node.Name);
                 IndexVariabelnDeklaration target = node;
                 if (tp is IndexVariabelnDeklaration u) target = u;
 
-                usePara.CompileIndexNode(compiler, target, "get");
+                CompilePopResult compilePopResult = new CompilePopResult();
+                compilePopResult.Position = count;
+                compilePopResult.Compile(compiler, target, "default");
+
+                count++;
             }
 
             compiler.Definition.ParaClean();
@@ -439,6 +438,7 @@ namespace Yama.Parser
             compileContainer.Ende.Compile(compiler, this, "default");
 
             CompileFunktionsEnde ende = new CompileFunktionsEnde();
+            ende.ArgsCount = count;
 
             this.SetVariabelCounter = compiler.Definition.VariabelCounter;
 
@@ -449,14 +449,17 @@ namespace Yama.Parser
 
         private bool CompileNormalFunktionGet(Compiler.Compiler compiler, CompileContainer compileContainer)
         {
+            int count = 0;
+
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
                 if (node.Name == "invalue") continue;
 
-                CompileUsePara usePara = new CompileUsePara();
-                usePara.Uses = this.Deklaration.GetContainer.ThisUses;
+                CompilePopResult compilePopResult = new CompilePopResult();
+                compilePopResult.Position = count;
+                compilePopResult.Compile(compiler, node, "default");
 
-                usePara.CompileIndexNode(compiler, node, "get");
+                count++;
             }
 
             compiler.Definition.ParaClean();
@@ -468,7 +471,7 @@ namespace Yama.Parser
             compileContainer.Ende.Compile(compiler, this, "default");
 
             CompileFunktionsEnde ende = new CompileFunktionsEnde();
-
+            ende.ArgsCount = count;
             this.GetVariabelCounter = compiler.Definition.VariabelCounter;
 
             ende.Compile(compiler, this, "get");

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Yama.Compiler;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -49,6 +50,7 @@ namespace Yama.Index
         public ValidUses BaseUsesSet { get; internal set; }
 
         public ValidUses SetUsesSet { get; internal set; }
+        public SSAVariableMap SSAMap { get; internal set; }
 
         public IndexVariabelnDeklaration (  )
         {

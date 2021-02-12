@@ -178,15 +178,10 @@ namespace Yama.Parser
         {
             this.ChildNode.Compile(compiler, mode);
 
-            CompileMovResult movResultLeft = new CompileMovResult();
-
-            movResultLeft.Compile(compiler, null, mode);
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "default");
 
             this.OperatorCall.Compile(compiler, this.Reference, "methode");
-
-            CompileUsePara usePara = new CompileUsePara();
-
-            usePara.Compile(compiler);
 
             this.FunctionExecute.Compile(compiler, null, mode);
 
