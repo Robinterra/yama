@@ -48,7 +48,11 @@ namespace Yama.Parser
             }
         }
 
-        public IndexContainer IndexContainer { get; private set; }
+        public IndexContainer IndexContainer
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 

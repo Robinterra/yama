@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
@@ -26,6 +27,50 @@ namespace Yama.Compiler
             set;
         } = new List<DataHold>();
 
+        public List<SSACompileLine> Lines
+        {
+            get;
+            set;
+        } = new List<SSACompileLine>();
+
+        public Dictionary<string, SSAVariableMap> VarMapper
+        {
+            get
+            {
+                return this.StackVarMapper.Peek();
+            }
+        }
+
+        public Stack<Dictionary<string, SSAVariableMap>> StackVarMapper
+        {
+            get;
+            set;
+        } = new Stack<Dictionary<string, SSAVariableMap>>();
+
+        public List<string> RegistersUses
+        {
+            get;
+            set;
+        }
+
+        public List<CompileContainer> Containers
+        {
+            get;
+            set;
+        } = new List<CompileContainer>();
+
+        public List<SSACompileLine> PhiSetNewVar
+        {
+            get;
+            set;
+        } = new List<SSACompileLine>();
+
+        public SSACompileLine LoopLine
+        {
+            get;
+            set;
+        }
+
         public string AddDataCall(string jumpPoint, Compiler compiler)
         {
             DataHold dataHold = new DataHold();
@@ -36,6 +81,58 @@ namespace Yama.Compiler
             this.DataHolds.Add(dataHold);
 
             return dataHold.JumpPoint;
+        }
+
+        public bool DoAllocate(Compiler compiler)
+        {
+            if (!(compiler.Definition is GenericDefinition t)) return false;
+            t.Allocater.Init(t);
+
+            foreach (SSACompileLine line in this.Lines)
+            {
+                line.DoAllocate(compiler, t, t.Allocater, this);
+            }
+
+            return true;
+        }
+
+        public bool BeginNewContainerVars()
+        {
+            Dictionary<string, SSAVariableMap> copyMap = new Dictionary<string, SSAVariableMap>();
+
+            foreach (KeyValuePair<string, SSAVariableMap> orgMap in this.VarMapper)
+            {
+                copyMap.Add(orgMap.Key, new SSAVariableMap(orgMap.Value));
+            }
+
+            this.StackVarMapper.Push(copyMap);
+
+            return true;
+        }
+
+        public Dictionary<string, SSAVariableMap> PopVarMap()
+        {
+            if (this.StackVarMapper.Count == 0) return null;
+
+            return this.StackVarMapper.Pop();
+        }
+
+        public bool IsReferenceInVarsContains(SSACompileLine reference)
+        {
+            if (reference == null) return false;
+
+            foreach (KeyValuePair<string, SSAVariableMap> keyValuePair in this.VarMapper)
+            {
+                if (keyValuePair.Value.Reference == null) continue;
+
+                foreach (SSACompileLine line in keyValuePair.Value.Reference.PhiMap)
+                {
+                    if (reference.Equals(line)) return true;
+                }
+
+            }
+
+            return false;
         }
     }
 

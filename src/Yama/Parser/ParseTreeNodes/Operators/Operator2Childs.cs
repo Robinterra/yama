@@ -188,50 +188,24 @@ namespace Yama.Parser
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
 
-            CompileMovResult movResultRight = new CompileMovResult();
-
-            movResultRight.Compile(compiler, null, "default");
-
             this.LeftNode.Compile(compiler, mode);
-
-            CompileMovResult movResultLeft = new CompileMovResult();
-
-            movResultLeft.Compile(compiler, null, "default");
-
-            CompileUsePara usePara = new CompileUsePara();
-
-            usePara.Compile(compiler);
-
-            usePara = new CompileUsePara();
-
-            usePara.Compile(compiler);
 
             t.Statement.Compile(compiler, "default");
 
-            return compiler.Definition.ParaClean();
+            return true;
         }
 
         private bool FunctionsCall(Compiler.Compiler compiler, string mode)
         {
-            CompileMovResult movResultRight = new CompileMovResult();
-
-            movResultRight.Compile(compiler, null, "default");
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "default");
 
             this.LeftNode.Compile(compiler, mode);
 
-            CompileMovResult movResultLeft = new CompileMovResult();
-
-            movResultLeft.Compile(compiler, null, "default");
+            compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "default");
 
             this.OperatorCall.Compile(compiler, this.Reference, "methode");
-
-            CompileUsePara usePara = new CompileUsePara();
-
-            usePara.Compile(compiler);
-
-            usePara = new CompileUsePara();
-
-            usePara.Compile(compiler);
 
             this.FunctionExecute.Compile(compiler, null, mode);
 

@@ -444,40 +444,47 @@ namespace Yama.Parser
             if (this.AccessDefinition != null)
                 if (this.AccessDefinition.Kind == IdentifierKind.Copy) return true;
 
-            compiler.Definition.BeginNewMethode(this.RegisterInUse);
-
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
-            compiler.SetNewContainer(this.CompileContainer);
+
+            compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, ((Container)this.Statement).IndexContainer.ThisUses);
 
             if (this.AccessDefinition != null)
-                if (this.AccessDefinition.Kind == IdentifierKind.Simple) mode = "simple";
+                if (this.AccessDefinition.Kind == IdentifierKind.Simple) return compiler.AddError("simple keyword is not anymore supported!", this);
 
             this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
 
-            if (mode != "simple")
+            int count = 0;
+            foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
-                foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
-                {
-                    CompileUsePara usePara = new CompileUsePara();
+                if (!this.MakeOneArgument(node, compiler, count)) continue;
 
-                    usePara.CompileIndexNode(compiler, node, "get");
+                count++;
 
-                    if (node.Name != "this") continue;
-                    if (this.Deklaration.Klasse.InheritanceBase == null) continue;
+                if (node.Name != "this") continue;
+                if (this.Deklaration.Klasse.InheritanceBase == null) continue;
 
-                    compiler.CurrentThis = node;
+                compiler.CurrentThis = node;
 
-                    bool v = this.BaseCompile(compiler);
-                }
-
-                compiler.Definition.ParaClean();
+                bool v = this.BaseCompile(compiler);
             }
 
             if (this.Deklaration.Type == MethodeType.Ctor) this.CompileCtor(compiler, mode);
             if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(compiler, mode);
 
-            return this.CompileNormalFunktion(compiler, mode);
+            return this.CompileNormalFunktion(compiler, mode, count);
+        }
+
+        private bool MakeOneArgument(IndexVariabelnDeklaration node, Compiler.Compiler compiler, int count)
+        {
+            if (this.Deklaration.Type == MethodeType.Ctor)
+                if (node.Name == "this") return false;
+
+            CompilePopResult compilePopResult = new CompilePopResult();
+            compilePopResult.Position = count;
+            compilePopResult.Compile(compiler, node, "default");
+
+            return true;
         }
 
         private bool BaseCompile(Compiler.Compiler compiler)
@@ -523,17 +530,15 @@ namespace Yama.Parser
         {
             if (this.Deklaration.Klasse.GetNonStaticPropCount == 0) return true;
 
-            CompileUsePara usePara = new CompileUsePara();
-            usePara.CompileIndexNode(compiler, this.Deklaration.Parameters.FirstOrDefault(), "get");
+            /*CompilePopResult compilePopResult = new CompilePopResult();
+            compilePopResult.Position = 0;
+            compilePopResult.Compile(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");*/
 
             CompileReferenceCall refCall = new CompileReferenceCall();
             refCall.CompileDek(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");
 
-            CompileMovResult movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, "default");
-
-            usePara = new CompileUsePara();
-            usePara.Compile(compiler, null);
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "default");
 
             refCall = new CompileReferenceCall();
             refCall.Compile(compiler, this.MallocFree.ParentCall, "methode");
@@ -551,20 +556,14 @@ namespace Yama.Parser
             CompileNumConst num = new CompileNumConst();
             num.Compile(compiler, new Number { Token = new IdentifierToken { Value = this.Deklaration.Klasse.GetNonStaticPropCount * compiler.Definition.AdressBytes } }, mode);
 
-            CompileMovResult movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, "default");
-
-            CompileUsePara usePara = new CompileUsePara();
-            usePara.Compile(compiler, null);
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "default");
 
             CompileReferenceCall refCall = new CompileReferenceCall();
             refCall.Compile(compiler, this.Malloc.ParentCall, "methode");
 
             CompileExecuteCall executeCall = new CompileExecuteCall();
             executeCall.Compile(compiler, (MethodeDeclarationNode)this.Malloc.ParentCall.Deklaration.Use);
-
-            movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, "default");
 
             IndexVariabelnDeklaration dek = this.Deklaration.Parameters.FirstOrDefault(t=>t.Name == "this");
             CompileReferenceCall a = new CompileReferenceCall();
@@ -574,9 +573,6 @@ namespace Yama.Parser
             {
                 CompileReferenceCall referenceCall = new CompileReferenceCall();
                 referenceCall.CompileData(compiler, this, this.Deklaration.Klasse.DataRef.JumpPointName);
-
-                movResultRight = new CompileMovResult();
-                movResultRight.Compile(compiler, null, "default");
 
                 CompileReferenceCall compileReference = new CompileReferenceCall();
                 compileReference.CompileDek(compiler, dek);
@@ -588,7 +584,7 @@ namespace Yama.Parser
             return compiler.Definition.ParaClean();
         }
 
-        private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode)
+        private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode, int count)
         {
             this.CompileContainer.Begin.Compile(compiler, this, "default");
 
@@ -596,6 +592,7 @@ namespace Yama.Parser
 
             this.CompileContainer.Ende.Compile(compiler, this, "default");
 
+            this.FunktionsEndeCompile.ArgsCount = count;
             this.FunktionsEndeCompile.Compile(compiler, this, mode);
 
             this.VariabelCounter = compiler.Definition.VariabelCounter;

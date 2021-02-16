@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
@@ -21,11 +22,19 @@ namespace Yama.Compiler
             get;
             set;
         }
+
         public List<string> AssemblyCommands
         {
             get;
             set;
         } = new List<string>();
+
+        public List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+
         public IParseTreeNode Node
         {
             get;
@@ -38,16 +47,26 @@ namespace Yama.Compiler
             set;
         }
 
+        public bool IsUsed
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         #endregion get/set
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(Number node, AlgoKeyCall key, string mode)
+        private DefaultRegisterQuery BuildQuery(Number node, AlgoKeyCall key, string mode, SSACompileLine line)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
             query.Kategorie = mode;
             query.Value = node.Token.Value;
+
+            if (key.Name == "[SSAPOP]" || key.Name == "[SSAPUSH]") query.Value = new RequestSSAArgument(line);
 
             return query;
         }
@@ -60,14 +79,18 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
+                DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                if (result == null)
+                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -80,9 +103,20 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+
+            foreach (string str in this.AssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str, false));
+            }
+
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this,this.Algo.AssemblyCommands[i], this.PrimaryKeys));
+            }
+
+            foreach (string str in this.PostAssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str));
             }
 
             return true;

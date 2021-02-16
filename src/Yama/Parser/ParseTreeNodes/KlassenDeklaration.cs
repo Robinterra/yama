@@ -11,6 +11,12 @@ namespace Yama.Parser
 
         #region get/set
 
+        public CompileData compile
+        {
+            get;
+            set;
+        } = new CompileData();
+
         public IndexKlassenDeklaration Deklaration
         {
             get;
@@ -277,16 +283,6 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            CompileData compile = new CompileData();
-
-            if (this.Deklaration.IsMethodsReferenceMode)
-            {
-                this.Deklaration.DataRef = compile;
-                compile.Data = new DataObject();
-                compile.Data.Mode = DataMode.JumpPointListe;
-                compile.Compile(compiler, this, "datalist");
-            }
-
             foreach(IMethode m in this.Deklaration.StaticMethods)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;

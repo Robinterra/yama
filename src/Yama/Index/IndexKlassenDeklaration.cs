@@ -152,8 +152,18 @@ namespace Yama.Index
             get;
             set;
         }
-        public IndexVariabelnDeklaration BaseVar { get; private set; }
-        public CompileData DataRef { get; set; }
+
+        public IndexVariabelnDeklaration BaseVar
+        {
+            get;
+            set;
+        }
+
+        public CompileData DataRef
+        {
+            get;
+            set;
+        }
 
         public bool IsInUse (int depth)
         {

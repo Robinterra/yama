@@ -6,7 +6,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileJumpWithCondition : ICompileRoot
+    public class CompilePopResult : ICompile<VariabelDeklaration>
     {
 
         #region get/set
@@ -15,31 +15,21 @@ namespace Yama.Compiler
         {
             get;
             set;
-        } = "JumpWithCondition";
+        } = "PopResult";
 
-        public PointMode Point
+        public List<string> AssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
+
+        public IParseTreeNode Node
         {
             get;
             set;
         }
 
         public CompileAlgo Algo
-        {
-            get;
-            set;
-        }
-
-        public CompileSprungPunkt Punkt
-        {
-            get;
-            set;
-        }
-        public List<string> AssemblyCommands
-        {
-            get;
-            set;
-        } = new List<string>();
-        public IParseTreeNode Node
         {
             get;
             set;
@@ -59,6 +49,12 @@ namespace Yama.Compiler
             }
         }
 
+        public int Position
+        {
+            get;
+            set;
+        }
+
         public List<string> PostAssemblyCommands
         {
             get;
@@ -69,7 +65,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(CompileSprungPunkt node, AlgoKeyCall key, string mode, SSACompileLine line)
+        private DefaultRegisterQuery BuildQuery(IParseTreeNode node, AlgoKeyCall key, string mode, SSACompileLine line)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
@@ -81,33 +77,33 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, CompileSprungPunkt node, string mode = "default")
+        public bool Compile(Compiler compiler, IndexVariabelnDeklaration node, string mode = "default")
         {
-            this.Node = node.Node;
+            this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
 
-            this.Algo = compiler.GetAlgo(this.AlgoName, mode);
+            if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("Variable not found in mapper", node.Use);
+            SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
 
+            this.Algo = compiler.GetAlgo(this.AlgoName, "default");
             if (this.Algo == null) return false;
 
             SSACompileLine line = new SSACompileLine(this);
             compiler.AddSSALine(line);
+            map.Reference = line;
 
-            if (this.Point == PointMode.Custom) this.Punkt = node;
-            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Begin;
-            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Ende;
-            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer.Begin;
-            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
+            //SSACompileArgument arg = new SSACompileArgument(line);
+            //compiler.ContainerMgmt.StackArguments.Push(arg);
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
-                DefaultRegisterQuery query = this.BuildQuery(this.Punkt, key, mode, line);
+                DefaultRegisterQuery query = this.BuildQuery(node.Use, key, mode, line);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
                 if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -125,9 +121,22 @@ namespace Yama.Compiler
                 compiler.AddLine(new RequestAddLine(this, str, false));
             }
 
+            Dictionary<string, string> postreplaces = new Dictionary<string, string>();
+
+            foreach (AlgoKeyCall key in this.Algo.PostKeys)
+            {
+                DefaultRegisterQuery query = new DefaultRegisterQuery();
+                query.Key = key;
+                query.Value = this.Position + 1;
+
+                string value = compiler.Definition.PostKeyReplace(query);
+
+                postreplaces.Add(key.Name, value);
+            }
+
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys));
+                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys, postreplaces));
             }
 
             foreach (string str in this.PostAssemblyCommands)
@@ -136,6 +145,11 @@ namespace Yama.Compiler
             }
 
             return true;
+        }
+
+        public bool Compile(Compiler compiler, VariabelDeklaration node, string mode = "default")
+        {
+            return compiler.AddError("this methods is not be allowed to call");
         }
 
         #endregion methods

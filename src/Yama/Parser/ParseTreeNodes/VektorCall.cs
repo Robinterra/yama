@@ -156,7 +156,7 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            List<IParseTreeNode> copylist = this.ParametersNodes.ToArray().ToList();
+            List<IParseTreeNode> copylist = this.ParametersNodes;//.ToArray().ToList();
             copylist.Reverse();
             IParseTreeNode dek = null;
 
@@ -164,9 +164,8 @@ namespace Yama.Parser
 
             if (mode == "set")
             {
-                CompileMovResult movResultRight = new CompileMovResult();
-
-                movResultRight.Compile(compiler, null, "default");
+                CompilePushResult compilePushResult = new CompilePushResult();
+                compilePushResult.Compile(compiler, null, "default");
 
                 parasCount++;
             }
@@ -179,9 +178,8 @@ namespace Yama.Parser
 
                 dek.Compile(compiler, "default");
 
-                CompileMovResult movResultRight = new CompileMovResult();
-
-                movResultRight.Compile(compiler, null, "default");
+                CompilePushResult compilePushResult = new CompilePushResult();
+                compilePushResult.Compile(compiler, null, "default");
 
                 parasCount++;
             }
@@ -192,13 +190,6 @@ namespace Yama.Parser
             if (!(this.LeftNode is OperatorPoint op)) return false;
 
             if (op.IsANonStatic) parasCount++;
-
-            for (int i = 0; i < parasCount; i++)
-            {
-                CompileUsePara usePara = new CompileUsePara();
-
-                usePara.Compile(compiler, null);
-            }
 
             this.FunctionExecute.Compile(compiler, null, "default");
 

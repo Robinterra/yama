@@ -173,6 +173,14 @@ namespace Yama.Compiler.Definition
         {
             get;
             set;
+        } = new RegisterAllocater();
+
+        // -----------------------------------------------
+
+        public int FramePointer
+        {
+            get;
+            set;
         }
 
         // -----------------------------------------------
@@ -190,6 +198,21 @@ namespace Yama.Compiler.Definition
         // -----------------------------------------------
 
         #region methods
+
+        // -----------------------------------------------
+
+        public int GetNextFreeRegister()
+        {
+            int result = this.CurrentPlaceToKeepRegister;
+
+            if (result < this.PlaceToKeepRegisterStart) return -1;
+
+            int bytes = this.AdressBytes / this.CalculationBytes;
+
+            this.CurrentPlaceToKeepRegister -= bytes;
+
+            return result;
+        }
 
         // -----------------------------------------------
 
@@ -239,12 +262,13 @@ namespace Yama.Compiler.Definition
             if (query.Key.Values == null) query.Key.Values = new List<string>();
 
             if (query.Key.Name == "[VAR]") return this.VarQuery(query);
+            if (query.Key.Name == "[SSAPOP]") return this.SsaPop(query);
+            if (query.Key.Name == "[SSAPUSH]") return this.SsaPush(query);
             if (query.Kategorie == "funcref") return this.FuncRef(query);
             if (query.Kategorie == "setref") return this.FuncRef(query);
             if (query.Kategorie == "point0") return this.Point0(query);
             if (query.Key.Name == "[REG]") return this.RegisterQuery(query);
             if (query.Key.Name == "[NAME]") return this.NameQuery(query);
-            if (query.Key.Name == "[REGPOP]") return this.MethodeRegPop(query);
             if (query.Key.Name == "[PARA]") return this.MethodePara(query);
             if (query.Key.Name == "[NUMCONST]") return this.MethodeNumConst(query);
             if (query.Key.Name == "[JUMPTO]") return this.JumpToQuery(query);
@@ -257,9 +281,26 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
+        private Dictionary<string, string> SsaPush(IRegisterQuery query)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+
+            if (!(query.Value is RequestSSAArgument request)) return result;
+
+            SSACompileArgument arg = new SSACompileArgument(request.Target);
+
+            this.Compiler.ContainerMgmt.StackArguments.Push(arg);
+
+            request.Target.HasReturn = true;
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         private Dictionary<string, string> DataContainerQuery(IRegisterQuery query)
         {
-            List<DataHold> dataHolds = this.Compiler.CurrentContainer.CurrentContainer.DataHolds;
+            List<DataHold> dataHolds = this.Compiler.ContainerMgmt.CurrentContainer.DataHolds;
 
             StringBuilder builder = new StringBuilder();
 
@@ -291,7 +332,7 @@ namespace Yama.Compiler.Definition
         {
             Index.Index index = query.Uses.GetIndex;
 
-            string pointer = this.Compiler.CurrentContainer.AddDataCall(query.Value.ToString(), this.Compiler);
+            string pointer = this.Compiler.ContainerMgmt.AddDataCall(query.Value.ToString(), this.Compiler);
 
             return new Dictionary<string, string> { { query.Key.Name, pointer }};
         }
@@ -386,8 +427,29 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[PUSHREG]") return this.PushReg(query);
             if (query.Key.Name == "[POPREG]") return this.PopReg(query);
             if (query.Key.Name == "[VARCOUNT]") return this.VarCountQuery(query);
+            if (query.Key.Name == "[stackpos]") return this.StackPositionQuery(query);
+            if (query.Key.Name == "[stackcount]") return this.StackCountQuery(query);
+            if (query.Key.Name == "[virtuelRegister]") return this.StackCountQuery(query);
+
+            this.Compiler.AddError("Post Key not supported");
 
             return null;
+        }
+
+        private string StackCountQuery(IRegisterQuery query)
+        {
+            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
+            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
+            return string.Format( keyPattern.Pattern, ((int)query.Value) * this.AdressBytes );
+        }
+
+        private string StackPositionQuery(IRegisterQuery query)
+        {
+            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
+            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
+            return string.Format( keyPattern.Pattern, ((int)query.Value) * this.AdressBytes );
         }
 
         // -----------------------------------------------
@@ -445,7 +507,8 @@ namespace Yama.Compiler.Definition
         private Dictionary<string,string> JumpToQuery(IRegisterQuery query)
         {
             if (query.Key.Values != null && query.Key.Values.Count > 0) return this.JumpToQueryWithValues(query);
-            if (!(query.Value is CompileSprungPunkt t)) return null;
+            if (!(query.Value is CompileSprungPunkt t))
+                return null;
 
             t.Add(this.Compiler, t);
 
@@ -539,28 +602,28 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string,string> MethodeRegPop(IRegisterQuery query)
+        private Dictionary<string,string> SsaPop(IRegisterQuery query)
         {
-            string keypattern = "[REGPOP[{0}]]";
             Dictionary<string, string> result = new Dictionary<string, string>();
 
-            int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
-            int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : (this.AdressBytes / this.CalculationBytes);
+            if (!(query.Value is RequestSSAArgument request)) return result;
 
-            int einzelbyte = bytes / duration;
+            string countStr = query.Key.Values.FirstOrDefault();
+            int count = Convert.ToInt32(countStr);
 
-            this.CurrentPlaceToKeepRegister += bytes + 1;
-            for (int i = 0; i < duration; i++ )
+            for (int i = 0; i < count; i++)
             {
-                this.CurrentPlaceToKeepRegister -= einzelbyte;
-                int registerStart = this.CurrentPlaceToKeepRegister;
+                try
+                {
+                    SSACompileArgument arg = this.Compiler.ContainerMgmt.StackArguments.Pop();
 
-                if (registerStart > this.PlaceToKeepRegisterLast)
-                    { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
-
-                result.Add(string.Format(keypattern, i), this.AviableRegisters[registerStart]);
+                    request.Target.AddArgument(arg);
+                }
+                catch
+                {
+                    return result;
+                }
             }
-            this.CurrentPlaceToKeepRegister += bytes - 1;
 
             return result;
         }
@@ -600,7 +663,9 @@ namespace Yama.Compiler.Definition
 
         private Dictionary<string,string> VarQuery(IRegisterQuery query)
         {
-            string keypattern = "[VAR[{0}]]";
+            return new Dictionary<string, string>();
+
+            /*string keypattern = "[VAR[{0}]]";
             GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
             if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
             Dictionary<string,string> result = new Dictionary<string,string>();
@@ -631,7 +696,7 @@ namespace Yama.Compiler.Definition
                 return  result;
             }
 
-            return null;
+            return null;*/
         }
 
         // -----------------------------------------------
@@ -745,6 +810,13 @@ namespace Yama.Compiler.Definition
             this.Algos.AddRange(correctDefinition.Algos);
 
             return true;
+        }
+
+        // -----------------------------------------------
+
+        public string GetRegister(int reg)
+        {
+            return this.AviableRegisters[reg];
         }
 
         // -----------------------------------------------

@@ -1,14 +1,21 @@
 using System.Collections.Generic;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
 namespace Yama.Compiler
 {
 
-    public class CompileRegionAsm : ICompile<ConditionalCompilationNode>
+    public class CompileFreeLoop : ICompile<IParseTreeNode>
     {
 
         #region get/set
+
+        public string AlgoName
+        {
+            get;
+            set;
+        } = "none";
 
         public List<string> AssemblyCommands
         {
@@ -22,13 +29,13 @@ namespace Yama.Compiler
             set;
         }
 
-        public string AlgoName
+        public CompileAlgo Algo
         {
             get;
             set;
-        } = "RegionAsm";
+        }
 
-        public CompileAlgo Algo
+        public Dictionary<string, string> PrimaryKeys
         {
             get;
             set;
@@ -38,11 +45,11 @@ namespace Yama.Compiler
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
-        public Dictionary<string, string> PrimaryKeys
+        public int Position
         {
             get;
             set;
@@ -58,35 +65,20 @@ namespace Yama.Compiler
 
         #region methods
 
-        public bool Compile(Compiler compiler, ConditionalCompilationNode node, string mode = "default")
+        public bool Compile(Compiler compiler, IParseTreeNode node, string mode = "default")
         {
             this.Node = node;
 
-            compiler.AssemblerSequence.Add(this);
-
-            this.Algo = new CompileAlgo();
-
-            this.Algo.AssemblyCommands.Add(node.Token.Value.ToString());
+            SSACompileLine line = new SSACompileLine(this);
+            line.LoopContainer = compiler.ContainerMgmt.CurrentContainer;
+            line.LoopContainer.LoopLine = line;
+            compiler.AddSSALine(line);
 
             return true;
         }
 
         public bool InFileCompilen(Compiler compiler)
         {
-            foreach (string str in this.AssemblyCommands)
-            {
-                compiler.AddLine(new RequestAddLine(this, str, false));
-            }
-
-            for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
-            {
-                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i]));
-            }
-
-            foreach (string str in this.PostAssemblyCommands)
-            {
-                compiler.AddLine(new RequestAddLine(this, str));
-            }
 
             return true;
         }

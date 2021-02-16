@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Yama.Compiler.Definition;
 using Yama.Index;
 using Yama.Parser;
 
@@ -21,6 +23,7 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<string>();
+
         public IParseTreeNode Node
         {
             get;
@@ -44,6 +47,26 @@ namespace Yama.Compiler
             get;
             set;
         }
+
+        public bool IsUsed
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public List<RegisterMap> VirtuellRegister
+        {
+            get;
+            set;
+        } = new List<RegisterMap>();
+
+        public List<string> PostAssemblyCommands
+        {
+            get;
+            set;
+        } = new List<string>();
 
         #endregion get/set
 
@@ -111,6 +134,9 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
@@ -118,7 +144,8 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
 
                 Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                if (result == null)
+                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -138,6 +165,9 @@ namespace Yama.Compiler
             if (mode == "get") this.GetNode = node;
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
             if (this.Algo == null)  return false;
+
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -167,6 +197,9 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
             if (this.Algo == null)  return false;
 
+            SSACompileLine line = new SSACompileLine(this);
+            compiler.AddSSALine(line);
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
@@ -187,6 +220,13 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.VirtuellRegister.Count != 0) this.MakeVirtuelAdvnced(compiler);;
+
+            foreach (string str in this.AssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str, false));
+            }
+
             Dictionary<string, string> postreplaces = new Dictionary<string, string>();
 
             int varcount = 0;
@@ -209,6 +249,7 @@ namespace Yama.Compiler
                 query.Key = key;
                 query.Value = registerInUse;
                 if (key.Name == "[VARCOUNT]") query.Value = varcount;
+                if (key.Name == "[virtuelRegister]") query.Value = this.VirtuellRegister.Count;
 
                 string value = compiler.Definition.PostKeyReplace(query);
 
@@ -219,6 +260,21 @@ namespace Yama.Compiler
             {
                 compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys, postreplaces));
             }
+
+            foreach (string str in this.PostAssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str, this.PrimaryKeys, postreplaces));
+            }
+
+            return true;
+        }
+
+        private bool MakeVirtuelAdvnced(Compiler compiler)
+        {
+            CompileAlgo algo = compiler.GetAlgo(this.AlgoName, "virtuel");
+            if (algo == null) return false;
+
+            this.PostAssemblyCommands.AddRange(algo.AssemblyCommands);
 
             return true;
         }

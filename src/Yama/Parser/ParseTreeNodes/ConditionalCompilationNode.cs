@@ -30,12 +30,6 @@ namespace Yama.Parser
             set;
         } = new CompileRegionAsm();
 
-        public CompileRegionDefAlgo RegionDefAlgo
-        {
-            get;
-            set;
-        } = new CompileRegionDefAlgo();
-
         #endregion get/set
 
         #region ctor
@@ -66,7 +60,12 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
-            if (this.Token.Text.Contains("#defalgo")) return this.RegionDefAlgo.Compile(compiler, this, mode);;
+            if (this.Token.Text.Contains("#defalgo"))
+            {
+                CompileRegionDefAlgo regionDefAlgo = new CompileRegionDefAlgo();
+
+                return regionDefAlgo.Compile(compiler, this, mode);
+            }
             if (this.Token.Text.Contains("#region asm")) return this.RegionAsm.Compile(compiler, this, mode);;
 
             return true;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
 using Yama.Compiler;
+using System.Linq;
 
 namespace Yama.Parser
 {
@@ -167,23 +168,17 @@ namespace Yama.Parser
             compileReference = new CompileReferenceCall();
             compileReference.CompilePoint0(compiler);
 
-            CompileMovResult movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, "default");
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "default");
 
             CompileReferenceCall referenceCall = new CompileReferenceCall();
             referenceCall.CompileData(compiler, this, t.DataRef.JumpPointName);
 
-            movResultRight = new CompileMovResult();
-            movResultRight.Compile(compiler, null, "default");
+            compilePushResult = new CompilePushResult();
+            compilePushResult.Compile(compiler, null, "default");
 
             CompileReferenceCall operatorCall = new CompileReferenceCall();
             operatorCall.Compile(compiler, this.EqualsReference, "methode");
-
-            CompileUsePara usePara = new CompileUsePara();
-            usePara.Compile(compiler);
-
-            usePara = new CompileUsePara();
-            usePara.Compile(compiler);
 
             CompileExecuteCall functionExecute = new CompileExecuteCall();
             functionExecute.Compile(compiler, null, mode);

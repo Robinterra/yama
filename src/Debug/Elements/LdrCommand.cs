@@ -17,7 +17,14 @@ namespace Yama.Debug
         {
             uint adresse = runtime.Register[runtime.B] + (runtime.C << 2);
 
-            runtime.Register[runtime.A] = System.BitConverter.ToUInt32(runtime.Memory, (int)adresse);
+            try
+            {
+                runtime.Register[runtime.A] = System.BitConverter.ToUInt32(runtime.Memory, (int)adresse);
+            }
+            catch
+            {
+                return false;
+            }
 
             return true;
         }
