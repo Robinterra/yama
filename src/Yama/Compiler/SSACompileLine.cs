@@ -127,7 +127,7 @@ namespace Yama.Compiler
 
                 this.Owner.PrimaryKeys.Add("[SSAPUSH]", map.Name);
 
-                if (map.Type == RegisterType.Stack) this.HandleVirtuellSetRegister(compiler, map);
+                if (map.Type == RegisterType.Stack) this.HandleVirtuellSetRegister(container, genericDefinition, compiler, map);
 
                 return true;
             }
@@ -146,7 +146,7 @@ namespace Yama.Compiler
 
             this.Owner.PrimaryKeys.Add("[SSAPUSH]", newMap.Name);
 
-            if (newMap.Type == RegisterType.Stack) return this.HandleVirtuellSetRegister(compiler, newMap);
+            if (newMap.Type == RegisterType.Stack) return this.HandleVirtuellSetRegister(container , genericDefinition, compiler, newMap);
 
             if (!container.RegistersUses.Contains(newMap.Name)) container.RegistersUses.Add(newMap.Name);
 
@@ -175,10 +175,13 @@ namespace Yama.Compiler
             return false;
         }
 
-        private bool HandleVirtuellSetRegister(Compiler compiler, RegisterMap map)
+        private bool HandleVirtuellSetRegister(CompileContainer container, GenericDefinition generic, Compiler compiler, RegisterMap map)
         {
             CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Set");
             this.Owner.PostAssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * map.RegisterId).ToString()).Replace("[NAME]", map.Name));
+
+            string nameReg = generic.GetRegister(generic.FramePointer);
+            if (!container.RegistersUses.Contains(nameReg)) container.RegistersUses.Add(nameReg);
 
             return true;
         }

@@ -6,6 +6,7 @@
     "PlaceToKeepRegisterStart": 1,
     "WorkingRegisterLast": 10,
     "PlaceToKeepRegisterLast": 2,
+    "FramePointer":11,
     "ResultRegister":12,
     "Algos": [
       {
@@ -264,7 +265,22 @@
         "AssemblyCommands": [
           "[NAME]:",
           "mov r1, sp",
-          "push {[PUSHREG]r11,lr}",
+          "push {[PUSHREG]lr}"
+        ]
+      },
+      {
+        "Name": "FunktionsDeklaration",
+        "Mode": "virtuel",
+        "Description": "Die Deklaration einer Funktion",
+        "Keys": [
+        ],
+        "PostKeys": [
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
           "sub sp, sp, #[virtuelRegister]",
           "mov r11,sp"
         ]
@@ -290,10 +306,25 @@
           }
         ],
         "AssemblyCommands": [
-          "add sp, sp, #[virtuelRegister]",
-          "pop {[POPREG]r11,lr}",
+          "pop {[POPREG]lr}",
           "add sp, sp, #[stackcount]",
           "bx lr"
+        ]
+      },
+      {
+        "Name": "FunktionsEnde",
+        "Mode": "virtuel",
+        "Description": "Das ende einer Funktion",
+        "Keys": [
+        ],
+        "PostKeys": [
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "add sp, sp, #[virtuelRegister]"
         ]
       },
       {
