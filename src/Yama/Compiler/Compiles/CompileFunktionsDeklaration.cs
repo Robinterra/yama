@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yama.Compiler.Definition;
 using Yama.Index;
@@ -219,6 +220,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.VirtuellRegister.Count != 0) this.MakeVirtuelAdvnced(compiler);;
+
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));
@@ -260,8 +263,18 @@ namespace Yama.Compiler
 
             foreach (string str in this.PostAssemblyCommands)
             {
-                compiler.AddLine(new RequestAddLine(this, str));
+                compiler.AddLine(new RequestAddLine(this, str, this.PrimaryKeys, postreplaces));
             }
+
+            return true;
+        }
+
+        private bool MakeVirtuelAdvnced(Compiler compiler)
+        {
+            CompileAlgo algo = compiler.GetAlgo(this.AlgoName, "virtuel");
+            if (algo == null) return false;
+
+            this.PostAssemblyCommands.AddRange(algo.AssemblyCommands);
 
             return true;
         }

@@ -42,6 +42,15 @@ namespace Yama.Compiler
             this.AddToList = addToList;
         }
 
+        public RequestAddLine(ICompileRoot rootm, string assemblyCode, bool addToList, Dictionary<string, string> dictionary, Dictionary<string, string> postreplaces)
+        {
+            this.Root = rootm;
+            this.AssemblyCode = assemblyCode;
+            this.AddToList = addToList;
+            this.PostReplaces = postreplaces;
+            this.Dictionaries = dictionary;
+        }
+
         public RequestAddLine(ICompileRoot root, string assemblyCode)
         {
             this.Root = root;

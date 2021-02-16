@@ -231,11 +231,6 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
-            foreach (string str in this.AssemblyCommands)
-            {
-                compiler.AddLine(new RequestAddLine(this, str, false));
-            }
-
             Dictionary<string, string> postreplaces = new Dictionary<string, string>();
 
             int varcount = 0;
@@ -265,6 +260,8 @@ namespace Yama.Compiler
                 postreplaces.Add(key.Name, value);
             }
 
+            if (this.VirtuellRegister.Count != 0) this.MakeVirtuelAdvnced(compiler, postreplaces);;
+
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys, postreplaces));
@@ -272,7 +269,20 @@ namespace Yama.Compiler
 
             foreach (string str in this.PostAssemblyCommands)
             {
-                compiler.AddLine(new RequestAddLine(this, str));
+                compiler.AddLine(new RequestAddLine(this, str, this.PrimaryKeys, postreplaces));
+            }
+
+            return true;
+        }
+
+        private bool MakeVirtuelAdvnced(Compiler compiler, Dictionary<string, string> postreplaces)
+        {
+            CompileAlgo algo = compiler.GetAlgo(this.AlgoName, "virtuel");
+            if (algo == null) return false;
+
+            foreach (string str in algo.AssemblyCommands)
+            {
+                compiler.AddLine(new RequestAddLine(this, str, this.PrimaryKeys, postreplaces));
             }
 
             return true;
