@@ -41,6 +41,13 @@ namespace Yama.Assembler.ARMT32
             get;
             set;
         }
+
+        public uint Zusatz
+        {
+            get;
+            set;
+        }
+
         public IParseTreeNode Node
         {
             get;
@@ -51,12 +58,13 @@ namespace Yama.Assembler.ARMT32
 
         #region ctor
 
-        public T3StackOneRegisterCommand(string key, string format, uint id, int size)
+        public T3StackOneRegisterCommand(string key, string format, uint id, int size, uint zusatz)
         {
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
+            this.Zusatz = zusatz;
         }
 
         public T3StackOneRegisterCommand(T3StackOneRegisterCommand t, IParseTreeNode node, List<byte> bytes)
@@ -83,7 +91,7 @@ namespace Yama.Assembler.ARMT32
 
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Arguments[0].Text));
             assembleFormat.Arguments.Add(request.Assembler.GetRegister("r13"));
-            assembleFormat.Arguments.Add(0xB04);
+            assembleFormat.Arguments.Add(this.Zusatz);
 
             if (!format.Assemble(assembleFormat)) return false;
 
