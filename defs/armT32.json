@@ -289,7 +289,6 @@
           }
         ],
         "AssemblyCommands": [
-          "add sp, sp, #[virtuelRegister]",
           "pop {[POPREG]r11}",
           "add sp, sp, #[stackcount]",
           "mov pc,r11",
