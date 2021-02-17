@@ -252,8 +252,8 @@
                 "PostKeys": [],
                 "AssemblyCommands": [
                 "sub r12, [SSAPOP[0]], #8",
-                "mov r11, #0",
-                "str r11,[r12]"
+                "mov r0, #0",
+                "str r0,[r12]"
                 ]
             },
             {
@@ -512,26 +512,24 @@
                 ],
                 "PostKeys":[],
                 "AssemblyCommands":[
-                    "push {r10}",
                     "mov lr,[SSAPOP[0]]",
-                    "ldr r11,[lr,#0]",
-                    "cmp r11, #0",
+                    "ldr r1,[lr,#0]",
+                    "cmp r1, #0",
                     "bne [JUMPTO[0]]",
-                    "ldr r11,[lr,#4]",
-                    "add lr,lr,r11",
+                    "ldr r1,[lr,#4]",
+                    "add lr,lr,r1",
                     "add lr,lr,#8",
-                    "ldr r10,[lr,#0]",
-                    "cmp r10,#0x2",
+                    "ldr r0,[lr,#0]",
+                    "cmp r0,#0x2",
                     "beq [JUMPTO[0]]",
-                    "ldr r11,[lr, #4]",
-                    "add r11, r11, #8",
+                    "ldr r1,[lr, #4]",
+                    "add r1, r1, #8",
                     "mov lr,[SSAPOP[0]]",
-                    "str r10,[lr,#0]",
-                    "ldr r10,[lr, #4]",
-                    "add r10, r10, r11",
-                    "str r10,[lr,#4]",
-                    "[JUMPTO[0]]:",
-                    "pop {r10}"
+                    "str r0,[lr,#0]",
+                    "ldr r0,[lr, #4]",
+                    "add r0, r0, r1",
+                    "str r0,[lr,#4]",
+                    "[JUMPTO[0]]:"
                 ]
             }
        ],
