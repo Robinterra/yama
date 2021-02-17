@@ -449,7 +449,10 @@ namespace Yama.Compiler.Definition
             GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
             if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
 
-            return string.Format( keyPattern.Pattern, ((int)query.Value) * this.AdressBytes );
+            int position = (int)query.Value;
+            if (this.Name == "arm-t32") position -= 1;
+
+            return string.Format( keyPattern.Pattern, (position) * this.AdressBytes );
         }
 
         // -----------------------------------------------

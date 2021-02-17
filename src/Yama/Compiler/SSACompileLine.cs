@@ -117,7 +117,9 @@ namespace Yama.Compiler
                 if (map.Type != RegisterType.Stack) continue;
 
                 CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Get");
-                this.Owner.AssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * map.RegisterId).ToString()).Replace("[NAME]", map.Name));
+                int subtraction = 0;
+                if (genericDefinition.Name == "arm-t32") subtraction = 1;
+                this.Owner.AssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * (map.RegisterId - subtraction)).ToString()).Replace("[NAME]", map.Name));
             }
 
             if (!this.HasReturn) return true;
@@ -178,7 +180,9 @@ namespace Yama.Compiler
         private bool HandleVirtuellSetRegister(CompileContainer container, GenericDefinition generic, Compiler compiler, RegisterMap map)
         {
             CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Set");
-            this.Owner.PostAssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * map.RegisterId).ToString()).Replace("[NAME]", map.Name));
+            int subtraction = 0;
+            if (generic.Name == "arm-t32") subtraction = 1;
+            this.Owner.PostAssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * (map.RegisterId - subtraction)).ToString()).Replace("[NAME]", map.Name));
 
             string nameReg = generic.GetRegister(generic.FramePointer);
             if (!container.RegistersUses.Contains(nameReg)) container.RegistersUses.Add(nameReg);
