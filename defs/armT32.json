@@ -138,7 +138,22 @@
         "PostKeys": [],
         "AssemblyCommands": [
           "mov r11, pc",
-          "mov pc, [SSAPOP[0]]",
+          "mov pc, [SSAPOP[0]]"
+        ]
+      },
+      {
+        "Name": "ExecuteCall",
+        "Mode": "result",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
           "mov [SSAPUSH], r12"
         ]
       },

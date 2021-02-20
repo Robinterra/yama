@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yama.Compiler.Definition;
 using Yama.Index;
@@ -102,6 +103,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            this.ResultCompile(compiler);
+
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));
@@ -114,8 +117,24 @@ namespace Yama.Compiler
 
             foreach (string str in this.PostAssemblyCommands)
             {
-                compiler.AddLine(new RequestAddLine(this, str));
+                compiler.AddLine(new RequestAddLine(this, str, this.PrimaryKeys));
             }
+
+            return true;
+        }
+
+        private bool ResultCompile(Compiler compiler)
+        {
+            if (!this.PrimaryKeys.ContainsKey("[SSAPUSH]")) return true;
+
+            string register = this.PrimaryKeys["[SSAPUSH]"];
+            if (!(compiler.Definition is GenericDefinition t)) return true;
+            if (register == t.GetRegister(t.ResultRegister)) return true;
+
+            CompileAlgo algo = compiler.GetAlgo(this.AlgoName, "result");
+            if (algo == null) return false;
+
+            this.PostAssemblyCommands.AddRange(algo.AssemblyCommands);
 
             return true;
         }
