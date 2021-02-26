@@ -42,6 +42,7 @@ namespace Yama.Assembler.ARMT32
             set;
         }
         public bool Sonder { get; }
+        public bool Sonder2 { get; }
         public IParseTreeNode Node
         {
             get;
@@ -52,13 +53,14 @@ namespace Yama.Assembler.ARMT32
 
         #region ctor
 
-        public T3RegisterCommand(string key, string format, uint id, int size, bool sonder = false)
+        public T3RegisterCommand(string key, string format, uint id, int size, bool sonder = false, bool sonder2 = false)
         {
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
             this.Sonder = sonder;
+            this.Sonder2 = sonder2;
         }
 
         public T3RegisterCommand(T3RegisterCommand t, IParseTreeNode node, List<byte> bytes)
@@ -86,6 +88,7 @@ namespace Yama.Assembler.ARMT32
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument1.Token.Text));
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument2.Token.Text));
             assembleFormat.Sonder = this.Sonder;
+            assembleFormat.Sonder2 = this.Sonder2;
 
             if (!format.Assemble(assembleFormat)) return false;
 

@@ -22,5 +22,6 @@ namespace Yama.Assembler
             set;
         } = new List<byte>();
         public bool Sonder { get; set; }
+        public bool Sonder2 { get; set; }
     }
 }

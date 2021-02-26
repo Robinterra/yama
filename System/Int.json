@@ -453,6 +453,28 @@
                 ]
             },
             {
+              "Name": "IntArimetics",
+              "Mode": "Division",
+              "Description": "Division",
+              "Keys": [
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+                  "udiv [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
+              ]
+          },
+            {
                 "Name": "IntArimetics",
                 "Mode": "Incremtation",
                 "Description": "Incremtation",
@@ -902,6 +924,28 @@
                     "mul [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
                 ]
             },
+            {
+              "Name": "IntArimetics",
+              "Mode": "Division",
+              "Description": "Division",
+              "Keys": [
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+                  "div [SSAPUSH], [SSAPOP[0]], [SSAPOP[1]]"
+              ]
+          },
             {
                 "Name": "IntArimetics",
                 "Mode": "Incremtation",
