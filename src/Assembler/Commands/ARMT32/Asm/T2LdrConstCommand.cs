@@ -99,7 +99,7 @@ namespace Yama.Assembler.ARMT32
             assembleFormatBranch.Arguments.Add(valueSkip);
 
             RequestAssembleFormat assembleFormatConst = new RequestAssembleFormat();
-            assembleFormatConst.Command = Convert.ToUInt32(t.Argument1.Token.Value);
+            assembleFormatConst.Command = (uint)Convert.ToInt64(t.Argument1.Token.Value);
             assembleFormatConst.Result = assembleFormat.Result;
 
             if (!format.Assemble(assembleFormat)) return false;
