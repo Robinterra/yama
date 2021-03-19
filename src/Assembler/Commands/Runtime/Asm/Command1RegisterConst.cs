@@ -97,7 +97,7 @@ namespace Yama.Assembler.Runtime
 
             if (request.WithMapper) request.Result.Add(new Command1RegisterConst(this, request.Node, assembleFormat.Result));
 
-            byte[] tmp = BitConverter.GetBytes ( Convert.ToUInt32(t.Argument1.Token.Value) );
+            byte[] tmp = BitConverter.GetBytes ( (uint)Convert.ToInt64(t.Argument1.Token.Value) );
             assembleFormat.Result.Add ( tmp[0] );
             assembleFormat.Result.Add ( tmp[1] );
             assembleFormat.Result.Add ( tmp[2] );

@@ -637,6 +637,8 @@ namespace Yama
         {
             foreach ( IndexError error in index.Errors )
             {
+                if (error.Use == null) return this.PrintSyntaxError ( null, error.Msg, "Index error" );
+
                 IdentifierToken token = error.Use.Token;
 
                 this.PrintSyntaxError ( token, error.Msg, "Index error" );
@@ -650,6 +652,11 @@ namespace Yama
         public bool PrintSyntaxError(IdentifierToken token, string msg, string nexterrormsg = "Syntax error")
         {
             //if (token.Kind != SyntaxKind.Unknown) return false;
+            if (token == null)
+            {
+                Console.Error.WriteLine ( "Unkown Error {0}, {1}", msg, nexterrormsg );
+                return false;
+            }
 
             ConsoleColor colr = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
