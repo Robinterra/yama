@@ -113,7 +113,7 @@ namespace Yama.Index
         {
             this.ParentUsesSet = parentCall.ParentUsesSet;
 
-            if (parentCall.Deklaration is IndexVariabelnDeklaration vd) return this.OperatorMethodType (vd);
+            if (parentCall.Deklaration is IndexVariabelnDeklaration vd) return this.OperatorMethodType (parentCall, vd);
 
             if (parentCall.Deklaration is IndexKlassenDeklaration kd)
             {
@@ -201,7 +201,7 @@ namespace Yama.Index
             return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / regular");
         }
 
-        private bool OperatorMethodType(IndexVariabelnDeklaration vd)
+        private bool OperatorMethodType(IndexVariabelnReference parentCall, IndexVariabelnDeklaration vd)
         {
             if (!(vd.Type.Deklaration is IndexKlassenDeklaration kdd)) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no support type definition");
 
