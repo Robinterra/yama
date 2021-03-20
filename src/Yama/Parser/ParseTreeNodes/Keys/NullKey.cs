@@ -67,6 +67,11 @@ namespace Yama.Parser
         {
             if (!(parent is IndexContainer container)) return index.CreateError(this);
 
+            IndexVariabelnReference reference = new IndexVariabelnReference();
+            reference.Use = this;
+            reference.Name = "int";
+            container.VariabelnReferences.Add(reference);
+
             return true;
         }
 
