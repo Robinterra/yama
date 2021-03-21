@@ -75,9 +75,6 @@ namespace Yama.Parser
 
             expression.Token = token;
             expression.Ende = kind;
-            expression.Ende.Node = expression;
-            token.Node = expression;
-            kind.Node = expression;
 
             List<IParseTreeNode> nodes = parser.ParseCleanTokens ( token.Position + 1, kind.Position );
 
@@ -85,6 +82,10 @@ namespace Yama.Parser
 
             if ( nodes == null ) return null;
             if ( nodes.Count != 1 ) return null;
+
+            expression.Ende.Node = expression;
+            token.Node = expression;
+            kind.Node = expression;
 
             expression.ExpressionParent = nodes[0];
 

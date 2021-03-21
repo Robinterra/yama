@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yama.Compiler;
 using Yama.Index;
@@ -85,7 +86,6 @@ namespace Yama.Parser
 
             IfKey key = new IfKey (  );
             key.Token = token;
-            token.Node = key;
 
             IdentifierToken conditionkind = parser.Peek ( token, 1 );
 
@@ -99,6 +99,8 @@ namespace Yama.Parser
 
             IdentifierToken ifStatementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
 
+            if (!this.IsAllowedStatmentToken (ifStatementchild)) return null;
+
             key.IfStatement = parser.ParseCleanToken(ifStatementchild);
 
             if (key.IfStatement == null) return null;
@@ -108,6 +110,8 @@ namespace Yama.Parser
             IdentifierToken elsePeekToken = (key.IfStatement is IContainer t) ? t.Ende : key.IfStatement.Token;
 
             IdentifierToken elseStatementChild = parser.Peek ( elsePeekToken, 1 );
+
+            key.Token.Node = key;
 
             if ( elseStatementChild == null ) return key;
 
@@ -122,6 +126,19 @@ namespace Yama.Parser
             key.ElseStatement.Token.ParentNode = key;
 
             return key;
+        }
+
+        private bool IsAllowedStatmentToken(IdentifierToken ifStatementchild)
+        {
+            if (ifStatementchild.Kind == IdentifierKind.Return) return true;
+            if (ifStatementchild.Kind == IdentifierKind.Break) return true;
+            if (ifStatementchild.Kind == IdentifierKind.Continue) return true;
+            if (ifStatementchild.Kind == IdentifierKind.BeginContainer) return true;
+            if (ifStatementchild.Kind == IdentifierKind.If) return true;
+            if (ifStatementchild.Kind == IdentifierKind.While) return true;
+            if (ifStatementchild.Kind == IdentifierKind.For) return true;
+
+            return false;
         }
 
         public bool Indezieren(Index.Index index, IParent parent)

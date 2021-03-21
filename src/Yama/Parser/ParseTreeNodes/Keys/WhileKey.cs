@@ -69,6 +69,17 @@ namespace Yama.Parser
 
         #region methods
 
+        private bool IsAllowedStatmentToken(IdentifierToken ifStatementchild)
+        {
+            if (ifStatementchild.Kind == IdentifierKind.Continue) return true;
+            if (ifStatementchild.Kind == IdentifierKind.BeginContainer) return true;
+            if (ifStatementchild.Kind == IdentifierKind.If) return true;
+            if (ifStatementchild.Kind == IdentifierKind.While) return true;
+            if (ifStatementchild.Kind == IdentifierKind.For) return true;
+
+            return false;
+        }
+
         public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
         {
             if ( token.Kind != IdentifierKind.While ) return null;
@@ -76,7 +87,6 @@ namespace Yama.Parser
 
             WhileKey key = new WhileKey (  );
             key.Token = token;
-            token.Node = key;
 
             IdentifierToken conditionkind = parser.Peek ( token, 1 );
 
@@ -89,12 +99,14 @@ namespace Yama.Parser
             key.Condition.Token.ParentNode = key;
 
             IdentifierToken Statementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
+            if (!this.IsAllowedStatmentToken (Statementchild)) return null;
 
             key.Statement = parser.ParseCleanToken(Statementchild);
 
             if (key.Statement == null) return null;
 
             key.Statement.Token.ParentNode = key;
+            key.Token.Node = key;
 
             return key;
         }

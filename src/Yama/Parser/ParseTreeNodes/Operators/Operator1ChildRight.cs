@@ -161,6 +161,7 @@ namespace Yama.Parser
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
             reference.Name = this.Token.Text;
+            reference.IsOperator = true;
             this.ChildNode.Indezieren(index, parent);
             IndexVariabelnReference varref = container.VariabelnReferences.LastOrDefault();
 
@@ -176,6 +177,13 @@ namespace Yama.Parser
 
         public bool Compile(Compiler.Compiler compiler, string mode = "default")
         {
+            if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
+            {
+                bool isok = this.CompileCopy(compiler, mode, t);
+
+                if (isok) return true;
+            }
+
             this.ChildNode.Compile(compiler, mode);
 
             CompilePushResult compilePushResult = new CompilePushResult();
@@ -184,6 +192,18 @@ namespace Yama.Parser
             this.OperatorCall.Compile(compiler, this.Reference, "methode");
 
             this.FunctionExecute.Compile(compiler, null, mode);
+
+            return true;
+        }
+
+        private bool CompileCopy(Compiler.Compiler compiler, string mode, MethodeDeclarationNode t)
+        {
+            if (t.AccessDefinition == null) return false;
+            if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
+
+            this.ChildNode.Compile(compiler, mode);
+
+            t.Statement.Compile(compiler, "default");
 
             return true;
         }

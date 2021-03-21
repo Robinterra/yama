@@ -241,13 +241,13 @@ namespace Yama
             layer.ParserMembers.Add ( new OperatorPoint ( 11 ) );
             layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<IdentifierKind> { IdentifierKind.NumberToken, IdentifierKind.Word, IdentifierKind.OpenBracket }, new List<IdentifierKind> { IdentifierKind.OpenBracket } ) );
             layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++", "!", "~" }, 11, new List<IdentifierKind> { IdentifierKind.Word, IdentifierKind.Unknown } ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 2 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 3 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 4 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 5 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.LessThan, 6 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.GreaterThan, 6 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=", "<", ">" }, 6 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 2 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.LessThan, 3 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.GreaterThan, 3 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=", "<", ">" }, 3 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 4 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 5 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 6 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 7 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9 ) );
@@ -637,6 +637,8 @@ namespace Yama
         {
             foreach ( IndexError error in index.Errors )
             {
+                if (error.Use == null) return this.PrintSyntaxError ( null, error.Msg, "Index error" );
+
                 IdentifierToken token = error.Use.Token;
 
                 this.PrintSyntaxError ( token, error.Msg, "Index error" );
@@ -650,6 +652,11 @@ namespace Yama
         public bool PrintSyntaxError(IdentifierToken token, string msg, string nexterrormsg = "Syntax error")
         {
             //if (token.Kind != SyntaxKind.Unknown) return false;
+            if (token == null)
+            {
+                Console.Error.WriteLine ( "Unkown Error {0}, {1}", msg, nexterrormsg );
+                return false;
+            }
 
             ConsoleColor colr = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;

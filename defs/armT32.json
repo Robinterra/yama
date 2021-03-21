@@ -366,14 +366,6 @@
             "Values": null
           },
           {
-            "Name": "[RCC]",
-            "Values": null
-          },
-          {
-            "Name": "[RCC_SKIP]",
-            "Values": null
-          },
-          {
             "Name":"[SPBEGIN]",
             "Values": null
           }
@@ -386,12 +378,6 @@
           ".word __start",
           ".space 0xe4",
           "__start:",
-          "ldr r0,*RCC",
-          "ldr r2, [r0]",
-          "mov r1, #0xf",
-          "lsl r1, r1, #[RCC_SKIP]",
-          "orr r1,r1,r2",
-          "str r1,[r0]",
           "ldr r12,*RAMENDE",
           "ldr r10,*RAMBEGIN",
           "mov r11,#0x1",
@@ -399,7 +385,6 @@
           "str r11,[r10,#0]",
           "str r12,[r10,#4]",
           "b main",
-          "RCC: .word [RCC]",
           "RAMENDE: .word [RAMENDE]",
           "RAMBEGIN: .word [RAMBEGIN]"
         ]
@@ -570,20 +555,6 @@
       {
         "Key": "[RAMBEGIN]",
         "Value": "0x20001400",
-        "Defines": [
-          "STM32F401"
-        ]
-      },
-      {
-        "Key": "[RCC]",
-        "Value": "0x40023830",
-        "Defines": [
-          "STM32F401"
-        ]
-      },
-      {
-        "Key": "[RCC_SKIP]",
-        "Value": "0x0",
         "Defines": [
           "STM32F401"
         ]

@@ -147,12 +147,11 @@ namespace "System"
         /**
         * Binary Negation of 2 Values
         *
-        * @param[in] a (int) The left Child of the Operator
-        * @param[in] b (int) The rigth Child of the Operator
+        * @param[in] a (int) The Child of the Operator
         *
         * @return (int) Result
         */
-        copy operator int !(int a, int b)
+        copy operator int !(int a)
         {
             #defalgo IntArimetics,BinaryNegation:;
         }
@@ -271,7 +270,6 @@ namespace "System"
 
         // -----------------------------------------------
 
-        
         /**
         * Multiplcation of 2 Values
         *
@@ -283,6 +281,21 @@ namespace "System"
         copy operator int *(int a, int b)
         {
             #defalgo IntArimetics,Mul:;
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Division of 2 Values
+        *
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
+        *
+        * @return (int) Result
+        */
+        copy operator int /(int a, int b)
+        {
+            #defalgo IntArimetics,Division:;
         }
 
         // -----------------------------------------------

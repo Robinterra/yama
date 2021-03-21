@@ -213,6 +213,7 @@ namespace Yama.Assembler
             definition.Commands.Add(new T3RegisterCommand ("sbc", "T3Register", 0xEB6, 4));
             definition.Commands.Add(new T3RegisterCommand ("sub", "T3Register", 0xEBA, 4));
             definition.Commands.Add(new T3RegisterCommand ("mul", "T3Register", 0xFB0, 4, true));
+            definition.Commands.Add(new T3RegisterCommand ("udiv", "T3Register", 0xFBB, 4, true, true));
             definition.Commands.Add(new T3RegisterCommand ("and", "T3Register", 0xEA0, 4));
             definition.Commands.Add(new T3RegisterCommand ("eor", "T3Register", 0xEA8, 4));
             definition.Commands.Add(new T3RegisterCommand ("orr", "T3Register", 0xEA4, 4));
