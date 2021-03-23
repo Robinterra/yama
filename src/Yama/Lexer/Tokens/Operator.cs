@@ -65,7 +65,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
             return lexer.SubLexen ( this.Operators );
         }
@@ -76,7 +76,7 @@ namespace Yama.Lexer
         {
             foreach ( ZeichenKette oper in this.Operators )
             {
-                if ( oper.CheckChar ( lexer ) == TokenStatus.Complete ) return true;
+                if ( oper.CheckChar ( lexer ) == TokenState.Complete ) return true;
             }
 
             return false;

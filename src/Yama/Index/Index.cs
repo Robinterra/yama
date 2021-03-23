@@ -81,9 +81,11 @@ namespace Yama.Index
 
         private bool Indezieren()
         {
+            Parser.Request.RequestParserTreeIndezieren request = new Parser.Request.RequestParserTreeIndezieren(this, null);
+
             foreach (IParseTreeNode node in this.Roots)
             {
-                node.Indezieren(this, null);
+                node.Indezieren(request);
             }
 
             if (this.MainFunction == null) this.CreateError(this.Roots[0], "No main method found!");

@@ -39,25 +39,25 @@ namespace Yama.Parser
 
         #endregion get/set
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
             //SyntaxToken kind = parser.FindAToken ( token, SyntaxKind.EndOfCommand );
             
             //if ( kind == null ) return null;
             //if ( kind.Node != null ) return null;
-            if ( token.Kind != IdentifierKind.EndOfCommand ) return null;
+            if ( request.Token.Kind != IdentifierKind.EndOfCommand ) return null;
 
-            IdentifierToken left = parser.Peek ( token, -1 );
+            IdentifierToken left = request.Parser.Peek ( request.Token, -1 );
 
             NormalExpression expression = new NormalExpression (  );
 
-            expression.Token = token;
+            expression.Token = request.Token;
 
-            token.Node = expression;
+            request.Token.Node = expression;
 
             if (left == null) return expression;
 
-            List<IParseTreeNode> nodes = parser.ParseCleanTokens ( parser.Start, token.Position );
+            List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens ( request.Parser.Start, request.Token.Position );
 
             IParseTreeNode node = null;
 
@@ -73,18 +73,18 @@ namespace Yama.Parser
             return expression;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             //if (!(parent is IndexContainer container)) return index.CreateError(this);
 
             if (this.ExpressionParent == null) return true;
 
-            return this.ExpressionParent.Indezieren(index, parent);
+            return this.ExpressionParent.Indezieren(request);
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            this.ExpressionParent.Compile(compiler, mode);
+            this.ExpressionParent.Compile(request);
 
             return true;
         }

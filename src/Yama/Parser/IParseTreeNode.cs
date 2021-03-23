@@ -19,6 +19,8 @@ namespace Yama.Parser
             set;
         }
 
+        // -----------------------------------------------
+
         List<IParseTreeNode> GetAllChilds
         {
             get;
@@ -34,15 +36,15 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        IParseTreeNode Parse ( Parser parser, IdentifierToken token );
+        IParseTreeNode Parse ( Request.RequestParserTreeParser request );
 
         // -----------------------------------------------
 
-        bool Indezieren(Index.Index index, IParent parent);
+        bool Indezieren ( Request.RequestParserTreeIndezieren request );
 
         // -----------------------------------------------
 
-        bool Compile ( Compiler.Compiler compiler, string mode = "default" );
+        bool Compile ( Request.RequestParserTreeCompile request );
 
         // -----------------------------------------------
 

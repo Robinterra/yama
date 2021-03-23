@@ -215,25 +215,24 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-
             PropertyDeklaration deklaration = new PropertyDeklaration();
 
-            token = this.MakeAccessValid(parser, token, deklaration);
+            IdentifierToken token = this.MakeAccessValid( request.Parser, request.Token, deklaration );
 
-            token = this.MakeZusatzValid ( parser, token, deklaration );
+            token = this.MakeZusatzValid ( request.Parser, token, deklaration );
 
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
 
-            token = parser.Peek ( token, 1 );
+            token = request.Parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
 
-            token = parser.Peek ( token, 1 );
+            token = request.Parser.Peek ( token, 1 );
 
             //IParseTreeNode rule = new Container(SyntaxKind.BeginContainer, SyntaxKind.CloseContainer);
 
@@ -287,9 +286,9 @@ namespace Yama.Parser
             return type;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexKlassenDeklaration klasse)) return index.CreateError(this);
+            if (!(request.Parent is IndexKlassenDeklaration klasse)) return request.Index.CreateError(this);
 
             IndexPropertyDeklaration deklaration = new IndexPropertyDeklaration();
             deklaration.Use = this;
@@ -318,7 +317,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             return true;
         }

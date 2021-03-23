@@ -42,18 +42,18 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
             lexer.CurrentCharMode (  );
 
             foreach ( char zeichen in this.Word )
             {
-                if (lexer.CurrentChar != zeichen) return TokenStatus.Cancel;
+                if (lexer.CurrentChar != zeichen) return TokenState.Cancel;
 
                 lexer.NextChar();
             }
 
-            return char.IsLetter(lexer.CurrentChar) ? TokenStatus.Cancel : TokenStatus.Complete;
+            return char.IsLetter(lexer.CurrentChar) ? TokenState.Cancel : TokenState.Complete;
         }
 
         // -----------------------------------------------

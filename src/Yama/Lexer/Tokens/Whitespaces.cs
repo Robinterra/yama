@@ -27,18 +27,18 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
             lexer.CurrentCharMode (  );
 
-            if (!char.IsWhiteSpace ( lexer.CurrentChar)) return TokenStatus.Cancel;
+            if (!char.IsWhiteSpace ( lexer.CurrentChar)) return TokenState.Cancel;
 
             while ( char.IsWhiteSpace ( lexer.CurrentChar ) )
             {
                 lexer.NextChar (  );
             }
 
-            return TokenStatus.Complete;
+            return TokenState.Complete;
         }
 
         // -----------------------------------------------

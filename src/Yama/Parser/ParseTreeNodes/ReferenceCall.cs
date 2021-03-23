@@ -56,15 +56,15 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( !this.CheckValidTokens ( token ) ) return null;
+            if ( !this.CheckValidTokens ( request.Token ) ) return null;
 
             ReferenceCall result = new ReferenceCall (  );
 
-            token.Node = result;
+            result.Token = request.Token;
 
-            result.Token = token;
+            request.Token.Node = result;
 
             return result;
         }
@@ -78,10 +78,10 @@ namespace Yama.Parser
             return false;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (parent is IndexVariabelnReference varref) return this.RefComb(varref);
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (request.Parent is IndexVariabelnReference varref) return this.RefComb(varref);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
@@ -104,34 +104,34 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             string moderesult = "default";
-            if (mode == "set") moderesult = mode;
-            if (mode == "point") moderesult = mode;
-            if (mode == "setpoint") moderesult = mode;
+            if (request.Mode == "set") moderesult = request.Mode;
+            if (request.Mode == "point") moderesult = request.Mode;
+            if (request.Mode == "setpoint") moderesult = request.Mode;
             if (this.Reference.Deklaration is IMethode dek)
             {
-                if (dek.Klasse.IsMethodsReferenceMode && dek.Klasse.Methods.Contains(dek)) return this.RefNameCall(compiler, dek, mode);
+                if (dek.Klasse.IsMethodsReferenceMode && dek.Klasse.Methods.Contains(dek)) return this.RefNameCall(request.Compiler, dek, request.Mode);
                 moderesult = "methode";
             }
-            if (this.Reference.Deklaration is IndexEnumEntryDeklaration ed) return this.CompileEnumEntry(compiler, ed);
+            if (this.Reference.Deklaration is IndexEnumEntryDeklaration ed) return this.CompileEnumEntry(request.Compiler, ed);
             if (this.Reference.Deklaration is IndexEnumDeklaration) return true;
-            if (this.Reference.Deklaration is IndexVektorDeklaration) moderesult = mode;
+            if (this.Reference.Deklaration is IndexVektorDeklaration) moderesult = request.Mode;
 
             if (this.Reference.Deklaration is IndexPropertyGetSetDeklaration)
             {
                 moderesult = "point";
-                if (mode == "setvektorcall") moderesult = "setpoint";
+                if (request.Mode == "setvektorcall") moderesult = "setpoint";
             }
 
-            compiler.LastVariableCall = this.Token.Text;
+            request.Compiler.LastVariableCall = this.Token.Text;
 
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
-            if (this.CheckAndCompileBase(compiler, compileReference, moderesult)) return true;
+            if (this.CheckAndCompileBase(request.Compiler, compileReference, moderesult)) return true;
 
-            return compileReference.Compile(compiler, this, moderesult);
+            return compileReference.Compile(request.Compiler, this, moderesult);
         }
 
         private bool CheckAndCompileBase(Compiler.Compiler compiler, CompileReferenceCall compileReference, string moderesult)

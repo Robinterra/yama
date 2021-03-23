@@ -25,23 +25,23 @@ namespace Yama.Parser
 
         #endregion get/set
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
             ParserError result = new ParserError ();
 
-            result.Token = token;
+            result.Token = request.Token;
 
-            token.Node = result;
+            result.Token.Node = result;
 
             return result;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren ( Request.RequestParserTreeIndezieren request )
         {
-            return index.CreateError(this);
+            return request.Index.CreateError(this);
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile ( Request.RequestParserTreeCompile request)
         {
             return false;
         }

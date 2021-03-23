@@ -1,6 +1,6 @@
 namespace Yama.Lexer
 {
-    public enum TokenStatus
+    public enum TokenState
     {
         SyntaxError,
         Accept,

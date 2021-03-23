@@ -107,25 +107,25 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Operator ) return null;
-            if ( !this.CheckHashValidOperator ( token ) ) return null;
+            if ( request.Token.Kind != IdentifierKind.Operator ) return null;
+            if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
             Operator3Childs node = new Operator3Childs ( this.Prio );
-            node.Token = token;
-            token.Node = node;
+            node.Token = request.Token;
 
-            IdentifierToken steuerToken = parser.FindAToken ( token, this.Steuerzeichen );
+            IdentifierToken steuerToken = request.Parser.FindAToken ( request.Token, this.Steuerzeichen );
 
             if ( steuerToken == null ) return null;
 
+            node.Token.Node = node;
             steuerToken.ParentNode = node;
             steuerToken.Node = node;
 
-            node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
-            node.MiddleNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
-            node.RightNode = parser.ParseCleanToken ( parser.Peek ( steuerToken, 1 ) );
+            node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
+            node.MiddleNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, 1 ) );
+            node.RightNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( steuerToken, 1 ) );
 
             node.LeftNode.Token.ParentNode = node;
             node.MiddleNode.Token.ParentNode = node;
@@ -135,18 +135,18 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
             reference.Name = this.Token.Text;
-            this.LeftNode.Indezieren(index, parent);
+            this.LeftNode.Indezieren(request);
             IndexVariabelnReference varref = container.VariabelnReferences.Last();
 
-            this.MiddleNode.Indezieren(index, parent);
-            this.RightNode.Indezieren(index, parent);
+            this.MiddleNode.Indezieren(request);
+            this.RightNode.Indezieren(request);
             this.VariabelReference = reference;
             //container.VariabelnReferences.Add(reference);
 
@@ -157,7 +157,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             return true;
         }

@@ -114,18 +114,18 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != this.ValidKind ) return null;
-            if ( !this.CheckHashValidOperator ( token ) ) return null;
+            if ( request.Token.Kind != this.ValidKind ) return null;
+            if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
             Operator2Childs node = new Operator2Childs ( this.Prio );
-            node.Token = token;
-            token.Node = node;
+            node.Token = request.Token;
+            node.Token.Node = node;
 
-            node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
+            node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
 
-            node.RightNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
+            node.RightNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, 1 ) );
 
             node.LeftNode.Token.ParentNode = node;
             node.RightNode.Token.ParentNode = node;
@@ -133,24 +133,24 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
             reference.Name = this.Token.Text;
             reference.IsOperator = true;
-            this.LeftNode.Indezieren(index, parent);
+            this.LeftNode.Indezieren(request);
             IndexVariabelnReference varref = container.VariabelnReferences.LastOrDefault();
 
 
-            this.RightNode.Indezieren(index, parent);
+            this.RightNode.Indezieren(request);
             this.VariabelReference = reference;
             //container.VariabelnReferences.Add(reference);
 
             if (this.Token.Text == "=") return true;
-            if (varref == null) return index.CreateError(this);
+            if (varref == null) return request.Index.CreateError(this);
 
             varref.ParentCall = reference;
             varref.VariabelnReferences.Add(reference);
@@ -159,27 +159,25 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            this.RightNode.Compile(compiler, mode);
+            this.RightNode.Compile(request);
 
             if (this.Token.Text == "=")
             {
-                mode = "set";
-
-                this.LeftNode.Compile(compiler, mode);
+                this.LeftNode.Compile(new Request.RequestParserTreeCompile ( request.Compiler, "set" ));
 
                 return true;
             }
 
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {
-                bool isok = this.CompileCopy(compiler, mode, t);
+                bool isok = this.CompileCopy(request.Compiler, request.Mode, t);
 
                 if (isok) return true;
             }
 
-            this.FunctionsCall(compiler, mode);
+            this.FunctionsCall(request.Compiler, request.Mode);
 
             return true;
         }
@@ -189,9 +187,9 @@ namespace Yama.Parser
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
 
-            this.LeftNode.Compile(compiler, mode);
+            this.LeftNode.Compile(new Request.RequestParserTreeCompile (compiler, mode));
 
-            t.Statement.Compile(compiler, "default");
+            t.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
 
             return true;
         }
@@ -201,7 +199,7 @@ namespace Yama.Parser
             CompilePushResult compilePushResult = new CompilePushResult();
             compilePushResult.Compile(compiler, null, "default");
 
-            this.LeftNode.Compile(compiler, mode);
+            this.LeftNode.Compile(new Request.RequestParserTreeCompile(compiler, mode));
 
             compilePushResult = new CompilePushResult();
             compilePushResult.Compile(compiler, null, "default");

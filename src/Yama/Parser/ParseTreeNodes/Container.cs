@@ -73,11 +73,11 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != this.BeginKind ) return null;
+            if ( request.Token.Kind != this.BeginKind ) return null;
 
-            IdentifierToken kind = parser.FindEndTokenWithoutParse ( token, this.EndeKind, this.BeginKind );
+            IdentifierToken kind = request.Parser.FindEndTokenWithoutParse ( request.Token, this.EndeKind, this.BeginKind );
 
             if ( kind == null ) return null;
 
@@ -85,15 +85,15 @@ namespace Yama.Parser
 
             Container expression = new Container (  );
 
-            expression.Token = token;
+            expression.Token = request.Token;
+            expression.Token.Node = expression;
             expression.Ende = kind;
 
-            token.Node = expression;
             kind.Node = expression;
 
-            List<IParseTreeNode> nodes = parser.ParseCleanTokens ( token.Position + 1, kind.Position );
+            List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, kind.Position );
 
-            parser.Repleace ( token, kind.Position );
+            request.Parser.Repleace ( request.Token, kind.Position );
 
             if ( nodes == null ) return null;
 
@@ -107,10 +107,10 @@ namespace Yama.Parser
             return expression;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (parent is IndexNamespaceDeklaration dek) return this.NamespaceIndezi(index, dek);
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (request.Parent is IndexNamespaceDeklaration dek) return this.NamespaceIndezi(request);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             IndexContainer indexContainer = new IndexContainer();
             indexContainer.Use = this;
@@ -119,27 +119,27 @@ namespace Yama.Parser
 
             foreach (IParseTreeNode node in this.Statements)
             {
-                node.Indezieren(index, indexContainer);
+                node.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, indexContainer));
             }
 
             return true;
         }
 
-        private bool NamespaceIndezi(Index.Index index, IndexNamespaceDeklaration dek)
+        private bool NamespaceIndezi(Request.RequestParserTreeIndezieren request)
         {
             foreach (IParseTreeNode node in this.Statements)
             {
-                node.Indezieren(index, dek);
+                node.Indezieren(request);
             }
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             foreach (IParseTreeNode nodes in this.Statements)
             {
-                nodes.Compile(compiler, mode);
+                nodes.Compile(request);
             }
 
             return true;

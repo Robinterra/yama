@@ -50,7 +50,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
             return this.punctuation.CheckChar ( lexer );
 

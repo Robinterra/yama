@@ -44,7 +44,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
             bool isok = true;
             bool firstrun = true;
@@ -54,7 +54,7 @@ namespace Yama.Lexer
                 if (isok) firstrun = false;
             }
 
-            return firstrun ? TokenStatus.Cancel : TokenStatus.Complete;
+            return firstrun ? TokenState.Cancel : TokenState.Complete;
         }
 
         // -----------------------------------------------
@@ -63,15 +63,15 @@ namespace Yama.Lexer
         {
             foreach ( ILexerToken token in this.operators )
             {
-                TokenStatus status = token.CheckChar ( lexer );
+                TokenState status = token.CheckChar ( lexer );
 
-                if (status == TokenStatus.CompleteOne)
+                if (status == TokenState.CompleteOne)
                 {
                     lexer.NextByte (  );
-                    status = TokenStatus.Complete;
+                    status = TokenState.Complete;
                 }
 
-                if (status != TokenStatus.Complete) continue;
+                if (status != TokenState.Complete) continue;
 
                 return true;
             }

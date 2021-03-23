@@ -53,15 +53,15 @@ namespace Yama.Parser
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
             EnumKeyValue node = new EnumKeyValue();
 
-            node.Token = token;
+            node.Token = request.Token;
 
-            token = parser.Peek ( token, 1 );
+            IdentifierToken token = request.Parser.Peek ( request.Token, 1 );
 
-            if (token == null) return null;
+            if ( token == null ) return null;
             if ( token.Kind != IdentifierKind.NumberToken ) return null;
 
             node.Value = token;
@@ -72,9 +72,9 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexEnumDeklaration dek)) return index.CreateError(this);
+            if (!(request.Parent is IndexEnumDeklaration dek)) return request.Index.CreateError(this);
 
             IndexEnumEntryDeklaration deklaration = new IndexEnumEntryDeklaration();
             deklaration.Name = this.Token.Text;
@@ -88,7 +88,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             return true;
         }

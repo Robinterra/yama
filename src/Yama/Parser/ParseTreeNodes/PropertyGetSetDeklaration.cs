@@ -123,8 +123,17 @@ namespace Yama.Parser
             set;
         } = new CompileContainer();
 
-        public int GetVariabelCounter { get; private set; }
-        public int SetVariabelCounter { get; private set; }
+        public int GetVariabelCounter
+        {
+            get;
+            private set;
+        }
+
+        public int SetVariabelCounter
+        {
+            get;
+            private set;
+        }
 
         #endregion get/set
 
@@ -215,31 +224,30 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-
             PropertyGetSetDeklaration deklaration = new PropertyGetSetDeklaration();
 
-            token = this.MakeAccessValid(parser, token, deklaration);
+            IdentifierToken token = this.MakeAccessValid ( request.Parser, request.Token, deklaration );
 
-            token = this.MakeZusatzValid ( parser, token, deklaration );
+            token = this.MakeZusatzValid ( request.Parser, token, deklaration );
 
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
 
-            token = parser.Peek ( token, 1 );
+            token = request.Parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
 
-            token = parser.Peek ( token, 1 );
+            token = request.Parser.Peek ( token, 1 );
 
             //IParseTreeNode rule = new Container(SyntaxKind.BeginContainer, SyntaxKind.CloseContainer);
 
             if ( token == null ) return null;
 
-            IParseTreeNode container = parser.ParseCleanToken(token, this.layer);
+            IParseTreeNode container = request.Parser.ParseCleanToken(token, this.layer);
 
             if (container == null) return null;
             if (!(container is Container ab)) return null;
@@ -310,9 +318,9 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexKlassenDeklaration klasse)) return index.CreateError(this);
+            if (!(request.Parent is IndexKlassenDeklaration klasse)) return request.Index.CreateError(this);
 
             IndexPropertyGetSetDeklaration deklaration = new IndexPropertyGetSetDeklaration();
             deklaration.Use = this;
@@ -326,8 +334,8 @@ namespace Yama.Parser
 
             deklaration.Type = this.GetMethodeType();
 
-            this.GetStatement.Indezieren(index, deklaration);
-            this.SetStatement.Indezieren(index, deklaration);
+            this.GetStatement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
+            this.SetStatement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
 
             this.IndezierenNonStaticDek(deklaration);
 
@@ -348,19 +356,19 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool CompileSetMethode(Compiler.Compiler compiler, string mode = "default")
+        public bool CompileSetMethode(Request.RequestParserTreeCompile request)
         {
             CompileContainer compileContainer = new CompileContainer();
             compileContainer.Begin = new CompileSprungPunkt();
             compileContainer.Ende = new CompileSprungPunkt();
 
-            compiler.BeginNewMethode( this.SetRegisterInUse, compileContainer, this.SetStatement.Statement.IndexContainer.ThisUses );
+            request.Compiler.BeginNewMethode( this.SetRegisterInUse, compileContainer, this.SetStatement.Statement.IndexContainer.ThisUses );
 
             CompileFunktionsDeklaration dek = new CompileFunktionsDeklaration();
 
-            dek.Compile(compiler, this, "set");
+            dek.Compile(request.Compiler, this, "set");
 
-            return this.CompileNormalFunktionSet(compiler, compileContainer);
+            return this.CompileNormalFunktionSet(request.Compiler, compileContainer);
         }
 
         public bool CompileGetMethode(Compiler.Compiler compiler, string mode = "default")
@@ -401,13 +409,13 @@ namespace Yama.Parser
             return t.CanCompile();
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            if (!this.CanCompile(compiler)) return true;
+            if (!this.CanCompile(request.Compiler)) return true;
 
-            this.CompileGetMethode(compiler, mode);
+            this.CompileGetMethode(request.Compiler, request.Mode);
 
-            this.CompileSetMethode(compiler, mode);
+            this.CompileSetMethode(request);
 
             return true;
         }

@@ -29,11 +29,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
             lexer.CurrentCharMode (  );
 
-            if ( !char.IsDigit ( lexer.CurrentChar ) ) return TokenStatus.Cancel;
+            if ( !char.IsDigit ( lexer.CurrentChar ) ) return TokenState.Cancel;
 
             bool isFirst0 = lexer.CurrentChar == '0';
             bool ishex = false;
@@ -49,12 +49,12 @@ namespace Yama.Lexer
                 bool isok = lexer.CurrentChar == 'x';
                 ishex = isok;
                 if (!isok) isok = lexer.CurrentChar == 'b';
-                if (!isok) return TokenStatus.Complete;
+                if (!isok) return TokenState.Complete;
 
                 lexer.NextChar (  );
             }
 
-            return TokenStatus.Complete;
+            return TokenState.Complete;
         }
 
         private bool CheckCurrentChar(char currentChar, bool ishex)

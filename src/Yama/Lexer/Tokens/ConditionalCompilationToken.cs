@@ -64,22 +64,22 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
-            if ( this.Begin.CheckChar ( lexer ) != TokenStatus.Complete ) return TokenStatus.Cancel;
+            if ( this.Begin.CheckChar ( lexer ) != TokenState.Complete ) return TokenState.Cancel;
 
             bool isOnBox = true;
 
             while ( isOnBox )
             {
-                if ( lexer.CurrentByte == 0 ) return TokenStatus.SyntaxError;
+                if ( lexer.CurrentByte == 0 ) return TokenState.SyntaxError;
 
-                isOnBox = this.End.CheckChar ( lexer ) != TokenStatus.Complete;
+                isOnBox = this.End.CheckChar ( lexer ) != TokenState.Complete;
 
                 if ( isOnBox ) lexer.NextByte (  );
             }
 
-            return TokenStatus.Complete;
+            return TokenState.Complete;
         }
 
         // -----------------------------------------------

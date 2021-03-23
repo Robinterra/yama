@@ -69,7 +69,7 @@ namespace Yama.Lexer
         {
             foreach ( ZeichenKette kette in this.Split )
             {
-                if ( kette.CheckChar ( lexer ) == TokenStatus.Complete ) return true;
+                if ( kette.CheckChar ( lexer ) == TokenState.Complete ) return true;
             }
 
             return false;
@@ -77,7 +77,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
             while ( !this.CheckSplit ( lexer ) )
             {
@@ -85,10 +85,10 @@ namespace Yama.Lexer
 
                 lexer.NextByte (  );
 
-                if ( lexer.CurrentChar == '\0' ) return TokenStatus.Complete;
+                if ( lexer.CurrentChar == '\0' ) return TokenState.Complete;
             }
 
-            return TokenStatus.Complete;
+            return TokenState.Complete;
         }
 
         // -----------------------------------------------

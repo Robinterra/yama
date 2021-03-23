@@ -61,30 +61,29 @@ namespace Yama.Parser
          * @todo Ab in die Parser klasse damit!
          */
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.OpenBracket ) return null;
+            if ( request.Token.Kind != IdentifierKind.OpenBracket ) return null;
 
-            IdentifierToken kind = parser.FindEndTokenWithoutParse ( token, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
+            IdentifierToken kind = request.Parser.FindEndTokenWithoutParse ( request.Token, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
 
             if ( kind == null ) return null;
-
             if ( kind.Node != null ) return null;
 
             ContainerExpression expression = new ContainerExpression (  );
 
-            expression.Token = token;
+            expression.Token = request.Token;
             expression.Ende = kind;
 
-            List<IParseTreeNode> nodes = parser.ParseCleanTokens ( token.Position + 1, kind.Position );
+            List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, kind.Position );
 
-            parser.Repleace ( token, kind.Position );
+            request.Parser.Repleace ( request.Token, kind.Position );
 
             if ( nodes == null ) return null;
             if ( nodes.Count != 1 ) return null;
 
             expression.Ende.Node = expression;
-            token.Node = expression;
+            expression.Token.Node = expression;
             kind.Node = expression;
 
             expression.ExpressionParent = nodes[0];
@@ -94,16 +93,16 @@ namespace Yama.Parser
             return expression;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
-            return this.ExpressionParent.Indezieren(index, parent);
+            return this.ExpressionParent.Indezieren(request);
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            this.ExpressionParent.Compile(compiler, mode);
+            this.ExpressionParent.Compile(request);
 
             return true;
         }
