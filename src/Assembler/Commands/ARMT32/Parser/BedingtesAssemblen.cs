@@ -21,19 +21,19 @@ namespace Yama.Assembler.ARMT32
             }
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
             return true;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Parser.Request.RequestParserTreeIndezieren request)
         {
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Parser parser, IdentifierToken token)
+        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
         {
-            if (token.Kind != IdentifierKind.Point) return null;
+            if (request.Token.Kind != IdentifierKind.Point) return null;
 
             return null;
         }

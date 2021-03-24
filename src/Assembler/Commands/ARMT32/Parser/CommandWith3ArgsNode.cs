@@ -61,63 +61,63 @@ namespace Yama.Assembler.ARMT32
             }
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
             return true;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Parser.Request.RequestParserTreeIndezieren request)
         {
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Parser parser, IdentifierToken token)
+        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
         {
-            if (token.Kind != IdentifierKind.Word) return null;
+            if (request.Token.Kind != IdentifierKind.Word) return null;
 
             CommandWith3ArgsNode deklaration = new CommandWith3ArgsNode();
-            deklaration.Token = token;
+            deklaration.Token = request.Token;
 
-            token = parser.Peek(token, 1);
+            IdentifierToken token = request.Parser.Peek(request.Token, 1);
 
-            parser.ActivateLayer(this.argumentLayer);
+            request.Parser.ActivateLayer(this.argumentLayer);
 
-            deklaration.Argument0 = parser.ParseCleanToken(token);
+            deklaration.Argument0 = request.Parser.ParseCleanToken(token);
 
-            parser.VorherigesLayer();
+            request.Parser.VorherigesLayer();
 
             if (deklaration.Argument0 == null) return null;
             if (!(deklaration.Argument0 is IContainer b)) return null;
             token = b.Ende;
 
-            token = parser.Peek(token ,1);
+            token = request.Parser.Peek(token ,1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Comma) return null;
             deklaration.SupportTokens.Add(token);
 
-            token = parser.Peek(token ,1);
+            token = request.Parser.Peek(token ,1);
 
-            parser.ActivateLayer(this.argumentLayer);
+            request.Parser.ActivateLayer(this.argumentLayer);
 
-            deklaration.Argument1 = parser.ParseCleanToken(token);
+            deklaration.Argument1 = request.Parser.ParseCleanToken(token);
 
-            parser.VorherigesLayer();
+            request.Parser.VorherigesLayer();
             if (deklaration.Argument1 == null) return null;
             if (!(deklaration.Argument1 is IContainer t)) return null;
             token = t.Ende;
 
-            token = parser.Peek(token ,1);
+            token = request.Parser.Peek(token ,1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Comma) return null;
             deklaration.SupportTokens.Add(token);
 
-            token = parser.Peek(token, 1);
+            token = request.Parser.Peek(token, 1);
 
-            parser.ActivateLayer(this.argumentLayer);
+            request.Parser.ActivateLayer(this.argumentLayer);
 
-            deklaration.Argument2 = parser.ParseCleanToken(token);
+            deklaration.Argument2 = request.Parser.ParseCleanToken(token);
 
-            parser.VorherigesLayer();
+            request.Parser.VorherigesLayer();
             if (!(deklaration.Argument2 is IContainer ic)) return null;
 
             token = ic.Ende;

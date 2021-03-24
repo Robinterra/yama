@@ -441,7 +441,7 @@ namespace Yama.Parser
 
             compileContainer.Begin.Compile(compiler, this, "default");
 
-            this.SetStatement.Compile(compiler, "default");
+            this.SetStatement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
 
             compileContainer.Ende.Compile(compiler, this, "default");
 
@@ -474,7 +474,7 @@ namespace Yama.Parser
 
             compileContainer.Begin.Compile(compiler, this, "default");
 
-            this.GetStatement.Compile(compiler, "default");
+            this.GetStatement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
 
             compileContainer.Ende.Compile(compiler, this, "default");
 

@@ -87,23 +87,23 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.New ) return null;
+            if ( request.Token.Kind != IdentifierKind.New ) return null;
 
             NewKey newKey = new NewKey();
-            newKey.Token = token;
-            newKey.Definition = parser.Peek ( token, 1 );
+            newKey.Token = request.Token;
+            newKey.Definition = request.Parser.Peek ( request.Token, 1 );
 
             if ( !this.CheckHashValidOperator( newKey.Definition )) return null;
 
-            IdentifierToken beginkind = parser.Peek ( newKey.Definition, 1 );
+            IdentifierToken beginkind = request.Parser.Peek ( newKey.Definition, 1 );
 
-            IdentifierToken endToken = parser.FindEndToken ( beginkind, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
+            IdentifierToken endToken = request.Parser.FindEndToken ( beginkind, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
 
             if ( endToken == null ) return null;
 
-            newKey.Parameters = parser.ParseCleanTokens ( beginkind.Position + 1, endToken.Position, true );
+            newKey.Parameters = request.Parser.ParseCleanTokens ( beginkind.Position + 1, endToken.Position, true );
 
             if (newKey.Parameters == null) return null;
 
@@ -123,14 +123,14 @@ namespace Yama.Parser
             return newKey;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             //if (parent is IndexVariabelnReference varref) return this.RefComb(varref);
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             foreach (IParseTreeNode node in this.Parameters)
             {
-                node.Indezieren(index, container);
+                node.Indezieren(request);
             }
 
             IndexVariabelnReference typeDeklaration = new IndexVariabelnReference();
@@ -149,7 +149,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             List<IParseTreeNode> copylist = this.Parameters;
             copylist.Reverse();
@@ -163,19 +163,19 @@ namespace Yama.Parser
                 if (par is EnumartionExpression b) dek = b.ExpressionParent;
                 if (dek == null) continue;
 
-                dek.Compile(compiler, mode);
+                dek.Compile(request);
 
                 CompilePushResult compilePushResult = new CompilePushResult();
-                compilePushResult.Compile(compiler, null, "default");
+                compilePushResult.Compile(request.Compiler, null, "default");
 
                 parasCount++;
             }
 
-            this.CtorCall.Compile(compiler, this.Reference, "methode");
+            this.CtorCall.Compile(request.Compiler, this.Reference, "methode");
 
             parasCount++;
 
-            this.FunctionExecute.Compile(compiler, null, mode);
+            this.FunctionExecute.Compile(request.Compiler, null, request.Mode);
 
             return true;
         }

@@ -49,37 +49,37 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Else ) return null;
+            if ( request.Token.Kind != IdentifierKind.Else ) return null;
 
             ElseKey key = new ElseKey (  );
-            key.Token = token;
-            token.Node = key;
+            key.Token = request.Token;
 
-            IdentifierToken statementchild = parser.Peek ( token, 1);
+            IdentifierToken statementchild = request.Parser.Peek ( request.Token, 1);
 
-            key.Statement = parser.ParseCleanToken(statementchild);
+            key.Statement = request.Parser.ParseCleanToken(statementchild);
 
             if (key.Statement == null) return null;
 
+            key.Token.Node = key;
             key.Statement.Token.ParentNode = key;
 
             return key;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
-            this.Statement.Indezieren(index, parent);
+            this.Statement.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            this.Statement.Compile(compiler, mode);
+            this.Statement.Compile(request);
 
             return true;
         }

@@ -40,15 +40,15 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Using ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != IdentifierKind.Text ) return null;
+            if ( request.Token.Kind != IdentifierKind.Using ) return null;
+            if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.Text ) return null;
 
             UsingKey key = new UsingKey (  );
-            token.Node = key;
+            request.Token.Node = key;
 
-            IdentifierToken keyNamenToken = parser.Peek ( token, 1 );
+            IdentifierToken keyNamenToken = request.Parser.Peek ( request.Token, 1 );
 
             key.Token = keyNamenToken;
             keyNamenToken.Node = key;
@@ -56,9 +56,9 @@ namespace Yama.Parser
             return key;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexNamespaceDeklaration dek)) return index.CreateError(this, "Kein Namespace als Parent dieses Usings");
+            if (!(request.Parent is IndexNamespaceDeklaration dek)) return request.Index.CreateError(this, "Kein Namespace als Parent dieses Usings");
 
             IndexNamespaceReference deklaration = new IndexNamespaceReference();
             deklaration.Name = this.Token.Value.ToString();
@@ -69,7 +69,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             return true;
         }

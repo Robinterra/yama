@@ -54,47 +54,46 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Namespace ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != IdentifierKind.Text ) return null;
+            if ( request.Token.Kind != IdentifierKind.Namespace ) return null;
+            if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.Text ) return null;
 
             NamespaceKey key = new NamespaceKey (  );
-            token.Node = key;
+            request.Token.Node = key;
 
-            IdentifierToken keyNamenToken = parser.Peek ( token, 1 );
+            IdentifierToken keyNamenToken = request.Parser.Peek ( request.Token, 1 );
 
             key.Token = keyNamenToken;
             keyNamenToken.Node = key;
 
-            IdentifierToken Statementchild = parser.Peek ( keyNamenToken, 1);
+            IdentifierToken Statementchild = request.Parser.Peek ( keyNamenToken, 1);
 
-            key.Statement = parser.ParseCleanToken(Statementchild, this.NextLayer);
+            key.Statement = request.Parser.ParseCleanToken(Statementchild, this.NextLayer);
 
             if (key.Statement == null) return null;
 
             key.Statement.Token.ParentNode = key;
 
-
             return key;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             IndexNamespaceDeklaration dek = new IndexNamespaceDeklaration();
             dek.Name = this.Token.Value.ToString();
 
-            dek = index.NamespaceAdd(dek);
+            dek = request.Index.NamespaceAdd(dek);
             this.Deklaration = dek;
 
             dek.Files.Add(this.Token.FileInfo);
 
-            this.Statement.Indezieren(index, dek);
+            this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, dek));
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             //this.Statement.Compile(compiler, mode);
 

@@ -33,39 +33,39 @@ namespace Yama.Assembler.ARMT32
             }
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
             return true;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Parser.Request.RequestParserTreeIndezieren request)
         {
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Parser parser, IdentifierToken token)
+        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
         {
-            if (token.Kind != IdentifierKind.Word) return null;
+            if (request.Token.Kind != IdentifierKind.Word) return null;
 
             CommandWithList deklaration = new CommandWithList();
-            deklaration.Token = token;
+            deklaration.Token = request.Token;
 
-            token = parser.Peek(token, 1);
+            IdentifierToken token = request.Parser.Peek(request.Token, 1);
             if (token.Kind != IdentifierKind.BeginContainer) return null;
             deklaration.SupportTokens.Add(token);
-            token = parser.Peek(token, 1);
+            token = request.Parser.Peek(token, 1);
 
             while (token.Kind == IdentifierKind.Word)
             {
                 deklaration.Arguments.Add(token);
 
-                token = parser.Peek(token, 1);
+                token = request.Parser.Peek(token, 1);
 
                 if (token.Kind != IdentifierKind.Comma) continue;
 
                 deklaration.SupportTokens.Add(token);
 
-                token = parser.Peek(token, 1);
+                token = request.Parser.Peek(token, 1);
             }
 
             if (token.Kind != IdentifierKind.CloseContainer) return null;

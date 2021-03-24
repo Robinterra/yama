@@ -80,28 +80,28 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.While ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
+            if ( request.Token.Kind != IdentifierKind.While ) return null;
+            if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
 
             WhileKey key = new WhileKey (  );
-            key.Token = token;
+            key.Token = request.Token;
 
-            IdentifierToken conditionkind = parser.Peek ( token, 1 );
+            IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
 
-            IParseTreeNode rule = parser.GetRule<ContainerExpression>();
+            IParseTreeNode rule = request.Parser.GetRule<ContainerExpression>();
 
-            key.Condition = rule.Parse(parser, conditionkind);
+            key.Condition = rule.Parse(new Request.RequestParserTreeParser(request.Parser, conditionkind));
 
             if (key.Condition == null) return null;
 
             key.Condition.Token.ParentNode = key;
 
-            IdentifierToken Statementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
+            IdentifierToken Statementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
             if (!this.IsAllowedStatmentToken (Statementchild)) return null;
 
-            key.Statement = parser.ParseCleanToken(Statementchild);
+            key.Statement = request.Parser.ParseCleanToken(Statementchild);
 
             if (key.Statement == null) return null;
 
@@ -111,52 +111,52 @@ namespace Yama.Parser
             return key;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             this.IndexContainer =  container;
 
-            this.Statement.Indezieren(index, parent);
+            this.Statement.Indezieren(request);
             if (this.Statement is Container ec) this.IndexContainer = ec.IndexContainer;
 
-            this.Condition.Indezieren(index, parent);
+            this.Condition.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             this.CompileContainer.Begin = new CompileSprungPunkt();
 
             this.CompileContainer.Ende = new CompileSprungPunkt();
 
-            compiler.PushContainer(this.CompileContainer, this.IndexContainer.ThisUses, true);
+            request.Compiler.PushContainer(this.CompileContainer, this.IndexContainer.ThisUses, true);
 
             CompileJumpTo jumpbegin = new CompileJumpTo();
 
             CompileJumpWithCondition jumpende = new CompileJumpWithCondition();
 
-            this.CompileContainer.Begin.Compile(compiler, this, mode);
+            this.CompileContainer.Begin.Compile(request.Compiler, this, request.Mode);
 
             //compiler.IsLoopHeaderBegin = true;
 
-            this.Condition.Compile(compiler, mode);
+            this.Condition.Compile(request);
 
             //compiler.IsLoopHeaderBegin = false;
 
-            jumpende.Compile(compiler, this.CompileContainer.Ende, "isZero");
+            jumpende.Compile(request.Compiler, this.CompileContainer.Ende, "isZero");
 
-            this.Statement.Compile(compiler, mode);
+            this.Statement.Compile(request);
 
-            jumpbegin.Compile(compiler, this.CompileContainer.Begin, mode);
+            jumpbegin.Compile(request.Compiler, this.CompileContainer.Begin, request.Mode);
 
-            this.CompileContainer.Ende.Compile(compiler, this, mode);
+            this.CompileContainer.Ende.Compile(request.Compiler, this, request.Mode);
 
             CompileFreeLoop freeLoop = new CompileFreeLoop();
-            freeLoop.Compile(compiler, this, mode);
+            freeLoop.Compile(request.Compiler, this, request.Mode);
 
-            compiler.PopContainer();
+            request.Compiler.PopContainer();
 
             return true;
         }

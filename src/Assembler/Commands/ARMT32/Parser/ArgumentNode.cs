@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Yama.Index;
 using Yama.Lexer;
 using Yama.Parser;
+using Yama.Parser.Request;
 
 namespace Yama.Assembler.ARMT32
 {
@@ -33,33 +34,33 @@ namespace Yama.Assembler.ARMT32
             set;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(RequestParserTreeCompile request)
         {
             return true;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Parser parser, IdentifierToken token)
+        public IParseTreeNode Parse(RequestParserTreeParser request)
         {
             ArgumentNode deklaration = new ArgumentNode();
 
-            if (token.Kind == IdentifierKind.Word)
+            if (request.Token.Kind == IdentifierKind.Word)
             {
-                deklaration.Token = token;
+                deklaration.Token = request.Token;
 
-                deklaration.Ende = token;
+                deklaration.Ende = request.Token;
 
                 return this.CleanUp(deklaration);
             }
 
-            if (token.Kind == IdentifierKind.Gleich || token.Kind == IdentifierKind.Hash)
+            if (request.Token.Kind == IdentifierKind.Gleich || request.Token.Kind == IdentifierKind.Hash)
             {
-                deklaration.SupportTokens.Add(token);
-                token = parser.Peek(token, 1);
+                deklaration.SupportTokens.Add(request.Token);
+                IdentifierToken token = request.Parser.Peek(request.Token, 1);
 
                 if (token == null) return null;
                 if (token.Kind != IdentifierKind.NumberToken && token.Kind != IdentifierKind.Word) return null;

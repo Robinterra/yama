@@ -44,15 +44,15 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Return ) return null;
+            if ( request.Token.Kind != IdentifierKind.Return ) return null;
 
-            IdentifierToken ende = parser.FindAToken(token, IdentifierKind.EndOfCommand);
+            IdentifierToken ende = request.Parser.FindAToken(request.Token, IdentifierKind.EndOfCommand);
 
             if (ende == null) return null;
 
-            List<IParseTreeNode> nodes = parser.ParseCleanTokens(token.Position + 1, ende.Position);
+            List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens(request.Token.Position + 1, ende.Position);
             IParseTreeNode node = null;
 
             if ( nodes == null ) return null;
@@ -62,33 +62,33 @@ namespace Yama.Parser
             ReturnKey result = new ReturnKey();
 
             result.Statement = node;
-            result.Token = token;
-            token.Node = result;
+            result.Token = request.Token;
+            request.Token.Node = result;
             if ( node != null ) node.Token.ParentNode = result;
 
             return result;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
-            this.Statement.Indezieren(index, parent);
+            this.Statement.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            this.Statement.Compile(compiler, mode);
+            this.Statement.Compile(request);
 
             if (this.Statement is ReferenceCall)
             {
                 CompileMovReg movReg = new CompileMovReg();
-                movReg.Compile(compiler, this);
+                movReg.Compile(request.Compiler, this);
             }
 
-            this.JumpTo.Compile(compiler, null, mode);
+            this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
             return true;
         }

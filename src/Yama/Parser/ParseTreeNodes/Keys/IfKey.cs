@@ -79,29 +79,29 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.If ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
+            if ( request.Token.Kind != IdentifierKind.If ) return null;
+            if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
 
             IfKey key = new IfKey (  );
-            key.Token = token;
+            key.Token = request.Token;
 
-            IdentifierToken conditionkind = parser.Peek ( token, 1 );
+            IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
 
-            IParseTreeNode rule = parser.GetRule<ContainerExpression>();
+            IParseTreeNode rule = request.Parser.GetRule<ContainerExpression>();
 
-            key.Condition = rule.Parse(parser, conditionkind);
+            key.Condition = rule.Parse(new Request.RequestParserTreeParser(request.Parser, conditionkind));
 
             if (key.Condition == null) return null;
 
             key.Condition.Token.ParentNode = key;
 
-            IdentifierToken ifStatementchild = parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
+            IdentifierToken ifStatementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
 
             if (!this.IsAllowedStatmentToken (ifStatementchild)) return null;
 
-            key.IfStatement = parser.ParseCleanToken(ifStatementchild);
+            key.IfStatement = request.Parser.ParseCleanToken(ifStatementchild);
 
             if (key.IfStatement == null) return null;
 
@@ -109,7 +109,7 @@ namespace Yama.Parser
 
             IdentifierToken elsePeekToken = (key.IfStatement is IContainer t) ? t.Ende : key.IfStatement.Token;
 
-            IdentifierToken elseStatementChild = parser.Peek ( elsePeekToken, 1 );
+            IdentifierToken elseStatementChild = request.Parser.Peek ( elsePeekToken, 1 );
 
             key.Token.Node = key;
 
@@ -119,7 +119,7 @@ namespace Yama.Parser
 
             if ( elseStatementChild.Kind != IdentifierKind.Else ) return key;
 
-            key.ElseStatement = parser.ParseCleanToken ( elseStatementChild );
+            key.ElseStatement = request.Parser.ParseCleanToken ( elseStatementChild );
 
             if (key.ElseStatement == null) return null;
 
@@ -141,64 +141,64 @@ namespace Yama.Parser
             return false;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             this.IfContainer = container;
             this.ElseContainer = container;
 
             if (this.ElseStatement != null)
             {
-                this.ElseStatement.Indezieren(index, parent);
+                this.ElseStatement.Indezieren(request);
                 if (this.ElseStatement is Container ec) this.ElseContainer = ec.IndexContainer;
             }
 
-            this.IfStatement.Indezieren(index, parent);
+            this.IfStatement.Indezieren(request);
             if (this.IfStatement is Container c) this.IfContainer = c.IndexContainer;
 
-            this.Condition.Indezieren(index, parent);
+            this.Condition.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             CompileContainer ifcontainer = new CompileContainer();
-            ifcontainer.Begin = compiler.ContainerMgmt.CurrentContainer.Begin;
+            ifcontainer.Begin = request.Compiler.ContainerMgmt.CurrentContainer.Begin;
             ifcontainer.Ende = new CompileSprungPunkt();
 
             CompileContainer elsecontainer = new CompileContainer();
-            elsecontainer.Begin = compiler.ContainerMgmt.CurrentContainer.Begin;
+            elsecontainer.Begin = request.Compiler.ContainerMgmt.CurrentContainer.Begin;
             elsecontainer.Ende = new CompileSprungPunkt();
 
             CompileJumpTo jumpafterelse = new CompileJumpTo();
 
             CompileJumpWithCondition jumpWithCondition = new CompileJumpWithCondition();
 
-            this.Condition.Compile(compiler, mode);
+            this.Condition.Compile(request);
 
-            jumpWithCondition.Compile(compiler, ifcontainer.Ende, "isZero");
+            jumpWithCondition.Compile(request.Compiler, ifcontainer.Ende, "isZero");
 
-            compiler.PushContainer(ifcontainer, this.IfContainer.ThisUses);
+            request.Compiler.PushContainer(ifcontainer, this.IfContainer.ThisUses);
 
-            this.IfStatement.Compile(compiler, mode);
+            this.IfStatement.Compile(request);
 
-            compiler.PopContainer();
+            request.Compiler.PopContainer();
 
-            if (this.ElseStatement != null) jumpafterelse.Compile(compiler, elsecontainer.Ende, mode);
+            if (this.ElseStatement != null) jumpafterelse.Compile(request.Compiler, elsecontainer.Ende, request.Mode);
 
-            ifcontainer.Ende.Compile(compiler, this, mode);
+            ifcontainer.Ende.Compile(request.Compiler, this, request.Mode);
 
             if (this.ElseStatement == null) return true;
 
-            compiler.PushContainer(elsecontainer, this.ElseContainer.ThisUses);
+            request.Compiler.PushContainer(elsecontainer, this.ElseContainer.ThisUses);
 
-            this.ElseStatement.Compile(compiler, mode);
+            this.ElseStatement.Compile(request);
 
-            compiler.PopContainer();
+            request.Compiler.PopContainer();
 
-            elsecontainer.Ende.Compile(compiler, this, mode);
+            elsecontainer.Ende.Compile(request.Compiler, this, request.Mode);
 
             return true;
         }
