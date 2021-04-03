@@ -55,6 +55,34 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        public static int ReadKey (  )
+        {
+            InputOutput.ExecWith1Arg ( 4, 0, 7 );
+        }
+
+        // -----------------------------------------------
+
+        public static int SetCursorPosition ( int x, int y )
+        {
+            InputOutput.ExecWith2Args ( 1, x, y, 7 );
+        }
+
+        // -----------------------------------------------
+
+        public static int SetBackgroundColor ( int color )
+        {
+            InputOutput.ExecWith1Arg ( 3, color, 7 );
+        }
+
+        // -----------------------------------------------
+
+        public static int SetForegroundColor ( int color )
+        {
+            InputOutput.ExecWith1Arg ( 2, color, 7 );
+        }
+
+        // -----------------------------------------------
+
         #endregion methods
 
         // -----------------------------------------------
