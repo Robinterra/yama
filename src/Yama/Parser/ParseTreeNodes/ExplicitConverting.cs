@@ -168,22 +168,24 @@ namespace Yama.Parser
             compileReference = new CompileReferenceCall();
             compileReference.CompilePoint0(request.Compiler);
 
-            CompilePushResult compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(request.Compiler, null, "default");
-
             CompileReferenceCall referenceCall = new CompileReferenceCall();
             referenceCall.CompileData(request.Compiler, this, t.DataRef.JumpPointName);
 
-            compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(request.Compiler, null, "default");
+            if (!(this.EqualsReference.Deklaration.Use is MethodeDeclarationNode mdn)) return false;
 
-            CompileReferenceCall operatorCall = new CompileReferenceCall();
-            operatorCall.Compile(request.Compiler, this.EqualsReference, "methode");
-
-            CompileExecuteCall functionExecute = new CompileExecuteCall();
-            functionExecute.Compile(request.Compiler, null, request.Mode);
+            this.CompileCopy(request.Compiler, request.Mode, mdn);
 
             return request.Compiler.Definition.ParaClean();
+        }
+
+        private bool CompileCopy(Compiler.Compiler compiler, string mode, MethodeDeclarationNode t)
+        {
+            if (t.AccessDefinition == null) return false;
+            if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
+
+            t.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+
+            return true;
         }
 
         #endregion methods
