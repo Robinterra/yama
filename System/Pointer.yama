@@ -3,7 +3,7 @@ namespace "System"
     /**
     * Pointer
     */
-    public class Pointer
+    public primitive class Pointer
     {
         public int Value;
     }

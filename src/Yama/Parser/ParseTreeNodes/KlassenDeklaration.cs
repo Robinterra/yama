@@ -171,6 +171,7 @@ namespace Yama.Parser
         private bool CheckHashValidZusatzDefinition ( IdentifierToken token )
         {
             if (token.Kind == IdentifierKind.Static) return true;
+            if (token.Kind == IdentifierKind.Primitive) return true;
 
             return false;
         }
@@ -203,7 +204,12 @@ namespace Yama.Parser
 
         private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
         {
-            if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
+            if ( !this.CheckHashValidZusatzDefinition ( token ) )
+            {
+                deklaration.InheritanceBase = new IdentifierToken(IdentifierKind.Word, token.Position, token.Line, token.Column, "object", "object");
+
+                return token;
+            }
 
             deklaration.ZusatzDefinition = token;
 

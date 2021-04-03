@@ -3,7 +3,7 @@ namespace "System"
     /**
     * string
     */
-    public class string
+    public primitive class string
     {
         #region vars
 

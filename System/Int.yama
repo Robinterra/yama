@@ -3,7 +3,7 @@ namespace "System"
     /**
     * Integer current 16 Bit
     */
-    public class int
+    public primitive class int
     {
 
         // -----------------------------------------------
