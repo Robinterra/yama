@@ -24,7 +24,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        TokenStatus CheckChar ( Lexer lexer );
+        TokenState CheckChar ( Lexer lexer );
 
         // -----------------------------------------------
 

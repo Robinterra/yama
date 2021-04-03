@@ -30,37 +30,37 @@ namespace Yama.Assembler.ARMT32
         public IdentifierToken Data { get; private set; }
         public List<IdentifierToken> Arguments { get; set; } = new List<IdentifierToken>();
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
             return true;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Parser.Request.RequestParserTreeIndezieren request)
         {
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Parser parser, IdentifierToken token)
+        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
         {
-            if (token.Kind != IdentifierKind.Base) return null;
+            if (request.Token.Kind != IdentifierKind.Base) return null;
 
             DataNode node = new DataNode();
-            node.SupportTokens.Add(token);
+            node.SupportTokens.Add(request.Token);
 
-            token = parser.Peek(token, 1);
+            IdentifierToken token = request.Parser.Peek(request.Token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Word) return null;
 
             node.Token = token;
-            token = parser.Peek(token, 1);
+            token = request.Parser.Peek(token, 1);
 
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Gleich) return null;
             node.SupportTokens.Add(token);
 
-            token = parser.Peek(token, 1);
+            token = request.Parser.Peek(token, 1);
             if (token.Kind == IdentifierKind.Text) node.Data = token;
-            else if (!this.TryParseList(parser, token, node)) return null;
+            else if (!this.TryParseList(request.Parser, token, node)) return null;
 
             return this.CleanUp(node);
         }

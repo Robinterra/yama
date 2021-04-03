@@ -27,13 +27,13 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
             lexer.CurrentCharMode (  );
 
             bool isok = '_' == lexer.CurrentChar;
 
-            return isok ? TokenStatus.CompleteOne : TokenStatus.Cancel;
+            return isok ? TokenState.CompleteOne : TokenState.Cancel;
         }
 
         // -----------------------------------------------

@@ -128,41 +128,41 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Operator ) return null;
-            if ( !this.CheckHashValidOperator ( token ) ) return null;
+            if ( request.Token.Kind != IdentifierKind.Operator ) return null;
+            if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
-            IdentifierToken lexerLeft = parser.Peek ( token, -1 );
+            IdentifierToken lexerLeft = request.Parser.Peek ( request.Token, -1 );
 
             if ( this.CheckHashValidChild ( lexerLeft ) && !this.CheckAusnahmen ( lexerLeft ) ) return null;
 
-            IdentifierToken lexerRight = parser.Peek ( token, 1 );
+            IdentifierToken lexerRight = request.Parser.Peek ( request.Token, 1 );
 
             if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
 
             Operator1ChildRight node = new Operator1ChildRight ( this.Prio );
-            node.Token = token;
-            token.Node = node;
+            node.Token = request.Token;
 
-            node.ChildNode = parser.ParseCleanToken ( lexerRight );
+            node.ChildNode = request.Parser.ParseCleanToken ( lexerRight );
 
             if ( node.ChildNode == null ) return null;
 
+            node.Token.Node = node;
             node.ChildNode.Token.ParentNode = node;
 
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
             reference.Name = this.Token.Text;
             reference.IsOperator = true;
-            this.ChildNode.Indezieren(index, parent);
+            this.ChildNode.Indezieren(request);
             IndexVariabelnReference varref = container.VariabelnReferences.LastOrDefault();
 
             this.VariabelReference = reference;
@@ -175,23 +175,23 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {
-                bool isok = this.CompileCopy(compiler, mode, t);
+                bool isok = this.CompileCopy(request.Compiler, request.Mode, t);
 
                 if (isok) return true;
             }
 
-            this.ChildNode.Compile(compiler, mode);
+            this.ChildNode.Compile(request);
 
             CompilePushResult compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(compiler, null, "default");
+            compilePushResult.Compile(request.Compiler, null, "default");
 
-            this.OperatorCall.Compile(compiler, this.Reference, "methode");
+            this.OperatorCall.Compile(request.Compiler, this.Reference, "methode");
 
-            this.FunctionExecute.Compile(compiler, null, mode);
+            this.FunctionExecute.Compile(request.Compiler, null, request.Mode);
 
             return true;
         }
@@ -201,9 +201,9 @@ namespace Yama.Parser
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
 
-            this.ChildNode.Compile(compiler, mode);
+            this.ChildNode.Compile(new Request.RequestParserTreeCompile(compiler, mode));
 
-            t.Statement.Compile(compiler, "default");
+            t.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
 
             return true;
         }

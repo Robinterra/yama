@@ -81,20 +81,19 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.For ) return null;
-            if ( parser.Peek ( token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
+            if ( request.Token.Kind != IdentifierKind.For ) return null;
+            if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
 
             ForKey key = new ForKey (  );
-            key.Token = token;
-            token.Node = key;
+            key.Token = request.Token;
 
-            IdentifierToken conditionkind = parser.Peek ( token, 1 );
+            IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
 
             IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
 
-            IParseTreeNode klammer = rule.Parse(parser, conditionkind);
+            IParseTreeNode klammer = rule.Parse(new Request.RequestParserTreeParser(request.Parser, conditionkind));
 
             if (klammer == null) return null;
             if (!(klammer is Container t)) return null;
@@ -106,33 +105,34 @@ namespace Yama.Parser
             key.Condition = t.Statements[1];
             key.Inkrementation = t.Statements[2];
 
-            IdentifierToken Statementchild = parser.Peek ( t.Ende, 1);
+            IdentifierToken Statementchild = request.Parser.Peek ( t.Ende, 1);
 
-            key.Statement = parser.ParseCleanToken(Statementchild);
+            key.Statement = request.Parser.ParseCleanToken(Statementchild);
 
             if (key.Statement == null) return null;
 
+            key.Token.Node = key;
             key.Statement.Token.ParentNode = key;
 
             return key;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             this.IndexContainer = container;
 
-            this.Statement.Indezieren(index, parent);
+            this.Statement.Indezieren(request);
             if (this.Statement is Container ec) this.IndexContainer = ec.IndexContainer;
-            this.Inkrementation.Indezieren(index, parent);
-            this.Condition.Indezieren(index, parent);
-            this.Deklaration.Indezieren(index, parent);
+            this.Inkrementation.Indezieren(request);
+            this.Condition.Indezieren(request);
+            this.Deklaration.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             this.CompileContainer.Begin = new CompileSprungPunkt();
 
@@ -140,9 +140,9 @@ namespace Yama.Parser
 
             CompileSprungPunkt sprungPunktSkipInc = new CompileSprungPunkt();
 
-            this.Deklaration.Compile(compiler, mode);
+            this.Deklaration.Compile(request);
 
-            compiler.PushContainer(this.CompileContainer, this.IndexContainer.ThisUses, true);
+            request.Compiler.PushContainer(this.CompileContainer, this.IndexContainer.ThisUses, true);
 
             CompileJumpTo jumpbegin = new CompileJumpTo();
 
@@ -150,28 +150,28 @@ namespace Yama.Parser
 
             CompileJumpWithCondition jumpende = new CompileJumpWithCondition();
 
-            jumpSkipInc.Compile(compiler, sprungPunktSkipInc, mode);
+            jumpSkipInc.Compile(request.Compiler, sprungPunktSkipInc, request.Mode);
 
-            this.CompileContainer.Begin.Compile(compiler, this, mode);
+            this.CompileContainer.Begin.Compile(request.Compiler, this, request.Mode);
 
-            this.Inkrementation.Compile(compiler, mode);
+            this.Inkrementation.Compile(request);
 
-            sprungPunktSkipInc.Compile(compiler, this, mode);
+            sprungPunktSkipInc.Compile(request.Compiler, this, request.Mode);
 
-            this.Condition.Compile(compiler, mode);
+            this.Condition.Compile(request);
 
-            jumpende.Compile(compiler, this.CompileContainer.Ende, "isZero");
+            jumpende.Compile(request.Compiler, this.CompileContainer.Ende, "isZero");
 
-            this.Statement.Compile(compiler, mode);
+            this.Statement.Compile(request);
 
-            jumpbegin.Compile(compiler, this.CompileContainer.Begin, mode);
+            jumpbegin.Compile(request.Compiler, this.CompileContainer.Begin, request.Mode);
 
-            this.CompileContainer.Ende.Compile(compiler, this, mode);
+            this.CompileContainer.Ende.Compile(request.Compiler, this, request.Mode);
 
             CompileFreeLoop freeLoop = new CompileFreeLoop();
-            freeLoop.Compile(compiler, this, mode);
+            freeLoop.Compile(request.Compiler, this, request.Mode);
 
-            compiler.PopContainer();
+            request.Compiler.PopContainer();
 
             return true;
         }

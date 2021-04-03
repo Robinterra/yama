@@ -46,34 +46,34 @@ namespace Yama.Parser
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Text ) return null;
+            if ( request.Token.Kind != IdentifierKind.Text ) return null;
 
-            TextParser node = new TextParser { Token = token };
+            TextParser node = new TextParser { Token = request.Token };
 
-            token.Node = node;
+            node.Token.Node = node;
 
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren( Request.RequestParserTreeIndezieren request )
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             CompileData compile = new CompileData();
             compile.Data = new DataObject();
             compile.Data.Mode = DataMode.Text;
             compile.Data.Text = this.Token.Text;
-            compile.Compile(compiler, this);
+            compile.Compile(request.Compiler, this);
 
             CompileReferenceCall referenceCall = new CompileReferenceCall();
-            referenceCall.CompileData(compiler, this, compile.JumpPointName);
+            referenceCall.CompileData(request.Compiler, this, compile.JumpPointName);
 
             return true;
         }

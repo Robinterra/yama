@@ -1,0 +1,10 @@
+namespace "System"
+{
+    /**
+    * Object
+    */
+    public primitive class object
+    {
+
+    }
+}

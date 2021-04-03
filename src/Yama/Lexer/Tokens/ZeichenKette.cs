@@ -63,16 +63,16 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
             foreach ( byte zeichen in this.Data )
             {
-                if (lexer.CurrentByte != zeichen) return TokenStatus.Cancel;
+                if (lexer.CurrentByte != zeichen) return TokenState.Cancel;
 
                 lexer.NextByte (  );
             }
 
-            return TokenStatus.Complete;
+            return TokenState.Complete;
         }
 
         // -----------------------------------------------

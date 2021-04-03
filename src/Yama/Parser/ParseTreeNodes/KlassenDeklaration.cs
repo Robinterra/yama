@@ -171,6 +171,7 @@ namespace Yama.Parser
         private bool CheckHashValidZusatzDefinition ( IdentifierToken token )
         {
             if (token.Kind == IdentifierKind.Static) return true;
+            if (token.Kind == IdentifierKind.Primitive) return true;
 
             return false;
         }
@@ -203,36 +204,40 @@ namespace Yama.Parser
 
         private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
         {
-            if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
+            if ( !this.CheckHashValidZusatzDefinition ( token ) )
+            {
+                deklaration.InheritanceBase = new IdentifierToken(IdentifierKind.Word, token.Position, token.Line, token.Column, "object", "object");
+
+                return token;
+            }
 
             deklaration.ZusatzDefinition = token;
 
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-
             KlassenDeklaration deklaration = new KlassenDeklaration();
 
-            token = this.MakeAccessValid(parser, token, deklaration);
+            IdentifierToken token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
 
-            token = this.MakeZusatzValid ( parser, token, deklaration );
+            token = this.MakeZusatzValid ( request.Parser, token, deklaration );
 
             if ( !this.CheckHashValidClass ( token ) ) return null;
 
             deklaration.ClassDefinition = token;
 
-            token = parser.Peek ( token, 1 );
+            token = request.Parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
 
-            token = parser.Peek ( token, 1 );
+            token = request.Parser.Peek ( token, 1 );
 
-            token = this.MakeInheritanceBase ( parser, token, deklaration );
+            token = this.MakeInheritanceBase ( request.Parser, token, deklaration );
 
-            deklaration.Statement = parser.ParseCleanToken(token, this.NextLayer);
+            deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer);
 
             if (deklaration.Statement == null) return null;
 
@@ -260,9 +265,9 @@ namespace Yama.Parser
             return deklaration;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexNamespaceDeklaration dek)) return index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
+            if (!(request.Parent is IndexNamespaceDeklaration dek)) return request.Index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
 
             IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration();
             deklaration.Name = this.Token.Text;
@@ -275,26 +280,26 @@ namespace Yama.Parser
             dek.KlassenDeklarationen.Add(deklaration);
             foreach (IParseTreeNode node in this.Statement.GetAllChilds)
             {
-                node.Indezieren(index, deklaration);
+                node.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
             }
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             foreach(IMethode m in this.Deklaration.StaticMethods)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(compiler, mode);
+                m.Use.Compile(request);
             }
 
             foreach(IndexMethodDeklaration m in this.Deklaration.Operators)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(compiler, mode);
+                m.Use.Compile(request);
             }
 
             foreach(IMethode m in this.Deklaration.Methods)
@@ -303,28 +308,28 @@ namespace Yama.Parser
 
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(compiler, mode);
+                m.Use.Compile(request);
             }
 
             foreach(IndexPropertyDeklaration m in this.Deklaration.IndexProperties)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(compiler, mode);
+                m.Use.Compile(request);
             }
 
             foreach(IndexMethodDeklaration m in this.Deklaration.Ctors)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(compiler, mode);
+                m.Use.Compile(request);
             }
 
             foreach(IndexMethodDeklaration m in this.Deklaration.DeCtors)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(compiler, mode);
+                m.Use.Compile(request);
             }
 
             return true;

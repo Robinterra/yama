@@ -150,14 +150,14 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus SubLexen ( List<ILexerToken> tokens )
+        public TokenState SubLexen ( List<ILexerToken> tokens )
         {
             foreach ( ILexerToken token in tokens )
             {
-                if ( this.ExecuteLexerToken ( token, out _, out _, out _ ) == TokenStatus.Complete ) return TokenStatus.Complete;
+                if ( this.ExecuteLexerToken ( token, out _, out _, out _ ) == TokenState.Complete ) return TokenState.Complete;
             }
 
-            return TokenStatus.Cancel;
+            return TokenState.Cancel;
         }
 
         // -----------------------------------------------
@@ -253,16 +253,16 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        private TokenStatus ExecuteLexerToken ( ILexerToken token, out int start, out int column, out int line )
+        private TokenState ExecuteLexerToken ( ILexerToken token, out int start, out int column, out int line )
         {
             start = this.position;
             column = this.column;
             line = this.line;
             byte current = this.CurrentByte;
 
-            TokenStatus status = token.CheckChar ( this );
+            TokenState state = token.CheckChar ( this );
 
-            if (status == TokenStatus.Complete) return status;
+            if (state == TokenState.Complete) return state;
 
             this.position = start;
             this.column = column;
@@ -271,16 +271,16 @@ namespace Yama.Lexer
 
             this.Daten.Seek ( this.position, SeekOrigin.Begin );
 
-            return status;
+            return state;
         }
 
         // -----------------------------------------------
 
         private IdentifierToken ExecuteLexerToken ( ILexerToken token )
         {
-            TokenStatus status = this.ExecuteLexerToken ( token, out int start, out int column, out int line );
+            TokenState state = this.ExecuteLexerToken ( token, out int start, out int column, out int line );
 
-            if (status != TokenStatus.Complete) return null;
+            if (state != TokenState.Complete) return null;
 
             byte[] daten = new byte[this.position - start];
 

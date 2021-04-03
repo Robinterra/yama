@@ -41,32 +41,32 @@ namespace Yama.Parser
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.ConditionalCompilation ) return null;
+            if ( request.Token.Kind != IdentifierKind.ConditionalCompilation ) return null;
 
-            ConditionalCompilationNode node = new ConditionalCompilationNode { Token = token };
+            ConditionalCompilationNode node = new ConditionalCompilationNode { Token = request.Token };
 
-            token.Node = node;
+            node.Token.Node = node;
 
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             if (this.Token.Text.Contains("#defalgo"))
             {
                 CompileRegionDefAlgo regionDefAlgo = new CompileRegionDefAlgo();
 
-                return regionDefAlgo.Compile(compiler, this, mode);
+                return regionDefAlgo.Compile(request.Compiler, this, request.Mode);
             }
-            if (this.Token.Text.Contains("#region asm")) return this.RegionAsm.Compile(compiler, this, mode);;
+            if (this.Token.Text.Contains("#region asm")) return this.RegionAsm.Compile(request.Compiler, this, request.Mode);
 
             return true;
         }

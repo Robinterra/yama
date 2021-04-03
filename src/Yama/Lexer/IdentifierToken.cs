@@ -229,6 +229,7 @@ namespace Yama.Lexer
         Copy,
         Hash,
         Gleich,
+        Primitive,
     }
 }
 

@@ -55,16 +55,16 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public TokenStatus CheckChar ( Lexer lexer )
+        public TokenState CheckChar ( Lexer lexer )
         {
-            if ( this.EscapeZeichen.CheckChar ( lexer ) != TokenStatus.Complete ) return TokenStatus.Cancel;
+            if ( this.EscapeZeichen.CheckChar ( lexer ) != TokenState.Complete ) return TokenState.Cancel;
 
             foreach ( Replacer replacer in this.Replacers )
             {
-                if ( replacer.CheckChar ( lexer ) == TokenStatus.Complete ) return TokenStatus.Complete;
+                if ( replacer.CheckChar ( lexer ) == TokenState.Complete ) return TokenState.Complete;
             }
 
-            return TokenStatus.SyntaxError;
+            return TokenState.SyntaxError;
         }
 
         // -----------------------------------------------

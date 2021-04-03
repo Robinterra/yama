@@ -1,6 +1,6 @@
 namespace "System"
 {
-    public class bool
+    public primitive class bool
     {
 
         // -----------------------------------------------

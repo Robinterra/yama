@@ -48,26 +48,25 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            bool isok = token.Kind == IdentifierKind.True;
+            bool isok = request.Token.Kind == IdentifierKind.True;
 
-            if ( !isok ) isok = token.Kind == IdentifierKind.False;
+            if ( !isok ) isok = request.Token.Kind == IdentifierKind.False;
 
             if ( !isok ) return null;
 
             TrueFalseKey result = new TrueFalseKey (  );
 
-            token.Node = result;
-
-            result.Token = token;
+            result.Token = request.Token;
+            result.Token.Node = result;
 
             return result;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
@@ -77,14 +76,14 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             Number number = new Number();
             if (this.Token.Text == "true") number.Token = new IdentifierToken { Value = 0xff };
             if (this.Token.Text == "false") number.Token = new IdentifierToken { Value = 0 };
 
             CompileNumConst numConst = new CompileNumConst();
-            numConst.Compile(compiler, number, mode);
+            numConst.Compile(request.Compiler, number, request.Mode);
 
             return true;
         }

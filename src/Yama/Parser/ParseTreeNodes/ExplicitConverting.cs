@@ -96,22 +96,22 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Is ) return null;
+            if ( request.Token.Kind != IdentifierKind.Is ) return null;
 
             ExplicitConverting node = new ExplicitConverting ( this.Prio );
-            node.Token = token;
-            token.Node = node;
+            node.Token = request.Token;
 
-            node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
+            node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
 
-            node.RightToken = parser.Peek ( token, 1 );
+            node.RightToken = request.Parser.Peek ( request.Token, 1 );
             if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return null;
 
-            node.ReferenceDeklaration = parser.Peek ( node.RightToken, 1 );
+            node.ReferenceDeklaration = request.Parser.Peek ( node.RightToken, 1 );
             if (node.ReferenceDeklaration.Kind != IdentifierKind.Word) return null;
 
+            node.Token.Node = node;
             node.LeftNode.Token.ParentNode = node;
             node.RightToken.Node = node;
             node.ReferenceDeklaration.Node = node;
@@ -119,11 +119,11 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
-            this.LeftNode.Indezieren(index, parent);
+            this.LeftNode.Indezieren(request);
 
             IndexVariabelnReference equalsReference = new IndexVariabelnReference();
             equalsReference.Use = this;
@@ -152,38 +152,40 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             if (!(this.Deklaration.Type.Deklaration is IndexKlassenDeklaration t)) return false;
-            if (t.InheritanceBase == null && t.InheritanceChilds.Count == 0) return compiler.AddError("The Is Keyword works only with inheritance.", this);
+            if (t.InheritanceBase == null && t.InheritanceChilds.Count == 0) return request.Compiler.AddError("The Is Keyword works only with inheritance.", this);
 
-            this.LeftNode.Compile(compiler, mode);
+            this.LeftNode.Compile(request);
 
             CompileReferenceCall compileReference = new CompileReferenceCall();
             ReferenceCall call = new ReferenceCall();
             call.Token = this.ReferenceDeklaration;
             call.Reference = new IndexVariabelnReference { Deklaration = this.Deklaration, Name = this.Deklaration.Name, Use = this, ParentUsesSet = this.BooleascherReturn.ThisUses };
-            compileReference.Compile(compiler, call, "set");
+            compileReference.Compile(request.Compiler, call, "set");
 
             compileReference = new CompileReferenceCall();
-            compileReference.CompilePoint0(compiler);
-
-            CompilePushResult compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(compiler, null, "default");
+            compileReference.CompilePoint0(request.Compiler);
 
             CompileReferenceCall referenceCall = new CompileReferenceCall();
-            referenceCall.CompileData(compiler, this, t.DataRef.JumpPointName);
+            referenceCall.CompileData(request.Compiler, this, t.DataRef.JumpPointName);
 
-            compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(compiler, null, "default");
+            if (!(this.EqualsReference.Deklaration.Use is MethodeDeclarationNode mdn)) return false;
 
-            CompileReferenceCall operatorCall = new CompileReferenceCall();
-            operatorCall.Compile(compiler, this.EqualsReference, "methode");
+            this.CompileCopy(request.Compiler, request.Mode, mdn);
 
-            CompileExecuteCall functionExecute = new CompileExecuteCall();
-            functionExecute.Compile(compiler, null, mode);
+            return request.Compiler.Definition.ParaClean();
+        }
 
-            return compiler.Definition.ParaClean();
+        private bool CompileCopy(Compiler.Compiler compiler, string mode, MethodeDeclarationNode t)
+        {
+            if (t.AccessDefinition == null) return false;
+            if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
+
+            t.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+
+            return true;
         }
 
         #endregion methods

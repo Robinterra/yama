@@ -108,25 +108,24 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-
             EnumDeklaration deklaration = new EnumDeklaration();
 
-            token = this.MakeAccessValid(parser, token, deklaration);
+            IdentifierToken token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
 
             if ( !this.CheckHashValidClass ( token ) ) return null;
 
             deklaration.ClassDefinition = token;
 
-            token = parser.Peek ( token, 1 );
+            token = request.Parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
 
-            token = parser.Peek ( token, 1 );
+            token = request.Parser.Peek ( token, 1 );
 
-            deklaration.Statement = parser.ParseCleanToken(token, this.NextLayer);
+            deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer);
 
             if (deklaration.Statement == null) return null;
 
@@ -149,9 +148,9 @@ namespace Yama.Parser
             return deklaration;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexNamespaceDeklaration dek)) return index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
+            if (!(request.Parent is IndexNamespaceDeklaration dek)) return request.Index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
 
             IndexEnumDeklaration deklaration = new IndexEnumDeklaration();
             deklaration.Name = this.Token.Text;
@@ -162,13 +161,13 @@ namespace Yama.Parser
             dek.EnumDeklarationen.Add(deklaration);
             foreach (IParseTreeNode node in this.Statement.GetAllChilds)
             {
-                node.Indezieren(index, deklaration);
+                node.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
             }
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             return true;
         }

@@ -92,18 +92,18 @@ namespace Yama.Parser
             return token.Kind == IdentifierKind.Point;
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Point ) return null;
-            if ( !this.CheckHashValidOperator ( token ) ) return null;
+            if ( request.Token.Kind != IdentifierKind.Point ) return null;
+            if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
             OperatorPoint node = new OperatorPoint ( this.Prio );
-            node.Token = token;
-            token.Node = node;
+            node.Token = request.Token;
+            node.Token.Node = node;
 
-            node.LeftNode = parser.ParseCleanToken ( parser.Peek ( token, -1 ) );
+            node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
 
-            node.RightNode = parser.ParseCleanToken ( parser.Peek ( token, 1 ) );
+            node.RightNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, 1 ) );
 
             node.LeftNode.Token.ParentNode = node;
             node.RightNode.Token.ParentNode = node;
@@ -111,53 +111,54 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
-            if (!this.LeftNode.Indezieren(index, parent)) return false;
+            if (!this.LeftNode.Indezieren(request)) return false;
 
-            IndexVariabelnReference reference = container.VariabelnReferences.Last();
+            IndexVariabelnReference reference = container.VariabelnReferences.LastOrDefault();
+            if (reference == null) return request.Index.CreateError(this);
 
-            this.RightNode.Indezieren(index, reference);
+            this.RightNode.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, reference));
 
             //container.VariabelnReferences.Add(reference);
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             if (this.RightNode is ReferenceCall rct)
                 if (rct.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
-                    if (!this.CompileNonStaticCallt(compiler, mode, pgsdek)) return true;
+                    if (!this.CompileNonStaticCallt(request.Compiler, request.Mode, pgsdek)) return true;
 
-            this.CompileLeftNodeIfNotStaticClass(compiler, mode);
+            this.CompileLeftNodeIfNotStaticClass(request.Compiler, request.Mode);
 
             if (this.RightNode is ReferenceCall rctu)
                 if (rctu.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
-                    this.CompileNonStaticCall(compiler, mode, pgsdek);
+                    this.CompileNonStaticCall(request.Compiler, request.Mode, pgsdek);
 
             string moderesult = "point";
-            if (mode == "set") moderesult = "setpoint";
+            if (request.Mode == "set") moderesult = "setpoint";
 
-            if (mode == "methode")
+            if (request.Mode == "methode")
             {
-                moderesult = mode;
+                moderesult = request.Mode;
                 if (this.RightNode is ReferenceCall rc)
                     if (rc.Reference.Deklaration is IndexMethodDeklaration dek)
-                        this.CompileNonStaticCall(compiler, "default", dek);
+                        this.CompileNonStaticCall(request.Compiler, "default", dek);
             }
 
-            if (mode == "vektorcall" || mode == "setvektorcall")
+            if (request.Mode == "vektorcall" || request.Mode == "setvektorcall")
             {
-                moderesult = mode;
+                moderesult = request.Mode;
                 if (this.RightNode is ReferenceCall rc)
                     if (rc.Reference.Deklaration is IndexVektorDeklaration dek)
-                        this.CompileNonStaticCall(compiler, "default", dek);
+                        this.CompileNonStaticCall(request.Compiler, "default", dek);
             }
 
-            this.RightNode.Compile(compiler, moderesult);
+            this.RightNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, moderesult));
 
             return true;
         }
@@ -176,7 +177,7 @@ namespace Yama.Parser
                     if (pgsd.Type == MethodeType.VektorStatic) return true;
             }
 
-            return this.LeftNode.Compile(compiler, "default");
+            return this.LeftNode.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
         }
 
         private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexMethodDeklaration methdek)
@@ -223,7 +224,7 @@ namespace Yama.Parser
                 call.LeftNode = this;
                 call.ParametersNodes = new List<IParseTreeNode>();
 
-                call.Compile(compiler, mode);
+                call.Compile(new Request.RequestParserTreeCompile(compiler, mode));
 
                 return false;
             }

@@ -210,9 +210,11 @@ namespace Yama.Compiler
 
             if (this.Errors.Count != 0) return false;
 
+            Parser.Request.RequestParserTreeCompile request = new Parser.Request.RequestParserTreeCompile(this);
+
             foreach (IParseTreeNode node in nodes)
             {
-                if (!node.Compile(this)) this.AddError("Beim assembelieren ist in einer Klasse ein Fehler aufgetreten", node);
+                if (!node.Compile(request)) this.AddError("Beim assembelieren ist in einer Klasse ein Fehler aufgetreten", node);
             }
 
             if (this.Errors.Count != 0) return false;

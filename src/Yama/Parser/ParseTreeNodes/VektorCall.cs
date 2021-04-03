@@ -97,11 +97,11 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != this.BeginZeichen ) return null;
+            if ( request.Token.Kind != this.BeginZeichen ) return null;
 
-            IdentifierToken left = parser.Peek ( token, -1 );
+            IdentifierToken left = request.Parser.Peek ( request.Token, -1 );
 
             if ( left.Kind == IdentifierKind.Operator ) return null;
             if ( left.Kind == IdentifierKind.NumberToken ) return null;
@@ -111,23 +111,24 @@ namespace Yama.Parser
             if ( left.Kind == IdentifierKind.EndOfCommand ) return null;
             if ( left.Kind == IdentifierKind.Comma ) return null;
 
-            IdentifierToken steuerToken = parser.FindEndToken ( token, this.EndeZeichen, this.BeginZeichen );
+            IdentifierToken steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
 
             if ( steuerToken == null ) return null;
 
             VektorCall node = new VektorCall ( this.Prio );
 
-            node.LeftNode = parser.ParseCleanToken ( left );
+            node.LeftNode = request.Parser.ParseCleanToken ( left );
 
-            node.ParametersNodes = parser.ParseCleanTokens ( token.Position + 1, steuerToken.Position, true );
+            node.ParametersNodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
 
-            node.Token = token;
-            token.Node = node;
+            node.Token = request.Token;
 
             if (node.LeftNode == null) return null;
 
             node.LeftNode.Token.ParentNode = node;
             node.Ende = steuerToken;
+
+            node.Token.Node = node;
 
             steuerToken.ParentNode = node;
             steuerToken.Node = node;
@@ -140,21 +141,21 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             foreach (IParseTreeNode node in this.ParametersNodes)
             {
-                node.Indezieren(index, container);
+                node.Indezieren(request);
             }
 
-            this.LeftNode.Indezieren(index, parent);
+            this.LeftNode.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             List<IParseTreeNode> copylist = this.ParametersNodes;//.ToArray().ToList();
             copylist.Reverse();
@@ -162,10 +163,10 @@ namespace Yama.Parser
 
             int parasCount = 0;
 
-            if (mode == "set")
+            if (request.Mode == "set")
             {
                 CompilePushResult compilePushResult = new CompilePushResult();
-                compilePushResult.Compile(compiler, null, "default");
+                compilePushResult.Compile(request.Compiler, null, "default");
 
                 parasCount++;
             }
@@ -176,22 +177,22 @@ namespace Yama.Parser
                 if (par is EnumartionExpression b) dek = b.ExpressionParent;
                 if (dek == null) continue;
 
-                dek.Compile(compiler, "default");
+                dek.Compile(new Request.RequestParserTreeCompile (request.Compiler, "default"));
 
                 CompilePushResult compilePushResult = new CompilePushResult();
-                compilePushResult.Compile(compiler, null, "default");
+                compilePushResult.Compile(request.Compiler, null, "default");
 
                 parasCount++;
             }
 
             string modeCall = "vektorcall";
-            if (mode == "set") modeCall = "setvektorcall";
-            this.LeftNode.Compile(compiler, modeCall);
+            if (request.Mode == "set") modeCall = "setvektorcall";
+            this.LeftNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, modeCall));
             if (!(this.LeftNode is OperatorPoint op)) return false;
 
             if (op.IsANonStatic) parasCount++;
 
-            this.FunctionExecute.Compile(compiler, null, "default");
+            this.FunctionExecute.Compile(request.Compiler, null, "default");
 
             return true;
         }

@@ -30,26 +30,26 @@ namespace Yama.Assembler.ARMT32
         public IdentifierToken Data { get; private set; }
         public List<IdentifierToken> Arguments { get; set; } = new List<IdentifierToken>();
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
             return true;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Parser.Request.RequestParserTreeIndezieren request)
         {
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Parser parser, IdentifierToken token)
+        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
         {
-            if (token.Kind != IdentifierKind.Base) return null;
-            if (token.Text != ".word") return null;
+            if (request.Token.Kind != IdentifierKind.Base) return null;
+            if (request.Token.Text != ".word") return null;
 
             WordNode node = new WordNode();
-            node.SupportTokens.Add(token);
-            node.Token = token;
+            node.SupportTokens.Add(request.Token);
+            node.Token = request.Token;
 
-            token = parser.Peek(token, 1);
+            IdentifierToken token = request.Parser.Peek(request.Token, 1);
             if (token == null) return null;
             if (token.Kind == IdentifierKind.NumberToken) node.Data = token;
             if (token.Kind == IdentifierKind.Word) node.Data = token;

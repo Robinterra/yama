@@ -39,30 +39,25 @@ namespace Yama.Parser
 
         #endregion get/set
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            //SyntaxToken kind = parser.FindAToken ( token, SyntaxKind.EndOfCommand );
-            
-            //if ( kind == null ) return null;
-            //if ( kind.Node != null ) return null;
-            if ( token.Kind != IdentifierKind.Comma ) return null;
+            if ( request.Token.Kind != IdentifierKind.Comma ) return null;
 
-            IdentifierToken left = parser.Peek ( token, -1 );
+            IdentifierToken left = request.Parser.Peek ( request.Token, -1 );
 
             EnumartionExpression expression = new EnumartionExpression (  );
 
-            expression.Token = token;
-
-            token.Node = expression;
+            expression.Token = request.Token;
+            expression.Token.Node = expression;
 
             if (left == null) return expression;
 
-            List<IParseTreeNode> nodes = parser.ParseCleanTokens (left, parser.Start, token.Position );
+            List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens (left, request.Parser.Start, request.Token.Position );
 
             IParseTreeNode node = null;
 
-            if ( nodes == null ) return null;
-            if ( nodes.Count > 1 ) return null;
+            if ( nodes == null ) return expression.Token.Node = null;
+            if ( nodes.Count > 1 ) return expression.Token.Node = null;
             if ( nodes.Count == 1 ) node = nodes[0];
 
             expression.ExpressionParent = node;
@@ -72,14 +67,14 @@ namespace Yama.Parser
             return expression;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             if (this.ExpressionParent == null) return true;
 
-            return this.ExpressionParent.Indezieren(index, parent);
+            return this.ExpressionParent.Indezieren(request);
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
             return true;
         }

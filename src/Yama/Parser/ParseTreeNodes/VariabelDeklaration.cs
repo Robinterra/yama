@@ -117,37 +117,37 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Word )
-                if ( !this.CheckHashValidOperator ( token ) ) return null;
+            if ( request.Token.Kind != IdentifierKind.Word )
+                if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
-            IdentifierToken lexerLeft = parser.Peek ( token, -1 );
+            IdentifierToken lexerLeft = request.Parser.Peek ( request.Token, -1 );
 
             if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
 
-            IdentifierToken lexerRight = parser.Peek ( token, 1 );
+            IdentifierToken lexerRight = request.Parser.Peek ( request.Token, 1 );
 
             if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
 
             VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
             node.Token = lexerRight;
-            lexerRight.Node = node;
 
-            IParseTreeNode callRule = parser.GetRule<ReferenceCall>();
+            IParseTreeNode callRule = request.Parser.GetRule<ReferenceCall>();
 
-            node.TypeDefinition = callRule.Parse(parser, token);
+            node.TypeDefinition = callRule.Parse(request);
 
             if ( node.TypeDefinition == null ) return null;
 
+            lexerRight.Node = node;
             node.TypeDefinition.Token.ParentNode = node;
 
             return node;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexContainer container)) return index.CreateError(this);
+            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             IndexVariabelnDeklaration reference = this.Deklaration;
 
@@ -157,8 +157,11 @@ namespace Yama.Parser
                 reference.Use = this;
                 reference.Name = this.Token.Text;
 
-                this.TypeDefinition.Indezieren(index, parent);
-                IndexVariabelnReference type = container.VariabelnReferences.Last();
+                this.TypeDefinition.Indezieren(request);
+                IndexVariabelnReference type = container.VariabelnReferences.LastOrDefault();
+
+                if (type == null) return request.Index.CreateError(this);
+
                 reference.Type = type;
 
                 this.Deklaration = reference;
@@ -169,16 +172,16 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            if (mode == "set")
+            if (request.Mode == "set")
             {
                 IndexVariabelnReference varref = new IndexVariabelnReference();
                 varref.Deklaration = this.Deklaration;
                 varref.Use = this;
                 varref.ParentUsesSet = this.Deklaration.ParentUsesSet;
 
-                this.Compilen.Compile(compiler, varref, mode);
+                this.Compilen.Compile(request.Compiler, varref, request.Mode);
             }
 
             return true;

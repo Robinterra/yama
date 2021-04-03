@@ -248,36 +248,35 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-
             MethodeDeclarationNode deklaration = new MethodeDeclarationNode();
 
-            token = this.MakeAccessValid(parser, token, deklaration);
+            IdentifierToken token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
 
-            token = this.MakeZusatzValid ( parser, token, deklaration );
+            token = this.MakeZusatzValid ( request.Parser, token, deklaration );
 
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
 
-            if ( !this.CheckSonderRegleung ( deklaration.TypeDefinition ) ) token = parser.Peek ( token, 1 );
+            if ( !this.CheckSonderRegleung ( deklaration.TypeDefinition ) ) token = request.Parser.Peek ( token, 1 );
 
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
 
-            token = parser.Peek ( token, 1 );
+            token = request.Parser.Peek ( token, 1 );
 
             IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
 
             if ( token == null ) return null;
 
-            parser.ActivateLayer(this.layer);
+            request.Parser.ActivateLayer(this.layer);
 
-            IParseTreeNode klammer = rule.Parse(parser, token);
+            IParseTreeNode klammer = rule.Parse(new Request.RequestParserTreeParser(request.Parser, token));
 
-            parser.VorherigesLayer();
+            request.Parser.VorherigesLayer();
 
             if (klammer == null) return null;
             if (!(klammer is Container t)) return null;
@@ -285,9 +284,9 @@ namespace Yama.Parser
             t.Token.ParentNode = deklaration;
             deklaration.Parameters = t.Statements;
 
-            IdentifierToken Statementchild = parser.Peek ( t.Ende, 1);
+            IdentifierToken Statementchild = request.Parser.Peek ( t.Ende, 1);
 
-            deklaration.Statement = parser.ParseCleanToken(Statementchild, this.layer);
+            deklaration.Statement = request.Parser.ParseCleanToken(Statementchild, this.layer);
 
             if (deklaration.Statement == null) return null;
 
@@ -349,9 +348,9 @@ namespace Yama.Parser
             return type;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(parent is IndexKlassenDeklaration klasse)) return index.CreateError(this);
+            if (!(request.Parent is IndexKlassenDeklaration klasse)) return request.Index.CreateError(this);
 
             IndexMethodDeklaration deklaration = new IndexMethodDeklaration();
             deklaration.Use = this;
@@ -381,23 +380,23 @@ namespace Yama.Parser
                     dek = (VariabelDeklaration)b.ExpressionParent;
                 }
 
-                if (dek == null) { index.CreateError(this, "A Index error by the parameters of this method"); continue; }
+                if (dek == null) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
 
-                if (!dek.Indezieren(index, container)) continue;
+                if (!dek.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, container))) continue;
 
                 deklaration.Parameters.Add(dek.Deklaration);
             }
 
             if (deklaration.Type == MethodeType.Static)
             if (this.Token.Text == "main")
-                index.SetMainFunction(this);
+                request.Index.SetMainFunction(this);
 
             if (deklaration.Type == MethodeType.Ctor) container.VariabelnReferences.Add(this.Malloc);
             if (deklaration.Type == MethodeType.DeCtor) container.VariabelnReferences.Add(this.MallocFree);
 
             this.AddMethode(klasse, deklaration);
 
-            this.Statement.Indezieren(index, container);
+            this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, container));
 
             return true;
         }
@@ -437,9 +436,9 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            if (!this.CanCompile(compiler)) return true;
+            if (!this.CanCompile(request.Compiler)) return true;
 
             if (this.AccessDefinition != null)
                 if (this.AccessDefinition.Kind == IdentifierKind.Copy) return true;
@@ -447,32 +446,32 @@ namespace Yama.Parser
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
 
-            compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, ((Container)this.Statement).IndexContainer.ThisUses);
+            request.Compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, ((Container)this.Statement).IndexContainer.ThisUses);
 
             if (this.AccessDefinition != null)
-                if (this.AccessDefinition.Kind == IdentifierKind.Simple) return compiler.AddError("simple keyword is not anymore supported!", this);
+                if (this.AccessDefinition.Kind == IdentifierKind.Simple) return request.Compiler.AddError("simple keyword is not anymore supported!", this);
 
-            this.FunktionsDeklarationCompile.Compile(compiler, this, mode);
+            this.FunktionsDeklarationCompile.Compile(request.Compiler, this, request.Mode);
 
             int count = 0;
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
-                if (!this.MakeOneArgument(node, compiler, count)) continue;
+                if (!this.MakeOneArgument(node, request.Compiler, count)) continue;
 
                 count++;
 
                 if (node.Name != "this") continue;
                 if (this.Deklaration.Klasse.InheritanceBase == null) continue;
 
-                compiler.CurrentThis = node;
+                request.Compiler.CurrentThis = node;
 
-                bool v = this.BaseCompile(compiler);
+                bool v = this.BaseCompile(request.Compiler);
             }
 
-            if (this.Deklaration.Type == MethodeType.Ctor) this.CompileCtor(compiler, mode);
-            if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(compiler, mode);
+            if (this.Deklaration.Type == MethodeType.Ctor) this.CompileCtor(request.Compiler, request.Mode);
+            if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(request.Compiler, request.Mode);
 
-            return this.CompileNormalFunktion(compiler, mode, count);
+            return this.CompileNormalFunktion(request.Compiler, request.Mode, count);
         }
 
         private bool MakeOneArgument(IndexVariabelnDeklaration node, Compiler.Compiler compiler, int count)
@@ -588,7 +587,7 @@ namespace Yama.Parser
         {
             this.CompileContainer.Begin.Compile(compiler, this, "default");
 
-            this.Statement.Compile(compiler, "default");
+            this.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
 
             this.CompileContainer.Ende.Compile(compiler, this, "default");
 

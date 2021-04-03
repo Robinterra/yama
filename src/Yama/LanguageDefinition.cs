@@ -346,6 +346,7 @@ namespace Yama
             rules.Add ( new KeyWord ( "return", IdentifierKind.Return ) );
             rules.Add ( new KeyWord ( "class", IdentifierKind.Class ) );
             rules.Add ( new KeyWord ( "static", IdentifierKind.Static ) );
+            rules.Add ( new KeyWord ( "primitive", IdentifierKind.Primitive ) );
             rules.Add ( new KeyWord ( "nonref", IdentifierKind.Nonref ) );
             rules.Add ( new KeyWord ( "public", IdentifierKind.Public ) );
             rules.Add ( new KeyWord ( "private", IdentifierKind.Private ) );

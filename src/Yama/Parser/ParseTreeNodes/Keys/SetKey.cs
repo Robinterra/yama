@@ -64,17 +64,17 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Set ) return null;
+            if ( request.Token.Kind != IdentifierKind.Set ) return null;
 
             SetKey key = new SetKey (  );
-            key.Token = token;
-            token.Node = key;
+            key.Token = request.Token;
+            key.Token.Node = key;
 
-            IdentifierToken conditionkind = parser.Peek ( token, 1 );
+            IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
 
-            if (parser.ParseCleanToken(conditionkind, this.layer) is Container container) key.Statement = container;
+            if (request.Parser.ParseCleanToken(conditionkind, this.layer) is Container container) key.Statement = container;
 
             if (key.Statement == null) return null;
 
@@ -89,7 +89,7 @@ namespace Yama.Parser
 
             parent.SetContainer = container;
 
-            this.Statement.Indezieren(index, container);
+            this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(index, container));
 
             return true;
         }
@@ -100,30 +100,30 @@ namespace Yama.Parser
 
             parent.SetContainer = container;
 
-            this.Statement.Indezieren(index, container);
+            this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(index, container));
 
             return true;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (parent is IndexVektorDeklaration vekdek) return this.IndezierenVektor(index, vekdek);
-            if (parent is IndexPropertyGetSetDeklaration popdek) return this.IndezierenPropertyGetSet(index, popdek);
-            if (!(parent is IndexPropertyDeklaration propertyDeklaration)) return index.CreateError(this);
-            if (this.Statement == null) return index.CreateError(this);
+            if (request.Parent is IndexVektorDeklaration vekdek) return this.IndezierenVektor(request.Index, vekdek);
+            if (request.Parent is IndexPropertyGetSetDeklaration popdek) return this.IndezierenPropertyGetSet(request.Index, popdek);
+            if (!(request.Parent is IndexPropertyDeklaration propertyDeklaration)) return request.Index.CreateError(this);
+            if (this.Statement == null) return request.Index.CreateError(this);
 
             IndexContainer container = new IndexContainer();
 
             propertyDeklaration.SetContainer = container;
 
-            this.Statement.Indezieren(index, container);
+            this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, container));
 
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            this.Statement.Compile(compiler, mode);
+            this.Statement.Compile(request);
 
             return true;
         }

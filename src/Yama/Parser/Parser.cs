@@ -16,6 +16,7 @@ namespace Yama.Parser
         // -----------------------------------------------
 
         private int grosstePrio = -1;
+
         private List<IParseTreeNode> possibleParents;
 
         // -----------------------------------------------
@@ -33,7 +34,14 @@ namespace Yama.Parser
             get;
             private set;
         }
-        public int Start { get; private set; }
+
+        // -----------------------------------------------
+
+        public int Start
+        {
+            get;
+            private set;
+        }
 
         // -----------------------------------------------
 
@@ -329,6 +337,15 @@ namespace Yama.Parser
 
             nodeParents = this.GetCleanNodeParents();
 
+            for (int i = this.Start; i < this.Max; i++)
+            {
+                if ( this.Peek(i) == null ) continue;
+                if ( this.Peek(i).Node == null )
+                {
+                    this.SyntaxErrorToken ( this.Peek(i) );
+                }
+            }
+
             this.Position = currentpos;
             this.Max = tempmax;
             this.Start = orgstart;
@@ -336,6 +353,8 @@ namespace Yama.Parser
 
             return nodeParents;
         }
+
+        // -----------------------------------------------
 
         private List<IParseTreeNode> GetCleanNodeParents()
         {
@@ -363,6 +382,8 @@ namespace Yama.Parser
 
             return result;
         }
+
+        // -----------------------------------------------
 
         private IParseTreeNode ParsePrimary ( int max )
         {
@@ -466,18 +487,24 @@ namespace Yama.Parser
             return this.SyntaxErrorToken ( token );
         }
 
+        // -----------------------------------------------
+
         public IParseTreeNode ParseCleanToken ( IdentifierToken token )
         {
             return this.ParseCleanToken(token, this.CurrentLayer);
         }
 
+        // -----------------------------------------------
+
         private IParseTreeNode ParseEndExpression(IdentifierToken token)
         {
+            Request.RequestParserTreeParser request = new Request.RequestParserTreeParser(this, token);
+
             foreach ( IParseTreeNode node in this.CurrentParserMembers )
             {
                 if (!(node is IEndExpression)) continue;
 
-                IParseTreeNode nodet = node.Parse(this, token);
+                IParseTreeNode nodet = node.Parse ( request );
 
                 if (nodet != null) return nodet;
             }
@@ -491,7 +518,7 @@ namespace Yama.Parser
         {
             if ( token == null ) token = new IdentifierToken ( IdentifierKind.Unknown, -1, -1, -1, "Unexpectet Error", "Unexpectet Error" );
 
-            IParseTreeNode error = this.ErrorNode.Parse ( this, token );
+            IParseTreeNode error = this.ErrorNode.Parse ( new Request.RequestParserTreeParser ( this, token ) );
 
             if (error == null) return null;
 
@@ -504,14 +531,15 @@ namespace Yama.Parser
 
         private IParseTreeNode ParseSteuerTokens ( IdentifierToken token )
         {
+            Request.RequestParserTreeParser request = new Request.RequestParserTreeParser ( this, token );
+
             foreach ( IParseTreeNode member in this.CurrentParserMembers )
             {
                 if ( member is IPriority ) continue;
 
-                IParseTreeNode result = member.Parse ( this, token );
+                IParseTreeNode result = member.Parse ( request );
 
-                if ( result != null )
-                    return result;
+                if ( result != null ) return result;
             }
 
             return null;
@@ -540,12 +568,14 @@ namespace Yama.Parser
         {
             if ( prio < 0 ) return null;
 
+            Request.RequestParserTreeParser request = new Request.RequestParserTreeParser ( this, token );
+
             foreach ( IParseTreeNode member in this.CurrentParserMembers )
             {
                 if ( !(member is IPriority t) ) continue;
                 if ( t.Prio != prio ) continue;
 
-                IParseTreeNode result = member.Parse ( this, token );
+                IParseTreeNode result = member.Parse ( request );
 
                 if ( result != null ) return result;
             }
@@ -561,7 +591,7 @@ namespace Yama.Parser
         {
             int pos = this.Position;
 
-            IParseTreeNode result = member.Parse ( this, token );
+            IParseTreeNode result = member.Parse ( new Request.RequestParserTreeParser ( this, token ) );
 
             if ( result != null ) return result;
 
@@ -664,6 +694,8 @@ namespace Yama.Parser
 
         public bool ActivateLayer(ParserLayer start)
         {
+            if (start == null) return false;
+
             this.ParserStack.Push(start);
 
             return true;
@@ -694,6 +726,8 @@ namespace Yama.Parser
 
             return kind;
         }
+
+        // -----------------------------------------------
 
         public IdentifierToken FindEndTokenWithoutParse ( IdentifierToken begin, IdentifierKind endKind, IdentifierKind escapeKind )
         {

@@ -45,25 +45,25 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Parser parser, IdentifierToken token )
+        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( token.Kind != IdentifierKind.Continue ) return null;
+            if ( request.Token.Kind != IdentifierKind.Continue ) return null;
 
             ContinueKey key = new ContinueKey (  );
-            token.Node = key;
-            key.Token = token;
+            key.Token = request.Token;
+            key.Token.Node = key;
 
             return key;
         }
 
-        public bool Indezieren(Index.Index index, IParent parent)
+        public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             return true;
         }
 
-        public bool Compile(Compiler.Compiler compiler, string mode = "default")
+        public bool Compile(Request.RequestParserTreeCompile request)
         {
-            this.JumpTo.Compile(compiler, null, mode);
+            this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
             return true;
         }

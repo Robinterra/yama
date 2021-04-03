@@ -6,7 +6,7 @@ namespace "System.Collections"
     /**
     * Array
     */
-    public class ByteArray
+    public primitive class ByteArray
     {
         #region vars
 
