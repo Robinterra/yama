@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Yama.Parser
 {
-    public class ExplicitConverting : IParseTreeNode
+    public class TypePatternMatching : IParseTreeNode
     {
 
         #region get/set
@@ -62,23 +62,35 @@ namespace Yama.Parser
         {
             get;
         }
+
         public List<string> ValidOperators
         {
             get;
         }
+
         public IdentifierToken ReferenceDeklaration
         {
             get;
             set;
         }
-        public IndexVariabelnDeklaration Deklaration { get; private set; }
-        public IndexVariabelnReference EqualsReference { get; set; }
+
+        public IndexVariabelnDeklaration Deklaration
+        {
+            get;
+            set;
+        }
+
+        public IndexVariabelnReference EqualsReference
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
         #region ctor
 
-        public ExplicitConverting ( int prio )
+        public TypePatternMatching ( int prio )
         {
             this.Prio = prio;
         }
@@ -100,7 +112,7 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.Is ) return null;
 
-            ExplicitConverting node = new ExplicitConverting ( this.Prio );
+            TypePatternMatching node = new TypePatternMatching ( this.Prio );
             node.Token = request.Token;
 
             node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
