@@ -48,7 +48,7 @@ namespace "System.Runtime"
         /**
          * Read int
          */
-        public static int ReadText (  )
+        public static string ReadText (  )
         {
             #defalgo Console,ReadText:;
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -141,20 +142,30 @@ namespace Yama.Parser
             reference.Use = this;
             reference.Name = this.Token.Text;
             reference.IsOperator = true;
+            int anzahl = container.VariabelnReferences.Count;
             this.LeftNode.Indezieren(request);
             IndexVariabelnReference varref = container.VariabelnReferences.LastOrDefault();
+            if (anzahl == container.VariabelnReferences.Count) varref = null;
 
 
             this.RightNode.Indezieren(request);
             this.VariabelReference = reference;
             //container.VariabelnReferences.Add(reference);
 
-            if (this.Token.Text == "=") return true;
+            if (this.Token.Text == "=") return this.SetIndex(request, varref, container.VariabelnReferences.LastOrDefault());
             if (varref == null) return request.Index.CreateError(this);
 
             varref.ParentCall = reference;
             varref.VariabelnReferences.Add(reference);
             this.Reference = reference;
+
+            return true;
+        }
+
+        private bool SetIndex(RequestParserTreeIndezieren request, IndexVariabelnReference varref, IndexVariabelnReference indexVariabelnReference)
+        {
+
+            request.Index.IndexTypeSafeties.Add(new IndexSetValue(varref, indexVariabelnReference));
 
             return true;
         }
