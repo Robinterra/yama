@@ -46,14 +46,41 @@ namespace LearnCsStuf.CommandLines
         public bool Print (  )
         {
             Console.WriteLine ( "Compiler for Yama, a Object-oriented Language for Microcontroller like ARM Cortex-M and AVR" );
-            Console.WriteLine ( "yama out out.S define atmega328p define avr-gcc def avr inc bin/Debug/netcoreapp3.1/System bin/Debug/netcoreapp3.1/iftest.yama" );
+            Console.WriteLine ( "Examples:" );
+            Console.WriteLine ( "yama build skip 0x08000000 out ./bin/out.bin define STM32F401 def arm-t32 inc ./src/" );
+            Console.WriteLine ( "yama build out ./out.bin def runtime ./test.yama" );
             Console.WriteLine (  );
 
             foreach ( ICommandLine line in this.CommandLines )
             {
                 if ( line == null ) continue;
+                if ( !( line is ICommandParent p )) continue;
 
                this.PrintLine ( line.HelpLine );
+
+               this.PrintChilds ( p.Childs, "    " );
+            }
+
+            Console.WriteLine (  );
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool PrintChilds(List<ICommandLine> childs, string v)
+        {
+            if (childs == null) return false;
+
+            foreach (ICommandLine line in childs)
+            {
+                if ( line == null ) continue;
+
+                Console.Write ( v );
+
+               this.PrintLine ( line.HelpLine );
+
+               if ( line is ICommandParent p ) this.PrintChilds ( p.Childs, v + "    " );
             }
 
             Console.WriteLine (  );

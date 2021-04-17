@@ -29,12 +29,15 @@ You can read it in the book Severed.
 ## What is comming soon ?
 chronological order
 1. Array, LinkListand List in Framework
-2. How to add a new Assembly this Language - docu
-3. Show in a Blog little projects with yama - my own reason.
+2. Add AVR Translate from Assembler to Binary
+3. How to add a new Assembly this Language - docu
+4. Show in a Blog little projects with yama - my own reason.
  * You want support me or you have ideas then please send me a email: robin.dandrea@gmail.com / robin.dandrea@versalitic.com
 
 ## What can current use?
- - AVR and ARM Assembler, (ARM Current not testet)
+ - AVR and ARM Assembler and Runtime Assembler (ARM Current testet) (AVR current not compatible)
+ - ARM Assembler and Runtime Assembler can be translate to Binary
+ - Debugger for Assembler and binary code (Support Runtime assembly)
  - static and non static Methods
  - Array Get Set Methods and Call
  - Enums
@@ -45,8 +48,8 @@ chronological order
  - Conditional Compilation
   1. region and endregion
   2. `#defalgo <name>,<mode>:` read from a json file a assembly algo and replace it with des assemlby commands
- - keyword they work = if, else, while, for, continue, break, return, this, base, true, false, null, class, enum, static, namespace, using
- - Simple Inheritance (base, this, override methods from the base class).
+ - keyword they work = if, else, while, for, continue, break, return, this, base, true, false, null, class, enum, static, namespace, using, is, as, primitive
+ - Simple Inheritance (base, this, override methods from the base class, "is" to check in a if statement a class is the right type and cast it to his type).
   1. Possible is this case: `class A` `class B : A` `class C : A` `class D : B`
   2. Not Possible is this case: `class A` `class B` `class C : A, B`
   3. Not Possible is this case: `class A : B` `class B : A`
@@ -76,7 +79,8 @@ sudo ln -s /mnt/c/pro/learncs/bin/Release/netcoreapp3.1/YamaCompiler /usr/bin/ya
 
 ## Example
 
-A Example Project with Arduino Uno [Blinking Led](https://github.com/Robinterra/blinkledyama)
+ - A Example Project with Arduino Uno [Blinking Led](https://github.com/Robinterra/blinkledyama)
+ - A Example Project run on STM32F401 [ARM Test](https://github.com/Robinterra/blinkledYamaSTM32.git)
 
 ### A Yama Code snippet:
  - The using "System" is for the types: int and bool.
@@ -124,8 +128,50 @@ namespace "Program"
         {
             return this;
         }
+
+        public this ~()
+        {
+
+        }
+
     }
 }
+
+```
+
+### Compiler Arguments
+```
+Compiler for Yama, a Object-oriented Language for Microcontroller like ARM Cortex-M and AVR
+Examples:
+yama build skip 0x08000000 out ./bin/out.bin define STM32F401 def arm-t32 inc ./src/
+yama build out ./out.bin def runtime ./test.yama
+
+build               Build a Yama Programm
+    file <file>         One file which to Compile
+    include <folder>    Include all files from this folder (recursive).
+    asmoutput <file>    The output Filename (Default:no assembler output)
+    output <file>       The output Filename (Default:out.bin) Shortcut:out
+    optimize <level>    Configuration of Code Opitmizen (None, Level1 (Default), SSA (Always))
+    definition <name>   Set the Compiler definition for translate in assembler
+    define <define>     One Define for conditional compilation
+    print <subcommand>  Gibt <subcommand> (tree) in der Console aus
+    skip <value>        The Skip value at top from binary code (Hex Format)
+    start <namespace>   The start namespace that is to compile (default:Program) // Location of the main function
+
+assemble            Assemble a Assembler file to Binary
+    size <value>        The Size of the Memory (Hex Format)
+    file <file>         One file which to Compile
+    definition <name>   Set the Compiler definition for translate in assembler
+    output <file>       The output Filename (Default:out.bin) Shortcut:out
+    skip <value>        The Skip value at top from binary code (Hex Format)
+
+run                 Run/Debug a Binary File
+    size <value>        The Size of the Memory (Hex Format)
+    file <file>         One file which to Compile
+
+debug               Debug a Yama Source File
+    size <value>        The Size of the Memory (Hex Format)
+    file <file>         One file which to Compile
 ```
 
 ### avr-gcc

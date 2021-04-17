@@ -1,6 +1,8 @@
+using System.Collections.Generic;
+
 namespace LearnCsStuf.CommandLines.Commands
 {
-    public class RunExpression : ICommandLine
+    public class RunExpression : ICommandLine, ICommandParent
     {
 
         // -----------------------------------------------
@@ -47,7 +49,37 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
+        public List<ICommandLine> Childs
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public RunExpression (  )
+        {
+
+        }
+
+        // -----------------------------------------------
+
+        public RunExpression ( List<ICommandLine> commands )
+        {
+            this.Childs = commands;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
 
         // -----------------------------------------------
 
@@ -60,6 +92,11 @@ namespace LearnCsStuf.CommandLines.Commands
             if (this.Key != command) return null;
 
             return new RunExpression (  );
+        }
+
+        public bool Execute(RequestExecuteArgs request)
+        {
+            throw new System.NotImplementedException();
         }
 
         // -----------------------------------------------
