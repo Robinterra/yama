@@ -88,6 +88,8 @@ namespace Yama.Debug
                 return true;
             }
 
+            if (runtime.Register[runtime.A] == 7) return this.ExecuteConsoleStuff(runtime);
+
             uint id = runtime.Register[runtime.A];
 
             foreach (IMapper mapper in this.Mappers)
@@ -100,5 +102,43 @@ namespace Yama.Debug
             return true;
         }
 
+        private bool ExecuteConsoleStuff(Runtime runtime)
+        {
+            if (runtime.Register[1] == 1)
+            {
+                Console.SetCursorPosition((int)runtime.Register[2], (int)runtime.Register[3]);
+
+                return true;
+            }
+
+            if (runtime.Register[1] == 2)
+            {
+                Console.Write("\x1B[38;5;{0}m", runtime.Register[2]);
+
+                return true;
+            }
+
+            if (runtime.Register[1] == 3)
+            {
+                Console.BackgroundColor = (ConsoleColor)runtime.Register[2];
+
+                return true;
+            }
+
+            if (runtime.Register[1] == 4)
+            {
+                ConsoleKeyInfo key = Console.ReadKey();
+
+                runtime.Register[12] = (uint)key.KeyChar;
+
+                Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                Console.Write(" ");
+                Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+
+                return true;
+            }
+
+            return true;
+        }
     }
 }
