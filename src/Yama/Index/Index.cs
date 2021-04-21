@@ -192,6 +192,21 @@ namespace Yama.Index
             return true;
         }
 
+        public string GetTypeName(IndexVariabelnReference reference)
+        {
+            if (reference == null) return string.Empty;
+            if (reference.ParentCall != null) return this.GetTypeName(reference.ParentCall);
+
+            if (reference.Deklaration is IndexKlassenDeklaration t) return t.Name;
+            if (reference.Deklaration is IndexVariabelnDeklaration vd) return vd.Type.Name;
+            if (reference.Deklaration is IndexPropertyGetSetDeklaration pgsd) return pgsd.ReturnValue.Name;
+            if (reference.Deklaration is IndexVektorDeklaration ved) return ved.ReturnValue.Name;
+            if (reference.Deklaration is IndexMethodDeklaration md) return md.ReturnValue.Name;
+            if (reference.Deklaration is IndexPropertyDeklaration pd) return pd.Type.Name;
+
+            return string.Empty;
+        }
+
         private bool Mappen()
         {
 

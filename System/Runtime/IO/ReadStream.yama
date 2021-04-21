@@ -33,7 +33,7 @@ namespace "System.Runtime.IO"
         {
             //this.filepath = filepath;
 
-            this.filestream_id = InputOutput.ExecWith1Arg ( 6, filepath, 6 );
+            this.filestream_id = InputOutput.ExecWith1Arg ( 6, filepath as int, 6 );
 
             return this;
         }

@@ -145,12 +145,24 @@ namespace Yama.Parser
         {
             if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
+            IndexMethodReference methodReference = new IndexMethodReference();
+            methodReference.Use = this;
+
             foreach (IParseTreeNode node in this.ParametersNodes)
             {
                 node.Indezieren(request);
+
+                IndexVariabelnReference reference = container.VariabelnReferences.LastOrDefault();
+
+                methodReference.Parameters.Add(reference);
             }
 
             this.LeftNode.Indezieren(request);
+
+            IndexVariabelnReference callRef = container.VariabelnReferences.LastOrDefault();
+            methodReference.CallRef = callRef;
+
+            container.MethodReferences.Add(methodReference);
 
             return true;
         }
@@ -195,5 +207,6 @@ namespace Yama.Parser
         }
 
         #endregion methods
+
     }
 }

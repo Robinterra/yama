@@ -33,7 +33,7 @@ namespace "System.Runtime.IO"
         {
             //this.filepath = filepath;
 
-            this.filestream_id = InputOutput.ExecWith1Arg ( 9, filepath, 6 );
+            this.filestream_id = InputOutput.ExecWith1Arg ( 9, filepath as int, 6 );
 
             return this;
         }
@@ -57,7 +57,7 @@ namespace "System.Runtime.IO"
 
         public bool WriteNextBytes(ByteArray array)
         {
-            return InputOutput.ExecWith2Args ( 10, this.filestream_id, array, 6 );
+            return InputOutput.ExecWith2Args ( 10, this.filestream_id, array as int, 6 );
         }
 
         // -----------------------------------------------

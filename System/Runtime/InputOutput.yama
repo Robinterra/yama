@@ -28,9 +28,9 @@ namespace "System.Runtime"
         /**
          * Print int
          */
-        public static bool WriteFileData ( int filename, int data )
+        public static bool WriteFileData ( string filename, int data )
         {
-            InputOutput.ExecWith2Args ( 2, filename, data, 6 );
+            InputOutput.ExecWith2Args ( 2, filename as int, data, 6 );
         }
 
         // -----------------------------------------------
@@ -38,9 +38,9 @@ namespace "System.Runtime"
         /**
          * Print int
          */
-        public static bool WriteFileObject ( int filename, int data )
+        public static bool WriteFileObject ( string filename, int data )
         {
-            InputOutput.ExecWith2Args ( 1, filename, data, 6 );
+            InputOutput.ExecWith2Args ( 1, filename as int, data, 6 );
         }
 
         // -----------------------------------------------
@@ -48,9 +48,9 @@ namespace "System.Runtime"
         /**
          * Print int
          */
-        public static int ReadFileObject ( int filename )
+        public static int ReadFileObject ( string filename )
         {
-            InputOutput.ExecWith1Arg ( 3, filename, 6 );
+            InputOutput.ExecWith1Arg ( 3, filename as int, 6 );
         }
 
         // -----------------------------------------------
@@ -58,16 +58,16 @@ namespace "System.Runtime"
         /**
          * Print int
          */
-        public static int ReadFileData ( int filename )
+        public static int ReadFileData ( string filename )
         {
-            InputOutput.ExecWith1Arg ( 4, filename, 6 );
+            InputOutput.ExecWith1Arg ( 4, filename as int, 6 );
         }
 
         // -----------------------------------------------
 
-        public static bool Exist ( int filename )
+        public static bool Exist ( string filename )
         {
-            InputOutput.ExecWith1Arg ( 5, filename, 6 );
+            InputOutput.ExecWith1Arg ( 5, filename as int, 6 );
         }
 
         // -----------------------------------------------

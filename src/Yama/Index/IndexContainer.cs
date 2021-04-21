@@ -114,6 +114,11 @@ namespace Yama.Index
                 reference.Mappen(this.ThisUses);
             }
 
+            foreach (IndexMethodReference methodReference in this.MethodReferences)
+            {
+                methodReference.Mappen(this.ThisUses);
+            }
+
             foreach (IndexContainer container in this.Containers)
             {
                 container.Mappen(this.ThisUses);
