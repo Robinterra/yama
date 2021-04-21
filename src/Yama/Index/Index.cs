@@ -203,6 +203,7 @@ namespace Yama.Index
             if (reference.Deklaration is IndexVektorDeklaration ved) return ved.ReturnValue.Name;
             if (reference.Deklaration is IndexMethodDeklaration md) return md.ReturnValue.Name;
             if (reference.Deklaration is IndexPropertyDeklaration pd) return pd.Type.Name;
+            if (reference.Deklaration is IndexEnumEntryDeklaration) return "int";
 
             return string.Empty;
         }
