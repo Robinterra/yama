@@ -8,6 +8,8 @@ namespace Yama.Index
     public class IndexVariabelnReference : IIndexReference, IParent
     {
 
+        #region get/set
+
         public IParseTreeNode Use
         {
             get;
@@ -104,10 +106,18 @@ namespace Yama.Index
             set;
         }
 
+        #endregion get/set
+
+        #region ctor
+
         public IndexVariabelnReference (  )
         {
             this.VariabelnReferences = new List<IndexVariabelnReference>();
         }
+
+        #endregion ctor
+
+        #region methods
 
         public bool Mappen(IndexVariabelnReference parentCall)
         {
@@ -275,6 +285,8 @@ namespace Yama.Index
 
             if (this.Deklaration == null) return uses.GetIndex.CreateError(this.Use, string.Format("no defintion in index found {0}", this.Name));
 
+            if (this.Deklaration is IndexMethodDeklaration mud) this.MethodenDeklaration ( mud, this.ParentUsesSet.Deklarationen );
+
             if (this.ParentCall != null) this.ParentCall.Mappen(this);
 
             foreach (IndexVariabelnReference t in this.VariabelnReferences)
@@ -298,5 +310,18 @@ namespace Yama.Index
 
             return uses.GetIndex.CreateError(this.Use, "no support type definition");
         }
+
+        private bool MethodenDeklaration(IndexMethodDeklaration mud, List<IParent> deklarationen)
+        {
+            List<IParent> parents = deklarationen.Where(t=>t.Name == this.Name).ToList();
+            if (parents.Count <= 1) return true;
+
+            
+
+            return true;
+        }
+
+        #endregion methods
+
     }
 }

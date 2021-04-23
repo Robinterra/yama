@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Yama.Lexer;
 using Yama.Parser;
 
@@ -88,9 +89,15 @@ namespace Yama.Index
             {
                 if (this.NameInText == "main") return "main";
 
-                string pattern = "{0}_{1}_{2}";
+                StringBuilder build = new StringBuilder();
+                foreach (IndexVariabelnDeklaration dek in this.Parameters)
+                {
+                    build.AppendFormat("_{0}", dek.Type.Name);
+                }
 
-                return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count);
+                string pattern = "{0}_{1}_{2}{3}";
+
+                return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count, build.ToString());
             }
         }
 
