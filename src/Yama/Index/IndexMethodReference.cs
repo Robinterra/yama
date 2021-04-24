@@ -51,6 +51,12 @@ namespace Yama.Index
             }
         }
 
+        public Index Index
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -73,7 +79,45 @@ namespace Yama.Index
             if (functionRef == null) return false;
             if (!(functionRef.Deklaration is IndexMethodDeklaration imd)) return false;
 
+            if (functionRef.OverloadMethods != null) return this.OverrideMethodsDeklaration(functionRef, imd);
+
             this.Deklaration = imd;
+
+            return true;
+        }
+
+        private bool OverrideMethodsDeklaration(IndexVariabelnReference functionRef, IndexMethodDeklaration firstDek)
+        {
+            foreach (IMethode methode in functionRef.OverloadMethods)
+            {
+                if (!(methode is IndexMethodDeklaration imd)) continue;
+
+                this.Deklaration = imd;
+                if (imd.Parameters.Count != this.ParametersCount) continue;
+                if (!this.OverrideMethodTypeCheck()) continue;
+
+                firstDek.References.Remove(functionRef);
+                imd.References.Add(functionRef);
+                functionRef.Deklaration = imd;
+
+                return true;
+            }
+
+            return this.Index.CreateError(functionRef.Use, "for this function exist multible overloadings and no one is the chosen one");
+        }
+
+        private bool OverrideMethodTypeCheck()
+        {
+            int count = 0;
+            for (int i = 0; i < this.Deklaration.Parameters.Count; i++)
+            {
+                IndexVariabelnDeklaration dek = this.Deklaration.Parameters[i];
+                if (dek.Name == "this") continue;
+
+                if (this.Index.GetTypeName(this.Parameters[count]) != dek.Type.Name) return false;
+
+                count = count + 1;
+            }
 
             return true;
         }
@@ -87,6 +131,7 @@ namespace Yama.Index
 
         public bool Mappen(ValidUses thisUses)
         {
+            this.Index = thisUses.GetIndex;
             if (!this.FindDeklaration()) return thisUses.GetIndex.CreateError(this.Use, "methoden declaretion can not be found");
 
             if (this.Deklaration.Type == MethodeType.Operator) return true;

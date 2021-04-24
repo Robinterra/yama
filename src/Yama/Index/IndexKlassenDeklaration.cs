@@ -224,13 +224,13 @@ namespace Yama.Index
             List<IMethode> sortMethods = new List<IMethode>();
             foreach (IMethode met in dek.Methods)
             {
-                IMethode setmet = this.Methods.FirstOrDefault(q=>q.Name == met.Name);
+                IMethode setmet = this.Methods.FirstOrDefault(q=>q.KeyName == met.KeyName);
                 if (setmet == null) setmet = met;
 
                 sortMethods.Add(setmet);
             }
 
-            sortMethods.AddRange(this.Methods.Where(t=>!sortMethods.Any(q=>q.Name == t.Name)));
+            sortMethods.AddRange(this.Methods.Where(t=>!sortMethods.Any(q=>q.KeyName == t.KeyName)));
 
             this.IndexProperties = deks;
             this.Methods = sortMethods;

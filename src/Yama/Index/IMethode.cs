@@ -12,6 +12,11 @@ namespace Yama.Index
             set;
         }
 
+        string KeyName
+        {
+            get;
+        }
+
         IndexKlassenDeklaration Klasse
         {
             get;

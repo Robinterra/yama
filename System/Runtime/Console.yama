@@ -21,7 +21,7 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
-        public static bool PrintText ( string input )
+        public static bool Print ( string input )
         {
             #defalgo Console,PrintText: = input;
         }
@@ -30,7 +30,7 @@ namespace "System.Runtime"
 
         public static bool PrintLine (  )
         {
-            Console.PrintText ( "\n" );
+            Console.Print ( "\n" );
         }
 
         // -----------------------------------------------
