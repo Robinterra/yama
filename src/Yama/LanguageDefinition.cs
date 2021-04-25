@@ -226,7 +226,8 @@ namespace Yama
             layer.ParserMembers.Add ( new NullKey (  ) );
             layer.ParserMembers.Add ( new ContinueKey (  ) );
             layer.ParserMembers.Add ( new BreakKey (  ) );
-            layer.ParserMembers.Add ( new ExplicitConverting ( 10 ) );
+            layer.ParserMembers.Add ( new TypePatternMatching ( 10 ) );
+            layer.ParserMembers.Add ( new ExplicitlyConvert ( 10 ) );
             layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12 ) );
             layer.ParserMembers.Add ( new VektorCall ( IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket, 12 ) );
             layer.ParserMembers.Add ( new ContainerExpression ( 11 ) );

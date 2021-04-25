@@ -8,6 +8,8 @@ namespace Yama.Index
     public class IndexVariabelnReference : IIndexReference, IParent
     {
 
+        #region get/set
+
         public IParseTreeNode Use
         {
             get;
@@ -53,6 +55,12 @@ namespace Yama.Index
         }
 
         public bool IsMapped
+        {
+            get;
+            set;
+        }
+
+        public List<IMethode> OverloadMethods
         {
             get;
             set;
@@ -104,10 +112,18 @@ namespace Yama.Index
             set;
         }
 
+        #endregion get/set
+
+        #region ctor
+
         public IndexVariabelnReference (  )
         {
             this.VariabelnReferences = new List<IndexVariabelnReference>();
         }
+
+        #endregion ctor
+
+        #region methods
 
         public bool Mappen(IndexVariabelnReference parentCall)
         {
@@ -222,7 +238,7 @@ namespace Yama.Index
             IndexMethodDeklaration md = kd.DeCtors.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
             IMethode imd = kd.Methods.FirstOrDefault(t=>t.Name == this.Name);
-            if (imd != null) { imd.References.Add(this); return imd; }
+            if (imd != null) { this.MethodenDeklaration(imd, kd.Methods); imd.References.Add(this); return imd; }
             md = kd.Operators.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
             IndexPropertyDeklaration pd = kd.IndexProperties.FirstOrDefault(t=>t.Name == this.Name);
@@ -237,7 +253,7 @@ namespace Yama.Index
             if (kd == null) return null;
 
             IMethode md = kd.StaticMethods.FirstOrDefault(t=>t.Name == this.Name);
-            if (md != null) { md.References.Add(this); return md; }
+            if (md != null) { this.MethodenDeklaration(md, kd.StaticMethods); md.References.Add(this); return md; }
             md = kd.Ctors.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
             md = kd.Operators.FirstOrDefault(t=>t.Name == this.Name);
@@ -281,6 +297,7 @@ namespace Yama.Index
             {
                 t.Owner = uses.GetIndex.CurrentMethode;
                 if (t.Deklaration == null) t.Deklaration = this.Deklaration.ThisUses.Deklarationen.FirstOrDefault(u=>u.Name == t.Name);
+                if (t.Deklaration == null) return uses.GetIndex.CreateError(t.Use, string.Format("no defintion in index found {0}", t.Name));
 
                 if (t.Deklaration is IndexVektorDeklaration ivdu) { ivdu.References.Add(this); continue; }
                 if (t.Deklaration is IndexPropertyGetSetDeklaration pgsdu) { pgsdu.References.Add(this); continue; }
@@ -298,5 +315,28 @@ namespace Yama.Index
 
             return uses.GetIndex.CreateError(this.Use, "no support type definition");
         }
+
+        private bool MethodenDeklaration(IMethode mud, List<IMethode> deklarationen)
+        {
+            List<IMethode> parents = deklarationen.Where(t=>t.Name == mud.Name).ToList();
+            if (parents.Count <= 1) return true;
+
+            this.OverloadMethods = parents;
+
+            return true;
+        }
+
+        /*private bool MethodenDeklaration(IndexMethodDeklaration mud, List<IParent> deklarationen)
+        {
+            List<IParent> parents = deklarationen.Where(t=>t.Name == mud.Name).ToList();
+            if (parents.Count <= 1) return true;
+
+
+
+            return true;
+        }*/
+
+        #endregion methods
+
     }
 }

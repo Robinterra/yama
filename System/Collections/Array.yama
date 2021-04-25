@@ -34,7 +34,7 @@ namespace "System.Collections"
                 if (index > this.size) return 0;
 
                 index = 4 + index;
-                Pointer pointer = index + this;
+                Pointer pointer = index + this as Pointer;
 
                 return pointer.Value;
             }
@@ -45,7 +45,7 @@ namespace "System.Collections"
                 if (index > this.size) return 0;
 
                 index = 4 + index;
-                Pointer pointer = index + this;
+                Pointer pointer = index + this as Pointer;
 
                 pointer.Value = invalue;
             }
@@ -62,7 +62,7 @@ namespace "System.Collections"
                 int orgSize = size << 2;
                 size = orgSize + 4;
 
-                Array array = MemoryManager.Malloc ( size );
+                Array array = MemoryManager.Malloc ( size ) as Array;
                 array.size = orgSize;
 
                 return array;

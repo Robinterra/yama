@@ -21,7 +21,7 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
-        public static bool PrintText ( int input )
+        public static bool Print ( string input )
         {
             #defalgo Console,PrintText: = input;
         }
@@ -30,7 +30,7 @@ namespace "System.Runtime"
 
         public static bool PrintLine (  )
         {
-            Console.PrintText ( "\n" );
+            Console.Print ( "\n" );
         }
 
         // -----------------------------------------------
@@ -48,9 +48,37 @@ namespace "System.Runtime"
         /**
          * Read int
          */
-        public static int ReadText (  )
+        public static string ReadText (  )
         {
             #defalgo Console,ReadText:;
+        }
+
+        // -----------------------------------------------
+
+        public static int ReadKey (  )
+        {
+            InputOutput.ExecWith1Arg ( 4, 0, 7 );
+        }
+
+        // -----------------------------------------------
+
+        public static int SetCursorPosition ( int x, int y )
+        {
+            InputOutput.ExecWith2Args ( 1, x, y, 7 );
+        }
+
+        // -----------------------------------------------
+
+        public static int SetBackgroundColor ( int color )
+        {
+            InputOutput.ExecWith1Arg ( 3, color, 7 );
+        }
+
+        // -----------------------------------------------
+
+        public static int SetForegroundColor ( int color )
+        {
+            InputOutput.ExecWith1Arg ( 2, color, 7 );
         }
 
         // -----------------------------------------------

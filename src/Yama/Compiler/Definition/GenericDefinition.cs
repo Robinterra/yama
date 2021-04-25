@@ -375,7 +375,7 @@ namespace Yama.Compiler.Definition
 
                 counter += count;
 
-                if (a.Name != dek.Name) continue;
+                if (a.KeyName != dek.KeyName) continue;
                 if (isset) count = 1;
 
                 counter = counter - count;

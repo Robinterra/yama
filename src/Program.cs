@@ -134,7 +134,7 @@ namespace Yama
             foreach ( ICommandLine command in commands )
             {
                 if (command is FileExpression) runtime.Input = new FileInfo ( command.Value );
-                if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+                if (command is SizeExpression) runtime.MemorySize = Program.ParseSkipExpressionHex(command.Value);
                 if (command is FileExpression && !isfirst) runtime.Arguments.Add(command.Value);
                 if (command is FileExpression && isfirst) isfirst = false;
             }
@@ -157,7 +157,7 @@ namespace Yama
             {
                 if (command is DefinitionExpression) assembler = def.GenerateAssembler ( assembler, command.Value );
                 if (command is FileExpression) request.InputFile = new FileInfo ( command.Value );
-                if (command is SkipExpression) assembler.Position = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+                if (command is SkipExpression) assembler.Position = Program.ParseSkipExpressionHex(command.Value);
                 if (command is OutputFileExpression)
                 {
                     FileInfo file = new FileInfo ( command.Value );
@@ -200,7 +200,7 @@ namespace Yama
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
                 if (command is DefinesExpression) yama.Defines.Add(command.Value);
                 if (command is Print t) Program.CheckPrint ( yama, t );
-                if (command is SkipExpression) yama.StartPosition = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+                if (command is SkipExpression) yama.StartPosition = Program.ParseSkipExpressionHex(command.Value);
                 if (command is StartNamespace) yama.StartNamespace = command.Value;
             }
 
@@ -208,6 +208,20 @@ namespace Yama
             if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary.FullName );
 
             return yama.Compile();
+        }
+
+        // -----------------------------------------------
+
+        private static uint ParseSkipExpressionHex(string value)
+        {
+            if (!uint.TryParse(value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber, null, out uint result))
+            {
+                Console.Error.WriteLine("can not parse hex number from arguments");
+
+                Environment.Exit(1);
+            }
+
+            return result;
         }
 
         // -----------------------------------------------
@@ -264,10 +278,37 @@ namespace Yama
         {
             Program.EnabledCommandLines = new List<ICommandLine> (  );
 
-            Program.EnabledCommandLines.Add ( new CompileExpression (  ) );
-            Program.EnabledCommandLines.Add ( new AssembleExpression (  ) );
-            Program.EnabledCommandLines.Add ( new RunExpression (  ) );
-            Program.EnabledCommandLines.Add ( new DebugExpression (  ) );
+            List<ICommandLine> compileArgs = new List<ICommandLine>();
+            compileArgs.Add( new FileExpression () );
+            compileArgs.Add( new IncludeExpression () );
+            compileArgs.Add( new AssemblerOutputFileExpression () );
+            compileArgs.Add( new OutputFileExpression () );
+            compileArgs.Add( new OptimizingExpression () );
+            compileArgs.Add( new DefinitionExpression () );
+            compileArgs.Add( new DefinesExpression () );
+            compileArgs.Add( new Print () );
+            compileArgs.Add( new SkipExpression () );
+            compileArgs.Add( new StartNamespace () );
+
+            List<ICommandLine> debugArgs = new List<ICommandLine>();
+            debugArgs.Add(new SizeExpression ());
+            debugArgs.Add(new FileExpression ());
+
+            List<ICommandLine> runArgs = new List<ICommandLine>();
+            runArgs.Add(new SizeExpression ());
+            runArgs.Add(new FileExpression ());
+
+            List<ICommandLine> assembleArgs = new List<ICommandLine>();
+            assembleArgs.Add(new SizeExpression ());
+            assembleArgs.Add(new FileExpression ());
+            assembleArgs.Add( new DefinitionExpression () );
+            assembleArgs.Add( new OutputFileExpression () );
+            assembleArgs.Add( new SkipExpression () );
+
+            Program.EnabledCommandLines.Add ( new CompileExpression ( compileArgs ) );
+            Program.EnabledCommandLines.Add ( new AssembleExpression ( assembleArgs ) );
+            Program.EnabledCommandLines.Add ( new RunExpression ( runArgs ) );
+            Program.EnabledCommandLines.Add ( new DebugExpression ( debugArgs ) );
             Program.EnabledCommandLines.Add ( new PrintDefinitionsExpression (  ) );
             Program.EnabledCommandLines.Add ( new AssemblerOutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );

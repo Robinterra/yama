@@ -31,9 +31,9 @@ namespace "System.Collections"
             {
                 if (index > this.size) return 1;
 
-                int clean = 4 + index + this;
+                int clean = 4 + index + this as int;
                 int bits = clean & 0x3;
-                Pointer pointer = clean ^ bits;
+                Pointer pointer = clean ^ bits as Pointer;
 
                 bits = index & 0x3;
 
@@ -48,9 +48,9 @@ namespace "System.Collections"
 
                 invalue = invalue & 0xff;
 
-                int clean = 4 + index + this;
+                int clean = 4 + index + this as int;
                 int bits = clean & 0x3;
-                Pointer pointer = clean ^ bits;
+                Pointer pointer = clean ^ bits as Pointer;
 
                 bits = bits << 0x3;
                 invalue = invalue << bits;
@@ -77,7 +77,7 @@ namespace "System.Collections"
                     size = 4 + (size ^ 0x3);
                 }
 
-                ByteArray array = MemoryManager.Malloc ( size );
+                ByteArray array = MemoryManager.Malloc ( size ) as ByteArray;
                 array.size = orgSize;
 
                 return array;

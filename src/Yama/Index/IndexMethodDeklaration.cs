@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Yama.Lexer;
 using Yama.Parser;
 
@@ -82,15 +83,42 @@ namespace Yama.Index
             get;
             set;
         }
+
+        public string KeyName
+        {
+            get
+            {
+                if (this.NameInText == "main") return "main";
+
+                StringBuilder build = new StringBuilder();
+                foreach (IndexVariabelnDeklaration dek in this.Parameters)
+                {
+                    if (dek.Name == "this") continue;
+
+                    build.AppendFormat("_{0}", dek.Type.Name);
+                }
+
+                string pattern = "{0}_{1}{2}";
+
+                return string.Format(pattern, this.NameInText, this.Parameters.Count, build.ToString());
+            }
+        }
+
         public string AssemblyName
         {
             get
             {
                 if (this.NameInText == "main") return "main";
 
-                string pattern = "{0}_{1}_{2}";
+                StringBuilder build = new StringBuilder();
+                foreach (IndexVariabelnDeklaration dek in this.Parameters)
+                {
+                    build.AppendFormat("_{0}", dek.Type.Name);
+                }
 
-                return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count);
+                string pattern = "{0}_{1}_{2}{3}";
+
+                return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count, build.ToString());
             }
         }
 
@@ -146,7 +174,7 @@ namespace Yama.Index
 
             if (this.Klasse.InheritanceBase == null) return false;
             if (!(this.Klasse.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return false;
-            IMethode parentMethods = dek.Methods.FirstOrDefault(u=>u.Name == this.Name);
+            IMethode parentMethods = dek.Methods.FirstOrDefault(u=>u.KeyName == this.KeyName);
             if (parentMethods == null) return false;
             if (!(parentMethods.Use is MethodeDeclarationNode t)) return false;
             if (t.Equals(this)) return false;

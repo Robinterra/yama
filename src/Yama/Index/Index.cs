@@ -57,13 +57,30 @@ namespace Yama.Index
             get;
             set;
         }
-        public List<FileInfo> AllUseFiles { get; set; }
+
+        public List<FileInfo> AllUseFiles
+        {
+            get;
+            set;
+        }
+
         public List<IndexEnumDeklaration> RegisterEnums
         {
             get;
             set;
         }
-        public IParent CurrentMethode { get; set; }
+
+        public IParent CurrentMethode
+        {
+            get;
+            set;
+        }
+
+        public List<IIndexTypeSafety> IndexTypeSafeties
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
@@ -77,7 +94,12 @@ namespace Yama.Index
             this.Namespaces = new Dictionary<string, IndexNamespaceDeklaration>();
             this.ZuCompilenNodes = new List<IParseTreeNode>();
             this.RegisterEnums = new List<IndexEnumDeklaration>();
+            this.IndexTypeSafeties = new List<IIndexTypeSafety>();
         }
+
+        #endregion ctor
+
+        #region methods
 
         private bool Indezieren()
         {
@@ -103,7 +125,24 @@ namespace Yama.Index
 
             this.MakeAllNamespace();
 
-            return this.Mappen();
+            if (!this.Mappen()) return false;
+
+            if (!this.ExecuteTypeSafties()) return false;
+
+            return true;
+        }
+
+        private bool ExecuteTypeSafties()
+        {
+            RequestTypeSafety request = new RequestTypeSafety();
+            request.Index = this;
+
+            foreach (IIndexTypeSafety indexTypeSafety in this.IndexTypeSafeties)
+            {
+                indexTypeSafety.CheckExecute(request);
+            }
+
+            return this.Errors.Count == 0;
         }
 
         public IndexNamespaceDeklaration NamespaceAdd(IndexNamespaceDeklaration dek)
@@ -151,6 +190,22 @@ namespace Yama.Index
             }
 
             return true;
+        }
+
+        public string GetTypeName(IndexVariabelnReference reference)
+        {
+            if (reference == null) return string.Empty;
+            if (reference.ParentCall != null) return this.GetTypeName(reference.ParentCall);
+
+            if (reference.Deklaration is IndexKlassenDeklaration t) return t.Name;
+            if (reference.Deklaration is IndexVariabelnDeklaration vd) return vd.Type.Name;
+            if (reference.Deklaration is IndexPropertyGetSetDeklaration pgsd) return pgsd.ReturnValue.Name;
+            if (reference.Deklaration is IndexVektorDeklaration ved) return ved.ReturnValue.Name;
+            if (reference.Deklaration is IndexMethodDeklaration md) return md.ReturnValue.Name;
+            if (reference.Deklaration is IndexPropertyDeklaration pd) return pd.Type.Name;
+            if (reference.Deklaration is IndexEnumEntryDeklaration) return "int";
+
+            return string.Empty;
         }
 
         private bool Mappen()
@@ -223,7 +278,7 @@ namespace Yama.Index
             return true;
         }
 
-        #endregion ctor
+        #endregion methods
 
     }
 

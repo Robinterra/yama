@@ -33,6 +33,14 @@ namespace Yama.Index
             set;
         }
 
+        public string KeyName
+        {
+            get
+            {
+                return this.Name;
+            }
+        }
+
         public MethodeType Type
         {
             get;
