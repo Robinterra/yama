@@ -183,7 +183,7 @@ namespace Yama.Assembler
             definition.Commands.Add(new CommandData());
             definition.Commands.Add(new CommandWord());
             definition.Commands.Add(new CommandSpace());
-            definition.Commands.Add(new CommandDataList());
+            definition.Commands.Add(new CommandDataList(0));
 
             return true;
         }
@@ -395,13 +395,14 @@ namespace Yama.Assembler
             definition.Commands.Add(new CommandJumpPoint("ble", "Format3", 0x32, 4, 0x1FFFF, 6));
 
             definition.Commands.Add(new CommandData());
-            definition.Commands.Add(new CommandDataList());
+            definition.Commands.Add(new CommandDataList(4));
 
             return true;
         }
         // -----------------------------------------------
         private Assembler GenerateRuntime(Assembler assembler)
         {
+            assembler.DataAddition = 4;
             assembler.Definition = new AssemblerDefinition();
             assembler.Definition.ProgramCounterIncress = 4;
             assembler.Definition.CommandEntitySize = 4;

@@ -75,6 +75,14 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
+        public uint DataAddition
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public List<ICommand> Sequence
         {
             get;
@@ -277,7 +285,7 @@ namespace Yama.Assembler
                     continue;
                 }
 
-                if (node is DataNode) this.Mappen(node.Token.Text, this.Position + 4);
+                if (node is DataNode) this.Mappen(node.Token.Text, this.Position + this.DataAddition);
 
                 ICommand command = this.Identify(node);
                 if (command == null)
@@ -306,7 +314,7 @@ namespace Yama.Assembler
                     continue;
                 }
 
-                if (node is DataNode) this.Mappen(node.Token.Text, this.Position + 4);
+                if (node is DataNode) this.Mappen(node.Token.Text, this.Position + this.DataAddition);
 
                 ICommand command = this.Identify(node);
                 if (command == null)

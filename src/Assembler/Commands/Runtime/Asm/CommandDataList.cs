@@ -49,13 +49,19 @@ namespace Yama.Assembler.Runtime
         }
         public uint Condition { get; set; }
 
+        public int Subtraction
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public CommandDataList()
+        public CommandDataList(int subtraction)
         {
-
+            this.Subtraction = subtraction;
         }
 
         public CommandDataList(CommandDataList t, IParseTreeNode node, List<byte> bytes)
@@ -81,7 +87,7 @@ namespace Yama.Assembler.Runtime
                 JumpPointMapper map = request.Assembler.GetJumpPoint(token.Text);
                 uint target = 4;
                 if (map != null) target = map.Adresse;
-                daten.AddRange(BitConverter.GetBytes(target - 4));
+                daten.AddRange(BitConverter.GetBytes(target - this.Subtraction));
             }
 
             if (request.WithMapper) request.Result.Add(new CommandDataList(this, request.Node, daten));
