@@ -47,7 +47,12 @@ namespace Yama.Assembler.Runtime
             get;
             set;
         }
-        public uint Condition { get; set; }
+
+        public uint Condition
+        {
+            get;
+            set;
+        }
 
         public int Subtraction
         {
@@ -64,7 +69,7 @@ namespace Yama.Assembler.Runtime
             this.Subtraction = subtraction;
         }
 
-        public CommandDataList(CommandDataList t, IParseTreeNode node, List<byte> bytes)
+        public CommandDataList(CommandDataList t, IParseTreeNode node, List<byte> bytes, int subtraction)
         {
             this.Key = t.Key;
             this.Format = t.Format;
@@ -72,6 +77,7 @@ namespace Yama.Assembler.Runtime
             this.Size = t.Size;
             this.Node = node;
             this.Data = bytes.ToArray();
+            this.Subtraction = subtraction;
         }
 
         #endregion ctor
@@ -90,7 +96,7 @@ namespace Yama.Assembler.Runtime
                 daten.AddRange(BitConverter.GetBytes(target - this.Subtraction));
             }
 
-            if (request.WithMapper) request.Result.Add(new CommandDataList(this, request.Node, daten));
+            if (request.WithMapper) request.Result.Add(new CommandDataList(this, request.Node, daten, this.Subtraction));
             request.Stream.Write(daten.ToArray());
 
             return true;

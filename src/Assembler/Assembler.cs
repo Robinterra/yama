@@ -285,7 +285,8 @@ namespace Yama.Assembler
                     continue;
                 }
 
-                if (node is DataNode) this.Mappen(node.Token.Text, this.Position + this.DataAddition);
+                if (node is DataNode)
+                    this.Mappen(node.Token.Text, this.Position + this.DataAddition);
 
                 ICommand command = this.Identify(node);
                 if (command == null)
@@ -314,7 +315,8 @@ namespace Yama.Assembler
                     continue;
                 }
 
-                if (node is DataNode) this.Mappen(node.Token.Text, this.Position + this.DataAddition);
+                if (node is DataNode)
+                    this.Mappen(node.Token.Text, this.Position + this.DataAddition);
 
                 ICommand command = this.Identify(node);
                 if (command == null)
