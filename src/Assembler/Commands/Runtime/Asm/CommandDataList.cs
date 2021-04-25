@@ -54,7 +54,7 @@ namespace Yama.Assembler.Runtime
             set;
         }
 
-        public int Subtraction
+        public uint Subtraction
         {
             get;
             set;
@@ -64,12 +64,12 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public CommandDataList(int subtraction)
+        public CommandDataList(uint subtraction)
         {
             this.Subtraction = subtraction;
         }
 
-        public CommandDataList(CommandDataList t, IParseTreeNode node, List<byte> bytes, int subtraction)
+        public CommandDataList(CommandDataList t, IParseTreeNode node, List<byte> bytes, uint subtraction)
         {
             this.Key = t.Key;
             this.Format = t.Format;
