@@ -6,18 +6,8 @@ namespace Yama.Assembler
 {
     public class CommandCompilerMap
     {
-        public CommandCompilerMap(ICommand command, IParseTreeNode node)
-        {
-            this.Command = command;
-            this.Node = node;
-        }
 
-        public CommandCompilerMap(ICommand command, IParseTreeNode node, AssemblerCompilerMap map)
-        {
-            this.Command = command;
-            this.Node = node;
-            this.Map = map;
-        }
+        #region get/set
 
         public ICommand Command
         {
@@ -36,5 +26,32 @@ namespace Yama.Assembler
             get;
             set;
         }
+
+        public int Size
+        {
+            get;
+            set;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public CommandCompilerMap(ICommand command, IParseTreeNode node, int size)
+        {
+            this.Command = command;
+            this.Node = node;
+            this.Size = size;
+        }
+
+        public CommandCompilerMap(ICommand command, IParseTreeNode node, AssemblerCompilerMap map, int size)
+        {
+            this.Command = command;
+            this.Node = node;
+            this.Map = map;
+            this.Size = size;
+        }
+
+        #endregion ctor
     }
 }

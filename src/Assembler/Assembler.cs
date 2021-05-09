@@ -83,6 +83,14 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
+        public bool IsOptimizeActive
+        {
+            get;
+            set;
+        } = true;
+
+        // -----------------------------------------------
+
         public List<ICommand> Sequence
         {
             get;
@@ -267,7 +275,7 @@ namespace Yama.Assembler
             {
                 if (!this.AssembleStep(assmblepair, startposition)) return false;
 
-                startposition += (uint)assmblepair.Command.Size;
+                startposition += (uint)assmblepair.Size;
             }
 
             return this.Errors.Count == 0;
@@ -288,16 +296,18 @@ namespace Yama.Assembler
                 if (node is DataNode)
                     this.Mappen(node.Token.Text, this.Position + this.DataAddition);
 
-                ICommand command = this.Identify(node);
+                RequestIdentify request = new RequestIdentify(node, this);
+
+                ICommand command = this.Identify(request);
                 if (command == null)
                 {
                     this.Errors.Add(node);
 
                     continue;
                 }
-                this.Position += (uint)command.Size;
+                this.Position += (uint)request.Size;
 
-                maptranslate.Add(new CommandCompilerMap(command, node));
+                maptranslate.Add(new CommandCompilerMap(command, node, request.Size));
             }
 
             return true;
@@ -318,16 +328,18 @@ namespace Yama.Assembler
                 if (node is DataNode)
                     this.Mappen(node.Token.Text, this.Position + this.DataAddition);
 
-                ICommand command = this.Identify(node);
+                RequestIdentify request = new RequestIdentify(node, this);
+
+                ICommand command = this.Identify(request);
                 if (command == null)
                 {
                     this.Errors.Add(node);
 
                     continue;
                 }
-                this.Position += (uint)command.Size;
+                this.Position += (uint)request.Size;
 
-                maptranslate.Add(new CommandCompilerMap(command, node, map));
+                maptranslate.Add(new CommandCompilerMap(command, node, map, request.Size));
             }
 
             return true;
@@ -348,17 +360,15 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        private ICommand Identify(IParseTreeNode node)
+        private ICommand Identify(RequestIdentify request)
         {
-            RequestIdentify request = new RequestIdentify();
-            request.Node = node;
-            request.Assembler = this;
-
             if (this.Definition == null) return null;
 
             foreach (ICommand command in this.Definition.Commands)
             {
                 if (!command.Identify(request)) continue;
+
+                if (request.Size == -1) request.Size = command.Size;
 
                 return command;
             }
@@ -377,14 +387,14 @@ namespace Yama.Assembler
             request.WithMapper = true;
             request.Position = position;
 
-            if (assmblepair.Command.Assemble(request))
+            if (!assmblepair.Command.Assemble(request))
             {
-                this.Sequence.AddRange(request.Result);
+                this.Errors.Add(request.Node);
 
                 return true;
             }
 
-            this.Errors.Add(request.Node);
+            this.Sequence.AddRange(request.Result);
 
             return true;
         }

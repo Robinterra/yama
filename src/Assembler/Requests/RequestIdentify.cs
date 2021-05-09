@@ -4,6 +4,9 @@ namespace Yama.Assembler
 {
     public class RequestIdentify
     {
+
+        #region get/set
+
         public Assembler Assembler
         {
             get;
@@ -19,5 +22,24 @@ namespace Yama.Assembler
             get;
             set;
         }
+
+        public int Size
+        {
+            get;
+            set;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public RequestIdentify ( IParseTreeNode node, Assembler assembler )
+        {
+            this.Size = -1;
+            this.Node = node;
+            this.Assembler = assembler;
+        }
+
+        #endregion ctor
     }
 }

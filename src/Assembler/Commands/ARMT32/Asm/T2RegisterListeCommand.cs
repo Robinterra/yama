@@ -77,6 +77,7 @@ namespace Yama.Assembler.ARMT32
         {
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
             if (!(request.Node is CommandWithList t)) return false;
+            if (t.Arguments.Count == 0) return request.Assembler.IsOptimizeActive;
 
             IFormat format = request.Assembler.GetFormat(this.Format);
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
@@ -105,7 +106,11 @@ namespace Yama.Assembler.ARMT32
         {
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
             if (!(request.Node is CommandWithList t)) return false;
-            if (t.Arguments.Count == 0) return false;
+            if (t.Arguments.Count == 0)
+            {
+                request.Size = 0;
+                if (!request.Assembler.IsOptimizeActive) return false;
+            }
 
             foreach (Lexer.IdentifierToken token in t.Arguments)
             {
