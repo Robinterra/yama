@@ -175,6 +175,9 @@ namespace Yama.Parser
 
                 if (rct.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsd)
                     if (pgsd.Type == MethodeType.VektorStatic) return true;
+
+                if (rct.Reference.Deklaration is IndexPropertyDeklaration klu)
+                    if (klu.Zusatz == MethodeType.Static) return true;
             }
 
             return this.LeftNode.Compile(new Request.RequestParserTreeCompile(compiler, "default"));

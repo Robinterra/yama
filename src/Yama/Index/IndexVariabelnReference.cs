@@ -100,6 +100,7 @@ namespace Yama.Index
             get
             {
                 if (this.Deklaration is IndexMethodDeklaration t) return t.AssemblyName;
+                if (this.Deklaration is IndexPropertyDeklaration pd) return pd.AssemblyName;
                 //if (this.Deklaration is IndexPropertyGetSetDeklaration pgsd) return pgsd.AssemblyName;
 
                 return this.Deklaration.Name;
@@ -258,12 +259,12 @@ namespace Yama.Index
             if (md != null) { md.References.Add(this); return md; }
             md = kd.Operators.FirstOrDefault(t=>t.Name == this.Name);
             if (md != null) { md.References.Add(this); return md; }
-            IndexPropertyDeklaration pd = kd.IndexProperties.FirstOrDefault(t=>t.Name == this.Name);
+            IndexPropertyDeklaration pd = kd.IndexStaticProperties.FirstOrDefault(t=>t.Name == this.Name);
             if (pd == null) return null;
 
-            if (pd.Zusatz == MethodeType.Static) { pd.References.Add(this); return pd; }
+            pd.References.Add(this);
 
-            return null;
+            return pd;
         }
 
         private IParent GetEnumFound(IndexEnumDeklaration kd)

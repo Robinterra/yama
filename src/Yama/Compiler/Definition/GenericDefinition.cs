@@ -481,6 +481,13 @@ namespace Yama.Compiler.Definition
 
             if (!(query.Value is IndexPropertyDeklaration dek)) return null;
 
+            if (dek.Zusatz == MethodeType.Static)
+            {
+                result.Add( string.Format(keypattern, 0), string.Format(keyPattern.Pattern, 0) );
+
+                return result;
+            }
+
             if (dek.Klasse.IsMethodsReferenceMode) counter += 1;
 
             foreach (IParent a in dek.Klasse.IndexProperties)

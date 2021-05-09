@@ -125,6 +125,16 @@ namespace Yama.Parser
                 if (request.Mode == "setvektorcall") moderesult = "setpoint";
             }
 
+            if (this.Reference.Deklaration is IndexPropertyDeklaration k)
+            {
+                if (k.Zusatz == MethodeType.Static)
+                {
+                    CompileReferenceCall refCall = new CompileReferenceCall();
+
+                    refCall.Compile(request.Compiler, this, "methode");
+                }
+            }
+
             request.Compiler.LastVariableCall = this.Token.Text;
 
             CompileReferenceCall compileReference = new CompileReferenceCall();
