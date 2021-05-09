@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
@@ -22,6 +24,12 @@ namespace Yama.Parser
             {
                 return new List<IParseTreeNode> (  );
             }
+        }
+
+        public string Tag
+        {
+            get;
+            set;
         }
 
         public CompileRegionAsm RegionAsm
@@ -48,6 +56,19 @@ namespace Yama.Parser
             ConditionalCompilationNode node = new ConditionalCompilationNode { Token = request.Token };
 
             node.Token.Node = node;
+
+            if (!node.Token.Text.Contains("#tag")) return node;
+
+            request.Parser.MethodTag.Add ( node );
+
+            MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(node.Token.Text));
+            Lexer.Lexer lexer = new Lexer.Lexer(stream);
+            lexer.LexerTokens.Add(new Lexer.Text(new ZeichenKette("("), new ZeichenKette(")"), null));
+
+            IdentifierToken token = lexer.NextFindMatch();
+            if (token == null) return null;
+
+            node.Tag = token.Value.ToString();
 
             return node;
         }

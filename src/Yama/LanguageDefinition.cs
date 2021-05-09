@@ -312,6 +312,7 @@ namespace Yama
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#defalgo" ), new ZeichenKette ( ":" ) ) );
             rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#region asm" ), new ZeichenKette ( "#endregion asm" ) ) );
+            rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#tag" ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new ConditionalCompilationToken ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new Operator ( new ZeichenKette ( "∑" ), new ZeichenKette ( "<=" ), new ZeichenKette ( "--" ), new ZeichenKette ( "++" ), new ZeichenKette ( "<>" ), new ZeichenKette ( ">=" ), new ZeichenKette ( "<<" ), new ZeichenKette ( ">>" ), new ZeichenKette ( "<" ), new ZeichenKette ( ">" ), new ZeichenKette ( "^^" ), new ZeichenKette ( "+" ), new ZeichenKette ( "-" ), new ZeichenKette ( "*" ), new ZeichenKette ( "/"), new ZeichenKette ( "%" ), new ZeichenKette ( "&&" ), new ZeichenKette ( "||" ), new ZeichenKette ( "&" ), new ZeichenKette ( "|" ), new ZeichenKette ( "==" ), new ZeichenKette ( "=" ), new ZeichenKette ( "!=" ), new ZeichenKette ( "!" ), new ZeichenKette ( "^"), new ZeichenKette ( "~" ), new ZeichenKette ( "√" ), new ZeichenKette ( "?" ) ) );
             rules.Add ( new Digit (  ) );

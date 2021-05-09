@@ -1,6 +1,7 @@
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace Yama.Lexer
 {
@@ -132,6 +133,8 @@ namespace Yama.Lexer
 
             foreach ( ILexerToken lexerToken in this.LexerTokens )
             {
+                if (lexerToken == null) continue;
+
                 IdentifierToken result = this.ExecuteLexerToken ( lexerToken );
 
                 if (result == null) continue;
@@ -146,6 +149,20 @@ namespace Yama.Lexer
             this.NextByte (  );
 
             return UnknownToken;
+        }
+
+        // -----------------------------------------------
+
+        public IdentifierToken NextFindMatch()
+        {
+            foreach (IdentifierToken token in this)
+            {
+                if (token.Kind == IdentifierKind.Unknown) continue;
+
+                return token;
+            }
+
+            return null;
         }
 
         // -----------------------------------------------

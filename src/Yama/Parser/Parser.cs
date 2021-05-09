@@ -171,6 +171,14 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
+        public List<IParseTreeNode> MethodTag
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -182,6 +190,7 @@ namespace Yama.Parser
         private Parser ( List<ParserLayer> layers, Lexer.Lexer lexer )
         {
             this.SyntaxErrors = new List<IdentifierToken> (  );
+            this.MethodTag = new List<IParseTreeNode> (  );
             this.ParserLayers = layers;
             this.Tokenizer = lexer;
         }
@@ -352,6 +361,17 @@ namespace Yama.Parser
             this.possibleParents = possibleParentsTemp;
 
             return nodeParents;
+        }
+
+        // -----------------------------------------------
+
+        public List<IParseTreeNode> PopMethodTag()
+        {
+            List<IParseTreeNode> result = this.MethodTag;
+
+            this.MethodTag = new List<IParseTreeNode>();
+
+            return result;
         }
 
         // -----------------------------------------------

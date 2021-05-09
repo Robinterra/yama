@@ -128,7 +128,8 @@ namespace Yama.Parser
 
         public IndexVariabelnReference MallocFree
         {
-            get;set;
+            get;
+            set;
         } = new IndexVariabelnReference
             {
                 Name = "MemoryManager",
@@ -137,6 +138,12 @@ namespace Yama.Parser
                     Name = "Free"
                 }
             };
+
+        public List<IParseTreeNode> Tags
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
@@ -289,6 +296,8 @@ namespace Yama.Parser
             deklaration.Statement = request.Parser.ParseCleanToken(Statementchild, this.layer);
 
             if (deklaration.Statement == null) return null;
+
+            deklaration.Tags = request.Parser.PopMethodTag (  );
 
             return this.CleanUp(deklaration);
         }
