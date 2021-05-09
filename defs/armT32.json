@@ -137,7 +137,7 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "mov r11, pc",
+          "mov lr, pc",
           "mov pc, [SSAPOP[0]]"
         ]
       },
@@ -243,6 +243,7 @@
         "AssemblyCommands": [
           "[NAME]:",
           "mov r1, sp",
+          "mov r11, lr",
           "push {[PUSHREG]r11}"
         ]
       },

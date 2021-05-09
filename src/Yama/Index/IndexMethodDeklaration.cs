@@ -175,6 +175,8 @@ namespace Yama.Index
 
             foreach (IndexVariabelnReference reference in this.References)
             {
+                if (reference == null) return true;
+
                 if (reference.IsOwnerInUse(depth)) return true;
             }
 
