@@ -293,8 +293,14 @@ namespace Yama.Parser
             IndexPropertyDeklaration deklaration = new IndexPropertyDeklaration();
             deklaration.Use = this;
             deklaration.Name = this.Token.Text;
+            deklaration.Zusatz = MethodeType.Property;
             deklaration.Type = new IndexVariabelnReference { Name = this.TypeDefinition.Text, Use = this };
             this.Deklaration = deklaration;
+
+            if (this.ZusatzDefinition != null)
+            {
+                if (this.ZusatzDefinition.Kind == IdentifierKind.Static) deklaration.Zusatz = MethodeType.Static;
+            }
 
             AccessModify access = AccessModify.Private;
             if (this.AccessDefinition != null) if (this.AccessDefinition.Kind == IdentifierKind.Public) access = AccessModify.Public;
@@ -312,6 +318,13 @@ namespace Yama.Parser
 
         private bool AddMethode(IndexKlassenDeklaration klasse, IndexPropertyDeklaration deklaration)
         {
+            if (deklaration.Zusatz == MethodeType.Static)
+            {
+                klasse.IndexStaticProperties.Add(deklaration);
+
+                return true;
+            }
+
             klasse.IndexProperties.Add(deklaration);
 
             return true;
@@ -319,6 +332,14 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.Deklaration.Zusatz != MethodeType.Static) return true;
+
+            CompileData compile = new CompileData();
+            compile.JumpPointName = this.Deklaration.AssemblyName;
+            compile.Data = new DataObject();
+            compile.Data.Mode = DataMode.Int;
+            compile.Compile(request.Compiler, this);
+
             return true;
         }
 

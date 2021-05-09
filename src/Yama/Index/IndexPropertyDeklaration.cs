@@ -26,6 +26,16 @@ namespace Yama.Index
             set;
         }
 
+        public string AssemblyName
+        {
+            get
+            {
+                string pattern = "{0}_{1}_StaticProperty";
+
+                return string.Format(pattern, this.Klasse.Name, this.Name);
+            }
+        }
+
         public MethodeType Zusatz
         {
             get;
@@ -55,7 +65,12 @@ namespace Yama.Index
             get;
             set;
         }
-        public IParseTreeNode Use { get; set; }
+
+        public IParseTreeNode Use
+        {
+            get;
+            set;
+        }
 
         private IndexVariabelnDeklaration Value
         {
@@ -100,9 +115,18 @@ namespace Yama.Index
             }
         }
 
-        public ValidUses ParentUsesSet { get;
-        set; }
-        public IndexKlassenDeklaration Klasse { get; set; }
+        public ValidUses ParentUsesSet
+        {
+            get;
+            set;
+        }
+
+        public IndexKlassenDeklaration Klasse
+        {
+            get;
+            set;
+        }
+
         public bool IsMapped
         {
             get;
@@ -135,7 +159,6 @@ namespace Yama.Index
             return this.IsMapped = true;
         }
 
-        
         public bool IsInUse (int depth)
         {
             if (depth > 10) return true;

@@ -18,6 +18,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public int IntValue
+        {
+            get;
+            set;
+        }
+
         public string Text
         {
             get;
@@ -26,6 +32,7 @@ namespace Yama.Compiler
 
         public string GetData()
         {
+            if (this.Mode == DataMode.Int) return string.Format("0x{0:x}", this.IntValue);
             if (this.Mode == DataMode.Text) return this.Text;
             if (this.Mode != DataMode.JumpPointListe) return null;
 
@@ -48,6 +55,7 @@ namespace Yama.Compiler
     {
         None,
         Text,
-        JumpPointListe
+        JumpPointListe,
+        Int
     }
 }

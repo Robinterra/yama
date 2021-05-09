@@ -318,6 +318,13 @@ namespace Yama.Parser
                 m.Use.Compile(request);
             }
 
+            foreach(IndexPropertyDeklaration m in this.Deklaration.IndexStaticProperties)
+            {
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
+
+                m.Use.Compile(request);
+            }
+
             foreach(IndexMethodDeklaration m in this.Deklaration.Ctors)
             {
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
