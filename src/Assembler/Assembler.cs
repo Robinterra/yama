@@ -275,7 +275,7 @@ namespace Yama.Assembler
             {
                 if (!this.AssembleStep(assmblepair, startposition)) return false;
 
-                startposition += (uint)assmblepair.Command.Size;
+                startposition += (uint)assmblepair.Size;
             }
 
             return this.Errors.Count == 0;
@@ -387,14 +387,14 @@ namespace Yama.Assembler
             request.WithMapper = true;
             request.Position = position;
 
-            if (assmblepair.Command.Assemble(request))
+            if (!assmblepair.Command.Assemble(request))
             {
-                this.Sequence.AddRange(request.Result);
+                this.Errors.Add(request.Node);
 
                 return true;
             }
 
-            this.Errors.Add(request.Node);
+            this.Sequence.AddRange(request.Result);
 
             return true;
         }

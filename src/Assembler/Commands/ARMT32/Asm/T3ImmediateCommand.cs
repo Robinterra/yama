@@ -80,7 +80,7 @@ namespace Yama.Assembler.ARMT32
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument2.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
-            if (this.CanBeIgnore(t, request)) return true;
+            if (this.CanBeIgnore(t, request.Assembler)) return true;
 
             IFormat format = request.Assembler.GetFormat(this.Format);
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
@@ -98,9 +98,9 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
-        private bool CanBeIgnore(CommandWith3ArgsNode t, RequestAssembleCommand request)
+        private bool CanBeIgnore(CommandWith3ArgsNode t, Assembler assembler)
         {
-            if (!request.Assembler.IsOptimizeActive) return false;
+            if (!assembler.IsOptimizeActive) return false;
             if ((int)t.Argument2.Token.Value != 0) return false;
             if (t.Argument0.Token.Value.ToString() != t.Argument1.Token.Value.ToString()) return false;
             if (!this.IsKeyValid()) return false;
@@ -116,10 +116,7 @@ namespace Yama.Assembler.ARMT32
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument2.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
-            if (!request.Assembler.IsOptimizeActive) return true;
-            if ((int)t.Argument2.Token.Value != 0) return true;
-            if (t.Argument0.Token.Value.ToString() != t.Argument1.Token.Value.ToString()) return true;
-            if (!this.IsKeyValid()) return true;
+            if (!this.CanBeIgnore(t, request.Assembler)) return true;
 
             request.Size = 0;
 
