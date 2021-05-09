@@ -74,6 +74,7 @@ namespace Yama.Assembler.Runtime
         public bool Assemble(RequestAssembleCommand request)
         {
             if (!(request.Node is DataNode t)) return false;
+            if (t.Data.Kind == Lexer.IdentifierKind.NumberToken) return this.AssembleNumberData(request);
 
             List<byte> daten = new List<byte>();
             byte[] data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
@@ -101,10 +102,50 @@ namespace Yama.Assembler.Runtime
             return true;
         }
 
+        private bool AssembleNumberData(RequestAssembleCommand request)
+        {
+            if (!(request.Node is DataNode t)) return false;
+
+            List<byte> daten = new List<byte>();
+
+            this.Size = 4;
+
+            uint datenValue = this.GetDatenValue(request, t);
+
+            byte[] data = BitConverter.GetBytes(datenValue);
+
+            daten.AddRange(data);
+
+            if (request.WithMapper) request.Result.Add(new CommandData(this, request.Node, daten));
+            request.Stream.Write(daten.ToArray());
+
+            return true;
+        }
+
+        private uint GetDatenValue(RequestAssembleCommand request, DataNode t)
+        {
+            if (t.Data.Kind == Lexer.IdentifierKind.NumberToken) return Convert.ToUInt32(t.Data.Value);
+            if (t.Data.Kind != Lexer.IdentifierKind.Word) return 0;
+
+            JumpPointMapper map = request.Assembler.GetJumpPoint(t.Data.Value.ToString());
+            if (map != null) return map.Adresse;
+
+            request.Assembler.Errors.Add(request.Node);
+
+            return 0;
+        }
+
         public bool Identify(RequestIdentify request)
         {
             if (!(request.Node is DataNode t)) return false;
             if (t.SupportTokens[0].Text != ".data") return false;
+            if (t.Data.Kind == Lexer.IdentifierKind.NumberToken)
+            {
+                this.Size = 4;
+                request.IsData = true;
+
+                return true;
+            }
 
             byte[] data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
 

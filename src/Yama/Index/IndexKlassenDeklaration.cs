@@ -47,6 +47,12 @@ namespace Yama.Index
             set;
         }
 
+        public List<IndexPropertyDeklaration> IndexStaticProperties
+        {
+            get;
+            set;
+        }
+
         public List<IndexMethodDeklaration> DeCtors
         {
             get;
@@ -105,8 +111,11 @@ namespace Yama.Index
             }
         }
 
-        public ValidUses ParentUsesSet { get;
-        set; }
+        public ValidUses ParentUsesSet
+        {
+            get;
+            set;
+        }
 
         public bool IsMethodsReferenceMode
         {
@@ -193,6 +202,7 @@ namespace Yama.Index
             this.Operators = new List<IndexMethodDeklaration>();
             this.IndexProperties = new List<IndexPropertyDeklaration>();
             this.StaticMethods = new List<IMethode>();
+            this.IndexStaticProperties = new List<IndexPropertyDeklaration>();
         }
 
         #endregion ctor
@@ -248,6 +258,7 @@ namespace Yama.Index
             this.PreviusMethodeMappen(this.Ctors, this.ThisUses);
             this.PreviusMethodeMappen(this.DeCtors, this.ThisUses);
             this.PreviusPropertyMappen(this.IndexProperties, this.ThisUses);
+            this.PreviusPropertyMappen(this.IndexStaticProperties, this.ParentUsesSet);
 
             return true;
         }
@@ -269,6 +280,7 @@ namespace Yama.Index
             this.MethodeMappen(this.Ctors, this.ThisUses);
             this.MethodeMappen(this.DeCtors, this.ThisUses);
             this.PropertyMappen(this.IndexProperties, this.ThisUses);
+            this.PropertyMappen(this.IndexStaticProperties, this.ParentUsesSet);
 
             return this.IsMapped = true;
         }

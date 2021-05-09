@@ -60,6 +60,7 @@ namespace Yama.Assembler.ARMT32
 
             token = request.Parser.Peek(token, 1);
             if (token.Kind == IdentifierKind.Text) node.Data = token;
+            else if (token.Kind == IdentifierKind.NumberToken) node.Data = token;
             else if (!this.TryParseList(request.Parser, token, node)) return null;
 
             return this.CleanUp(node);
