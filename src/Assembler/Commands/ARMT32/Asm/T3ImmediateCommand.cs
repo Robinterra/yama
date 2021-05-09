@@ -80,6 +80,7 @@ namespace Yama.Assembler.ARMT32
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument2.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
+            if (this.CanBeIgnore(t, request)) return true;
 
             IFormat format = request.Assembler.GetFormat(this.Format);
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
@@ -97,6 +98,16 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
+        private bool CanBeIgnore(CommandWith3ArgsNode t, RequestAssembleCommand request)
+        {
+            if (!request.Assembler.IsOptimizeActive) return false;
+            if ((int)t.Argument2.Token.Value != 0) return false;
+            if (t.Argument0.Token.Value.ToString() != t.Argument1.Token.Value.ToString()) return false;
+            if (!this.IsKeyValid()) return false;
+
+            return true;
+        }
+
         public bool Identify(RequestIdentify request)
         {
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
@@ -105,7 +116,22 @@ namespace Yama.Assembler.ARMT32
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument2.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
+            if (!request.Assembler.IsOptimizeActive) return true;
+            if ((int)t.Argument2.Token.Value != 0) return true;
+            if (t.Argument0.Token.Value.ToString() != t.Argument1.Token.Value.ToString()) return true;
+            if (!this.IsKeyValid()) return true;
+
+            request.Size = 0;
+
             return true;
+        }
+
+        private bool IsKeyValid()
+        {
+            if (this.Key == "add") return true;
+            if (this.Key == "sub") return true;
+
+            return false;
         }
 
         public bool DisAssemble(RequestDisAssembleCommand request)
