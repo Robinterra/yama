@@ -17,6 +17,12 @@ namespace Yama.Index
             get;
         }
 
+        List<string> Tags
+        {
+            get;
+            set;
+        }
+
         IndexKlassenDeklaration Klasse
         {
             get;

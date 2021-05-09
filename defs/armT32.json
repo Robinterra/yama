@@ -368,6 +368,12 @@
           {
             "Name":"[SPBEGIN]",
             "Values": null
+          },
+          {
+            "Name":"[METHODTAG]",
+            "Values":[
+              "InterruptSysTick"
+            ]
           }
         ],
         "PostKeys": [],
@@ -376,7 +382,9 @@
           ".thumb",
           ".word [SPBEGIN]",
           ".word __start",
-          ".space 0xe4",
+          ".space 0x34",
+          ".word [InterruptSysTick]",
+          ".space 0xaC",
           "__start:",
           "ldr r12,*RAMENDE",
           "ldr r10,*RAMBEGIN",

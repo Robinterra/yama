@@ -88,6 +88,12 @@ namespace Yama.Index
             }
         }
 
+        public List<string> Tags
+        {
+            get;
+            set;
+        } = new List<string>();
+
         public ValidUses SetUses
         {
             get

@@ -275,8 +275,45 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[PROPERTY]") return this.PropertyQuery(query);
             if (query.Key.Name == "[NAMEDATACALL]") return this.NameCallQuery(query);
             if (query.Key.Name == "[DATACONTAINER]") return this.DataContainerQuery(query);
+            if (query.Key.Name == "[METHODTAG]") return this.MethodTag(query);
 
             return this.MakeAdvanedKeyReplaces(query);
+        }
+
+        private Dictionary<string, string> MethodTag(IRegisterQuery query)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+
+            foreach (string tag in query.Key.Values)
+            {
+
+                this.MethodTagOneIteration(tag, result, query.Uses.Deklarationen);
+
+            }
+
+            return result;
+        }
+
+        private bool MethodTagOneIteration(string tag, Dictionary<string, string> result, List<IParent> parents)
+        {
+            string patternKey = "[{0}]";
+
+            foreach (IParent parent in parents)
+            {
+                if (!(parent is IndexKlassenDeklaration kd)) continue;
+
+                IMethode md = kd.StaticMethods.Find(t=>t.Tags.Contains(tag));
+                if (!(md is IndexMethodDeklaration imd)) continue;
+
+                result.Add(string.Format(patternKey, tag), imd.AssemblyName);
+                imd.References.Add(null);
+
+                return true;
+            }
+
+            result.Add(string.Format(patternKey, tag), "0x0");
+
+            return true;
         }
 
         // -----------------------------------------------

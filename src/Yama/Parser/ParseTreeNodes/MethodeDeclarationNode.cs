@@ -362,6 +362,7 @@ namespace Yama.Parser
             if (!(request.Parent is IndexKlassenDeklaration klasse)) return request.Index.CreateError(this);
 
             IndexMethodDeklaration deklaration = new IndexMethodDeklaration();
+            this.MakeTags(deklaration);
             deklaration.Use = this;
             deklaration.Name = this.Token.Text;
             deklaration.ReturnValue = this.GetReturnValueIndex(klasse);
@@ -406,6 +407,20 @@ namespace Yama.Parser
             this.AddMethode(klasse, deklaration);
 
             this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, container));
+
+            return true;
+        }
+
+        private bool MakeTags(IndexMethodDeklaration deklaration)
+        {
+            if (this.Tags == null) return true;
+
+            foreach (IParseTreeNode node in this.Tags)
+            {
+                if (!(node is ConditionalCompilationNode ccn)) continue;
+
+                deklaration.Tags.Add(ccn.Tag);
+            }
 
             return true;
         }

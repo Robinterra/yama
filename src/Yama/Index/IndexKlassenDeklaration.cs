@@ -70,7 +70,7 @@ namespace Yama.Index
             get;
             set;
         }
-        
+
         //public List<IndexVektorDeklaration> VektorDeclaration { get; set; }
 
         private ValidUses thisUses;
