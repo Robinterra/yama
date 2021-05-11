@@ -197,6 +197,7 @@ namespace Yama.Compiler
             if (this.Algo == null) return false;
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+            //if (map.Calls.Count == 0) return true;
             //SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
 
             SSACompileLine lineset = new SSACompileLine(this);
@@ -308,7 +309,8 @@ namespace Yama.Compiler
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[deklaration.Name];
 
-            if (map.Reference == null) return compiler.AddError("variable is not set!", deklaration.Use);
+            if (map.Reference == null)
+                return compiler.AddError("variable is not set!", deklaration.Use);
 
             SSACompileArgument arg = new SSACompileArgument(map.Reference);
             compiler.ContainerMgmt.StackArguments.Push(arg);

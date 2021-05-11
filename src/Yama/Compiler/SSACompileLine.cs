@@ -114,6 +114,14 @@ namespace Yama.Compiler
 
                 counter++;
 
+                if (map.Mode == RegisterUseMode.Free)
+                {
+                    if (this.Owner is CompileReferenceCall)
+                    {
+                        map.Line.Calls.AddRange(this.Calls);
+                        map.Mode = RegisterUseMode.Used;
+                    }
+                }
                 if (map.Type != RegisterType.Stack) continue;
 
                 CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Get");
@@ -136,10 +144,11 @@ namespace Yama.Compiler
             if (this.Calls.Count == 0)
             {
                 this.Owner.PrimaryKeys.Add("[SSAPUSH]", genericDefinition.GetRegister(genericDefinition.ResultRegister));
+
                 return true;
             }
 
-            RegisterMap newMap = allocater.GetNextFreeRegister();
+            RegisterMap newMap = allocater.GetNextFreeRegister(this);
             if (newMap == null) return compiler.AddError("Register Allocater failed to get a free Registermap, maybe out of Register and out of possible stack space", this.Owner.Node);
 
             newMap.Mode = RegisterUseMode.Used;

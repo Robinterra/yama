@@ -36,11 +36,13 @@ namespace Yama.Compiler
             set;
         }
 
-        public List<ICompileRoot> Calls
+        public List<IndexVariabelnReference> Calls
         {
-            get;
-            set;
-        } = new List<ICompileRoot>();
+            get
+            {
+                return this.Deklaration.References;
+            }
+        }
 
         public bool IsUsed
         {
@@ -74,7 +76,6 @@ namespace Yama.Compiler
         {
             this.Key = value.Key;
             this.Reference = value.Reference;
-            this.Calls = new List<ICompileRoot>();
             this.Deklaration = value.Deklaration;
             this.IsChecked = value.IsChecked;
         }

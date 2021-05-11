@@ -263,9 +263,11 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public RegisterMap GetNextFreeRegister()
+        public RegisterMap GetNextFreeRegister(SSACompileLine line)
         {
             this.LastVirtuell = false;
+
+            this.MakeUnusedToFree(line);
 
             foreach (RegisterMap map in this.RegisterMaps)
             {
@@ -285,6 +287,18 @@ namespace Yama.Compiler.Definition
             this.VirtuellRegister.Add(mapneu);
 
             return mapneu;
+        }
+
+        private bool MakeUnusedToFree(SSACompileLine line)
+        {
+            foreach (RegisterMap map in this.RegisterMaps)
+            {
+                if (map.Mode != RegisterUseMode.Used) continue;
+
+                this.CheckToFreeRegister(map, map.Line, line);
+            }
+
+            return true;
         }
 
         // -----------------------------------------------
