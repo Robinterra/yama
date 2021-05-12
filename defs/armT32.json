@@ -137,7 +137,8 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "blx [SSAPOP[0]]"
+          "mov lr, pc",
+          "mov pc, [SSAPOP[0]]"
         ]
       },
       {
@@ -305,7 +306,7 @@
         "AssemblyCommands": [
           "pop {[POPREG]lr}",
           "add sp, sp, #[stackcount]",
-          "bx lr",
+          "mov pc, lr",
           "[DATACONTAINER]"
         ]
       },
