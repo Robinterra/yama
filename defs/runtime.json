@@ -276,12 +276,27 @@
           {
             "Name": "[virtuelRegister]",
             "Values": null
+          },
+          {
+            "Name": "[stackpushcount]",
+            "Values": null
           }
         ],
         "AssemblyCommands": [
           "[NAME]:",
-          "mov r1, sp",
           "push {[PUSHREG]lr}"
+        ]
+      },
+      {
+        "Name": "FunktionsDeklaration",
+        "Mode": "stackpushcount",
+        "Description": "Die Deklaration einer Funktion",
+        "Keys": [
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "add r1, sp, #[stackpushcount]"
         ]
       },
       {

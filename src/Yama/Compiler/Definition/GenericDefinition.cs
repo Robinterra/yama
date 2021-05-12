@@ -467,10 +467,20 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[stackpos]") return this.StackPositionQuery(query);
             if (query.Key.Name == "[stackcount]") return this.StackCountQuery(query);
             if (query.Key.Name == "[virtuelRegister]") return this.StackCountQuery(query);
+            if (query.Key.Name == "[stackpushcount]") return this.StackPushCount(query);
 
             this.Compiler.AddError("Post Key not supported");
 
             return null;
+        }
+
+        private string StackPushCount(IRegisterQuery query)
+        {
+            if (!(query.Value is List<string> t)) return null;
+
+            query.Value = t.Count + 1;
+
+            return this.StackCountQuery(query);
         }
 
         private string StackCountQuery(IRegisterQuery query)

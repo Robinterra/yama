@@ -68,6 +68,12 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
+        public bool HasArguments
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -128,6 +134,7 @@ namespace Yama.Compiler
         public bool Compile(Compiler compiler, MethodeDeclarationNode node, string mode = "default")
         {
             this.Node = node;
+            this.HasArguments = node.Deklaration.Parameters.Count != 0;
             compiler.AssemblerSequence.Add(this);
 
             this.MethodNode = node;
@@ -161,6 +168,8 @@ namespace Yama.Compiler
             this.Node = node;
             compiler.AssemblerSequence.Add(this);
 
+            this.HasArguments = true;
+
             if (mode == "set") this.SetNode = node;
             if (mode == "get") this.GetNode = node;
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
@@ -192,6 +201,8 @@ namespace Yama.Compiler
             this.Node = node;
             compiler.AssemblerSequence.Add(this);
 
+            this.HasArguments = true;
+
             if (mode == "set") this.PSetNode = node;
             if (mode == "get") this.PGetNode = node;
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
@@ -220,7 +231,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
-            if (this.VirtuellRegister.Count != 0) this.MakeVirtuelAdvnced(compiler);;
+            if (this.HasArguments) this.MakeArgumentsSPAdd(compiler);
+            if (this.VirtuellRegister.Count != 0) this.MakeVirtuelAdvnced(compiler);
 
             foreach (string str in this.AssemblyCommands)
             {
@@ -265,6 +277,16 @@ namespace Yama.Compiler
             {
                 compiler.AddLine(new RequestAddLine(this, str, this.PrimaryKeys, postreplaces));
             }
+
+            return true;
+        }
+
+        private bool MakeArgumentsSPAdd(Compiler compiler)
+        {
+            CompileAlgo algo = compiler.GetAlgo(this.AlgoName, "stackpushcount");
+            if (algo == null) return false;
+
+            this.PostAssemblyCommands.AddRange(algo.AssemblyCommands);
 
             return true;
         }

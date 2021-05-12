@@ -94,7 +94,7 @@ namespace Yama.Compiler
 
         public bool DoAllocate(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
         {
-            if (this.SpecialRules(allocater)) return true;
+            if (this.SpecialRules(allocater, container, genericDefinition)) return true;
 
             int counter = 0;
             foreach (SSACompileArgument arg in this.Arguments)
@@ -164,7 +164,7 @@ namespace Yama.Compiler
             return true;
         }
 
-        private bool SpecialRules(RegisterAllocater allocater)
+        private bool SpecialRules(RegisterAllocater allocater, CompileContainer container, GenericDefinition gd)
         {
             if (this.Owner is CompileFreeLoop)
             {
@@ -176,6 +176,8 @@ namespace Yama.Compiler
             if (this.Owner is CompileFunktionsDeklaration fd)
             {
                 allocater.VirtuellRegister = fd.VirtuellRegister;
+
+                if (fd.HasArguments) container.RegistersUses.Add(gd.GetRegister(1));
             }
 
             if (this.Owner is CompileFunktionsEnde fe)
