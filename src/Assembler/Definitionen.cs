@@ -218,9 +218,9 @@ namespace Yama.Assembler
             definition.Commands.Add(new T3RegisterCommand ("eor", "T3Register", 0xEA8, 4));
             definition.Commands.Add(new T3RegisterCommand ("orr", "T3Register", 0xEA4, 4));
             definition.Commands.Add(new T3StackOneRegisterCommand ("pop", "T3LdrRegister", 0xF85, 4, 0xB04));
-            definition.Commands.Add(new T1RegisterListeCommand ("pop", "T2RegisterList", 0xE8B, 4, 12));
+            definition.Commands.Add(new T1RegisterListeCommand ("pop", "T2RegisterList", 0x8BD, 4, 14));
             definition.Commands.Add(new T3StackOneRegisterCommand ("push", "T3LdrRegister", 0xF84, 4, 0xD04));
-            definition.Commands.Add(new T1RegisterListeCommand ("push", "T2RegisterList", 0xE92, 4, 12));
+            definition.Commands.Add(new T1RegisterListeCommand ("push", "T2RegisterList", 0x92D, 4, 14));
 
 
             return true;

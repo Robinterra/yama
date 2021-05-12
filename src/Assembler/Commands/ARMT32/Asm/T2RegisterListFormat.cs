@@ -15,12 +15,12 @@ namespace Yama.Assembler.ARMT32
         // https://developer.arm.com/docs/ddi0597/h/base-instructions-alphabetic-order/adc-adcs-immediate-add-with-carry-immediate
         public bool Assemble(RequestAssembleFormat request)
         {
-            if (request.Arguments.Count != 2) return false;
+            if (request.Arguments.Count != 1) return false;
 
-            uint firstFragment = ( request.Command << 4 ) & 0xFFF0;
-            firstFragment |= ( request.Arguments[0] ) & 0x000F;
+            uint firstFragment = ( request.Command ) & 0x0FFF;
+            firstFragment |= 0xE000;
 
-            uint secondFragment = ( request.Arguments[1] ) & 0x7FFF;
+            uint secondFragment = ( request.Arguments[0] ) & 0xFFFF;
 
             byte[] tmp = BitConverter.GetBytes ( firstFragment );
             request.Result.Add ( tmp[0] );

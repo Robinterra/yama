@@ -146,6 +146,13 @@ namespace Yama.Assembler
             return this.Errors.Count == 0;
         }
 
+        public bool AddError(IParseTreeNode t, string v)
+        {
+            this.Parser.PrintSyntaxError(t.Token, v, "Assembler error");
+
+            return false;
+        }
+
         private bool ParseRoot(ParserLayer startlayer, ICompileRoot root)
         {
             StringBuilder builder = new StringBuilder();

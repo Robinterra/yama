@@ -88,10 +88,11 @@ namespace Yama.Assembler.ARMT32
             {
                 if (token.Kind != Lexer.IdentifierKind.Word) return false;
 
-                registerlist |= (uint) 1 << (int)request.Assembler.GetRegister(token.Text);
+                uint registerPos = (uint) 1 << (int)request.Assembler.GetRegister(token.Text);
+
+                registerlist |= registerPos;
             }
 
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister("r13"));
             assembleFormat.Arguments.Add(registerlist);
 
             if (!format.Assemble(assembleFormat)) return false;
@@ -116,7 +117,9 @@ namespace Yama.Assembler.ARMT32
             {
                 if (token.Kind != Lexer.IdentifierKind.Word) return false;
 
-                if (request.Assembler.GetRegister(token.Text) > this.Max) return false;
+                uint registerNumber = request.Assembler.GetRegister(token.Text);
+                if (registerNumber > this.Max)
+                    return request.Assembler.AddError(t, string.Format("the Register '{0}' ({2}) is about the maximum of {1}.", token.Text, this.Max, request.Assembler.GetRegister(token.Text)));
             }
 
             return true;
