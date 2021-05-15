@@ -407,7 +407,8 @@
           "sub r12,r12,r10",
           "str r11,[r10,#0]",
           "str r12,[r10,#4]",
-          "b main",
+          "ldr r12,=main",
+          "mov pc, r12",
           "RAMENDE: .word [RAMENDE]",
           "RAMBEGIN: .word [RAMBEGIN]"
         ]
