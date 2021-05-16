@@ -177,7 +177,7 @@ namespace Yama.Assembler
             definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T1InputOutputSmall", 0xC, 2, 0x7, 4));
             definition.Commands.Add(new T2LdrArrayRegisterCommand("str", "T3LdrRegister", 0xF8C, 4, 0xe, 1));
 
-            definition.Commands.Add(new T2RegisterImmediateCommand("mov", "T3Immediate", 0xF04, 4, 0x7ff));
+            definition.Commands.Add(new T2RegisterImmediateCommand("mov", "T3Immediate", 0xF04, 4, 0xff));
             definition.Commands.Add(new T2LdrConstCommand("mov", "T3LdrRegister", 0xF8D, 10));
 
             definition.Commands.Add(new CommandData());
