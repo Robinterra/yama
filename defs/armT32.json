@@ -463,7 +463,7 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-          "[NAME]: .word [DATA]"
+          ".data [NAME]=[DATA]"
         ]
       },
       {
