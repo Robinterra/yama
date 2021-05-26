@@ -96,51 +96,12 @@ namespace Yama.Compiler
         {
             if (this.SpecialRules(allocater, container, genericDefinition)) return true;
 
-            int counter = 0;
-            foreach (SSACompileArgument arg in this.Arguments)
-            {
-                RegisterMap map = allocater.GetReferenceRegister(arg.Reference, this);
-                if (map == null)
-                {
-                    compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
-                    map = allocater.GetReferenceRegister(arg.Reference, this);
-
-                    counter++;
-
-                    continue;
-                }
-
-                this.Owner.PrimaryKeys.Add(string.Format("[SSAPOP[{0}]]", counter), map.Name);
-
-                counter++;
-
-                if (map.Mode == RegisterUseMode.Free)
-                {
-                    if (this.Owner is CompileReferenceCall)
-                    {
-                        map.Line.Calls.AddRange(this.Calls);
-                        map.Mode = RegisterUseMode.Used;
-                    }
-                }
-                if (map.Type != RegisterType.Stack) continue;
-
-                CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Get");
-                int subtraction = 0;
-                if (genericDefinition.Name == "arm-t32") subtraction = 1;
-                this.Owner.AssemblyCommands.Add(algo.AssemblyCommands[0].Replace("[STACKVAR]", (compiler.Definition.CalculationBytes * (map.RegisterId - subtraction)).ToString()).Replace("[NAME]", map.Name));
-            }
+            this.DoAllocateArguments(compiler, genericDefinition, allocater);
 
             if (!this.HasReturn) return true;
-            if (allocater.ExistAllocation(this))
-            {
-                RegisterMap map = allocater.GetReferenceRegister(this, this);
 
-                this.Owner.PrimaryKeys.Add("[SSAPUSH]", map.Name);
+            if (allocater.ExistAllocation(this)) return this.DoAllocateExist(compiler, genericDefinition, allocater, container);
 
-                if (map.Type == RegisterType.Stack) this.HandleVirtuellSetRegister(container, genericDefinition, compiler, map);
-
-                return true;
-            }
             if (this.Calls.Count == 0)
             {
                 this.Owner.PrimaryKeys.Add("[SSAPUSH]", genericDefinition.GetRegister(genericDefinition.ResultRegister));
@@ -148,6 +109,11 @@ namespace Yama.Compiler
                 return true;
             }
 
+            return this.DoAllocateByMultibleCalls(compiler, genericDefinition, allocater, container);
+        }
+
+        private bool DoAllocateByMultibleCalls(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
+        {
             RegisterMap newMap = allocater.GetNextFreeRegister(this);
             if (newMap == null) return compiler.AddError("Register Allocater failed to get a free Registermap, maybe out of Register and out of possible stack space", this.Owner.Node);
 
@@ -157,9 +123,63 @@ namespace Yama.Compiler
 
             this.Owner.PrimaryKeys.Add("[SSAPUSH]", newMap.Name);
 
-            if (newMap.Type == RegisterType.Stack) return this.HandleVirtuellSetRegister(container , genericDefinition, compiler, newMap);
+            if (newMap.Type == RegisterType.Stack) return this.HandleVirtuellSetRegister(container, genericDefinition, compiler, newMap);
 
             if (!container.RegistersUses.Contains(newMap.Name)) container.RegistersUses.Add(newMap.Name);
+
+            return true;
+        }
+
+        private bool DoAllocateExist(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
+        {
+            RegisterMap map = allocater.GetReferenceRegister(this, this);
+
+            this.Owner.PrimaryKeys.Add("[SSAPUSH]", map.Name);
+
+            if (map.Type == RegisterType.Stack) this.HandleVirtuellSetRegister(container, genericDefinition, compiler, map);
+
+            return true;
+        }
+
+        private bool DoAllocateArguments(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater)
+        {
+            int counter = 0;
+
+            foreach (SSACompileArgument arg in this.Arguments)
+            {
+                this.DoAllocateArgumentIteration(arg, counter, compiler, genericDefinition, allocater);
+
+                counter = counter + 1;
+            }
+
+            return true;
+        }
+
+        private bool DoAllocateArgumentIteration(SSACompileArgument arg, int counter, Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater)
+        {
+            RegisterMap map = allocater.GetReferenceRegister(arg.Reference, this);
+            if (map == null) return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
+
+            this.Owner.PrimaryKeys.Add(string.Format("[SSAPOP[{0}]]", counter), map.Name);
+
+            if (map.Mode == RegisterUseMode.Free && this.Owner is CompileReferenceCall)
+            {
+                map.Line.Calls.AddRange(this.Calls);
+                map.Mode = RegisterUseMode.Used;
+            }
+            if (map.Type != RegisterType.Stack) return true;
+
+            CompileAlgo algo = compiler.GetAlgo("RefCallStack", "Get");
+
+            int subtraction = 0;
+            if (genericDefinition.Name == "arm-t32") subtraction = 1;
+
+            int stackPosition = (compiler.Definition.CalculationBytes * (map.RegisterId - subtraction));
+
+            string result = algo.AssemblyCommands[0].Replace("[STACKVAR]", stackPosition.ToString());
+            result = result.Replace("[NAME]", map.Name);
+
+            this.Owner.AssemblyCommands.Add(result);
 
             return true;
         }

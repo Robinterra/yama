@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Yama.Index;
 using Yama.Parser;
+using Yama.Parser.Request;
 
 namespace Yama.Compiler
 {
@@ -188,8 +189,7 @@ namespace Yama.Compiler
                 }
             }
 
-            if (this.Writer != null)
-                this.Writer.WriteLine(request.AssemblyCode);
+            if (this.Writer != null) this.Writer.WriteLine(request.AssemblyCode);
 
             if (request.AddToList) request.Root.AssemblyCommands.Add(request.AssemblyCode);
 
@@ -198,7 +198,7 @@ namespace Yama.Compiler
 
         public bool Compilen(List<IParseTreeNode> nodes)
         {
-            if (this.Definition == null) return this.AddError("Keine definition zur Übersetzung in Assembler gesetzt");
+            if (this.Definition == null) return this.AddError("No assembler defintion for translating found");
             this.Definition.Compiler = this;
 
             this.SetNewContainer(new CompileContainer(), null);
@@ -206,29 +206,28 @@ namespace Yama.Compiler
 
             this.Header.Compile(this, this.MainFunction);
 
-            this.MakeInheritance(nodes);
-
-            if (this.Errors.Count != 0) return false;
+            if (!this.GenerateInheritanceDataStructure(nodes)) return false;
 
             Parser.Request.RequestParserTreeCompile request = new Parser.Request.RequestParserTreeCompile(this);
 
+            if (!this.GenerateIRCode(nodes, request)) return false;
+
+            if (!this.DoAllocateRegisters()) return false;
+
+            return this.TranslateIRCodeToAssemblerSequence();
+        }
+
+        private bool GenerateIRCode(List<IParseTreeNode> nodes, RequestParserTreeCompile request)
+        {
             foreach (IParseTreeNode node in nodes)
             {
-                if (!node.Compile(request)) this.AddError("Beim assembelieren ist in einer Klasse ein Fehler aufgetreten", node);
+                if (!node.Compile(request)) this.AddError("One error orrcured: generate ir code", node);
             }
-
-            if (this.Errors.Count != 0) return false;
-
-            this.DoAllocate();
-
-            if (this.Errors.Count != 0) return false;
-
-            this.RunAssmblerSequence();
 
             return this.Errors.Count == 0;
         }
 
-        private bool MakeInheritance(List<IParseTreeNode> nodes)
+        private bool GenerateInheritanceDataStructure(List<IParseTreeNode> nodes)
         {
             foreach (IParseTreeNode node in nodes)
             {
@@ -241,20 +240,20 @@ namespace Yama.Compiler
                 k.compile.Compile(this, k, "datalist");
             }
 
-            return true;
+            return this.Errors.Count == 0;
         }
 
-        private bool DoAllocate()
+        private bool DoAllocateRegisters()
         {
             foreach (CompileContainer methode in this.ContainerMgmt.Methods)
             {
                 methode.DoAllocate(this);
             }
 
-            return true;
+            return this.Errors.Count == 0;
         }
 
-        private bool RunAssmblerSequence()
+        private bool TranslateIRCodeToAssemblerSequence()
         {
             if (this.OutputFile != null)
                 if (this.OutputFile.Exists) this.OutputFile.Delete();
@@ -266,16 +265,16 @@ namespace Yama.Compiler
                 if (this.OutputFile != null)
                     this.Writer = new StreamWriter(this.OutputFile.OpenWrite());
             }
-            catch (Exception e) { return this.AddError(string.Format("Die Datei in der Assemblercode geschrieben werden sollte konnte nicht angelegt werden. {0}", e.Message)); }
+            catch (Exception e) { return this.AddError(string.Format("The outputfile for the assembler sequence can not be created. {0}", e.Message)); }
 
             foreach (SSACompileLine line in this.SSALines)
             {
-                if (!line.Owner.InFileCompilen(this)) this.AddError("Beim Schreiben der Assemblersequence ist ein Fehler aufgetreten");
+                if (!line.Owner.InFileCompilen(this)) this.AddError("One error orrcured: translate ir code to assembler");
             }
 
             foreach (ICompileRoot root in this.DataSequence)
             {
-                if (!root.InFileCompilen(this)) this.AddError("Beim Schreiben der Assemblersequence ist ein Fehler aufgetreten");
+                if (!root.InFileCompilen(this)) this.AddError("One error orrcured: data sequence");
             }
 
             this.AssemblerSequence.AddRange(this.DataSequence);
@@ -288,7 +287,7 @@ namespace Yama.Compiler
             if (this.OutputFile != null)
                 this.Writer.Close();
 
-            return true;
+            return this.Errors.Count == 0;
         }
 
         public bool AddError(string msg, IParseTreeNode node = null)
@@ -362,38 +361,7 @@ namespace Yama.Compiler
 
             foreach (KeyValuePair<string, SSAVariableMap> conMap in containerMaps)
             {
-                if (!parentVarMap.ContainsKey(conMap.Key)) continue;
-                if (conMap.Value.Reference == null) continue;
-
-                if (isloop)
-                {
-                    conMap.Value.Reference.LoopContainer = loop;
-                    conMap.Value.Reference.Calls.Add(loop.LoopLine);
-                }
-
-                if (parentVarMap[conMap.Key].Reference == null || conMap.Value.Reference.Equals(parentVarMap[conMap.Key].Reference))
-                {
-                    parentVarMap[conMap.Key].Reference = conMap.Value.Reference;
-
-                    continue;
-                }
-
-                //if (containerMaps[orgMap.Key].Reference.ReplaceLine != null) this.CheckForCopy(containerMaps[orgMap.Key].Reference);
-
-                SSAVariableMap orig = parentVarMap[conMap.Key];
-                foreach (SSACompileLine line in conMap.Value.AllSets)
-                {
-                    orig.Reference.PhiMap.AddRange(line.PhiMap);
-                    line.PhiMap.AddRange(orig.Reference.PhiMap);
-                    foreach (SSACompileLine phi in line.PhiMap)
-                    {
-                        orig.Reference.Calls.AddRange(phi.Calls);
-                        phi.Calls.AddRange(orig.Reference.Calls);
-                    }
-                }
-
-                //
-                //orig.Reference.PhiMap.AddRange(conMap.Value.Reference.PhiMap);
+                this.PopContainerIterationContainerMap(loop, isloop, parentVarMap, conMap);
             }
 
             foreach (SSACompileLine line in container.PhiSetNewVar)
@@ -414,6 +382,44 @@ namespace Yama.Compiler
                 line.ReplaceLine.PhiMap.Add(line);
                 line.ReplaceLine.Calls.AddRange(line.Calls);
             }
+
+            return true;
+        }
+
+        private bool PopContainerIterationContainerMap(CompileContainer loop, bool isloop, Dictionary<string, SSAVariableMap> parentVarMap, KeyValuePair<string, SSAVariableMap> conMap)
+        {
+            if (!parentVarMap.ContainsKey(conMap.Key)) return false;
+            if (conMap.Value.Reference == null) return false;
+
+            if (isloop)
+            {
+                conMap.Value.Reference.LoopContainer = loop;
+                conMap.Value.Reference.Calls.Add(loop.LoopLine);
+            }
+
+            if (parentVarMap[conMap.Key].Reference == null || conMap.Value.Reference.Equals(parentVarMap[conMap.Key].Reference))
+            {
+                parentVarMap[conMap.Key].Reference = conMap.Value.Reference;
+
+                return false;
+            }
+
+            //if (containerMaps[orgMap.Key].Reference.ReplaceLine != null) this.CheckForCopy(containerMaps[orgMap.Key].Reference);
+
+            SSAVariableMap orig = parentVarMap[conMap.Key];
+            foreach (SSACompileLine line in conMap.Value.AllSets)
+            {
+                orig.Reference.PhiMap.AddRange(line.PhiMap);
+                line.PhiMap.AddRange(orig.Reference.PhiMap);
+                foreach (SSACompileLine phi in line.PhiMap)
+                {
+                    orig.Reference.Calls.AddRange(phi.Calls);
+                    phi.Calls.AddRange(orig.Reference.Calls);
+                }
+            }
+
+            //
+            //orig.Reference.PhiMap.AddRange(conMap.Value.Reference.PhiMap);
 
             return true;
         }

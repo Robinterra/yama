@@ -6,6 +6,8 @@ namespace Yama.Compiler
     public class SSACompileArgument
     {
 
+        #region get/set
+
         public SSACompileLine Reference
         {
             get;
@@ -36,6 +38,10 @@ namespace Yama.Compiler
             set;
         }
 
+        #endregion get/set
+
+        #region ctor
+
         public SSACompileArgument()
         {
 
@@ -47,6 +53,9 @@ namespace Yama.Compiler
             this.Mode = SSACompileArgumentMode.Reference;
             this.Root = line.Owner;
         }
+
+        #endregion ctor
+
     }
 
     public enum SSACompileArgumentMode

@@ -5,6 +5,8 @@ namespace Yama.Compiler
     public class RequestAddLine
     {
 
+        #region get/set
+
         public string AssemblyCode
         {
             get;
@@ -34,6 +36,10 @@ namespace Yama.Compiler
             get;
             set;
         } = true;
+
+        #endregion get/set
+
+        #region ctor
 
         public RequestAddLine(ICompileRoot rootm, string assemblyCode, bool addToList)
         {
@@ -69,5 +75,8 @@ namespace Yama.Compiler
         {
             this.PostReplaces = postreplaces;
         }
+
+        #endregion ctor
+
     }
 }
