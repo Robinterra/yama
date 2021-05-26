@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Yama.Index;
 using Yama.Parser;
 using Yama.Parser.Request;
@@ -82,6 +83,20 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<SSACompileLine>();
+
+        public bool IsOutputIRCode
+        {
+            get
+            {
+                return this.IRCodeStream != null;
+            }
+        }
+
+        public StreamWriter IRCodeStream
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
@@ -212,9 +227,35 @@ namespace Yama.Compiler
 
             if (!this.GenerateIRCode(nodes, request)) return false;
 
+            if (!this.OptimizeIRCode()) return false;
+
             if (!this.DoAllocateRegisters()) return false;
 
             return this.TranslateIRCodeToAssemblerSequence();
+        }
+
+        private bool OptimizeIRCode()
+        {
+            List<SSACompileLine> canBeRemove = new List<SSACompileLine>();
+
+            foreach (SSACompileLine line in this.SSALines)
+            {
+                if (line.Owner is CompileJumpTo)
+                {
+                    SSACompileArgument arg = line.Arguments.FirstOrDefault();
+                    if (arg == null) continue;
+
+                    if (arg.Mode != SSACompileArgumentMode.JumpReference) continue;
+                    if (arg.CompileReference.Line.Order == line.Order + 1) canBeRemove.Add(line);
+                }
+            }
+
+            foreach (SSACompileLine line in canBeRemove)
+            {
+                this.SSALines.Remove(line);
+            }
+
+            return true;
         }
 
         private bool GenerateIRCode(List<IParseTreeNode> nodes, RequestParserTreeCompile request)
@@ -269,8 +310,12 @@ namespace Yama.Compiler
 
             foreach (SSACompileLine line in this.SSALines)
             {
+                if (this.IsOutputIRCode) this.AddIrLineToStream(line);
+
                 if (!line.Owner.InFileCompilen(this)) this.AddError("One error orrcured: translate ir code to assembler");
             }
+
+            if (this.IsOutputIRCode) this.IRCodeStream.Write("-- [EOF] --");
 
             foreach (ICompileRoot root in this.DataSequence)
             {
@@ -288,6 +333,65 @@ namespace Yama.Compiler
                 this.Writer.Close();
 
             return this.Errors.Count == 0;
+        }
+
+        int emptyStrings = 0;
+        private bool AddIrLineToStream(SSACompileLine line)
+        {
+            if (line.ReplaceLine != null) return true;
+
+            StringBuilder result = new StringBuilder();
+
+            if (line.Owner is CompileFunktionsDeklaration fd) return this.AddIrLineFunktionsDeklaration(fd);
+
+            if (line.Owner is CompileFunktionsEnde fe) return this.AddIrLineFunktionsEnde(fe);
+
+            if (line.Owner is CompileReferenceCall rc && rc.Node != null) return this.AddIrLineReferenceCall(rc, line);
+
+            result.AppendFormat("{3}{0}: {1}{2}", line.Order, line.Owner.Algo.Name, line.Owner.Algo.Mode, new string(' ', emptyStrings));
+
+            foreach (SSACompileArgument arg in line.Arguments)
+            {
+                if (arg.Mode == SSACompileArgumentMode.Const) result.AppendFormat(" #0x{0:x}", arg.Const);
+                if (arg.Mode == SSACompileArgumentMode.Reference) result.AppendFormat(" {0}", arg.Reference.Order);
+                if (arg.Mode == SSACompileArgumentMode.Variable) result.AppendFormat(" {0}", arg.Variable.Reference.Order);
+                if (arg.Mode == SSACompileArgumentMode.JumpReference) result.AppendFormat(" {0}", arg.CompileReference.Line.Order);
+            }
+
+            this.IRCodeStream.WriteLine(result);
+
+            return true;
+        }
+
+        private bool AddIrLineReferenceCall(CompileReferenceCall rc, SSACompileLine line)
+        {
+            string result = string.Format("{2}{0}: {1} (  )", line.Order, rc.Node.Token.Text, new string(' ', emptyStrings));
+
+            this.IRCodeStream.WriteLine(result);
+
+            return true;
+        }
+
+        private bool AddIrLineFunktionsEnde(CompileFunktionsEnde fe)
+        {
+            emptyStrings -= 4;
+
+            this.IRCodeStream.WriteLine("}");
+            this.IRCodeStream.WriteLine();
+
+            return true;
+        }
+
+        private bool AddIrLineFunktionsDeklaration(CompileFunktionsDeklaration fd)
+        {
+            string result = string.Format("{0} (  )\n{{", fd.Node.Token.Text);
+
+            this.IRCodeStream.WriteLine();
+            this.IRCodeStream.WriteLine(result);
+
+            emptyStrings += 4;
+
+            return true;
         }
 
         public bool AddError(string msg, IParseTreeNode node = null)

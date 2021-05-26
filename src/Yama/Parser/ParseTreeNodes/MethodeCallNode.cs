@@ -161,6 +161,7 @@ namespace Yama.Parser
 
             IndexVariabelnReference callRef = container.VariabelnReferences.LastOrDefault();
             methodReference.CallRef = callRef;
+            this.Reference = methodReference;
 
             container.MethodReferences.Add(methodReference);
 
@@ -171,6 +172,9 @@ namespace Yama.Parser
         {
             List<IParseTreeNode> copylist = this.ParametersNodes.ToArray().ToList();
             copylist.Reverse();
+
+            //if (this.CompileCopy(copylist, request)) return true;
+
             IParseTreeNode dek = null;
 
             int parasCount = 0;
@@ -202,6 +206,31 @@ namespace Yama.Parser
             }*/
 
             this.FunctionExecute.Compile(request.Compiler, null, request.Mode);
+
+            return true;
+        }
+
+        private bool CompileCopy(List<IParseTreeNode> copylist, Request.RequestParserTreeCompile request)
+        {
+            if (!(this.Reference.Deklaration.Use is MethodeDeclarationNode t)) return false;
+
+            //TODO: Not in this place
+            if (t.Deklaration.References.Count == 1)
+            {
+                if (t.AccessDefinition == null) t.AccessDefinition = new IdentifierToken();
+
+                t.AccessDefinition.Kind = IdentifierKind.Copy;
+            }
+
+            if (t.AccessDefinition == null) return false;
+            if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
+
+            foreach ( IParseTreeNode parameter in copylist )
+            {
+                parameter.Compile(request);
+            }
+
+            t.Statement.Compile(new Request.RequestParserTreeCompile(request.Compiler, "default"));
 
             return true;
         }

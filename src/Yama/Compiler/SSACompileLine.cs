@@ -157,6 +157,9 @@ namespace Yama.Compiler
 
         private bool DoAllocateArgumentIteration(SSACompileArgument arg, int counter, Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater)
         {
+            if (arg.Mode == SSACompileArgumentMode.Const) return true;
+            if (arg.Mode == SSACompileArgumentMode.JumpReference) return true;
+
             RegisterMap map = allocater.GetReferenceRegister(arg.Reference, this);
             if (map == null) return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
 

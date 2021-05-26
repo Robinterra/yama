@@ -202,6 +202,7 @@ namespace Yama
                 if (command is Print t) Program.CheckPrint ( yama, t );
                 if (command is SkipExpression) yama.StartPosition = Program.ParseSkipExpressionHex(command.Value);
                 if (command is StartNamespace) yama.StartNamespace = command.Value;
+                if (command is IROutputExpression) yama.IROutputFile = command.Value;
             }
 
             DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
@@ -289,6 +290,7 @@ namespace Yama
             compileArgs.Add( new Print () );
             compileArgs.Add( new SkipExpression () );
             compileArgs.Add( new StartNamespace () );
+            compileArgs.Add( new IROutputExpression  () );
 
             List<ICommandLine> debugArgs = new List<ICommandLine>();
             debugArgs.Add(new SizeExpression ());
@@ -314,6 +316,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new AutoExpression (  ) );
             Program.EnabledCommandLines.Add ( new IncludeExpression (  ) );
             Program.EnabledCommandLines.Add ( new DefinitionExpression (  ) );
+            Program.EnabledCommandLines.Add ( new IROutputExpression (  ) );
             Program.EnabledCommandLines.Add ( new OptimizingExpression (  ) );
             Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
             Program.EnabledCommandLines.Add ( new StartNamespace (  ) );

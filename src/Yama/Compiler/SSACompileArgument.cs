@@ -37,6 +37,7 @@ namespace Yama.Compiler
             get;
             set;
         }
+        public CompileSprungPunkt CompileReference { get; internal set; }
 
         #endregion get/set
 
@@ -63,6 +64,7 @@ namespace Yama.Compiler
         None,
         Variable,
         Reference,
-        Const
+        Const,
+        JumpReference
     }
 }

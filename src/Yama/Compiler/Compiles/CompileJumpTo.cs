@@ -98,6 +98,8 @@ namespace Yama.Compiler
             if (this.Point == PointMode.RootEnde) this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
             if (this.Point == PointMode.LoopEnde) this.Punkt = compiler.ContainerMgmt.CurrentLoop.Ende;
 
+            line.Arguments.Add(new SSACompileArgument() { Mode = SSACompileArgumentMode.JumpReference, CompileReference = this.Punkt });
+
             this.PrimaryKeys = new Dictionary<string, string>();
 
             foreach (AlgoKeyCall key in this.Algo.Keys)

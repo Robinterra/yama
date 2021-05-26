@@ -188,6 +188,7 @@ namespace Yama.Compiler.Definition
 
         private SSACompileLine GetOriginal(SSACompileLine line)
         {
+            if (line == null) return null;
             if (line.ReplaceLine == null) return line;
 
             return this.GetOriginal(line.ReplaceLine);

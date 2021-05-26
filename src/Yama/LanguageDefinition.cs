@@ -112,6 +112,12 @@ namespace Yama
             set;
         }
 
+        public string IROutputFile
+        {
+            get;
+            set;
+        }
+
         // -----------------------------------------------
 
         #endregion get/set
@@ -502,23 +508,9 @@ namespace Yama
             compiler.MainFunction = main;
             compiler.Defines = this.Defines;
             compiler.Definition.Compiler = compiler;
+            this.InitCompilerIrPrinting(compiler);
 
-            if (!compiler.Definition.LoadExtensions(this.AllFilesInUse))
-            {
-                foreach (CompilerError error in compiler.Errors)
-                {
-                    if (error.Use != null)
-                    {
-                        this.PrintCompilerError(error);
-
-                        continue;
-                    }
-
-                    this.PrintSimpleError(error.Msg);
-                }
-
-                return false;
-            }
+            if (!compiler.Definition.LoadExtensions(this.AllFilesInUse)) return this.PrintCompilerErrors(compiler.Errors);
 
             if (compiler.Compilen(nodes))
             {
@@ -527,9 +519,32 @@ namespace Yama
                 return true;
             }
 
-            foreach (CompilerError error in compiler.Errors)
+            return this.PrintCompilerErrors(compiler.Errors);
+        }
+
+        private bool InitCompilerIrPrinting(Compiler.Compiler compiler)
+        {
+            if (string.IsNullOrEmpty(this.IROutputFile)) return true;
+
+            compiler.IRCodeStream = new StreamWriter(File.OpenWrite(this.IROutputFile));
+
+            compiler.IRCodeStream.AutoFlush = true;
+
+            return true;
+        }
+
+        private bool PrintCompilerErrors(List<CompilerError> errors)
+        {
+            foreach (CompilerError error in errors)
             {
-                this.PrintCompilerError(error);
+                if (error.Use != null)
+                {
+                    this.PrintCompilerError(error);
+
+                    continue;
+                }
+
+                this.PrintSimpleError(error.Msg);
             }
 
             return false;
