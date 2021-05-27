@@ -44,7 +44,8 @@ namespace Yama.Compiler
             if (this.AddFunktionsEnde(line)) return true;
             if (this.AddReferenceCall(line)) return true;
 
-            result.AppendFormat("{3}{0}: {1}{2}", line.Order, line.Owner.Algo.Name, line.Owner.Algo.Mode, new string(' ', emptyStrings));
+            string printMode = line.Owner.Algo.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
+            result.AppendFormat("{3}{0}: {1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings));
 
             foreach (SSACompileArgument arg in line.Arguments)
             {
