@@ -148,15 +148,16 @@ yama build out ./out.bin def runtime ./test.yama
 
 build               Build a Yama Programm
     file <file>         One file which to Compile
-    include <folder>    Include all files from this folder (recursive).
-    asmoutput <file>    The output Filename (Default:no assembler output)
+    include <folder>    Include all files from this folder (recursive). Only classes which namespace is using will be compile
+    asmoutput <file>    The output Filename (Default:No assembler output)
     output <file>       The output Filename (Default:out.bin) Shortcut:out
-    optimize <level>    Configuration of Code Opitmizen (None, Level1 (Default), SSA (Always))
+    optimize <level>    Configuration of Code Opitmizen (None, Level1, SSA (Default))
     definition <name>   Set the Compiler definition for translate in assembler
     define <define>     One Define for conditional compilation
     print <subcommand>  Gibt <subcommand> (tree) in der Console aus
     skip <value>        The Skip value at top from binary code (Hex Format)
-    start <namespace>   The start namespace that is to compile (default:Program) // Location of the main function
+    start <namespace>   The start namespace that is to compile (default:Program)
+    irout <file>        The output file of the IR Code
 
 assemble            Assemble a Assembler file to Binary
     size <value>        The Size of the Memory (Hex Format)

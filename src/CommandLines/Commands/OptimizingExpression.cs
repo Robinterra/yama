@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<level>", "Configuration of Code Opitmizen (None, Level1 (Default), SSA (Not implementet))" );
+                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<level>", "Configuration of Code Opitmizen (None, Level1, SSA (Default))" );
             }
         }
 

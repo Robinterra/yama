@@ -103,7 +103,7 @@ namespace Yama
         {
             get;
             set;
-        } = Optimize.Level1;
+        } = Optimize.SSA;
 
         // -----------------------------------------------
         public List<ICommand> Sequence
