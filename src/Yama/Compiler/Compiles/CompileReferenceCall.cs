@@ -290,7 +290,7 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, printmode);
             if (this.Algo == null) return false;
 
-            SSACompileLine line = new SSACompileLine(this);
+            SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
             this.Line = line;
 

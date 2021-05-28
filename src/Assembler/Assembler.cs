@@ -280,6 +280,8 @@ namespace Yama.Assembler
 
             foreach (CommandCompilerMap assmblepair in maptranslate)
             {
+                startposition += assmblepair.Skip;
+
                 if (!this.AssembleStep(assmblepair, startposition)) return false;
 
                 startposition += (uint)assmblepair.Size;
@@ -312,9 +314,22 @@ namespace Yama.Assembler
 
                     continue;
                 }
+
+                uint skip = 0;
+                if (request.IsData)
+                {
+                    uint temp = this.Position & 0x3;
+                    if (temp > 0)
+                    {
+                        this.Position = this.Position + 4;
+                        skip = 4 - temp;
+                    }
+                    this.Position = this.Position ^ temp;
+                }
+
                 this.Position += (uint)request.Size;
 
-                maptranslate.Add(new CommandCompilerMap(command, node, request.Size));
+                maptranslate.Add(new CommandCompilerMap(command, node, request.Size, skip));
             }
 
             return true;
@@ -344,9 +359,22 @@ namespace Yama.Assembler
 
                     continue;
                 }
+
+                uint skip = 0;
+                if (request.IsData)
+                {
+                    uint temp = this.Position & 0x3;
+                    if (temp > 0)
+                    {
+                        this.Position = this.Position + 4;
+                        skip = 4 - temp;
+                    }
+                    this.Position = this.Position ^ temp;
+                }
+
                 this.Position += (uint)request.Size;
 
-                maptranslate.Add(new CommandCompilerMap(command, node, map, request.Size));
+                maptranslate.Add(new CommandCompilerMap(command, node, map, request.Size, skip));
             }
 
             return true;
@@ -393,6 +421,8 @@ namespace Yama.Assembler
             request.Stream = this.Stream;
             request.WithMapper = true;
             request.Position = position;
+
+            if (assmblepair.Skip != 0) this.Stream.Write(new byte[assmblepair.Skip]);
 
             if (!assmblepair.Command.Assemble(request))
             {

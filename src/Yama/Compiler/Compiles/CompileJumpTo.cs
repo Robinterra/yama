@@ -109,7 +109,7 @@ namespace Yama.Compiler
                 try
                 {
                     SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
-                    arg.Reference.Calls.Add(line);
+                    arg.Reference.IsReturn = true;
                 }
                 catch{}
             }

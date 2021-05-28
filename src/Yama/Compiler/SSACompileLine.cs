@@ -58,6 +58,7 @@ namespace Yama.Compiler
             get
             {
                 if (this.IsPrimary) return true;
+                if (this.IsReturn) return true;
 
                 return this.Calls.Count != 0;
             }
@@ -70,6 +71,12 @@ namespace Yama.Compiler
         } = new List<SSACompileArgument>();
 
         public bool HasReturn
+        {
+            get;
+            set;
+        }
+
+        public bool IsReturn
         {
             get;
             set;

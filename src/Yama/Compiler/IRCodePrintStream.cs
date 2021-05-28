@@ -45,7 +45,7 @@ namespace Yama.Compiler
             if (this.AddReferenceCall(line)) return true;
 
             string printMode = line.Owner.Algo.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
-            string isNotUseChar = line.IsUsed ? "" : "!";
+            string isNotUseChar = line.IsUsed ? "" : "/!\\";
             result.AppendFormat("{3}{0}: {4}{1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
 
             foreach (SSACompileArgument arg in line.Arguments)
@@ -66,7 +66,8 @@ namespace Yama.Compiler
             if (!(line.Owner is CompileReferenceCall rc)) return false;
             if (rc.Node == null) return false;
 
-            string result = string.Format("{2}{0}: {1} (  )", line.Order, rc.Node.Token.Text, new string(' ', emptyStrings));
+            string isNotUseChar = line.IsUsed ? "" : "/!\\";
+            string result = string.Format("{2}{0}: {3}{1} (  )", line.Order, rc.Node.Token.Text, new string(' ', emptyStrings), isNotUseChar);
 
             this.Writer.WriteLine(result);
 

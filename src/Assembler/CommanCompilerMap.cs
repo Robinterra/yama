@@ -33,23 +33,31 @@ namespace Yama.Assembler
             set;
         }
 
+        public uint Skip
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public CommandCompilerMap(ICommand command, IParseTreeNode node, int size)
+        public CommandCompilerMap(ICommand command, IParseTreeNode node, int size, uint skip)
         {
             this.Command = command;
             this.Node = node;
             this.Size = size;
+            this.Skip = skip;
         }
 
-        public CommandCompilerMap(ICommand command, IParseTreeNode node, AssemblerCompilerMap map, int size)
+        public CommandCompilerMap(ICommand command, IParseTreeNode node, AssemblerCompilerMap map, int size, uint skip)
         {
             this.Command = command;
             this.Node = node;
             this.Map = map;
             this.Size = size;
+            this.Skip = skip;
         }
 
         #endregion ctor

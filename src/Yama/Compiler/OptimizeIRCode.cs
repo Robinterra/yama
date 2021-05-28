@@ -46,6 +46,7 @@ namespace Yama.Compiler
         {
             this.Methods = new List<OptimizeMethod>();
             this.Methods.Add(this.RemoveNotNecessaryJumps);
+            //this.Methods.Add(this.RemovedUnusedArgs);
             this.Methods.Add(this.RemoveNotUsedLines);
             //this.Methods.Add(this.RemoveJumpPointsWith0Calls);
 
@@ -95,6 +96,17 @@ namespace Yama.Compiler
             SSACompileLine line = request.Current;
             if (!(line.Owner is CompileSprungPunkt)) return false;
             if (line.Calls.Count != 0) return false;
+
+            request.ToRemove.Add(line);
+
+            return true;
+        }
+
+        private bool RemovedUnusedArgs(RequestOptimize request)
+        {
+            SSACompileLine line = request.Current;
+            if (!(line.Owner is CompilePopResult)) return false;
+            if (line.IsUsed) return false;
 
             request.ToRemove.Add(line);
 
