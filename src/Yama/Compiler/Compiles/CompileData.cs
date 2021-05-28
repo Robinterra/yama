@@ -72,6 +72,12 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
+        public SSACompileLine Line
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods

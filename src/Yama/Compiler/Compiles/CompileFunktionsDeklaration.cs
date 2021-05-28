@@ -74,6 +74,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public SSACompileLine Line
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -141,8 +147,9 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
 
-            SSACompileLine line = new SSACompileLine(this);
+            SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
+            this.Line = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -175,8 +182,9 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
             if (this.Algo == null)  return false;
 
-            SSACompileLine line = new SSACompileLine(this);
+            SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
+            this.Line = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -208,8 +216,9 @@ namespace Yama.Compiler
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
             if (this.Algo == null)  return false;
 
-            SSACompileLine line = new SSACompileLine(this);
+            SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
+            this.Line = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 

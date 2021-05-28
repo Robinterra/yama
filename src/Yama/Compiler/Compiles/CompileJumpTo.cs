@@ -65,6 +65,12 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
+        public SSACompileLine Line
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -88,14 +94,25 @@ namespace Yama.Compiler
 
             if (this.Algo == null) return false;
 
-            SSACompileLine line = new SSACompileLine(this);
+            SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
+            this.Line = line;
 
             if (this.Point == PointMode.Custom) this.Punkt = node;
             if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Begin;
             if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Ende;
             if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer.Begin;
-            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
+            if (this.Point == PointMode.RootEnde)
+            {
+                this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
+
+                try
+                {
+                    SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
+                    arg.Reference.Calls.Add(line);
+                }
+                catch{}
+            }
             if (this.Point == PointMode.LoopEnde) this.Punkt = compiler.ContainerMgmt.CurrentLoop.Ende;
 
             line.Arguments.Add(new SSACompileArgument() { Mode = SSACompileArgumentMode.JumpReference, CompileReference = this.Punkt });

@@ -65,6 +65,12 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
+        public SSACompileLine Line
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -90,8 +96,9 @@ namespace Yama.Compiler
 
             if (this.Algo == null) return false;
 
-            SSACompileLine line = new SSACompileLine(this);
+            SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
+            this.Line = line;
 
             if (this.Point == PointMode.Custom) this.Punkt = node;
             if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Begin;

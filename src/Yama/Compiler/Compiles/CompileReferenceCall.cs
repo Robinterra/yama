@@ -61,6 +61,12 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
+        public SSACompileLine Line
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -129,6 +135,7 @@ namespace Yama.Compiler
 
             SSACompileLine line = new SSACompileLine(this);
             compiler.AddSSALine(line);
+            this.Line = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();
             this.PrimaryKeys.Add("[NAME]", adressPorint);
@@ -167,6 +174,7 @@ namespace Yama.Compiler
 
             SSACompileLine line = new SSACompileLine(this);
             compiler.AddSSALine(line);
+            this.Line = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -201,6 +209,7 @@ namespace Yama.Compiler
             //SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
 
             SSACompileLine lineset = new SSACompileLine(this);
+            this.Line = lineset;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -283,6 +292,7 @@ namespace Yama.Compiler
 
             SSACompileLine line = new SSACompileLine(this);
             compiler.AddSSALine(line);
+            this.Line = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -372,8 +382,9 @@ namespace Yama.Compiler
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
-            SSACompileLine line = new SSACompileLine(this);
+            SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
+            this.Line = line;
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {

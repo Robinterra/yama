@@ -46,6 +46,8 @@ namespace Yama.Compiler
         {
             this.Methods = new List<OptimizeMethod>();
             this.Methods.Add(this.RemoveNotNecessaryJumps);
+            this.Methods.Add(this.RemoveNotUsedLines);
+            //this.Methods.Add(this.RemoveJumpPointsWith0Calls);
 
             return true;
         }
@@ -88,6 +90,27 @@ namespace Yama.Compiler
 
         #region delagetMethods
 
+        private bool RemoveJumpPointsWith0Calls(RequestOptimize request)
+        {
+            SSACompileLine line = request.Current;
+            if (!(line.Owner is CompileSprungPunkt)) return false;
+            if (line.Calls.Count != 0) return false;
+
+            request.ToRemove.Add(line);
+
+            return true;
+        }
+
+        private bool RemoveNotUsedLines(RequestOptimize request)
+        {
+            SSACompileLine line = request.Current;
+            if (line.IsUsed) return false;
+
+            request.ToRemove.Add(line);
+
+            return true;
+        }
+
         private bool RemoveNotNecessaryJumps(RequestOptimize request)
         {
             SSACompileLine line = request.Current;
@@ -98,6 +121,8 @@ namespace Yama.Compiler
 
             if (arg.Mode != SSACompileArgumentMode.JumpReference) return false;
             if (arg.CompileReference.Line.Order != line.Order + 1) return false;
+
+            arg.CompileReference.Line.Calls.Remove(line);
 
             request.ToRemove.Add(line);
 

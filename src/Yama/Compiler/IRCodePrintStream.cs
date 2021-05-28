@@ -45,7 +45,8 @@ namespace Yama.Compiler
             if (this.AddReferenceCall(line)) return true;
 
             string printMode = line.Owner.Algo.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
-            result.AppendFormat("{3}{0}: {1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings));
+            string isNotUseChar = line.IsUsed ? "" : "!";
+            result.AppendFormat("{3}{0}: {4}{1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
 
             foreach (SSACompileArgument arg in line.Arguments)
             {

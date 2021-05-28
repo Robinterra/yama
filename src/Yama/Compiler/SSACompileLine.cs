@@ -47,6 +47,22 @@ namespace Yama.Compiler
             set;
         } = new List<SSACompileLine>();
 
+        public bool IsPrimary
+        {
+            get;
+            set;
+        }
+
+        public bool IsUsed
+        {
+            get
+            {
+                if (this.IsPrimary) return true;
+
+                return this.Calls.Count != 0;
+            }
+        }
+
         public List<SSACompileArgument> Arguments
         {
             get;
@@ -73,6 +89,11 @@ namespace Yama.Compiler
         {
             this.Owner = compile;
             this.PhiMap.Add(this);
+        }
+
+        public SSACompileLine(ICompileRoot compile, bool isprimary) : this(compile)
+        {
+            this.IsPrimary = isprimary;
         }
 
         #endregion ctor

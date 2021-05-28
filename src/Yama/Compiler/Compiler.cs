@@ -242,6 +242,15 @@ namespace Yama.Compiler
                 if (!node.Compile(request)) this.AddError("One error orrcured: generate ir code", node);
             }
 
+            /*foreach (SSACompileLine line in this.SSALines)
+            {
+                SSACompileArgument arg = line.Arguments.FirstOrDefault();
+                if (arg == null) continue;
+                if (arg.Mode != SSACompileArgumentMode.JumpReference) continue;
+
+                arg.CompileReference.Line.Calls.Add(line);
+            }*/
+
             return this.Errors.Count == 0;
         }
 

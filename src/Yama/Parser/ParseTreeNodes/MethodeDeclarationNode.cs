@@ -528,7 +528,7 @@ namespace Yama.Parser
 
         public bool CanCompile(Compiler.Compiler compiler)
         {
-            if (compiler.OptimizeLevel != Optimize.Level1) return true;
+            if (compiler.OptimizeLevel == Optimize.None) return true;
 
             return this.CanCompile();
         }

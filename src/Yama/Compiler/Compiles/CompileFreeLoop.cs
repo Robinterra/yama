@@ -61,6 +61,12 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
+        public SSACompileLine Line
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -69,9 +75,10 @@ namespace Yama.Compiler
         {
             this.Node = node;
 
-            SSACompileLine line = new SSACompileLine(this);
+            SSACompileLine line = new SSACompileLine(this, true);
             line.LoopContainer = compiler.ContainerMgmt.CurrentContainer;
             line.LoopContainer.LoopLine = line;
+            this.Line = line;
             compiler.AddSSALine(line);
 
             return true;

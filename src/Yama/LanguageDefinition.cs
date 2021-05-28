@@ -525,6 +525,7 @@ namespace Yama
         private bool InitCompilerIrPrinting(Compiler.Compiler compiler)
         {
             if (string.IsNullOrEmpty(this.IROutputFile)) return true;
+            if (File.Exists(this.IROutputFile)) File.Delete(this.IROutputFile);
 
             compiler.IRCodeStream = new StreamWriter(File.OpenWrite(this.IROutputFile));
 
