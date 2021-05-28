@@ -4,6 +4,7 @@ using Yama.Index;
 using System.Linq;
 using System;
 using Yama.Compiler;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -460,6 +461,31 @@ namespace Yama.Parser
             return true;
         }
 
+        public bool CompileCopy(RequestParserTreeCompile request)
+        {
+            Compiler.Compiler compiler = request.Compiler;
+
+            CompileContainer container = new CompileContainer();
+            container.Begin = new CompileSprungPunkt();
+            container.Ende = new CompileSprungPunkt();
+
+            compiler.PushContainer(container, this.Deklaration.ThisUses, false);
+
+            container.Begin.Compile(compiler, this, "default");
+
+            foreach (IndexVariabelnDeklaration node in this.Deklaration.Parameters)
+            {
+                CompileReferenceCall rc = new CompileReferenceCall();
+                rc.CompileDek(compiler, node, "set");
+            }
+
+            this.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+
+            container.Ende.Compile(compiler, this, "default");
+
+            return compiler.PopContainer();
+        }
+
         public bool Compile(Request.RequestParserTreeCompile request)
         {
             if (!this.CanCompile(request.Compiler)) return true;
@@ -528,6 +554,11 @@ namespace Yama.Parser
 
         public bool CanCompile(Compiler.Compiler compiler)
         {
+            if (this.AccessDefinition != null)
+            {
+                if (this.AccessDefinition.Kind == IdentifierKind.Copy) return false;
+            }
+
             if (compiler.OptimizeLevel == Optimize.None) return true;
 
             return this.CanCompile();

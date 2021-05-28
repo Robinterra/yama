@@ -135,6 +135,8 @@ namespace Yama.Parser
 
             this.CompileLeftNodeIfNotStaticClass(request.Compiler, request.Mode);
 
+            if (request.Mode == "copy") return true;
+
             if (this.RightNode is ReferenceCall rctu)
                 if (rctu.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
                     this.CompileNonStaticCall(request.Compiler, request.Mode, pgsdek);

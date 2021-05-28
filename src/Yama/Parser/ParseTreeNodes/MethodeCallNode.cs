@@ -215,7 +215,7 @@ namespace Yama.Parser
             if (!(this.Reference.Deklaration.Use is MethodeDeclarationNode t)) return false;
 
             //TODO: Not in this place
-            if (t.Deklaration.References.Count == 1)
+            if (t.Deklaration.References.Count == 2 && t.ZusatzDefinition == null)
             {
                 if (t.AccessDefinition == null) t.AccessDefinition = new IdentifierToken();
 
@@ -230,7 +230,9 @@ namespace Yama.Parser
                 parameter.Compile(request);
             }
 
-            t.Statement.Compile(new Request.RequestParserTreeCompile(request.Compiler, "default"));
+            this.LeftNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, "copy"));
+
+            t.CompileCopy(new Request.RequestParserTreeCompile(request.Compiler, "default"));
 
             return true;
         }
