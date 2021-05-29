@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using System.Text;
+using Yama.Parser;
 
 namespace Yama.Compiler
 {
@@ -40,7 +42,7 @@ namespace Yama.Compiler
 
             StringBuilder result = new StringBuilder();
 
-            this.PrintUnit(line, result);
+            if (this.PrintUnit(line, result) == ContinueMode.Break) return true;
 
             foreach (SSACompileArgument arg in line.Arguments)
             {
@@ -55,15 +57,51 @@ namespace Yama.Compiler
             return true;
         }
 
-        private bool PrintUnit(SSACompileLine line, StringBuilder result)
+        private ContinueMode PrintUnit(SSACompileLine line, StringBuilder result)
         {
-            if (this.AddFunktionsDeklaration(line, result)) return true;
-            if (this.AddFunktionsEnde(line, result)) return true;
-            if (this.AddReferenceCall(line, result)) return true;
+            if (this.AddFunktionsDeklaration(line, result)) return ContinueMode.Continue;
+            if (this.AddFunktionsEnde(line, result)) return ContinueMode.Continue;
+            if (this.AddWhileLoop(line, result)) return ContinueMode.Continue;
+            if (this.AddForLoop(line, result)) return ContinueMode.Continue;
+            if (this.AddFreeLoop(line, result)) return ContinueMode.Break;
+            if (this.AddReferenceCall(line, result)) return ContinueMode.Continue;
 
             string printMode = line.Owner.Algo.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
             string isNotUseChar = line.IsUsed ? "" : "/!\\";
             result.AppendFormat("{3}{0}: {4}{1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
+
+            return ContinueMode.Continue;
+        }
+
+        private bool AddFreeLoop(SSACompileLine line, StringBuilder result)
+        {
+            if (!(line.Owner is CompileFreeLoop)) return false;
+
+            this.emptyStrings = this.emptyStrings - 4;
+
+            return true;
+        }
+
+        private bool AddWhileLoop(SSACompileLine line, StringBuilder result)
+        {
+            if (!(line.Owner is CompileJumpWithCondition)) return false;
+            if (!(line.Owner.Node is WhileKey ifk)) return false;
+
+            result.AppendFormat("{2}{0}: {1}", line.Order, ifk.Token.Text, new string(' ', emptyStrings));
+
+            this.emptyStrings = this.emptyStrings + 4;
+
+            return true;
+        }
+
+        private bool AddForLoop(SSACompileLine line, StringBuilder result)
+        {
+            if (!(line.Owner is CompileJumpWithCondition)) return false;
+            if (!(line.Owner.Node is ForKey ifk)) return false;
+
+            result.AppendFormat("{2}{0}: {1}", line.Order, ifk.Token.Text, new string(' ', emptyStrings));
+
+            this.emptyStrings = this.emptyStrings + 4;
 
             return true;
         }
@@ -104,5 +142,11 @@ namespace Yama.Compiler
 
         #endregion methods
 
+    }
+
+    public enum ContinueMode
+    {
+        Continue,
+        Break
     }
 }
