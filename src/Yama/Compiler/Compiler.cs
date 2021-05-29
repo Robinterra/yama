@@ -294,7 +294,7 @@ namespace Yama.Compiler
 
             //this.AssemblerSequence.AddRange(this.DataSequence);
 
-            IRCodePrintStream iRCodePrintStream = new IRCodePrintStream(this.IRCodeStream);
+            //if (this.IRCodeStream != null) this.PrintIr();
 
             try
             {
@@ -302,6 +302,8 @@ namespace Yama.Compiler
                     this.Writer = new StreamWriter(this.OutputFile.OpenWrite());
             }
             catch (Exception e) { return this.AddError(string.Format("The outputfile for the assembler sequence can not be created. {0}", e.Message)); }
+
+            IRCodePrintStream iRCodePrintStream = new IRCodePrintStream(this.IRCodeStream);
 
             foreach (SSACompileLine line in this.SSALines)
             {
@@ -327,6 +329,25 @@ namespace Yama.Compiler
 
             return this.Errors.Count == 0;
         }
+
+        /*private bool PrintIr()
+        {
+            IRCodePrintStream iRCodePrintStream = new IRCodePrintStream(this.IRCodeStream);
+
+            foreach (CompileContainer container in this.ContainerMgmt.RootContainer.Containers)
+            {
+                this.PrintIrContainer(container, iRCodePrintStream);
+            }
+
+            return true;
+        }
+
+        private bool PrintIrContainer(CompileContainer container, IRCodePrintStream iRCodePrintStream)
+        {
+            
+
+            return true;
+        }*/
 
         public bool AddError(string msg, IParseTreeNode node = null)
         {

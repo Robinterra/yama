@@ -33,7 +33,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        } = new CompileAlgo();
+        } = new CompileAlgo() { Name = "LoopEnde" };
 
         public Dictionary<string, string> PrimaryKeys
         {
