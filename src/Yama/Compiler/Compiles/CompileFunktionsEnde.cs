@@ -181,6 +181,8 @@ namespace Yama.Compiler
             this.Node = node;
             compiler.AssemblerSequence.Add(this);
 
+            compiler.EndCurrentMethod();
+
             if (mode == "set") this.SetNode = node;
             if (mode == "get") this.GetNode = node;
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
@@ -212,6 +214,8 @@ namespace Yama.Compiler
         {
             this.Node = node;
             compiler.AssemblerSequence.Add(this);
+
+            compiler.EndCurrentMethod();
 
             if (mode == "set") this.PSetNode = node;
             if (mode == "get") this.PGetNode = node;
