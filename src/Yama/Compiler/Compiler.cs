@@ -145,6 +145,13 @@ namespace Yama.Compiler
             return line;
         }
 
+        public bool EndCurrentMethod()
+        {
+            this.PopContainer();
+
+            return true;
+        }
+
         private bool CheckArgumentsEqual(SSACompileLine existLine, SSACompileLine line)
         {
             int count = 0;
@@ -162,7 +169,7 @@ namespace Yama.Compiler
 
         public bool BeginNewMethode(List<string> registerInUse, CompileContainer compileContainer, ValidUses uses)
         {
-            if (this.ContainerMgmt.CurrentMethod != null) this.PopContainer();
+            //if (this.ContainerMgmt.CurrentMethod != null) this.PopContainer();
 
             this.Definition.BeginNewMethode(registerInUse);
             this.ContainerMgmt.AddNewMethode(compileContainer);
@@ -432,7 +439,7 @@ namespace Yama.Compiler
             {
                 parentVarMap[conMap.Key].Reference = conMap.Value.Reference;
 
-                return false;
+                if (conMap.Value.Reference == null) return false;
             }
 
             //if (containerMaps[orgMap.Key].Reference.ReplaceLine != null) this.CheckForCopy(containerMaps[orgMap.Key].Reference);

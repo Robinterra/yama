@@ -269,12 +269,7 @@ namespace Yama.Compiler
 
         public bool FindEquals(SSACompileLine line)
         {
-            foreach (SSACompileLine refLine in this.PhiMap)
-            {
-                if (line.Equals(refLine)) return true;
-            }
-
-            return false;
+            return this.PhiMap.Contains(line);
         }
 
         #endregion methods

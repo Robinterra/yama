@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Yama.Compiler.Definition
 {
@@ -252,12 +253,33 @@ namespace Yama.Compiler.Definition
 
         private bool HasALoopContainer(RegisterMap map)
         {
-            if (map.Line.LoopContainer != null) return true;
+            if (map.Line.LoopContainer != null) return this.IsUsedAfterBeginOfLoop(map.Line.LoopContainer.LoopLine, map.Line.Calls);
 
             foreach (SSACompileLine line in map.Line.PhiMap)
             {
                 if (line.LoopContainer != null) return true;
             }
+
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        private bool IsUsedAfterBeginOfLoop(SSACompileLine loopLine, List<SSACompileLine> calls)
+        {
+            if (calls.Count == 0) return false;
+
+            SSACompileArgument arg = loopLine.Arguments.FirstOrDefault();
+            if (arg == null) return true;
+
+            List<SSACompileLine> find = calls.Where(t=>t.Order > arg.Reference.Order).ToList();
+            if (find.Count > 1) return true;
+
+            SSACompileLine lastMatch = find.FirstOrDefault();
+            if (lastMatch == null) return false;
+            if (lastMatch.Order != loopLine.Order) return true;
+
+            calls.Remove(lastMatch);
 
             return false;
         }

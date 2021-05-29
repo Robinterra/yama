@@ -33,7 +33,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new CompileAlgo();
 
         public Dictionary<string, string> PrimaryKeys
         {
@@ -67,6 +67,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public SSACompileLine Begin
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -79,6 +85,7 @@ namespace Yama.Compiler
             line.LoopContainer = compiler.ContainerMgmt.CurrentContainer;
             line.LoopContainer.LoopLine = line;
             this.Line = line;
+            line.AddArgument(new SSACompileArgument(this.Begin));
             compiler.AddSSALine(line);
 
             return true;
