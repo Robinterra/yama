@@ -236,6 +236,8 @@ namespace Yama.Compiler
                 if (map.Reference != null) map.AllSets.Add(arg.Reference);
                 map.Reference = arg.Reference;
 
+                arg.Reference.Calls.Remove(lineset);
+
                 return true;
             }
 

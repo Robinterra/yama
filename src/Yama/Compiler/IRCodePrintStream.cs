@@ -40,13 +40,7 @@ namespace Yama.Compiler
 
             StringBuilder result = new StringBuilder();
 
-            if (this.AddFunktionsDeklaration(line)) return true;
-            if (this.AddFunktionsEnde(line)) return true;
-            if (this.AddReferenceCall(line)) return true;
-
-            string printMode = line.Owner.Algo.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
-            string isNotUseChar = line.IsUsed ? "" : "/!\\";
-            result.AppendFormat("{3}{0}: {4}{1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
+            this.PrintUnit(line, result);
 
             foreach (SSACompileArgument arg in line.Arguments)
             {
@@ -61,39 +55,46 @@ namespace Yama.Compiler
             return true;
         }
 
-        private bool AddReferenceCall(SSACompileLine line)
+        private bool PrintUnit(SSACompileLine line, StringBuilder result)
+        {
+            if (this.AddFunktionsDeklaration(line, result)) return true;
+            if (this.AddFunktionsEnde(line, result)) return true;
+            if (this.AddReferenceCall(line, result)) return true;
+
+            string printMode = line.Owner.Algo.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
+            string isNotUseChar = line.IsUsed ? "" : "/!\\";
+            result.AppendFormat("{3}{0}: {4}{1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
+
+            return true;
+        }
+
+        private bool AddReferenceCall(SSACompileLine line, StringBuilder result)
         {
             if (!(line.Owner is CompileReferenceCall rc)) return false;
             if (rc.Node == null) return false;
 
             string isNotUseChar = line.IsUsed ? "" : "/!\\";
-            string result = string.Format("{2}{0}: {3}{1} (  )", line.Order, rc.Node.Token.Text, new string(' ', emptyStrings), isNotUseChar);
-
-            this.Writer.WriteLine(result);
+            result.AppendFormat("{2}{0}: {3}{1} (  )", line.Order, rc.Node.Token.Text, new string(' ', emptyStrings), isNotUseChar);
 
             return true;
         }
 
-        private bool AddFunktionsEnde(SSACompileLine line)
+        private bool AddFunktionsEnde(SSACompileLine line, StringBuilder result)
         {
             if (!(line.Owner is CompileFunktionsEnde fe)) return false;
 
             emptyStrings -= 4;
 
-            this.Writer.WriteLine("}");
-            this.Writer.WriteLine();
+            result.AppendLine("}");
 
             return true;
         }
 
-        private bool AddFunktionsDeklaration(SSACompileLine line)
+        private bool AddFunktionsDeklaration(SSACompileLine line, StringBuilder result)
         {
             if (!(line.Owner is CompileFunktionsDeklaration fd)) return false;
 
-            string result = string.Format("{0} (  )\n{{", fd.Node.Token.Text);
-
-            this.Writer.WriteLine();
-            this.Writer.WriteLine(result);
+            result.AppendFormat("{0} (  )\n{{", fd.Node.Token.Text);
 
             emptyStrings += 4;
 
