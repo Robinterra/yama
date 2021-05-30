@@ -145,7 +145,7 @@ namespace Yama.Parser
 
             //compiler.IsLoopHeaderBegin = false;
 
-            //this.CompileContainer.Ende.Node = this;
+            this.CompileContainer.Ende.Node = this;
             jumpende.Compile(request.Compiler, this.CompileContainer.Ende, "isZero");
 
             this.Statement.Compile(request);

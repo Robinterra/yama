@@ -77,7 +77,7 @@ namespace Yama.Compiler
         {
             if (!(line.Owner is CompileFreeLoop)) return false;
 
-            this.emptyStrings = this.emptyStrings - 4;
+            if (emptyStrings != 0) this.emptyStrings = this.emptyStrings - 4;
 
             return true;
         }
@@ -121,7 +121,7 @@ namespace Yama.Compiler
         {
             if (!(line.Owner is CompileFunktionsEnde fe)) return false;
 
-            emptyStrings -= 4;
+            if (emptyStrings != 0) emptyStrings -= 4;
 
             result.AppendLine("}");
 

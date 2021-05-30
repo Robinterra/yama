@@ -160,6 +160,7 @@ namespace Yama.Parser
 
             this.Condition.Compile(request);
 
+            this.CompileContainer.Ende.Node = this;
             jumpende.Compile(request.Compiler, this.CompileContainer.Ende, "isZero");
 
             this.Statement.Compile(request);
