@@ -17,7 +17,7 @@ namespace Yama.Parser
 
         private int grosstePrio = -1;
 
-        private List<IParseTreeNode> possibleParents;
+        public List<IParseTreeNode> possibleParents;
 
         // -----------------------------------------------
 
@@ -32,7 +32,7 @@ namespace Yama.Parser
         public int Position
         {
             get;
-            private set;
+            set;
         }
 
         // -----------------------------------------------
@@ -40,7 +40,7 @@ namespace Yama.Parser
         public int Start
         {
             get;
-            private set;
+            set;
         }
 
         // -----------------------------------------------
@@ -82,6 +82,8 @@ namespace Yama.Parser
             get;
             set;
         }
+
+        // -----------------------------------------------
 
         public Container ParentContainer
         {
@@ -244,10 +246,9 @@ namespace Yama.Parser
         {
             foreach (ParserLayer layer in this.ParserLayers)
             {
-                foreach ( IParseTreeNode rule in layer.ParserMembers )
-                {
-                    if ( rule is T ) return rule;
-                }
+                IParseTreeNode rule = layer.ParserMembers.Find(t => t is T);
+
+                if (rule != null) return rule;
             }
 
             return null;
@@ -311,16 +312,12 @@ namespace Yama.Parser
             if ( von >= bis ) return null;
             if (bis > this.Max) return null;
 
-            int currentpos = this.Position;
+            ParserPositionStack pos = new ParserPositionStack(this);
             this.Position = von;
-            int orgstart = this.Start;
             this.Start = von;
-            int tempmax = this.Max;
             this.Max = bis;
-            List<IParseTreeNode> possibleParentsTemp = this.possibleParents;
 
             this.possibleParents = new List<IParseTreeNode>();
-            List<IParseTreeNode> nodeParents = new List<IParseTreeNode>();
 
             bool isok = true;
             bool vorgangOhneNeueNodes = true;
@@ -344,23 +341,28 @@ namespace Yama.Parser
                 vorgangOhneNeueNodes = true;
             }
 
-            nodeParents = this.GetCleanNodeParents();
+            List<IParseTreeNode> nodeParents = this.GetCleanNodeParents();
 
+            this.FindTokensThatHasNoMatchNode();
+
+            pos.SetToParser(this);
+
+            return nodeParents;
+        }
+
+        // -----------------------------------------------
+
+        private bool FindTokensThatHasNoMatchNode()
+        {
             for (int i = this.Start; i < this.Max; i++)
             {
                 if ( this.Peek(i) == null ) continue;
-                if ( this.Peek(i).Node == null )
-                {
-                    this.SyntaxErrorToken ( this.Peek(i) );
-                }
+                if ( this.Peek(i).Node != null ) continue;
+
+                this.SyntaxErrorToken ( this.Peek(i) );
             }
 
-            this.Position = currentpos;
-            this.Max = tempmax;
-            this.Start = orgstart;
-            this.possibleParents = possibleParentsTemp;
-
-            return nodeParents;
+            return true;
         }
 
         // -----------------------------------------------
@@ -435,10 +437,7 @@ namespace Yama.Parser
 
             while ( this.Position < max )
             {
-                if ( this.Current.Node == null )
-                {
-                    return this.SyntaxErrorToken ( this.Current );
-                }
+                if ( this.Current.Node == null ) return this.SyntaxErrorToken ( this.Current );
 
                 this.NextToken (  );
             }
@@ -469,6 +468,7 @@ namespace Yama.Parser
         public bool NextToken (  )
         {
             this.Position++;
+
             return true;
         }
 
