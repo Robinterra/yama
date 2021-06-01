@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Yama.Index;
 using Yama.Lexer;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -9,27 +11,10 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IParseTreeNode LeftNode
-        {
-            get;
-            set;
-        }
-
-        public List<IParseTreeNode> ParametersNodes
-        {
-            get;
-            set;
-        }
-
         public IdentifierToken Token
         {
             get;
             set;
-        }
-
-        public int Prio
-        {
-            get;
         }
 
         public List<IParseTreeNode> GetAllChilds
@@ -38,25 +23,17 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.LeftNode );
-                result.AddRange ( this.ParametersNodes );
-
                 return result;
             }
         }
 
-        public IdentifierKind BeginZeichen
+        public IdentifierToken Ende
         {
             get;
             set;
         }
 
-        public IdentifierKind EndeZeichen
-        {
-            get;
-            set;
-        }
-        public IdentifierToken Ende
+        public IdentifierToken Begin
         {
             get;
             set;
@@ -66,16 +43,9 @@ namespace Yama.Parser
 
         #region ctor
 
-        public GenericCall ( int prio )
+        public GenericCall (  )
         {
-            this.Prio = prio;
-        }
 
-        public GenericCall ( IdentifierKind begin, IdentifierKind end, int prio )
-            : this ( prio )
-        {
-            this.BeginZeichen = begin;
-            this.EndeZeichen = end;
         }
 
         #endregion ctor
@@ -84,48 +54,64 @@ namespace Yama.Parser
 
         public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            if ( request.Token.Kind != this.BeginZeichen ) return null;
+            if ( request.Token.Kind != IdentifierKind.Operator ) return null;
+            if ( request.Token.Text != "<" ) return null;
 
-            MethodeCallNode node = new MethodeCallNode ( this.Prio );
+            GenericCall genericCall = new GenericCall();
 
-            IdentifierToken steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
+            genericCall.Begin = request.Token;
 
-            if ( steuerToken == null ) return null;
+            IdentifierToken token = request.Parser.Peek(request.Token, 1);
+            if (token == null) return null;
+            if (!this.ValidNameTokenKind(token.Kind)) return null;
 
-            IdentifierToken left = request.Parser.Peek ( request.Token, -1 );
+            genericCall.Token = token;
+            token = request.Parser.Peek(token, 1);
 
-            if ( left.Kind == IdentifierKind.Operator ) return null;
-            if ( left.Kind == IdentifierKind.NumberToken ) return null;
-            if ( left.Kind == IdentifierKind.OpenBracket ) return null;
-            if ( left.Kind == IdentifierKind.BeginContainer ) return null;
-            if ( left.Kind == IdentifierKind.OpenSquareBracket ) return null;
-            if ( left.Kind == IdentifierKind.EndOfCommand ) return null;
-            if ( left.Kind == IdentifierKind.Comma ) return null;
+            if (token.Kind != IdentifierKind.Operator) return null;
+            if (token.Text != ">") return null;
 
-            node.LeftNode = request.Parser.ParseCleanToken ( left );
+            genericCall.Ende = token;
 
-            node.ParametersNodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
+            return this.CleanUp(genericCall);
+        }
 
-            node.Token = request.Token;
-            node.Token.Node = node;
+        private bool ValidNameTokenKind(IdentifierKind kind)
+        {
+            if (kind == IdentifierKind.Word) return true;
+            if (kind == IdentifierKind.Int32Bit) return true;
+            if (kind == IdentifierKind.Boolean) return true;
+            if (kind == IdentifierKind.Char) return true;
+            if (kind == IdentifierKind.Byte) return true;
+            if (kind == IdentifierKind.Int16Bit) return true;
+            if (kind == IdentifierKind.Int64Bit) return true;
+            if (kind == IdentifierKind.Float32Bit) return true;
 
-            node.LeftNode.Token.ParentNode = node;
-            node.Ende = steuerToken;
+            return false;
+        }
 
-            steuerToken.ParentNode = node;
-            steuerToken.Node = node;
+        private IParseTreeNode CleanUp(GenericCall genericCall)
+        {
+            genericCall.Token.Node = genericCall;
 
-            foreach ( IParseTreeNode n in node.ParametersNodes )
-            {
-                n.Token.ParentNode = node;
-            }
+            genericCall.Begin.Node = genericCall;
 
-            return node;
+            genericCall.Ende.Node = genericCall;
+
+            return genericCall;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
+            if (request.Parent is IndexKlassenDeklaration idk) return this.IndezKlassenGeneric(request, idk);
             if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+
+            return true;
+        }
+
+        private bool IndezKlassenGeneric(RequestParserTreeIndezieren request, IndexKlassenDeklaration idk)
+        {
+
 
             return true;
         }

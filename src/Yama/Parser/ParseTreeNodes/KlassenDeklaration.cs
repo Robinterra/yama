@@ -3,6 +3,7 @@ using Yama.Lexer;
 using Yama.Index;
 using Yama.Compiler;
 using System;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -76,6 +77,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
+                if (this.GenericDefintion != null) result.Add ( this.GenericDefintion );
                 result.Add ( this.Statement );
 
                 return result;
@@ -230,10 +232,11 @@ namespace Yama.Parser
 
             token = request.Parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
-
             deklaration.Token = token;
 
             token = request.Parser.Peek ( token, 1 );
+
+            token = this.TryParseGeneric ( request, deklaration, token );
 
             token = this.MakeInheritanceBase ( request.Parser, token, deklaration );
 
@@ -244,9 +247,27 @@ namespace Yama.Parser
             return this.CleanUp(deklaration);
         }
 
+        private IdentifierToken TryParseGeneric(RequestParserTreeParser request, KlassenDeklaration deklaration, IdentifierToken token)
+        {
+            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
+            if (genericRule == null) return token;
+
+            IParseTreeNode node = genericRule.Parse(new RequestParserTreeParser(request.Parser, token));
+            if (!(node is GenericCall genericCall)) return token;
+
+            deklaration.GenericDefintion = genericCall;
+
+            return request.Parser.Peek(genericCall.Ende, 1);
+        }
+
         private KlassenDeklaration CleanUp(KlassenDeklaration deklaration)
         {
             deklaration.Statement.Token.ParentNode = deklaration;
+
+            if (deklaration.GenericDefintion != null)
+            {
+                deklaration.GenericDefintion.Token.ParentNode = deklaration;
+            }
 
             if (deklaration.AccessDefinition != null)
             {
@@ -272,6 +293,8 @@ namespace Yama.Parser
             IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration();
             deklaration.Name = this.Token.Text;
             deklaration.Use = this;
+
+            if (this.GenericDefintion != null) this.GenericDefintion.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
 
             if (this.InheritanceBase != null) deklaration.InheritanceBase = new IndexVariabelnReference { Name = this.InheritanceBase.Text, Use = this };
 
