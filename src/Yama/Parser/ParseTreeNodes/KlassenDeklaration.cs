@@ -42,7 +42,7 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode GenericDefintion
+        public GenericCall GenericDefintion
         {
             get;
             set;
@@ -294,7 +294,11 @@ namespace Yama.Parser
             deklaration.Name = this.Token.Text;
             deklaration.Use = this;
 
-            if (this.GenericDefintion != null) this.GenericDefintion.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
+            if (this.GenericDefintion != null)
+            {
+                this.GenericDefintion.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
+                deklaration.GenericDeklaration = this.GenericDefintion;
+            }
 
             if (this.InheritanceBase != null) deklaration.InheritanceBase = new IndexVariabelnReference { Name = this.InheritanceBase.Text, Use = this };
 

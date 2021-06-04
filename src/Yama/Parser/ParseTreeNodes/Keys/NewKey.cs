@@ -3,6 +3,7 @@ using System.Linq;
 using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -53,12 +54,19 @@ namespace Yama.Parser
             set;
         }
 
+        public GenericCall GenericDefintion
+        {
+            get;
+            set;
+        }
+
         public List<IParseTreeNode> GetAllChilds
         {
             get
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
+                if (this.GenericDefintion != null) result.Add(this.GenericDefintion);
                 if (this.Parameters != null) result.AddRange ( this.Parameters );
                 if (this.Zuweisung != null) result.Add ( this.Zuweisung );
 
@@ -99,6 +107,10 @@ namespace Yama.Parser
 
             IdentifierToken beginkind = request.Parser.Peek ( newKey.Definition, 1 );
 
+            beginkind = this.TryParseGeneric(request, newKey, beginkind);
+
+            if (beginkind.Kind != IdentifierKind.OpenBracket) return null;
+
             IdentifierToken endToken = request.Parser.FindEndToken ( beginkind, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
 
             if ( endToken == null ) return null;
@@ -114,6 +126,7 @@ namespace Yama.Parser
             endToken.Node = newKey;
             beginkind.ParentNode = newKey;
             beginkind.Node = newKey;
+            if (newKey.GenericDefintion != null) newKey.GenericDefintion.Token.ParentNode = newKey;
 
             foreach ( IParseTreeNode n in newKey.Parameters )
             {
@@ -121,6 +134,19 @@ namespace Yama.Parser
             }
 
             return newKey;
+        }
+
+        private IdentifierToken TryParseGeneric(RequestParserTreeParser request, NewKey deklaration, IdentifierToken token)
+        {
+            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
+            if (genericRule == null) return token;
+
+            IParseTreeNode node = genericRule.Parse(new RequestParserTreeParser(request.Parser, token));
+            if (!(node is GenericCall genericCall)) return token;
+
+            deklaration.GenericDefintion = genericCall;
+
+            return request.Parser.Peek(genericCall.Ende, 1);
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
