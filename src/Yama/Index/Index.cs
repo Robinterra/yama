@@ -195,7 +195,7 @@ namespace Yama.Index
         public string GetTypeName(IndexVariabelnReference reference)
         {
             if (reference == null) return string.Empty;
-            if (reference.ParentCall != null) return this.GetTypeName(reference.ParentCall);
+            if (reference.ParentCall != null) return this.GetTypeName(reference.ParentCall, reference);
 
             if (reference.Deklaration is IndexKlassenDeklaration t) return t.Name;
             if (reference.Deklaration is IndexVariabelnDeklaration vd) return vd.Type.Name;
@@ -206,6 +206,19 @@ namespace Yama.Index
             if (reference.Deklaration is IndexEnumEntryDeklaration) return "int";
 
             return string.Empty;
+        }
+
+        public string GetTypeName(IndexVariabelnReference reference, IndexVariabelnReference parent)
+        {
+            string typeName = this.GetTypeName(reference);
+
+            if (parent.ClassGenericDefinition == null) return typeName;
+            if (parent.GenericDeklaration == null) return typeName;
+            if (string.IsNullOrEmpty(typeName)) return typeName;
+
+            if (typeName != parent.ClassGenericDefinition.Token.Text) return typeName;
+
+            return parent.GenericDeklaration.Token.Text;
         }
 
         private bool Mappen()

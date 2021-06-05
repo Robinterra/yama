@@ -181,12 +181,12 @@ namespace Yama.Parser
             IndexVariabelnReference typeDeklaration = new IndexVariabelnReference();
             typeDeklaration.Use = this;
             typeDeklaration.Name = this.Definition.Text;
-            container.VariabelnReferences.Add(typeDeklaration);
             if (this.GenericDefintion != null)
             {
                 typeDeklaration.GenericDeklaration = this.GenericDefintion;
                 this.GenericDefintion.Indezieren(request);
             }
+            container.VariabelnReferences.Add(typeDeklaration);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
