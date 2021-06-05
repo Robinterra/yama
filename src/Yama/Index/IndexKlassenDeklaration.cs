@@ -93,6 +93,8 @@ namespace Yama.Index
 
                 List<IParent> dekList = new List<IParent> { dekThisVar };
 
+                this.CreateGenericForThisUses(dekList);
+
                 this.thisUses.Deklarationen = dekList;
 
                 if (this.InheritanceBase == null) return this.thisUses;
@@ -111,7 +113,28 @@ namespace Yama.Index
             }
         }
 
+        private bool CreateGenericForThisUses(List<IParent> dekList)
+        {
+            if (this.GenericDeklaration == null) return false;
+
+            IndexKlassenDeklaration dekThisVar = new IndexKlassenDeklaration();
+            dekThisVar.Name = this.GenericDeklaration.Token.Text;
+            dekThisVar.Use = this.GenericDeklaration;
+            dekThisVar.ParentUsesSet = this.thisUses;
+            dekThisVar.IsGeneric = true;
+
+            dekList.Add(dekThisVar);
+
+            return true;
+        }
+
         public ValidUses ParentUsesSet
+        {
+            get;
+            set;
+        }
+
+        public bool IsGeneric
         {
             get;
             set;
@@ -187,6 +210,12 @@ namespace Yama.Index
             }
 
             return false;
+        }
+
+        public GenericCall GenericDeklaration
+        {
+            get;
+            set;
         }
 
         #endregion get/set

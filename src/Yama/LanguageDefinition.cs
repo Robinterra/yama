@@ -268,6 +268,17 @@ namespace Yama
 
         // -----------------------------------------------
 
+        private ParserLayer GetGenericLayer()
+        {
+            ParserLayer layer = new ParserLayer("generic");
+
+            layer.ParserMembers.Add(new GenericCall());
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
         private List<ParserLayer> GetParserRules (  )
         {
             List<ParserLayer> parserRules = new List<ParserLayer>();
@@ -286,6 +297,7 @@ namespace Yama
             parserRules.Add(executionlayer);
             parserRules.Add(invektorlayer);
             parserRules.Add(inenumlayer);
+            parserRules.Add(this.GetGenericLayer());
 
             return parserRules;
         }

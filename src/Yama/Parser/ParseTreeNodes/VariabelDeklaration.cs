@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Yama.Lexer;
 using System.Linq;
 using Yama.Compiler;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -29,7 +30,7 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode GenericDefintion
+        public GenericCall GenericDefintion
         {
             get;
             set;
@@ -52,7 +53,8 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                //result.Add ( this.ChildNode );
+                result.Add ( this.TypeDefinition );
+                if (this.GenericDefintion != null) result.Add ( this.GenericDefintion );
 
                 return result;
             }
@@ -117,20 +119,23 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode Parse ( RequestParserTreeParser request )
         {
-            if ( request.Token.Kind != IdentifierKind.Word )
-                if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
+            if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
             IdentifierToken lexerLeft = request.Parser.Peek ( request.Token, -1 );
 
             if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
 
+            VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
+
             IdentifierToken lexerRight = request.Parser.Peek ( request.Token, 1 );
+            if (lexerRight == null) return null;
+
+            lexerRight = this.TryParseGeneric(request, node, lexerRight);
 
             if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
 
-            VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
             node.Token = lexerRight;
 
             IParseTreeNode callRule = request.Parser.GetRule<ReferenceCall>();
@@ -141,8 +146,22 @@ namespace Yama.Parser
 
             lexerRight.Node = node;
             node.TypeDefinition.Token.ParentNode = node;
+            if (node.GenericDefintion != null) node.GenericDefintion.Token.ParentNode = node;
 
             return node;
+        }
+
+        private IdentifierToken TryParseGeneric(RequestParserTreeParser request, VariabelDeklaration deklaration, IdentifierToken token)
+        {
+            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
+            if (genericRule == null) return token;
+
+            IParseTreeNode node = genericRule.Parse(new RequestParserTreeParser(request.Parser, token));
+            if (!(node is GenericCall genericCall)) return token;
+
+            deklaration.GenericDefintion = genericCall;
+
+            return request.Parser.Peek(genericCall.Ende, 1);
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
@@ -156,6 +175,11 @@ namespace Yama.Parser
                 reference = new IndexVariabelnDeklaration();
                 reference.Use = this;
                 reference.Name = this.Token.Text;
+                if (this.GenericDefintion != null)
+                {
+                    reference.GenericDeklaration = this.GenericDefintion;
+                    this.GenericDefintion.Indezieren(request);
+                }
 
                 this.TypeDefinition.Indezieren(request);
                 IndexVariabelnReference type = container.VariabelnReferences.LastOrDefault();

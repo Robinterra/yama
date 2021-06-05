@@ -35,9 +35,14 @@ namespace Yama.Index
         {
             if (this.LeftRef == null) return true;
 
-            if (request.Index.GetTypeName(this.LeftRef) == request.Index.GetTypeName(this.RightRef)) return true;
+            string leftName = request.Index.GetTypeName(this.LeftRef);
+            string rightName = request.Index.GetTypeName(this.RightRef);
 
-            request.Index.CreateError(this.LeftRef == null ? this.RightRef.Use : this.LeftRef.Use, string.Format("Set Value has not correct type, expectet: {0}, currently: {1}", request.Index.GetTypeName(this.LeftRef), request.Index.GetTypeName(this.RightRef)));
+            request.Index.GetTypeName(this.RightRef);
+
+            if (leftName == rightName) return true;
+
+            request.Index.CreateError(this.LeftRef == null ? this.RightRef.Use : this.LeftRef.Use, string.Format("Set Value has not correct type, expectet: {0}, currently: {1}", leftName, rightName));
 
             return false;
         }

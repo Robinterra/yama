@@ -8,11 +8,20 @@ namespace Yama.Index
 {
     public class IndexVariabelnDeklaration : IParent
     {
+
+        // -----------------------------------------------
+
+        #region get/set
+
+        // -----------------------------------------------
+
         public string Name
         {
             get;
             set;
         }
+
+        // -----------------------------------------------
 
         public List<IndexVariabelnReference> References
         {
@@ -20,17 +29,23 @@ namespace Yama.Index
             set;
         }
 
+        // -----------------------------------------------
+
         public IParseTreeNode Use
         {
             get;
             set;
         }
 
+        // -----------------------------------------------
+
         public IndexVariabelnReference Type
         {
             get;
             set;
         }
+
+        // -----------------------------------------------
 
         public ValidUses ThisUses
         {
@@ -40,24 +55,85 @@ namespace Yama.Index
             }
         }
 
+        // -----------------------------------------------
+
         public bool IsMapped
         {
             get;
             set;
         }
 
-        public ValidUses ParentUsesSet { get; set; }
-        public ValidUses BaseUsesSet { get; internal set; }
+        // -----------------------------------------------
 
-        public ValidUses SetUsesSet { get; internal set; }
-        public SSAVariableMap SSAMap { get; internal set; }
+        public ValidUses ParentUsesSet
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public ValidUses BaseUsesSet
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public ValidUses SetUsesSet
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public SSAVariableMap SSAMap
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public GenericCall GenericDeklaration
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        #endregion get/set
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
 
         public IndexVariabelnDeklaration (  )
         {
             this.References = new List<IndexVariabelnReference>();
-            
         }
-        public bool PreMappen(ValidUses uses){return true;}
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
+        public bool PreMappen(ValidUses uses)
+        {
+            return true;
+        }
+
+        // -----------------------------------------------
 
         public bool Mappen(ValidUses uses)
         {
@@ -106,7 +182,8 @@ namespace Yama.Index
             return true;
         }
 
-        
+        // -----------------------------------------------
+
         public bool IsInUse (int depth)
         {
             if (depth > 10) return true;
@@ -121,5 +198,12 @@ namespace Yama.Index
 
             return false;
         }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
+
     }
 }

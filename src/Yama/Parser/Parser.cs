@@ -242,16 +242,16 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public IParseTreeNode GetRule<T>() where T : IParseTreeNode
+        public T GetRule<T>() where T : IParseTreeNode
         {
             foreach (ParserLayer layer in this.ParserLayers)
             {
                 IParseTreeNode rule = layer.ParserMembers.Find(t => t is T);
 
-                if (rule != null) return rule;
+                if (rule != null) return (T)rule;
             }
 
-            return null;
+            return default;
         }
 
         // -----------------------------------------------

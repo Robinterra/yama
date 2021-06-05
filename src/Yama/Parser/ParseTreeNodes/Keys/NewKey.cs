@@ -3,6 +3,7 @@ using System.Linq;
 using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -53,12 +54,19 @@ namespace Yama.Parser
             set;
         }
 
+        public GenericCall GenericDefintion
+        {
+            get;
+            set;
+        }
+
         public List<IParseTreeNode> GetAllChilds
         {
             get
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
+                if (this.GenericDefintion != null) result.Add(this.GenericDefintion);
                 if (this.Parameters != null) result.AddRange ( this.Parameters );
                 if (this.Zuweisung != null) result.Add ( this.Zuweisung );
 
@@ -66,7 +74,17 @@ namespace Yama.Parser
             }
         }
 
-        public IdentifierToken Ende { get; set; }
+        public IdentifierToken Ende
+        {
+            get;
+            set;
+        }
+
+        public IdentifierToken SupportToken
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
@@ -99,6 +117,10 @@ namespace Yama.Parser
 
             IdentifierToken beginkind = request.Parser.Peek ( newKey.Definition, 1 );
 
+            beginkind = this.TryParseGeneric(request, newKey, beginkind);
+
+            if (beginkind.Kind != IdentifierKind.OpenBracket) return null;
+
             IdentifierToken endToken = request.Parser.FindEndToken ( beginkind, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
 
             if ( endToken == null ) return null;
@@ -107,13 +129,23 @@ namespace Yama.Parser
 
             if (newKey.Parameters == null) return null;
 
+            newKey.Ende = endToken;
+
+            newKey.SupportToken = beginkind;
+
+            return this.Clean(newKey);
+        }
+
+        private IParseTreeNode Clean(NewKey newKey)
+        {
+            newKey.Ende.ParentNode = newKey;
+            newKey.Ende.Node = newKey;
             newKey.Token.Node = newKey;
             newKey.Definition.Node = newKey;
-            newKey.Ende = endToken;
-            endToken.ParentNode = newKey;
-            endToken.Node = newKey;
-            beginkind.ParentNode = newKey;
-            beginkind.Node = newKey;
+
+            newKey.SupportToken.ParentNode = newKey;
+            newKey.SupportToken.Node = newKey;
+            if (newKey.GenericDefintion != null) newKey.GenericDefintion.Token.ParentNode = newKey;
 
             foreach ( IParseTreeNode n in newKey.Parameters )
             {
@@ -121,6 +153,19 @@ namespace Yama.Parser
             }
 
             return newKey;
+        }
+
+        private IdentifierToken TryParseGeneric(RequestParserTreeParser request, NewKey deklaration, IdentifierToken token)
+        {
+            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
+            if (genericRule == null) return token;
+
+            IParseTreeNode node = genericRule.Parse(new RequestParserTreeParser(request.Parser, token));
+            if (!(node is GenericCall genericCall)) return token;
+
+            deklaration.GenericDefintion = genericCall;
+
+            return request.Parser.Peek(genericCall.Ende, 1);
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
@@ -136,12 +181,19 @@ namespace Yama.Parser
             IndexVariabelnReference typeDeklaration = new IndexVariabelnReference();
             typeDeklaration.Use = this;
             typeDeklaration.Name = this.Definition.Text;
+            if (this.GenericDefintion != null)
+            {
+                typeDeklaration.GenericDeklaration = this.GenericDefintion;
+                this.GenericDefintion.Indezieren(request);
+            }
             container.VariabelnReferences.Add(typeDeklaration);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
             reference.Name = this.Token.Text;
             reference.Deklaration = typeDeklaration;
+            if (this.GenericDefintion != null) reference.GenericDeklaration = this.GenericDefintion;
+
             typeDeklaration.ParentCall = reference;
             typeDeklaration.VariabelnReferences.Add(reference);
             this.Reference = reference;
