@@ -8,6 +8,9 @@ namespace Yama.Assembler.ARMT32
 {
     public class WordNode : IParseTreeNode
     {
+
+        #region get/set
+
         public IdentifierToken Token
         {
             get;
@@ -27,8 +30,28 @@ namespace Yama.Assembler.ARMT32
             get;
             set;
         } = new List<IdentifierToken>();
-        public IdentifierToken Data { get; private set; }
-        public List<IdentifierToken> Arguments { get; set; } = new List<IdentifierToken>();
+
+        public IdentifierToken Data
+        {
+            get;
+            set;
+        }
+
+        public List<IdentifierToken> Arguments
+        {
+            get;
+            set;
+        } = new List<IdentifierToken>();
+
+        public IdentifierToken AdditionNumberToken
+        {
+            get;
+            set;
+        }
+
+        #endregion get/set
+
+        #region methods
 
         public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
@@ -56,6 +79,17 @@ namespace Yama.Assembler.ARMT32
 
             if (node.Data == null) return null;
 
+            token = request.Parser.Peek(token, 1);
+            if (token == null) return this.CleanUp(node);
+            if (token.Kind != IdentifierKind.PlusToken) return this.CleanUp(node);
+
+            node.SupportTokens.Add(token);
+
+            token = request.Parser.Peek(token, 1);
+            if (token.Kind != IdentifierKind.NumberToken) return this.CleanUp(node);
+
+            node.AdditionNumberToken = token;
+
             return this.CleanUp(node);
         }
 
@@ -63,6 +97,7 @@ namespace Yama.Assembler.ARMT32
         {
             node.Token.Node = node;
             if (node.Data != null) node.Data.Node = node;
+            if (node.AdditionNumberToken != null) node.AdditionNumberToken.Node = node;
 
             foreach (IdentifierToken token in node.SupportTokens)
             {
@@ -76,5 +111,7 @@ namespace Yama.Assembler.ARMT32
 
             return node;
         }
+
+        #endregion methods
     }
 }

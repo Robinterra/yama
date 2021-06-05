@@ -117,6 +117,7 @@ namespace Yama.Assembler
             rules.Add ( new Punctuation ( new ZeichenKette ( "#" ), IdentifierKind.Hash ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "=" ), IdentifierKind.Gleich ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "*" ), IdentifierKind.StarToken ) );
+            rules.Add ( new Punctuation ( new ZeichenKette ( "+" ), IdentifierKind.PlusToken ) );
             //rules.Add ( new Punctuation ( new ZeichenKette ( "\n" ), IdentifierKind.EndOfCommand ) );
             rules.Add ( new Whitespaces (  ) );
             rules.Add ( new Text ( new ZeichenKette ( "\"" ), new ZeichenKette ( "\"" ), escape ) );

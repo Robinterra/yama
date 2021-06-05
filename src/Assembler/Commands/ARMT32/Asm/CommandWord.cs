@@ -97,11 +97,21 @@ namespace Yama.Assembler.ARMT32
             if (t.Data.Kind != Lexer.IdentifierKind.Word) return 0;
 
             JumpPointMapper map = request.Assembler.GetJumpPoint(t.Data.Value.ToString());
-            if (map != null) return map.Adresse;
+            if (map == null)
+            {
+                request.Assembler.Errors.Add(request.Node);
 
-            request.Assembler.Errors.Add(request.Node);
+                return 0;
+            }
 
-            return 0;
+            uint result = map.Adresse;
+
+            if (t.AdditionNumberToken != null && result != 0)
+            {
+                result = (uint)(result + ((int)t.AdditionNumberToken.Value));
+            }
+
+            return result;
         }
 
         public bool Identify(RequestIdentify request)
