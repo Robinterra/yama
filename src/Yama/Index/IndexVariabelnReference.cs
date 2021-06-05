@@ -179,7 +179,7 @@ namespace Yama.Index
             }
 
             if (parentCall.Name == parentCall.Deklaration.Name) dek = this.GetStaticFound(md.Klasse);
-            else dek = this.GetKlassenFound(md.Klasse);
+            else dek = this.GetKlassenFound(md.Klasse, parentCall);
 
             if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / method");
 
@@ -196,10 +196,10 @@ namespace Yama.Index
             //if (parentCall.Name == parentCall.Deklaration.Name) dek = this.GetStaticFound(pd.Type.Deklaration as IndexKlassenDeklaration);
             //else 
 
-            dek = this.GetKlassenFound(pgsd.ReturnValue.Deklaration as IndexKlassenDeklaration);
+            dek = this.GetKlassenFound(pgsd.ReturnValue.Deklaration as IndexKlassenDeklaration, parentCall);
 
-            if (dek == null)
-                return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / prop dek");
+            if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / prop dek");
+
             this.Deklaration = dek;
 
             if (this.ParentCall != null) this.ParentCall.Mappen(this);
@@ -213,7 +213,7 @@ namespace Yama.Index
             //if (parentCall.Name == parentCall.Deklaration.Name) dek = this.GetStaticFound(pd.Type.Deklaration as IndexKlassenDeklaration);
             //else 
 
-            dek = this.GetKlassenFound(pd.Type.Deklaration as IndexKlassenDeklaration);
+            dek = this.GetKlassenFound(pd.Type.Deklaration as IndexKlassenDeklaration, parentCall);
 
             if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / property dek");
             this.Deklaration = dek;
@@ -251,15 +251,15 @@ namespace Yama.Index
         {
             if (!(vd.Type.Deklaration is IndexKlassenDeklaration kdd)) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no support type definition");
 
-            IParent dek = this.GetKlassenFound(kdd);
+            IParent dek = this.GetKlassenFound(kdd, parentCall);
 
             if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / variable dek");
             this.Deklaration = dek;
 
-            if (this.ParentCall != null) this.ParentCall.Mappen(this);
-
             this.ClassGenericDefinition = kdd.GenericDeklaration;
             this.GenericDeklaration = vd.GenericDeklaration;
+
+            if (this.ParentCall != null) this.ParentCall.Mappen(this);
 
             return true;
         }
@@ -337,6 +337,7 @@ namespace Yama.Index
 
             if (this.Deklaration == null) return uses.GetIndex.CreateError(this.Use, string.Format("no defintion in index found {0}", this.Name));
 
+            if (this.Deklaration is IndexVariabelnDeklaration vd) this.VariableDeklarationMappen(vd);
             if (this.ParentCall != null) this.ParentCall.Mappen(this);
 
             foreach (IndexVariabelnReference t in this.VariabelnReferences)
@@ -353,13 +354,25 @@ namespace Yama.Index
             if (this.Deklaration is IndexKlassenDeklaration kd) { kd.References.Add(this); return true; }
             if (this.Deklaration is IndexMethodDeklaration md) { md.References.Add(this); return true; }
             if (this.Deklaration is IndexPropertyDeklaration pd) { pd.References.Add(this); return true; }
-            if (this.Deklaration is IndexVariabelnDeklaration vd) { vd.References.Add(this); return true; }
+            if (this.Deklaration is IndexVariabelnDeklaration) return true;
             if (this.Deklaration is IndexEnumDeklaration ed) { ed.References.Add(this); return true; }
             if (this.Deklaration is IndexEnumEntryDeklaration eed) { eed.References.Add(this); return true; }
             if (this.Deklaration is IndexVektorDeklaration ivd) { ivd.References.Add(this); return true; }
             if (this.Deklaration is IndexPropertyGetSetDeklaration pgsd) { pgsd.References.Add(this); return true; }
 
             return uses.GetIndex.CreateError(this.Use, "no support type definition");
+        }
+
+        private bool VariableDeklarationMappen(IndexVariabelnDeklaration vd)
+        {
+            if (!(vd.Type.Deklaration is IndexKlassenDeklaration kdd)) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no support type definition");
+
+            this.GenericDeklaration = vd.GenericDeklaration;
+            this.ClassGenericDefinition = kdd.GenericDeklaration;
+
+            vd.References.Add(this);
+
+            return true;
         }
 
         private bool MethodenDeklaration(IMethode mud, List<IMethode> deklarationen)
