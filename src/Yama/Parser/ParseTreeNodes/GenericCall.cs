@@ -39,6 +39,12 @@ namespace Yama.Parser
             set;
         }
 
+        public IndexVariabelnReference Reference
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -105,6 +111,12 @@ namespace Yama.Parser
         {
             if (request.Parent is IndexKlassenDeklaration idk) return this.IndezKlassenGeneric(request, idk);
             if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+
+            IndexVariabelnReference reference = new IndexVariabelnReference();
+            reference.Use = this;
+            reference.Name = this.Token.Text;
+            container.VariabelnReferences.Add(reference);
+            this.Reference = reference;
 
             return true;
         }

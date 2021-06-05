@@ -74,7 +74,17 @@ namespace Yama.Parser
             }
         }
 
-        public IdentifierToken Ende { get; set; }
+        public IdentifierToken Ende
+        {
+            get;
+            set;
+        }
+
+        public IdentifierToken SupportToken
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
@@ -119,13 +129,22 @@ namespace Yama.Parser
 
             if (newKey.Parameters == null) return null;
 
+            newKey.Ende = endToken;
+
+            newKey.SupportToken = beginkind;
+
+            return this.Clean(newKey);
+        }
+
+        private IParseTreeNode Clean(NewKey newKey)
+        {
+            newKey.Ende.ParentNode = newKey;
+            newKey.Ende.Node = newKey;
             newKey.Token.Node = newKey;
             newKey.Definition.Node = newKey;
-            newKey.Ende = endToken;
-            endToken.ParentNode = newKey;
-            endToken.Node = newKey;
-            beginkind.ParentNode = newKey;
-            beginkind.Node = newKey;
+
+            newKey.SupportToken.ParentNode = newKey;
+            newKey.SupportToken.Node = newKey;
             if (newKey.GenericDefintion != null) newKey.GenericDefintion.Token.ParentNode = newKey;
 
             foreach ( IParseTreeNode n in newKey.Parameters )
@@ -163,11 +182,18 @@ namespace Yama.Parser
             typeDeklaration.Use = this;
             typeDeklaration.Name = this.Definition.Text;
             container.VariabelnReferences.Add(typeDeklaration);
+            if (this.GenericDefintion != null)
+            {
+                typeDeklaration.GenericDeklaration = this.GenericDefintion;
+                this.GenericDefintion.Indezieren(request);
+            }
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
             reference.Name = this.Token.Text;
             reference.Deklaration = typeDeklaration;
+            if (this.GenericDefintion != null) reference.GenericDeklaration = this.GenericDefintion;
+
             typeDeklaration.ParentCall = reference;
             typeDeklaration.VariabelnReferences.Add(reference);
             this.Reference = reference;

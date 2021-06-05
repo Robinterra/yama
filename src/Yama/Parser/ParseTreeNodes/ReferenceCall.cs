@@ -97,6 +97,7 @@ namespace Yama.Parser
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
             reference.Name = this.Token.Text;
+            reference.RefCombination = varref;
             varref.ParentCall = reference;
             varref.VariabelnReferences.Add(reference);
             this.Reference = reference;
