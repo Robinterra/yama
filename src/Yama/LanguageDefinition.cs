@@ -118,6 +118,12 @@ namespace Yama
             set;
         }
 
+        public List<string> Extensions
+        {
+            get;
+            set;
+        } = new List<string>();
+
         // -----------------------------------------------
 
         #endregion get/set
@@ -522,7 +528,10 @@ namespace Yama
             compiler.Definition.Compiler = compiler;
             this.InitCompilerIrPrinting(compiler);
 
-            if (!compiler.Definition.LoadExtensions(this.AllFilesInUse)) return this.PrintCompilerErrors(compiler.Errors);
+            List<FileInfo> extensionsFiles = new List<FileInfo>();
+            if (!this.LoadAllExtensionFiles(extensionsFiles)) return this.PrintSimpleError("failed to find extensions");
+
+            if (!compiler.Definition.LoadExtensions(extensionsFiles)) return this.PrintCompilerErrors(compiler.Errors);
 
             if (compiler.Compilen(nodes))
             {
@@ -533,6 +542,52 @@ namespace Yama
 
             return this.PrintCompilerErrors(compiler.Errors);
         }
+
+        // -----------------------------------------------
+
+        private bool LoadAllExtensionFiles(List<FileInfo> extensionsFiles)
+        {
+            foreach (FileInfo yamaFile in this.AllFilesInUse)
+            {
+                FileInfo extFile = new FileInfo(Path.ChangeExtension(yamaFile.FullName, ".json"));
+
+                if (!extFile.Exists) continue;
+
+                extensionsFiles.Add(extFile);
+            }
+
+            foreach (string extensionPath in this.Extensions)
+            {
+                DirectoryInfo directory = new DirectoryInfo(extensionPath);
+
+                if (!this.LoadExtensionFromDirectory(directory, extensionsFiles)) return false;
+            }
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool LoadExtensionFromDirectory(DirectoryInfo directory, List<FileInfo> extensionsFiles)
+        {
+            if (!directory.Exists) return this.PrintSimpleError(string.Format("can not find '{0}' extension path", directory.FullName));
+
+            foreach (DirectoryInfo childDirectory in directory.GetDirectories())
+            {
+                this.LoadExtensionFromDirectory(childDirectory, extensionsFiles);
+            }
+
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                if (file.Extension != ".json") continue;
+
+                extensionsFiles.Add(file);
+            }
+
+            return true;
+        }
+
+        // -----------------------------------------------
 
         private bool InitCompilerIrPrinting(Compiler.Compiler compiler)
         {
@@ -545,6 +600,8 @@ namespace Yama
 
             return true;
         }
+
+        // -----------------------------------------------
 
         private bool PrintCompilerErrors(List<CompilerError> errors)
         {
