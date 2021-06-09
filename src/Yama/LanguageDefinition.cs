@@ -424,12 +424,15 @@ namespace Yama
         {
             List<string> files = this.GetFiles();
 
+            List<ParserLayer> layers = this.GetParserRules();
+            Lexer.Lexer lexer = this.GetBasicLexer();
+            ParserLayer startlayer = layers.FirstOrDefault(t=>t.Name == "namespace");
+
             foreach (string File in files)
             {
                 System.IO.FileInfo file = new System.IO.FileInfo ( File );
 
-                Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
-                ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "namespace");
+                Parser.Parser p = new Parser.Parser ( file, layers, lexer );
 
                 p.ErrorNode = new ParserError (  );
 
