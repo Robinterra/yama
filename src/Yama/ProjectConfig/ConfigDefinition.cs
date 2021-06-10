@@ -13,11 +13,36 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
+        public bool Build(LanguageDefinition definition, FileInfo file)
+        {
+            if (file == null) return false;
+            if (!file.Exists) return false;
+
+            this.BuildOne(definition, file);
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool BuildOne(LanguageDefinition definition, FileInfo file)
+        {
+            List<IDeserialize> nodes = new List<IDeserialize>();
+            if (!this.Parse(nodes, file)) return false;
+
+            Project project = this.Deserialize(nodes);
+            if (project == null) return false;
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
         #region Lexer
 
         // -----------------------------------------------
 
-        public List<ILexerToken> GetLexerRules()
+        private List<ILexerToken> GetLexerRules()
         {
             List<ILexerToken> rules = new List<ILexerToken>();
 
@@ -50,7 +75,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public Lexer.Lexer GetBasicLexer()
+        private Lexer.Lexer GetBasicLexer()
         {
             Lexer.Lexer lexer = new Lexer.Lexer();
 
@@ -74,6 +99,7 @@ namespace Yama.ProjectConfig
             ParserLayer parserLayer = new ParserLayer("root");
 
             parserLayer.ParserMembers.Add(new SourcePathsNode());
+            parserLayer.ParserMembers.Add(new DefineNode());
 
             return parserLayer;
         }
@@ -105,10 +131,8 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        private bool Parse(List<IParseTreeNode> nodes)
+        private bool Parse(List<IDeserialize> nodes, FileInfo file)
         {
-            System.IO.FileInfo file = null;
-
             Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
             ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "root");
 
@@ -118,7 +142,7 @@ namespace Yama.ProjectConfig
 
             IParseTreeNode node = p.ParentContainer;
 
-            nodes.AddRange(node.GetAllChilds);
+            nodes.AddRange(node.GetAllChilds.Cast<IDeserialize>());
 
             return true;
         }
@@ -126,6 +150,29 @@ namespace Yama.ProjectConfig
         // -----------------------------------------------
 
         #endregion Parser
+
+        // -----------------------------------------------
+
+        #region Deserialize
+
+        // -----------------------------------------------
+
+        private Project Deserialize(List<IDeserialize> nodes)
+        {
+            RequestDeserialize request = new RequestDeserialize();
+            request.Project = new Project();
+
+            foreach (IDeserialize node in nodes)
+            {
+                node.Deserialize(request);
+            }
+
+            return request.Project;
+        }
+
+        // -----------------------------------------------
+
+        #endregion Deserialize
 
         // -----------------------------------------------
 

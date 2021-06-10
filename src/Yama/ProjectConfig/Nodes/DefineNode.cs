@@ -6,7 +6,7 @@ using Yama.Parser.Request;
 
 namespace Yama.ProjectConfig.Nodes
 {
-    public class SourcePathsNode : IDeserialize
+    public class DefineNode : IDeserialize
     {
         // -----------------------------------------------
 
@@ -52,7 +52,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public SourcePathsNode (  )
+        public DefineNode (  )
         {
             this.SupportTokens = new List<IdentifierToken>();
         }
@@ -72,11 +72,9 @@ namespace Yama.ProjectConfig.Nodes
 
         public bool Deserialize(RequestDeserialize request)
         {
-            string path = this.ValueToken.Value.ToString();
+            string define = this.ValueToken.Value.ToString();
 
-            DirectoryInfo directory = new DirectoryInfo(path);
-
-            request.Project.SourcePaths.Add(directory);
+            request.Project.Defines.Add(define);
 
             return true;
         }
@@ -93,9 +91,9 @@ namespace Yama.ProjectConfig.Nodes
         public IParseTreeNode Parse(RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
-            if (request.Token.Text.ToLower() != "source") return null;
+            if (request.Token.Text.ToLower() != "define") return null;
 
-            SourcePathsNode result = new SourcePathsNode();
+            DefineNode result = new DefineNode();
             result.SupportTokens.Add(request.Token);
             result.Token = request.Token;
 
@@ -115,7 +113,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        private IParseTreeNode CleanUp(SourcePathsNode node)
+        private IParseTreeNode CleanUp(DefineNode node)
         {
             foreach (IdentifierToken token in node.SupportTokens)
             {

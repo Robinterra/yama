@@ -10,6 +10,7 @@ using LearnCsStuf.CommandLines;
 using LearnCsStuf.CommandLines.Commands;
 using Yama.Assembler;
 using Yama.Debug;
+using Yama.ProjectConfig;
 
 namespace Yama
 {
@@ -190,6 +191,9 @@ namespace Yama
         {
             if (Program.yama == null) Program.yama = new LanguageDefinition();
 
+            FileInfo projectConfig = new FileInfo("config.yproj");
+            if (projectConfig.Exists) return Program.BuildWithProjectConfig(projectConfig);
+
             foreach ( ICommandLine command in commands )
             {
                 if (command is FileExpression) yama.Files.Add ( command.Value );
@@ -205,6 +209,19 @@ namespace Yama
                 if (command is IROutputExpression) yama.IROutputFile = command.Value;
                 if (command is ExtensionDirectoryExpression) yama.Extensions.Add(command.Value);
             }
+
+            DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
+            if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary.FullName );
+
+            return yama.Compile();
+        }
+
+        // -----------------------------------------------
+
+        private static bool BuildWithProjectConfig(FileInfo projectConfigFile)
+        {
+            ConfigDefinition projectConfig = new ConfigDefinition();
+            if (!projectConfig.Build(yama, projectConfigFile)) return false;
 
             DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
             if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary.FullName );
