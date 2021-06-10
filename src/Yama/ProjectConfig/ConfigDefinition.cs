@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Yama.Lexer;
 using Yama.Parser;
+using Yama.ProjectConfig.Nodes;
 
 namespace Yama.ProjectConfig
 {
@@ -32,6 +33,7 @@ namespace Yama.ProjectConfig
             } );
             rules.Add ( new Comment ( new ZeichenKette ( "/*" ), new ZeichenKette ( "*/" ) ) );
             rules.Add ( new Comment ( new ZeichenKette ( "//" ), new ZeichenKette ( "\n" ) ) );
+            rules.Add ( new Comment ( new ZeichenKette ( "#" ), new ZeichenKette ( "\n" ) ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( ":" ), IdentifierKind.DoublePoint ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "{" ), IdentifierKind.BeginContainer ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( "}" ), IdentifierKind.CloseContainer ) );
@@ -70,6 +72,8 @@ namespace Yama.ProjectConfig
         private ParserLayer RootLayer(ParserLayer packagelayer)
         {
             ParserLayer parserLayer = new ParserLayer("root");
+
+            parserLayer.ParserMembers.Add(new SourcePathsNode());
 
             return parserLayer;
         }

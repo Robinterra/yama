@@ -96,5 +96,23 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
+        #region ctor
+
+        // -----------------------------------------------
+
+        public Project (  )
+        {
+            this.SourcePaths = new List<DirectoryInfo>();
+            this.ExtensionsPaths = new List<DirectoryInfo>();
+            this.Defines = new List<string>();
+            this.Packages = new List<Package>();
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
     }
 }
