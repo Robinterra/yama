@@ -114,7 +114,7 @@ namespace Yama
 
             Runtime runtime = new Runtime();
             runtime.Sequence = Program.yama.Sequence;
-            runtime.Input = new FileInfo(Program.yama.OutputFile);
+            runtime.Input = Program.yama.OutputFile;
 
             foreach ( ICommandLine command in commands )
             {
@@ -197,9 +197,9 @@ namespace Yama
             foreach ( ICommandLine command in commands )
             {
                 if (command is FileExpression) yama.Files.Add ( command.Value );
-                if (command is IncludeExpression) yama.Includes.Add ( command.Value );
+                if (command is IncludeExpression) yama.Includes.Add ( new DirectoryInfo( command.Value ));
                 if (command is AssemblerOutputFileExpression) yama.OutputAssemblerFile = command.Value;
-                if (command is OutputFileExpression) yama.OutputFile = command.Value;
+                if (command is OutputFileExpression) yama.OutputFile = new FileInfo(command.Value);
                 if (command is OptimizingExpression) yama.OptimizeLevel = Program.GetOptimizeLevel ( command.Value );
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
                 if (command is DefinesExpression) yama.Defines.Add(command.Value);
@@ -207,11 +207,11 @@ namespace Yama
                 if (command is SkipExpression) yama.StartPosition = Program.ParseSkipExpressionHex(command.Value);
                 if (command is StartNamespace) yama.StartNamespace = command.Value;
                 if (command is IROutputExpression) yama.IROutputFile = command.Value;
-                if (command is ExtensionDirectoryExpression) yama.Extensions.Add(command.Value);
+                if (command is ExtensionDirectoryExpression) yama.Extensions.Add(new DirectoryInfo(command.Value));
             }
 
             DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
-            if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary.FullName );
+            if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary );
 
             return yama.Compile();
         }
@@ -226,7 +226,7 @@ namespace Yama
             if (!projectConfig.Build(yama, projectConfigFile)) return false;
 
             DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
-            if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary.FullName );
+            if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary );
 
             return yama.Compile();
         }

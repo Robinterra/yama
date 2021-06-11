@@ -43,11 +43,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public string OutputFile
+        public FileInfo OutputFile
         {
             get;
             set;
-        } = "out.bin";
+        } = new FileInfo("out.bin");
 
         // -----------------------------------------------
 
@@ -59,11 +59,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public List<string> Includes
+        public List<DirectoryInfo> Includes
         {
             get;
             set;
-        } = new List<string>();
+        } = new List<DirectoryInfo>();
 
         // -----------------------------------------------
 
@@ -118,11 +118,11 @@ namespace Yama
             set;
         }
 
-        public List<string> Extensions
+        public List<DirectoryInfo> Extensions
         {
             get;
             set;
-        } = new List<string>();
+        } = new List<DirectoryInfo>();
 
         // -----------------------------------------------
 
@@ -492,7 +492,7 @@ namespace Yama
 
         private bool Assemblen(List<ICompileRoot> compileRoots)
         {
-            FileInfo file = new FileInfo(this.OutputFile);
+            FileInfo file = this.OutputFile;
             if (file.Exists) file.Delete();
 
             string def = this.Definition.Name;
@@ -559,11 +559,11 @@ namespace Yama
                 extensionsFiles.Add(extFile);
             }
 
-            foreach (string extensionPath in this.Extensions)
+            foreach (DirectoryInfo extensionPath in this.Extensions)
             {
-                DirectoryInfo directory = new DirectoryInfo(extensionPath);
+                if (!extensionPath.Exists) return this.PrintSimpleError(string.Format("'{}' extension path can not be found", extensionPath.FullName));
 
-                if (!this.LoadExtensionFromDirectory(directory, extensionsFiles)) return false;
+                if (!this.LoadExtensionFromDirectory(extensionPath, extensionsFiles)) return false;
             }
 
             return true;
@@ -638,11 +638,11 @@ namespace Yama
 
             List<DirectoryInfo> infos = new List<DirectoryInfo>();
 
-            foreach (string inc in this.Includes)
+            foreach (DirectoryInfo inc in this.Includes)
             {
-                if (!Directory.Exists(inc)) this.PrintSimpleError(string.Format("Cannot inlcude {0} Directory, it is not exist", inc));
+                if (!inc.Exists) this.PrintSimpleError(string.Format("Cannot inlcude {0} Directory, it is not exist", inc));
 
-                infos.Add ( new DirectoryInfo ( inc ) );
+                infos.Add ( inc );
             }
 
             result.AddRange ( this.GetFilesIterativ ( infos ) );

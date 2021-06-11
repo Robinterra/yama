@@ -51,7 +51,12 @@ namespace Yama.ProjectConfig
             definition.Definition = this.TargetManager.GetDefinition(project.TargetPlattform);
             if (definition.Definition == null) return false;
 
+            if (project.Skip < 0) return this.PrintingError("skip is lower 0, that is not allowed", file);
+            definition.StartPosition = (uint)project.Skip;
 
+            if (project.OutputFile != null) definition.OutputFile = project.OutputFile;
+
+            if (!string.IsNullOrEmpty(project.StartNamespace)) definition.StartNamespace = project.StartNamespace;
 
             return true;
         }
@@ -61,6 +66,10 @@ namespace Yama.ProjectConfig
         private bool TranslateToDefinition(Project project, FileInfo file, LanguageDefinition definition)
         {
             definition.Defines.AddRange(project.Defines);
+
+            definition.Includes.AddRange(project.SourcePaths);
+
+            definition.Extensions.AddRange(project.ExtensionsPaths);
 
             return true;
         }
@@ -135,6 +144,8 @@ namespace Yama.ProjectConfig
             parserLayer.ParserMembers.Add(new StartNamespaceNode());
             parserLayer.ParserMembers.Add(new IROutputFileNode());
             parserLayer.ParserMembers.Add(new AssemblerOutputNode());
+            parserLayer.ParserMembers.Add(new OptimizeNode());
+            parserLayer.ParserMembers.Add(new SkipNode());
 
             return parserLayer;
         }
@@ -225,6 +236,22 @@ namespace Yama.ProjectConfig
 
                 p.PrintSyntaxError ( token, token.Text );
             }
+
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        private bool PrintingError(string msg, FileInfo file)
+        {
+            ConsoleColor colr = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+
+            string filename = file.FullName;
+
+            Console.Error.WriteLine ( "{0}: {1}", filename, msg );
+
+            Console.ForegroundColor = colr;
 
             return false;
         }

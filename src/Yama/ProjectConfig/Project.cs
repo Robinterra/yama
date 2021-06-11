@@ -76,6 +76,14 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
+        public int Skip
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public List<string> Defines
         {
             get;
