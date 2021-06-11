@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Yama.Compiler.Definition;
 using Yama.Lexer;
 using Yama.Parser;
 using Yama.ProjectConfig.Nodes;
@@ -10,6 +11,11 @@ namespace Yama.ProjectConfig
 {
     public class ConfigDefinition
     {
+        public DefinitionManager TargetManager
+        {
+            get;
+            set;
+        }
 
         // -----------------------------------------------
 
@@ -18,20 +24,43 @@ namespace Yama.ProjectConfig
             if (file == null) return false;
             if (!file.Exists) return false;
 
-            this.BuildOne(definition, file);
-
-            return true;
+            return this.BuildOne(definition, file, true);
         }
 
         // -----------------------------------------------
 
-        private bool BuildOne(LanguageDefinition definition, FileInfo file)
+        private bool BuildOne(LanguageDefinition definition, FileInfo file, bool ismain = false)
         {
             List<IDeserialize> nodes = new List<IDeserialize>();
             if (!this.Parse(nodes, file)) return false;
 
             Project project = this.Deserialize(nodes);
             if (project == null) return false;
+
+            if (!this.TranslateToDefinition(project, file, definition)) return false;
+
+            if (ismain) if (!this.TranslateToDefinitionMain(project, file, definition)) return false;
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool TranslateToDefinitionMain(Project project, FileInfo file, LanguageDefinition definition)
+        {
+            definition.Definition = this.TargetManager.GetDefinition(project.TargetPlattform);
+            if (definition.Definition == null) return false;
+
+
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool TranslateToDefinition(Project project, FileInfo file, LanguageDefinition definition)
+        {
+            definition.Defines.AddRange(project.Defines);
 
             return true;
         }
@@ -100,6 +129,12 @@ namespace Yama.ProjectConfig
 
             parserLayer.ParserMembers.Add(new SourcePathsNode());
             parserLayer.ParserMembers.Add(new DefineNode());
+            parserLayer.ParserMembers.Add(new ExtensionPathNode());
+            parserLayer.ParserMembers.Add(new OutputNode());
+            parserLayer.ParserMembers.Add(new TargetNode());
+            parserLayer.ParserMembers.Add(new StartNamespaceNode());
+            parserLayer.ParserMembers.Add(new IROutputFileNode());
+            parserLayer.ParserMembers.Add(new AssemblerOutputNode());
 
             return parserLayer;
         }

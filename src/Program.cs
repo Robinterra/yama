@@ -192,7 +192,7 @@ namespace Yama
             if (Program.yama == null) Program.yama = new LanguageDefinition();
 
             FileInfo projectConfig = new FileInfo("config.yproj");
-            if (projectConfig.Exists) return Program.BuildWithProjectConfig(projectConfig);
+            if (projectConfig.Exists) return Program.BuildWithProjectConfig(projectConfig, defs);
 
             foreach ( ICommandLine command in commands )
             {
@@ -218,9 +218,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static bool BuildWithProjectConfig(FileInfo projectConfigFile)
+        private static bool BuildWithProjectConfig(FileInfo projectConfigFile, DefinitionManager defs )
         {
             ConfigDefinition projectConfig = new ConfigDefinition();
+            projectConfig.TargetManager = defs;
+
             if (!projectConfig.Build(yama, projectConfigFile)) return false;
 
             DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
