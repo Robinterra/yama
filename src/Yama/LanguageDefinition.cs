@@ -35,7 +35,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public string OutputAssemblerFile
+        public FileInfo OutputAssemblerFile
         {
             get;
             set;
@@ -112,7 +112,7 @@ namespace Yama
             set;
         }
 
-        public string IROutputFile
+        public FileInfo IROutputFile
         {
             get;
             set;
@@ -524,7 +524,7 @@ namespace Yama
         {
             Compiler.Compiler compiler = new Compiler.Compiler();
             compiler.OptimizeLevel = this.OptimizeLevel;
-            if (!string.IsNullOrEmpty(this.OutputAssemblerFile)) compiler.OutputFile = new FileInfo(this.OutputAssemblerFile);
+            compiler.OutputFile = this.OutputAssemblerFile;
             compiler.Definition = this.Definition;
             compiler.MainFunction = main;
             compiler.Defines = this.Defines;
@@ -594,10 +594,11 @@ namespace Yama
 
         private bool InitCompilerIrPrinting(Compiler.Compiler compiler)
         {
-            if (string.IsNullOrEmpty(this.IROutputFile)) return true;
-            if (File.Exists(this.IROutputFile)) File.Delete(this.IROutputFile);
+            if ( this.IROutputFile == null ) return true;
 
-            compiler.IRCodeStream = new StreamWriter(File.OpenWrite(this.IROutputFile));
+            if ( this.IROutputFile.Exists ) this.IROutputFile.Delete ();
+
+            compiler.IRCodeStream = new StreamWriter ( this.IROutputFile.OpenWrite () );
 
             compiler.IRCodeStream.AutoFlush = true;
 

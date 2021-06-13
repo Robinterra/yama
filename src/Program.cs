@@ -198,7 +198,7 @@ namespace Yama
             {
                 if (command is FileExpression) yama.Files.Add ( command.Value );
                 if (command is IncludeExpression) yama.Includes.Add ( new DirectoryInfo( command.Value ));
-                if (command is AssemblerOutputFileExpression) yama.OutputAssemblerFile = command.Value;
+                if ( command is AssemblerOutputFileExpression ) yama.OutputAssemblerFile = new FileInfo ( command.Value );
                 if (command is OutputFileExpression) yama.OutputFile = new FileInfo(command.Value);
                 if (command is OptimizingExpression) yama.OptimizeLevel = Program.GetOptimizeLevel ( command.Value );
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
@@ -206,7 +206,7 @@ namespace Yama
                 if (command is Print t) Program.CheckPrint ( yama, t );
                 if (command is SkipExpression) yama.StartPosition = Program.ParseSkipExpressionHex(command.Value);
                 if (command is StartNamespace) yama.StartNamespace = command.Value;
-                if (command is IROutputExpression) yama.IROutputFile = command.Value;
+                if (command is IROutputExpression) yama.IROutputFile = new FileInfo(command.Value);
                 if (command is ExtensionDirectoryExpression) yama.Extensions.Add(new DirectoryInfo(command.Value));
             }
 
@@ -348,6 +348,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new Print (  ) );
             Program.EnabledCommandLines.Add ( new FileExpression (  ) );
             Program.EnabledCommandLines.Add ( new LearnCsStuf.CommandLines.Commands.Help (  ) );
+
             return true;
         }
 

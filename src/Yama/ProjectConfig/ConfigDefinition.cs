@@ -39,9 +39,9 @@ namespace Yama.ProjectConfig
 
             if (!this.TranslateToDefinition(project, file, definition)) return false;
 
-            if (ismain) if (!this.TranslateToDefinitionMain(project, file, definition)) return false;
+            if ( !ismain ) return true;
 
-            return true;
+            return this.TranslateToDefinitionMain ( project, file, definition );
         }
 
         // -----------------------------------------------
@@ -54,9 +54,13 @@ namespace Yama.ProjectConfig
             if (project.Skip < 0) return this.PrintingError("skip is lower 0, that is not allowed", file);
             definition.StartPosition = (uint)project.Skip;
 
-            if (project.OutputFile != null) definition.OutputFile = project.OutputFile;
+            if ( !string.IsNullOrEmpty ( project.StartNamespace ) ) definition.StartNamespace = project.StartNamespace;
 
-            if (!string.IsNullOrEmpty(project.StartNamespace)) definition.StartNamespace = project.StartNamespace;
+            if ( project.Optimize != Optimize.SSA ) definition.OptimizeLevel = project.Optimize;
+
+            if ( project.OutputFile != null ) definition.OutputFile = project.OutputFile;
+            if ( project.IROutputFile != null ) definition.IROutputFile = project.IROutputFile;
+            if ( project.AssemblerOutputFile != null ) definition.OutputAssemblerFile = project.AssemblerOutputFile;
 
             return true;
         }
@@ -146,6 +150,7 @@ namespace Yama.ProjectConfig
             parserLayer.ParserMembers.Add(new AssemblerOutputNode());
             parserLayer.ParserMembers.Add(new OptimizeNode());
             parserLayer.ParserMembers.Add(new SkipNode());
+            parserLayer.ParserMembers.Add ( new PackageGroupNode ( packagelayer ) );
 
             return parserLayer;
         }

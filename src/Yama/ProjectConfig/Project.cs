@@ -110,6 +110,7 @@ namespace Yama.ProjectConfig
 
         public Project (  )
         {
+            this.Optimize = Optimize.SSA;
             this.SourcePaths = new List<DirectoryInfo>();
             this.ExtensionsPaths = new List<DirectoryInfo>();
             this.Defines = new List<string>();

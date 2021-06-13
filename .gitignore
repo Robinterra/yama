@@ -1,6 +1,7 @@
 bin/
 obj/
 .vscode/
+.idea/
 out.hex
 out.S
 hallo.hex
