@@ -11,11 +11,49 @@ namespace Yama.ProjectConfig
 {
     public class ConfigDefinition
     {
+
+        // -----------------------------------------------
+
+        #region get/set
+
+        // -----------------------------------------------
+
         public DefinitionManager TargetManager
         {
             get;
             set;
         }
+
+        // -----------------------------------------------
+
+        public Dictionary<string, Package> BinPackages
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        #endregion get/set
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public ConfigDefinition ()
+        {
+            this.BinPackages = new Dictionary<string, Package> ();
+        }
+        
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
+        #region methods
 
         // -----------------------------------------------
 
@@ -75,6 +113,32 @@ namespace Yama.ProjectConfig
 
             definition.Extensions.AddRange(project.ExtensionsPaths);
 
+            bool isok = true;
+            foreach ( Package package in project.Packages )
+            {
+                if ( !this.BindPackage ( package ) ) isok = false;
+            }
+
+            return isok;
+        }
+
+        // -----------------------------------------------
+
+        private bool BindPackage ( Package package )
+        {
+            if ( this.BinPackages.ContainsKey ( package.GitRepository ) ) return true;
+
+            this.BinPackages.Add(package.GitRepository, package);
+
+            if ( !this.TryCloneOrPullRepository ( package ) ) return false;
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool TryCloneOrPullRepository ( Package package )
+        {
             return true;
         }
 
@@ -162,6 +226,7 @@ namespace Yama.ProjectConfig
             ParserLayer parserLayer = new ParserLayer("package");
 
             parserLayer.ParserMembers.Add ( new PackageGitRepositoryNode () );
+            parserLayer.ParserMembers.Add ( new PackageGitBranchNode () );
 
             return parserLayer;
         }
@@ -264,6 +329,10 @@ namespace Yama.ProjectConfig
         // -----------------------------------------------
 
         #endregion PrintErrors
+
+        // -----------------------------------------------
+
+        #endregion methods
 
         // -----------------------------------------------
 
