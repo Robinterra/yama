@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Yama.Lexer;
 using Yama.Parser;
 using Yama.Parser.Request;
@@ -7,7 +6,7 @@ using Yama.Parser.Request;
 namespace Yama.ProjectConfig.Nodes
 {
 
-    public class PackageGroupNode: IDeserialize, IContainer
+    public class PackageGitRepositoryNode : IDeserialize
     {
         // -----------------------------------------------
 
@@ -16,14 +15,6 @@ namespace Yama.ProjectConfig.Nodes
         // -----------------------------------------------
 
         public IdentifierToken Token
-        {
-            get;
-            set;
-        }
-
-        // -----------------------------------------------
-
-        public IdentifierToken Ende
         {
             get;
             set;
@@ -41,23 +32,15 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
+        public IdentifierToken ValueToken
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public List<IdentifierToken> SupportTokens
-        {
-            get;
-            set;
-        }
-
-        // -----------------------------------------------
-
-        public ParserLayer Layer
-        {
-            get;
-            set;
-        }
-
-        // -----------------------------------------------
-
-        public List<IDeserialize> Childs
         {
             get;
             set;
@@ -69,10 +52,9 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public PackageGroupNode ( ParserLayer layer )
+        public PackageGitRepositoryNode (  )
         {
             this.SupportTokens = new List<IdentifierToken>();
-            this.Layer = layer;
         }
 
         // -----------------------------------------------
@@ -90,14 +72,9 @@ namespace Yama.ProjectConfig.Nodes
 
         public bool Deserialize(RequestDeserialize request)
         {
-            Package package = new Package ();
-            request.Project.Packages.Add ( package );
-            request.Package = package;
+            string define = this.ValueToken.Value.ToString();
 
-            foreach ( IDeserialize child in this.Childs )
-            {
-                child.Deserialize ( request );
-            }
+            request.Package.GitRepository = define;
 
             return true;
         }
@@ -114,9 +91,9 @@ namespace Yama.ProjectConfig.Nodes
         public IParseTreeNode Parse(RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
-            if (request.Token.Text.ToLower() != "package") return null;
+            if (request.Token.Text.ToLower() != "git.repository") return null;
 
-            PackageGroupNode result = new PackageGroupNode ( this.Layer );
+            PackageGitRepositoryNode result = new PackageGitRepositoryNode();
             result.SupportTokens.Add(request.Token);
             result.Token = request.Token;
 
@@ -127,29 +104,16 @@ namespace Yama.ProjectConfig.Nodes
 
             token = request.Parser.Peek(token, 1);
             if (token == null) return null;
-            if (token.Kind != IdentifierKind.BeginContainer) return null;
+            if (token.Kind != IdentifierKind.Text) return null;
             result.SupportTokens.Add(token);
-            IdentifierToken begin = token;
-
-            token = request.Parser.FindEndToken ( token, IdentifierKind.CloseContainer, IdentifierKind.BeginContainer );
-            if (token == null) return null;
-
-            result.SupportTokens.Add ( token );
-            result.Ende = token;
-
-            request.Parser.ActivateLayer ( this.Layer );
-
-            List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens ( begin.Position + 1, result.Ende.Position );
-            result.Childs = nodes.Cast<IDeserialize>().ToList();
-
-            request.Parser.VorherigesLayer ();
+            result.ValueToken = token;
 
             return this.CleanUp(result);
         }
 
         // -----------------------------------------------
 
-        private IParseTreeNode CleanUp(PackageGroupNode node)
+        private IParseTreeNode CleanUp(PackageGitRepositoryNode node)
         {
             foreach (IdentifierToken token in node.SupportTokens)
             {

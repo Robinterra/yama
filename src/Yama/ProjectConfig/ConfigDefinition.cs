@@ -110,7 +110,7 @@ namespace Yama.ProjectConfig
             rules.Add ( new Whitespaces (  ) );
             rules.Add ( new Text ( new ZeichenKette ( "\"" ), new ZeichenKette ( "\"" ), escape ) );
             rules.Add ( new Text ( new ZeichenKette ( "\'" ), new ZeichenKette ( "\'" ), escape ) );
-            rules.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
+            rules.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ), new Punctuation( new ZeichenKette("."), IdentifierKind.Point) } ) );
 
             return rules;
         }
@@ -161,7 +161,7 @@ namespace Yama.ProjectConfig
         {
             ParserLayer parserLayer = new ParserLayer("package");
 
-
+            parserLayer.ParserMembers.Add ( new PackageGitRepositoryNode () );
 
             return parserLayer;
         }

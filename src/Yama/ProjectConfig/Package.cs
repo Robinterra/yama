@@ -17,7 +17,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public string GitReporsitory
+        public string GitRepository
         {
             get;
             set;
