@@ -158,6 +158,7 @@ build               Build a Yama Programm
     skip <value>        The Skip value at top from binary code (Hex Format)
     start <namespace>   The start namespace that is to compile (default:Program)
     irout <file>        The output file of the IR Code
+    extension <file>    A Directory with .json Extensions for the Compiler definition
 
 assemble            Assemble a Assembler file to Binary
     size <value>        The Size of the Memory (Hex Format)

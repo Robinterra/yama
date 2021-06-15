@@ -195,6 +195,7 @@ namespace Yama.Parser
             this.MethodTag = new List<IParseTreeNode> (  );
             this.ParserLayers = layers;
             this.Tokenizer = lexer;
+            lexer.Reset();
         }
 
         // -----------------------------------------------

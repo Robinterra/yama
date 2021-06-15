@@ -35,7 +35,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public string OutputAssemblerFile
+        public FileInfo OutputAssemblerFile
         {
             get;
             set;
@@ -43,11 +43,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public string OutputFile
+        public FileInfo OutputFile
         {
             get;
             set;
-        } = "out.bin";
+        } = new FileInfo("out.bin");
 
         // -----------------------------------------------
 
@@ -59,11 +59,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public List<string> Includes
+        public List<DirectoryInfo> Includes
         {
             get;
             set;
-        } = new List<string>();
+        } = new List<DirectoryInfo>();
 
         // -----------------------------------------------
 
@@ -112,11 +112,17 @@ namespace Yama
             set;
         }
 
-        public string IROutputFile
+        public FileInfo IROutputFile
         {
             get;
             set;
         }
+
+        public List<DirectoryInfo> Extensions
+        {
+            get;
+            set;
+        } = new List<DirectoryInfo>();
 
         // -----------------------------------------------
 
@@ -418,12 +424,15 @@ namespace Yama
         {
             List<string> files = this.GetFiles();
 
+            List<ParserLayer> layers = this.GetParserRules();
+            Lexer.Lexer lexer = this.GetBasicLexer();
+            ParserLayer startlayer = layers.FirstOrDefault(t=>t.Name == "namespace");
+
             foreach (string File in files)
             {
                 System.IO.FileInfo file = new System.IO.FileInfo ( File );
 
-                Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
-                ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "namespace");
+                Parser.Parser p = new Parser.Parser ( file, layers, lexer );
 
                 p.ErrorNode = new ParserError (  );
 
@@ -466,6 +475,10 @@ namespace Yama
             List<ICompileRoot> compileRoots = new List<ICompileRoot>();
             MethodeDeclarationNode main = null;
 
+            FileInfo file = this.OutputFile;
+            if ( file == null ) return this.PrintSimpleError("no output file is set");
+            if (!file.Directory.Exists) file.Directory.Create();
+
             if (!this.Parse(nodes)) return false;
 
             if (!this.Indezieren(ref nodes, ref main)) return false;
@@ -483,7 +496,8 @@ namespace Yama
 
         private bool Assemblen(List<ICompileRoot> compileRoots)
         {
-            FileInfo file = new FileInfo(this.OutputFile);
+            FileInfo file = this.OutputFile;
+            if (!file.Directory.Exists) file.Directory.Create();
             if (file.Exists) file.Delete();
 
             string def = this.Definition.Name;
@@ -515,14 +529,17 @@ namespace Yama
         {
             Compiler.Compiler compiler = new Compiler.Compiler();
             compiler.OptimizeLevel = this.OptimizeLevel;
-            if (!string.IsNullOrEmpty(this.OutputAssemblerFile)) compiler.OutputFile = new FileInfo(this.OutputAssemblerFile);
+            compiler.OutputFile = this.OutputAssemblerFile;
             compiler.Definition = this.Definition;
             compiler.MainFunction = main;
             compiler.Defines = this.Defines;
             compiler.Definition.Compiler = compiler;
             this.InitCompilerIrPrinting(compiler);
 
-            if (!compiler.Definition.LoadExtensions(this.AllFilesInUse)) return this.PrintCompilerErrors(compiler.Errors);
+            List<FileInfo> extensionsFiles = new List<FileInfo>();
+            if (!this.LoadAllExtensionFiles(extensionsFiles)) return this.PrintSimpleError("failed to find extensions");
+
+            if (!compiler.Definition.LoadExtensions(extensionsFiles)) return this.PrintCompilerErrors(compiler.Errors);
 
             if (compiler.Compilen(nodes))
             {
@@ -534,17 +551,66 @@ namespace Yama
             return this.PrintCompilerErrors(compiler.Errors);
         }
 
+        // -----------------------------------------------
+
+        private bool LoadAllExtensionFiles(List<FileInfo> extensionsFiles)
+        {
+            foreach (FileInfo yamaFile in this.AllFilesInUse)
+            {
+                FileInfo extFile = new FileInfo(Path.ChangeExtension(yamaFile.FullName, ".json"));
+
+                if (!extFile.Exists) continue;
+
+                extensionsFiles.Add(extFile);
+            }
+
+            foreach (DirectoryInfo extensionPath in this.Extensions)
+            {
+                if (!extensionPath.Exists) return this.PrintSimpleError(string.Format("'{}' extension path can not be found", extensionPath.FullName));
+
+                if (!this.LoadExtensionFromDirectory(extensionPath, extensionsFiles)) return false;
+            }
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool LoadExtensionFromDirectory(DirectoryInfo directory, List<FileInfo> extensionsFiles)
+        {
+            if (!directory.Exists) return this.PrintSimpleError(string.Format("can not find '{0}' extension path", directory.FullName));
+
+            foreach (DirectoryInfo childDirectory in directory.GetDirectories())
+            {
+                this.LoadExtensionFromDirectory(childDirectory, extensionsFiles);
+            }
+
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                if (file.Extension != ".json") continue;
+
+                extensionsFiles.Add(file);
+            }
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
         private bool InitCompilerIrPrinting(Compiler.Compiler compiler)
         {
-            if (string.IsNullOrEmpty(this.IROutputFile)) return true;
-            if (File.Exists(this.IROutputFile)) File.Delete(this.IROutputFile);
+            if ( this.IROutputFile == null ) return true;
 
-            compiler.IRCodeStream = new StreamWriter(File.OpenWrite(this.IROutputFile));
+            if ( this.IROutputFile.Exists ) this.IROutputFile.Delete ();
+
+            compiler.IRCodeStream = new StreamWriter ( this.IROutputFile.OpenWrite () );
 
             compiler.IRCodeStream.AutoFlush = true;
 
             return true;
         }
+
+        // -----------------------------------------------
 
         private bool PrintCompilerErrors(List<CompilerError> errors)
         {
@@ -578,11 +644,11 @@ namespace Yama
 
             List<DirectoryInfo> infos = new List<DirectoryInfo>();
 
-            foreach (string inc in this.Includes)
+            foreach (DirectoryInfo inc in this.Includes)
             {
-                if (!Directory.Exists(inc)) this.PrintSimpleError(string.Format("Cannot inlcude {0} Directory, it is not exist", inc));
+                if (!inc.Exists) this.PrintSimpleError(string.Format("Cannot inlcude {0} Directory, it is not exist", inc));
 
-                infos.Add ( new DirectoryInfo ( inc ) );
+                infos.Add ( inc );
             }
 
             result.AddRange ( this.GetFilesIterativ ( infos ) );

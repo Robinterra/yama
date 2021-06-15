@@ -826,14 +826,11 @@ namespace Yama.Compiler.Definition
 
         public bool LoadExtensions(List<FileInfo> allFilesinUse)
         {
-
             foreach (FileInfo file in allFilesinUse)
             {
-                FileInfo extFile = new FileInfo(Path.ChangeExtension(file.FullName, ".json"));
+                if (!file.Exists) return this.Compiler.AddError(string.Format("Extension {0} can not be found" , file.FullName));
 
-                if (!extFile.Exists) continue;
-
-                if (!this.LoadExtension(extFile)) return this.Compiler.AddError(string.Format("Extension {0} konnte nicht geladen werden" , extFile.FullName));
+                if (!this.LoadExtension(file)) return this.Compiler.AddError(string.Format("Extension {0} can not be loaded" , file.FullName));
             }
 
             return true;
@@ -841,7 +838,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private bool LoadExtension(FileInfo file)
+        public bool LoadExtension(FileInfo file)
         {
             if ( file.Extension != ".json" ) return false;
 

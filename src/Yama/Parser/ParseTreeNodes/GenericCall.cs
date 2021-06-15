@@ -74,6 +74,7 @@ namespace Yama.Parser
             genericCall.Token = token;
             token = request.Parser.Peek(token, 1);
 
+            if ( token == null ) return null;
             if (token.Kind != IdentifierKind.Operator) return null;
             if (token.Text != ">") return null;
 
