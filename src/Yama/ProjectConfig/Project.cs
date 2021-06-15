@@ -12,6 +12,14 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
+        public DirectoryInfo Directory
+        {
+            get;
+            set;
+        }
+        
+        // -----------------------------------------------
+
         public List<DirectoryInfo> SourcePaths
         {
             get;

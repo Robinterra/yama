@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LibGit2Sharp;
 using Yama.Compiler.Definition;
 using Yama.Lexer;
 using Yama.Parser;
@@ -72,7 +73,7 @@ namespace Yama.ProjectConfig
             List<IDeserialize> nodes = new List<IDeserialize>();
             if (!this.Parse(nodes, file)) return false;
 
-            Project project = this.Deserialize(nodes);
+            Project project = this.Deserialize(file.Directory, nodes);
             if (project == null) return false;
 
             if (!this.TranslateToDefinition(project, file, definition)) return false;
@@ -116,7 +117,7 @@ namespace Yama.ProjectConfig
             bool isok = true;
             foreach ( Package package in project.Packages )
             {
-                if ( !this.BindPackage ( package ) ) isok = false;
+                if ( !this.BindPackage ( definition, package ) ) isok = false;
             }
 
             return isok;
@@ -124,21 +125,69 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        private bool BindPackage ( Package package )
+        private bool BindPackage ( LanguageDefinition definition, Package package )
         {
-            if ( this.BinPackages.ContainsKey ( package.GitRepository ) ) return true;
+            if ( string.IsNullOrEmpty ( package.Name ) ) return false;
+            if ( this.BinPackages.ContainsKey ( package.Name ) ) return true;
 
-            this.BinPackages.Add(package.GitRepository, package);
+            this.BinPackages.Add(package.Name, package);
 
-            if ( !this.TryCloneOrPullRepository ( package ) ) return false;
+            string packagePath = Path.Combine ( Program.PackagePath.FullName, package.Name );
+            DirectoryInfo packDir = new DirectoryInfo ( packagePath );
+
+            if ( !this.TryCloneOrPullRepository ( packDir, package ) ) return this.PrintingError(string.Format("can not get newest git repository {0}", package.Name), null);
+
+            FileInfo projectConfig = new FileInfo ( Path.Combine ( packDir.FullName, "config.yproj" ) );
+            if ( !projectConfig.Exists ) return this.PrintingError("Project config file can not be found", projectConfig);
+
+            return this.BuildOne ( definition, projectConfig );
+        }
+
+        // -----------------------------------------------
+
+        private bool TryCloneOrPullRepository ( DirectoryInfo packDir, Package package )
+        {
+            if ( !packDir.Exists ) return this.ClonePackage (packDir, package);
+
+            try
+            {
+                Repository repository = new Repository ( packDir.FullName );
+
+                Remote origin = repository.Network.Remotes["origin"];
+
+                IEnumerable<string> refSpecs = origin.FetchRefSpecs.Select ( x => x.Specification );
+
+                Commands.Fetch ( repository, origin.Name, refSpecs, null, string.Empty );
+
+                Commands.Checkout ( repository, "origin/" + package.GitBranch );
+            }
+            catch
+            {
+                return false;
+            }
 
             return true;
         }
 
         // -----------------------------------------------
 
-        private bool TryCloneOrPullRepository ( Package package )
+        private bool ClonePackage ( DirectoryInfo packDir, Package package )
         {
+            CloneOptions cloneOptions = new CloneOptions ();
+
+            try
+            {
+                Repository.Clone ( package.GitRepository, packDir.FullName, cloneOptions );
+
+                Repository repository = new Repository ( packDir.FullName );
+
+                Commands.Checkout ( repository, package.GitBranch );
+            }
+            catch
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -273,10 +322,11 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        private Project Deserialize(List<IDeserialize> nodes)
+        private Project Deserialize(DirectoryInfo dir, List<IDeserialize> nodes)
         {
             RequestDeserialize request = new RequestDeserialize();
             request.Project = new Project();
+            request.Project.Directory = dir;
 
             foreach (IDeserialize node in nodes)
             {
@@ -317,7 +367,7 @@ namespace Yama.ProjectConfig
             ConsoleColor colr = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
 
-            string filename = file.FullName;
+            string filename = file == null ? "config.yproj" : file.FullName;
 
             Console.Error.WriteLine ( "{0}: {1}", filename, msg );
 

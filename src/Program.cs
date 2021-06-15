@@ -29,6 +29,12 @@ namespace Yama
             set;
         }
 
+        public static DirectoryInfo PackagePath
+        {
+            get;
+            set;
+        }
+
         // -----------------------------------------------
 
         public static int Main ( string[] args )
@@ -288,6 +294,8 @@ namespace Yama
 
         private static bool Init (  )
         {
+            Program.PackagePath = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "packages"));
+
             Program.InitCommandLines (  );
 
             return true;

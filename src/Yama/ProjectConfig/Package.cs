@@ -1,7 +1,13 @@
+using System.Linq;
+
 namespace Yama.ProjectConfig
 {
     public class Package
     {
+
+        // -----------------------------------------------
+
+        private string name;
 
         // -----------------------------------------------
 
@@ -11,8 +17,19 @@ namespace Yama.ProjectConfig
 
         public string Name
         {
-            get;
-            set;
+            get
+            {
+                if ( !string.IsNullOrEmpty ( this.name ) ) return this.name;
+
+                string[] splits = this.GitRepository.Split ( "/" );
+                string result = splits.LastOrDefault ();
+
+                if ( string.IsNullOrEmpty ( result ) ) return null;
+
+                this.name = result.Replace ( ".git", string.Empty );
+
+                return this.name;
+            }
         }
 
         // -----------------------------------------------

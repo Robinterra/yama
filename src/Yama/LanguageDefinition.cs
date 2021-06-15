@@ -475,6 +475,10 @@ namespace Yama
             List<ICompileRoot> compileRoots = new List<ICompileRoot>();
             MethodeDeclarationNode main = null;
 
+            FileInfo file = this.OutputFile;
+            if ( file == null ) return this.PrintSimpleError("no output file is set");
+            if (!file.Directory.Exists) file.Directory.Create();
+
             if (!this.Parse(nodes)) return false;
 
             if (!this.Indezieren(ref nodes, ref main)) return false;
@@ -493,6 +497,7 @@ namespace Yama
         private bool Assemblen(List<ICompileRoot> compileRoots)
         {
             FileInfo file = this.OutputFile;
+            if (!file.Directory.Exists) file.Directory.Create();
             if (file.Exists) file.Delete();
 
             string def = this.Definition.Name;

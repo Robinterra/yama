@@ -74,7 +74,7 @@ namespace Yama.ProjectConfig.Nodes
         {
             string path = this.ValueToken.Value.ToString();
 
-            DirectoryInfo directory = new DirectoryInfo(path);
+            DirectoryInfo directory = new DirectoryInfo(Path.Combine( request.Project.Directory.FullName, path));
 
             request.Project.SourcePaths.Add(directory);
 
