@@ -856,12 +856,11 @@ namespace Yama.Compiler.Definition
                 else return false;
             }
 
+            if (correctDefinition.KeyPatterns != null) this.KeyPatterns.AddRange(correctDefinition.KeyPatterns);
 
-            this.KeyPatterns.AddRange(correctDefinition.KeyPatterns);
+            if (correctDefinition.AdvancedKeyReplaces != null) this.AdvancedKeyReplaces.AddRange(correctDefinition.AdvancedKeyReplaces);
 
-            this.AdvancedKeyReplaces.AddRange(correctDefinition.AdvancedKeyReplaces);
-
-            this.Algos.AddRange(correctDefinition.Algos);
+            if (correctDefinition.Algos != null) this.Algos.AddRange(correctDefinition.Algos);
 
             return true;
         }

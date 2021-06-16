@@ -582,59 +582,9 @@
         ]
       },
       {
-        "Key": "[RAMENDE]",
-        "Value": "0x2000FFF8",
-        "Defines": [
-          "STM32F401"
-        ]
-      },
-      {
-        "Key": "[SPBEGIN]",
-        "Value": "0x2000FFF8",
-        "Defines": [
-          "STM32F401"
-        ]
-      },
-      {
         "Key": "[RAMBEGIN]",
         "Value": "0x20000000",
         "Defines": [
-          "STM32F401"
-        ]
-      },
-      {
-        "Key": "[RCC]",
-        "Value": "0x40021014",
-        "Defines": [
-          "STM32F303"
-        ]
-      },
-      {
-        "Key": "[RCC_SKIP]",
-        "Value": "0x10",
-        "Defines": [
-          "STM32F303"
-        ]
-      },
-      {
-        "Key": "[RAMENDE]",
-        "Value": "0x20009FF8",
-        "Defines": [
-          "STM32F303"
-        ]
-      },
-      {
-        "Key": "[SPBEGIN]",
-        "Value": "0x20009FF8",
-        "Defines": [
-          "STM32F303"
-        ]
-      },
-      {
-        "Key": "[RAMBEGIN]",
-        "Value": "0x20000000",
-        "Defines": [
-          "STM32F303"
         ]
       }
     ],
