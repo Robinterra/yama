@@ -33,6 +33,17 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> SupportTokens
+        {
+            get;
+        }
+
+        public IdentifierToken InheritanceToken
+        {
+            get;
+            set;
+        }
+
         public IdentifierToken Begin
         {
             get;
@@ -51,7 +62,7 @@ namespace Yama.Parser
 
         public GenericCall (  )
         {
-
+            this.SupportTokens = new List<IdentifierToken> ();
         }
 
         #endregion ctor
@@ -74,6 +85,8 @@ namespace Yama.Parser
             genericCall.Token = token;
             token = request.Parser.Peek(token, 1);
 
+            token = this.TryGetGenericInheritance ( genericCall, request, token ); 
+
             if ( token == null ) return null;
             if (token.Kind != IdentifierKind.Operator) return null;
             if (token.Text != ">") return null;
@@ -81,6 +94,23 @@ namespace Yama.Parser
             genericCall.Ende = token;
 
             return this.CleanUp(genericCall);
+        }
+
+        private IdentifierToken TryGetGenericInheritance ( GenericCall genericCall, RequestParserTreeParser request, IdentifierToken token )
+        {
+            if ( token == null ) return null;
+            if ( token.Kind != IdentifierKind.DoublePoint ) return token;
+
+            genericCall.SupportTokens.Add ( token );
+
+            token = request.Parser.Peek(token, 1);
+            if ( token == null ) return null;
+            if ( token.Kind != IdentifierKind.Word ) return null;
+
+            genericCall.InheritanceToken = token;
+            genericCall.SupportTokens.Add ( token );
+
+            return request.Parser.Peek(token, 1);
         }
 
         private bool ValidNameTokenKind(IdentifierKind kind)
