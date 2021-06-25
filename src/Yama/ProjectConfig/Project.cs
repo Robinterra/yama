@@ -100,6 +100,14 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
+        public List<FileInfo> LanguageDefinitions
+        {
+            get;
+            set;
+        }
+        
+        // -----------------------------------------------
+
         public List<Package> Packages
         {
             get;
@@ -123,6 +131,7 @@ namespace Yama.ProjectConfig
             this.ExtensionsPaths = new List<DirectoryInfo>();
             this.Defines = new List<string>();
             this.Packages = new List<Package>();
+            this.LanguageDefinitions = new List<FileInfo> ();
         }
 
         // -----------------------------------------------

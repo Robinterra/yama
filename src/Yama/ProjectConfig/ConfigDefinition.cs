@@ -114,6 +114,11 @@ namespace Yama.ProjectConfig
 
             definition.Extensions.AddRange(project.ExtensionsPaths);
 
+            foreach ( FileInfo langDef in project.LanguageDefinitions )
+            {
+                this.TargetManager.AddDefinition ( langDef );
+            }
+
             bool isok = true;
             foreach ( Package package in project.Packages )
             {

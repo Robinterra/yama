@@ -85,6 +85,19 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
+        public bool AddDefinition ( FileInfo file )
+        {
+            IProcessorDefinition def = this.DeserializesDef ( file );
+
+            if (def == null) return false;
+
+            this.AviableDefinitions.Add ( def );
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
         private bool GetAllDefinitions()
         {
             DirectoryInfo defsFolder = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "defs"));
@@ -93,11 +106,7 @@ namespace Yama.Compiler.Definition
 
             foreach ( FileInfo file in defsFolder.GetFiles (  ) )
             {
-                IProcessorDefinition def = this.DeserializesDef ( file );
-
-                if (def == null) continue;
-
-                this.AviableDefinitions.Add ( def );
+                this.AddDefinition ( file );
             }
 
             return true;

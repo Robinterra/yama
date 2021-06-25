@@ -138,6 +138,31 @@ namespace "Program"
 }
 
 ```
+### Project Config File
+Create a `config.yproj` in your Project root folder.
+````
+Target:"arm-t32"
+Skip:0x20000000
+StartNamespace:"Program"
+Optimize:2
+
+Out:"bin/outYama.bin"
+IROut:"bin/out.ir"
+AsmOut:"bin/out.S"
+
+Define:"stm32f4"
+Source:"src/"
+
+package: {
+    git.repository:"https://github.com/Robinterra/armlibrary.git"
+    git.branch:"master"
+}
+
+package: {
+    git.repository:"https://github.com/Robinterra/ps2interface.git"
+    git.branch:"master"
+}
+````
 
 ### Compiler Arguments
 ```
