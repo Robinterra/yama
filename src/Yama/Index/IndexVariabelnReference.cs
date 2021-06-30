@@ -365,7 +365,7 @@ namespace Yama.Index
 
         private bool VariableDeklarationMappen(IndexVariabelnDeklaration vd)
         {
-            if (!(vd.Type.Deklaration is IndexKlassenDeklaration kdd)) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no support type definition");
+            if (!(vd.Type.Deklaration is IndexKlassenDeklaration kdd)) return this.ParentUsesSet.GetIndex.CreateError(this.Use, "no support type definition");
 
             this.GenericDeklaration = vd.GenericDeklaration;
             this.ClassGenericDefinition = kdd.GenericDeklaration;
