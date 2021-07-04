@@ -38,9 +38,8 @@ namespace Yama.Index
             string leftName = request.Index.GetTypeName(this.LeftRef);
             string rightName = request.Index.GetTypeName(this.RightRef);
 
-            request.Index.GetTypeName(this.RightRef);
-
-            if (leftName == rightName) return true;
+            if ( leftName == rightName ) return true;
+            if ( request.Index.ExistTypeInheritanceHistory ( leftName, this.RightRef ) ) return true;
 
             request.Index.CreateError(this.LeftRef == null ? this.RightRef.Use : this.LeftRef.Use, string.Format("Set Value has not correct type, expectet: {0}, currently: {1}", leftName, rightName));
 

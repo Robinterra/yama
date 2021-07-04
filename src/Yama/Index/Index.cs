@@ -291,6 +291,23 @@ namespace Yama.Index
             return true;
         }
 
+        public bool ExistTypeInheritanceHistory ( string leftName, IndexVariabelnReference reference )
+        {
+            if ( reference == null ) return false;
+
+            if (reference.Deklaration is IndexVariabelnDeklaration vd) return this.ExistTypeInheritanceHistory ( leftName, vd.Type );
+            if (reference.Deklaration is IndexPropertyGetSetDeklaration pgsd) return this.ExistTypeInheritanceHistory ( leftName, pgsd.ReturnValue );
+            if ( reference.Deklaration is IndexVektorDeklaration ved ) return this.ExistTypeInheritanceHistory ( leftName, ved.ReturnValue );
+            if ( reference.Deklaration is IndexMethodDeklaration md ) return this.ExistTypeInheritanceHistory ( leftName, md.ReturnValue );
+            if ( reference.Deklaration is IndexPropertyDeklaration pd ) return this.ExistTypeInheritanceHistory ( leftName, pd.Type );
+            if ( !(reference.Deklaration is IndexKlassenDeklaration t) ) return false;
+
+            if ( t.Name == leftName ) return true;
+            if ( this.ExistTypeInheritanceHistory ( leftName, t.InheritanceBase ) ) return true;
+            
+            return false;
+        }
+
         #endregion methods
 
     }
