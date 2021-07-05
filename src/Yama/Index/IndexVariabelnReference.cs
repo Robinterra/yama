@@ -152,7 +152,7 @@ namespace Yama.Index
 
         public bool Mappen(IndexVariabelnReference parentCall)
         {
-            if ( this.ChildUse != null && !parentCall.Equals(this.ChildUse) ) return this.Mappen ( this.ChildUse );
+            if ( this.ChildUse != null ) parentCall = this.GetChildUse ( this.ChildUse );
             if ( this.IsMapped ) return true;
 
             this.IsMapped = true;
@@ -172,6 +172,14 @@ namespace Yama.Index
             if (parentCall.Deklaration is IndexMethodDeklaration md) return this.MethodMappen(md, parentCall);
 
             return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / regular");
+        }
+
+        private IndexVariabelnReference GetChildUse ( IndexVariabelnReference childUse )
+        {
+            if ( childUse.ParentCall == null ) return childUse;
+            if ( this.Equals ( childUse.ParentCall ) ) return childUse;
+
+            return this.GetChildUse ( childUse.ParentCall );
         }
 
         private bool MethodMappen(IndexMethodDeklaration md, IndexVariabelnReference parentCall)
@@ -341,7 +349,9 @@ namespace Yama.Index
         public bool Mappen(ValidUses uses)
         {
             if ( this.IsMapped ) return true;
-            
+
+            if ( this.ChildUse != null ) return this.Mappen ( this.ChildUse );
+
             this.Owner = uses.GetIndex.CurrentMethode;
 
             this.ParentUsesSet = uses;
