@@ -143,10 +143,10 @@ namespace Yama.Parser
             reference.Name = this.Token.Text;
             reference.IsOperator = true;
             int anzahl = container.VariabelnReferences.Count;
+
             this.LeftNode.Indezieren(request);
             IndexVariabelnReference varref = container.VariabelnReferences.LastOrDefault();
             if (anzahl == container.VariabelnReferences.Count) varref = null;
-
 
             this.RightNode.Indezieren(request);
             this.VariabelReference = reference;
@@ -157,7 +157,9 @@ namespace Yama.Parser
 
             varref.ParentCall = reference;
             varref.VariabelnReferences.Add(reference);
+            reference.ChildUse = varref;
             this.Reference = reference;
+            container.VariabelnReferences.Add(reference);
 
             return true;
         }

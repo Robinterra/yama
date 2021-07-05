@@ -131,6 +131,12 @@ namespace Yama.Index
             set;
         }
 
+        public IndexVariabelnReference ChildUse
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -146,6 +152,11 @@ namespace Yama.Index
 
         public bool Mappen(IndexVariabelnReference parentCall)
         {
+            if ( this.ChildUse != null && !parentCall.Equals(this.ChildUse) ) return this.Mappen ( this.ChildUse );
+            if ( this.IsMapped ) return true;
+
+            this.IsMapped = true;
+
             this.ParentUsesSet = parentCall.ParentUsesSet;
 
             if (parentCall.Deklaration is IndexVariabelnDeklaration vd) return this.VariableDeklarationMappen (parentCall, vd);
@@ -329,6 +340,8 @@ namespace Yama.Index
 
         public bool Mappen(ValidUses uses)
         {
+            if ( this.IsMapped ) return true;
+            
             this.Owner = uses.GetIndex.CurrentMethode;
 
             this.ParentUsesSet = uses;
