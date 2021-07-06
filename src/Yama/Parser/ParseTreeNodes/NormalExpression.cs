@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -64,7 +65,7 @@ namespace Yama.Parser
             if ( nodes == null ) return null;
             //if ( nodes.Count > 1 ) return null;
 //            if ( nodes.Count == 1 ) node = nodes[0];
-            node = nodes[nodes.Count - 1];
+            node = nodes.LastOrDefault();
 
             expression.ExpressionParent = node;
 
