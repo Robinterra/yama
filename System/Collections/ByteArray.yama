@@ -33,7 +33,9 @@ namespace "System.Collections"
 
                 int clean = 4 + index + this as int;
                 int bits = clean & 0x3;
-                Pointer pointer = clean ^ bits as Pointer;
+
+                int address = clean ^ bits;
+                Pointer pointer = address as Pointer;
 
                 bits = index & 0x3;
 
@@ -50,7 +52,8 @@ namespace "System.Collections"
 
                 int clean = 4 + index + this as int;
                 int bits = clean & 0x3;
-                Pointer pointer = clean ^ bits as Pointer;
+                int address = clean ^ bits;
+                Pointer pointer = address as Pointer;
 
                 bits = bits << 0x3;
                 invalue = invalue << bits;

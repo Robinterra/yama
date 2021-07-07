@@ -34,7 +34,8 @@ namespace "System.Collections"
                 if (index > this.size) return 0;
 
                 index = 4 + index;
-                Pointer pointer = index + this as Pointer;
+                int address = index + this;
+                Pointer pointer = address as Pointer;
 
                 return pointer.Value;
             }
@@ -45,7 +46,8 @@ namespace "System.Collections"
                 if (index > this.size) return 0;
 
                 index = 4 + index;
-                Pointer pointer = index + this as Pointer;
+                int address = index + this;
+                Pointer pointer = address as Pointer;
 
                 pointer.Value = invalue;
             }
