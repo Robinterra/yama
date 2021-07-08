@@ -136,8 +136,9 @@ namespace Yama.Index
 
             if (this.Deklaration.Type == MethodeType.Operator) return true;
 
-            if (this.Deklaration.Parameters.Count != this.ParametersCount)
-                return thisUses.GetIndex.CreateError(this.CallRef.ParentCall.Use, "parameter count is not equals with the declaration");
+            int expectedParaCount = this.Deklaration.Parameters.Count;
+            if ( this.Use is NewKey ) expectedParaCount -= 1;
+            if ( expectedParaCount != this.ParametersCount) return thisUses.GetIndex.CreateError(this.CallRef.ParentCall == null ? this.Use : this.CallRef.ParentCall.Use, "parameter count is not equals with the declaration");
 
             int count = 0;
             for (int i = 0; i < this.Deklaration.Parameters.Count; i++)

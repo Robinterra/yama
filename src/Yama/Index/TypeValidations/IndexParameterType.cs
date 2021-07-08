@@ -1,3 +1,5 @@
+using Yama.Parser;
+
 namespace Yama.Index
 {
     public class IndexParameterType : IIndexTypeSafety
@@ -56,7 +58,9 @@ namespace Yama.Index
         {
             if (this.ParaDeclaration.Type.Name == request.Index.GetTypeName(this.TypeUse)) return true;
 
-            request.Index.CreateError(this.MethodCall.ParentCall.Use, string.Format("Parameter has not correct type, expectet: {0}, currently: {1}, Position: {2}", this.ParaDeclaration.Type.Name, request.Index.GetTypeName(this.TypeUse), this.Position));
+            IParseTreeNode errorNode = this.MethodCall.ParentCall == null ? this.MethodCall.Use : this.MethodCall.ParentCall.Use;
+
+            request.Index.CreateError(errorNode, string.Format("Parameter has not correct type, expectet: {0}, currently: {1}, Position: {2}", this.ParaDeclaration.Type.Name, request.Index.GetTypeName(this.TypeUse), this.Position));
 
             return false;
         }

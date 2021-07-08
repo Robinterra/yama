@@ -173,10 +173,19 @@ namespace Yama.Parser
             //if (parent is IndexVariabelnReference varref) return this.RefComb(varref);
             if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
+            IndexMethodReference methodReference = new IndexMethodReference();
+            methodReference.Use = this;
+
             foreach (IParseTreeNode node in this.Parameters)
             {
                 node.Indezieren(request);
+
+                IndexVariabelnReference parRef = container.VariabelnReferences.LastOrDefault();
+
+                methodReference.Parameters.Add(parRef);
             }
+
+            container.MethodReferences.Add(methodReference);
 
             IndexVariabelnReference typeDeklaration = new IndexVariabelnReference();
             typeDeklaration.Use = this;
@@ -197,6 +206,7 @@ namespace Yama.Parser
             typeDeklaration.ParentCall = reference;
             typeDeklaration.VariabelnReferences.Add(reference);
             this.Reference = reference;
+            methodReference.CallRef = reference;
 
             return true;
         }
