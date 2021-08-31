@@ -7,7 +7,7 @@ using Yama.Parser;
 namespace Yama.Assembler.Commands.AVR.Asm
 {
 
-    public class Command1Register : ICommand
+    public class AvrCommand2Register : ICommand
     {
 
         #region get/set
@@ -43,11 +43,6 @@ namespace Yama.Assembler.Commands.AVR.Asm
             get;
             set;
         }
-        public uint Condition
-        {
-            get;
-            set;
-        }
         public IParseTreeNode Node
         {
             get;
@@ -58,16 +53,15 @@ namespace Yama.Assembler.Commands.AVR.Asm
 
         #region ctor
 
-        public Command1Register(string key, string format, uint id, int size, uint condition = 0)
+        public AvrCommand2Register(string key, string format, uint id, int size)
         {
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
-            this.Condition = condition;
         }
 
-        public Command1Register(Command1Register t, IParseTreeNode node, List<byte> bytes)
+        public AvrCommand2Register(AvrCommand2Register t, IParseTreeNode node, List<byte> bytes)
         {
             this.Key = t.Key;
             this.Format = t.Format;
@@ -82,18 +76,19 @@ namespace Yama.Assembler.Commands.AVR.Asm
         public bool Assemble(RequestAssembleCommand request)
         {
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
-            if (!(request.Node is CommandWith1ArgNode t)) return false;
+            if (!(request.Node is CommandWith2ArgsNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
+            if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
             IFormat format = request.Assembler.GetFormat(this.Format);
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(this.Condition);
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
+            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument1.Token.Text));
 
             if (!format.Assemble(assembleFormat)) return false;
 
-            if (request.WithMapper) request.Result.Add(new Command1Register(this, request.Node, assembleFormat.Result));
+            if (request.WithMapper) request.Result.Add(new AvrCommand2Register(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());
 
             return true;
@@ -102,8 +97,9 @@ namespace Yama.Assembler.Commands.AVR.Asm
         public bool Identify(RequestIdentify request)
         {
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
-            if (!(request.Node is CommandWith1ArgNode t)) return false;
+            if (!(request.Node is CommandWith2ArgsNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
+            if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
             return true;
         }

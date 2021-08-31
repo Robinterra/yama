@@ -3,7 +3,7 @@
 namespace Yama.Assembler.Commands.AVR.Asm
 {
 
-    public class Format1 : IFormat
+    public class AvrFormat1 : IFormat
     {
         public string Name
         {
