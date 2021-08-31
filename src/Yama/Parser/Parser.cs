@@ -598,12 +598,25 @@ namespace Yama.Parser
 
                 IParseTreeNode result = member.Parse ( request );
 
-                if ( result != null ) return result;
+                if ( result == null ) continue;
+
+                this.CleanPareNode ( result );
+
+                return result;
             }
 
             if (isrekursiv) return this.ParsePrioSystem ( token, prio - 1, isrekursiv );
 
             return null;
+        }
+
+        // -----------------------------------------------
+
+        private bool CleanPareNode ( IParseTreeNode result )
+        {
+            
+
+            return true;
         }
 
         // -----------------------------------------------
