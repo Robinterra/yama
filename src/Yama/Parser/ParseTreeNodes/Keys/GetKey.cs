@@ -46,13 +46,18 @@ namespace Yama.Parser
             }
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public GetKey()
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public GetKey(ParserLayer layer)
@@ -70,15 +75,14 @@ namespace Yama.Parser
 
             GetKey key = new GetKey (  );
             key.Token = request.Token;
+            key.AllTokens.Add(request.Token);
 
             IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
 
-            if (request.Parser.ParseCleanToken(conditionkind, this.layer) is Container container) key.Statement = container;
+            IParseTreeNode statement = request.Parser.ParseCleanToken ( conditionkind, this.layer );
+            if ( !(statement is Container container) ) return null;
 
-            if (key.Statement == null) return null;
-
-            key.Token.Node = key;
-            key.Statement.Token.ParentNode = key;
+            key.Statement = container;
 
             return key;
         }

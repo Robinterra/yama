@@ -75,7 +75,21 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
+
+        #region ctor
+
+        public IfKey ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
 
         #region methods
 
@@ -86,16 +100,15 @@ namespace Yama.Parser
 
             IfKey key = new IfKey (  );
             key.Token = request.Token;
+            key.AllTokens.Add(request.Token);
 
             IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
 
             IParseTreeNode rule = request.Parser.GetRule<ContainerExpression>();
 
-            key.Condition = rule.Parse(new Request.RequestParserTreeParser(request.Parser, conditionkind));
+            key.Condition = request.Parser.TryToParse ( rule, conditionkind );
 
             if (key.Condition == null) return null;
-
-            key.Condition.Token.ParentNode = key;
 
             IdentifierToken ifStatementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
 
@@ -105,13 +118,9 @@ namespace Yama.Parser
 
             if (key.IfStatement == null) return null;
 
-            key.IfStatement.Token.ParentNode = key;
-
             IdentifierToken elsePeekToken = (key.IfStatement is IContainer t) ? t.Ende : key.IfStatement.Token;
 
             IdentifierToken elseStatementChild = request.Parser.Peek ( elsePeekToken, 1 );
-
-            key.Token.Node = key;
 
             if ( elseStatementChild == null ) return key;
 
@@ -122,8 +131,6 @@ namespace Yama.Parser
             key.ElseStatement = request.Parser.ParseCleanToken ( elseStatementChild );
 
             if (key.ElseStatement == null) return null;
-
-            key.ElseStatement.Token.ParentNode = key;
 
             return key;
         }

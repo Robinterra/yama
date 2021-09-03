@@ -32,13 +32,18 @@ namespace Yama.Parser
             set;
         } = new CompileJumpTo() { Point = PointMode.CurrentBegin };
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public ContinueKey()
         {
-            
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         #endregion ctor
@@ -51,7 +56,7 @@ namespace Yama.Parser
 
             ContinueKey key = new ContinueKey (  );
             key.Token = request.Token;
-            key.Token.Node = key;
+            key.AllTokens.Add ( request.Token );
 
             return key;
         }

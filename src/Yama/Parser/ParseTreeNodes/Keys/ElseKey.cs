@@ -45,7 +45,21 @@ namespace Yama.Parser
             }
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
+
+        #region ctor
+
+        public ElseKey ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
 
         #region methods
 
@@ -55,15 +69,13 @@ namespace Yama.Parser
 
             ElseKey key = new ElseKey (  );
             key.Token = request.Token;
+            key.AllTokens.Add(request.Token);
 
             IdentifierToken statementchild = request.Parser.Peek ( request.Token, 1);
 
             key.Statement = request.Parser.ParseCleanToken(statementchild);
 
             if (key.Statement == null) return null;
-
-            key.Token.Node = key;
-            key.Statement.Token.ParentNode = key;
 
             return key;
         }

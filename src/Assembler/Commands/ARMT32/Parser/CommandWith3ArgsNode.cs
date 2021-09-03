@@ -7,15 +7,14 @@ namespace Yama.Assembler.ARMT32
 {
     public class CommandWith3ArgsNode : IParseTreeNode
     {
+
+        #region vars
+
         private ParserLayer argumentLayer;
 
-        public CommandWith3ArgsNode()
-        {
-        }
-        public CommandWith3ArgsNode(ParserLayer argumentLayer)
-        {
-            this.argumentLayer = argumentLayer;
-        }
+        #endregion vars
+
+        #region get/set
 
         public IdentifierToken Token
         {
@@ -41,12 +40,6 @@ namespace Yama.Assembler.ARMT32
             set;
         }
 
-        public List<IdentifierToken> SupportTokens
-        {
-            get;
-            set;
-        } = new List<IdentifierToken>();
-
         public List<IParseTreeNode> GetAllChilds
         {
             get
@@ -60,6 +53,28 @@ namespace Yama.Assembler.ARMT32
                 return nodes;
             }
         }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public CommandWith3ArgsNode()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        public CommandWith3ArgsNode(ParserLayer argumentLayer)
+        {
+            this.argumentLayer = argumentLayer;
+        }
+
+        #endregion
+
 
         public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
@@ -77,6 +92,7 @@ namespace Yama.Assembler.ARMT32
 
             CommandWith3ArgsNode deklaration = new CommandWith3ArgsNode();
             deklaration.Token = request.Token;
+            deklaration.AllTokens.Add(request.Token);
 
             IdentifierToken token = request.Parser.Peek(request.Token, 1);
 
@@ -93,7 +109,7 @@ namespace Yama.Assembler.ARMT32
             token = request.Parser.Peek(token ,1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Comma) return null;
-            deklaration.SupportTokens.Add(token);
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek(token ,1);
 
@@ -109,7 +125,7 @@ namespace Yama.Assembler.ARMT32
             token = request.Parser.Peek(token ,1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Comma) return null;
-            deklaration.SupportTokens.Add(token);
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
 
@@ -122,22 +138,7 @@ namespace Yama.Assembler.ARMT32
 
             token = ic.Ende;
 
-            return this.CleanUp(deklaration);
-        }
-
-        private IParseTreeNode CleanUp(CommandWith3ArgsNode node)
-        {
-            node.Token.Node = node;
-            node.Argument0.Token.ParentNode = node;
-            node.Argument1.Token.ParentNode = node;
-            node.Argument2.Token.ParentNode = node;
-
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            return node;
+            return deklaration;
         }
     }
 }
