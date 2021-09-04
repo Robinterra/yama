@@ -46,13 +46,18 @@ namespace Yama.Parser
             }
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public SetKey()
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public SetKey(ParserLayer layer)
@@ -70,15 +75,13 @@ namespace Yama.Parser
 
             SetKey key = new SetKey (  );
             key.Token = request.Token;
-            key.Token.Node = key;
+            key.AllTokens.Add(request.Token);
 
             IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
 
             if (request.Parser.ParseCleanToken(conditionkind, this.layer) is Container container) key.Statement = container;
 
             if (key.Statement == null) return null;
-
-            key.Statement.Token.ParentNode = key;
 
             return key;
         }

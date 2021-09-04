@@ -36,13 +36,18 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public NullKey (  )
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public NullKey ( int prio )
@@ -56,8 +61,9 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.Null ) return null;
 
-            NullKey node = new NullKey { Token = request.Token };
-            node.Token.Node = node;
+            NullKey node = new NullKey();
+            node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
             return node;
         }
