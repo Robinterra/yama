@@ -51,9 +51,9 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.LeftNode );
-                result.Add ( this.MiddleNode );
-                result.Add ( this.RightNode );
+                if (this.LeftNode != null) result.Add ( this.LeftNode );
+                if (this.MiddleNode != null) result.Add ( this.MiddleNode );
+                if (this.RightNode != null) result.Add ( this.RightNode );
 
                 return result;
             }
@@ -75,13 +75,28 @@ namespace Yama.Parser
             get;
             set;
         }
-        public IndexVariabelnReference VariabelReference { get; private set; }
+
+        public IndexVariabelnReference VariabelReference
+        {
+            get;
+            set;
+        }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
 
         #endregion get/set
 
         #region ctor
 
-        public Operator3Childs ( int prio )
+        public Operator3Childs ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        public Operator3Childs ( int prio ) : this()
         {
             this.Prio = prio;
         }
@@ -99,6 +114,8 @@ namespace Yama.Parser
 
         private bool CheckHashValidOperator ( IdentifierToken token )
         {
+            if ( token == null ) return false;
+            
             foreach ( string op in this.ValidOperators )
             {
                 if ( op == token.Text ) return true;
@@ -114,22 +131,18 @@ namespace Yama.Parser
 
             Operator3Childs node = new Operator3Childs ( this.Prio );
             node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
             IdentifierToken steuerToken = request.Parser.FindAToken ( request.Token, this.Steuerzeichen );
 
             if ( steuerToken == null ) return null;
 
-            node.Token.Node = node;
-            steuerToken.ParentNode = node;
-            steuerToken.Node = node;
+            node.AllTokens.Add(steuerToken);
 
             node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
             node.MiddleNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, 1 ) );
             node.RightNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( steuerToken, 1 ) );
 
-            node.LeftNode.Token.ParentNode = node;
-            node.MiddleNode.Token.ParentNode = node;
-            node.RightNode.Token.ParentNode = node;
             node.SteuerToken = steuerToken;
 
             return node;

@@ -31,13 +31,18 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public TrueFalseKey (  )
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public TrueFalseKey ( int prio )
@@ -59,7 +64,7 @@ namespace Yama.Parser
             TrueFalseKey result = new TrueFalseKey (  );
 
             result.Token = request.Token;
-            result.Token.Node = result;
+            result.AllTokens.Add(request.Token);
 
             return result;
         }

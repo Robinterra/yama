@@ -25,7 +25,10 @@ namespace Yama.Parser
             }
         }
 
-        public ParserLayer NextLayer { get; }
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
 
         #endregion get/set
 
@@ -33,7 +36,7 @@ namespace Yama.Parser
 
         public UsingKey()
         {
-            
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         #endregion ctor
@@ -46,12 +49,12 @@ namespace Yama.Parser
             if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.Text ) return null;
 
             UsingKey key = new UsingKey (  );
-            request.Token.Node = key;
+            key.AllTokens.Add ( request.Token );
 
             IdentifierToken keyNamenToken = request.Parser.Peek ( request.Token, 1 );
 
             key.Token = keyNamenToken;
-            keyNamenToken.Node = key;
+            key.AllTokens.Add ( keyNamenToken );
 
             return key;
         }
