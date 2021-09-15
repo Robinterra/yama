@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -29,15 +30,21 @@ namespace Yama.Parser
             }
         }
 
-        public int Prio
+        public List<IdentifierToken> AllTokens
         {
-            get
-            {
-                return 0;
-            }
+            get;
         }
 
         #endregion get/set
+
+        #region ctor
+
+        public EnumartionExpression ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
 
         public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
@@ -48,21 +55,16 @@ namespace Yama.Parser
             EnumartionExpression expression = new EnumartionExpression (  );
 
             expression.Token = request.Token;
-            expression.Token.Node = expression;
+            expression.AllTokens.Add(request.Token);
 
             if (left == null) return expression;
 
             List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens (left, request.Parser.Start, request.Token.Position );
 
-            IParseTreeNode node = null;
+            if ( nodes == null ) return null;
+            if ( nodes.Count > 1 ) return null;
 
-            if ( nodes == null ) return expression.Token.Node = null;
-            if ( nodes.Count > 1 ) return expression.Token.Node = null;
-            if ( nodes.Count == 1 ) node = nodes[0];
-
-            expression.ExpressionParent = node;
-
-            if ( node != null ) node.Token.ParentNode = expression;
+            expression.ExpressionParent = nodes.FirstOrDefault();
 
             return expression;
         }
