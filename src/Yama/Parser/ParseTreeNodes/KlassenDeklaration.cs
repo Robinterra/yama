@@ -66,11 +66,6 @@ namespace Yama.Parser
             set;
         }
 
-        public int Prio
-        {
-            get;
-        }
-
         public List<IParseTreeNode> GetAllChilds
         {
             get
@@ -84,11 +79,15 @@ namespace Yama.Parser
             }
         }
 
-        public List<IdentifierKind> Ausnahmen
+        public ParserLayer NextLayer
         {
             get;
         }
-        public ParserLayer NextLayer { get; }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
 
         #endregion get/set
 
@@ -96,17 +95,12 @@ namespace Yama.Parser
 
         public KlassenDeklaration()
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public KlassenDeklaration(ParserLayer nextLayer)
         {
             this.NextLayer = nextLayer;
-        }
-
-        public KlassenDeklaration ( int prio )
-        {
-            this.Prio = prio;
         }
 
         #endregion ctor
@@ -183,6 +177,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
             deklaration.AccessDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -191,15 +186,13 @@ namespace Yama.Parser
         {
             if (token.Kind != IdentifierKind.DoublePoint) return token;
 
-            token.Node = deklaration;
-
+            deklaration.AllTokens.Add(token);
             token = parser.Peek(token, 1);
 
             if (token.Kind != IdentifierKind.Word) return token;
 
-            token.Node = deklaration;
-
             deklaration.InheritanceBase = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -209,16 +202,18 @@ namespace Yama.Parser
             if ( !this.CheckHashValidZusatzDefinition ( token ) )
             {
                 deklaration.InheritanceBase = new IdentifierToken(IdentifierKind.Word, token.Position, token.Line, token.Column, "object", "object");
+                deklaration.AllTokens.Add(deklaration.InheritanceBase);
 
                 return token;
             }
 
             deklaration.ZusatzDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode Parse ( RequestParserTreeParser request )
         {
             KlassenDeklaration deklaration = new KlassenDeklaration();
 
@@ -229,10 +224,12 @@ namespace Yama.Parser
             if ( !this.CheckHashValidClass ( token ) ) return null;
 
             deklaration.ClassDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
             deklaration.Token = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
 
@@ -244,7 +241,7 @@ namespace Yama.Parser
 
             if (deklaration.Statement == null) return null;
 
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
         private IdentifierToken TryParseGeneric(RequestParserTreeParser request, KlassenDeklaration deklaration, IdentifierToken token)
@@ -252,38 +249,12 @@ namespace Yama.Parser
             GenericCall genericRule = request.Parser.GetRule<GenericCall>();
             if (genericRule == null) return token;
 
-            IParseTreeNode node = genericRule.Parse(new RequestParserTreeParser(request.Parser, token));
+            IParseTreeNode node = request.Parser.TryToParse ( genericRule, token );
             if (!(node is GenericCall genericCall)) return token;
 
             deklaration.GenericDefintion = genericCall;
 
             return request.Parser.Peek(genericCall.Ende, 1);
-        }
-
-        private KlassenDeklaration CleanUp(KlassenDeklaration deklaration)
-        {
-            deklaration.Statement.Token.ParentNode = deklaration;
-
-            if (deklaration.GenericDefintion != null)
-            {
-                deklaration.GenericDefintion.Token.ParentNode = deklaration;
-            }
-
-            if (deklaration.AccessDefinition != null)
-            {
-                deklaration.AccessDefinition.Node = deklaration;
-                deklaration.AccessDefinition.ParentNode = deklaration;
-            }
-            if (deklaration.ZusatzDefinition != null)
-            {
-                deklaration.ZusatzDefinition.Node = deklaration;
-                deklaration.ZusatzDefinition.ParentNode = deklaration;
-            }
-            deklaration.ClassDefinition.Node = deklaration;
-            deklaration.ClassDefinition.ParentNode = deklaration;
-            deklaration.Token.Node = deklaration;
-
-            return deklaration;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
