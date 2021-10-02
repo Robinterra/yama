@@ -11,12 +11,6 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexVariabelnReference Reference
-        {
-            get;
-            set;
-        }
-
         public IndexVariabelnReference BooleascherReturn
         {
             get;
@@ -58,16 +52,6 @@ namespace Yama.Parser
             }
         }
 
-        public IdentifierKind ValidKind
-        {
-            get;
-        }
-
-        public List<string> ValidOperators
-        {
-            get;
-        }
-
         public IdentifierToken ReferenceDeklaration
         {
             get;
@@ -86,12 +70,18 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public TypePatternMatching ( int prio )
         {
+            this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
 
@@ -114,19 +104,24 @@ namespace Yama.Parser
 
             TypePatternMatching node = new TypePatternMatching ( this.Prio );
             node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
-            node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
+            IdentifierToken token = request.Parser.Peek ( request.Token, -1 );
+            if ( token == null ) return null;
+
+            node.LeftNode = request.Parser.ParseCleanToken ( token );
 
             node.RightToken = request.Parser.Peek ( request.Token, 1 );
+            if ( node.RightToken == null ) return null;
+
+            node.AllTokens.Add(node.RightToken);
             if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return null;
 
             node.ReferenceDeklaration = request.Parser.Peek ( node.RightToken, 1 );
+            if ( node.ReferenceDeklaration == null ) return null;
             if (node.ReferenceDeklaration.Kind != IdentifierKind.Word) return null;
 
-            node.Token.Node = node;
-            node.LeftNode.Token.ParentNode = node;
-            node.RightToken.Node = node;
-            node.ReferenceDeklaration.Node = node;
+            node.AllTokens.Add(node.ReferenceDeklaration);
 
             return node;
         }

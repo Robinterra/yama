@@ -39,13 +39,18 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public ReferenceCall (  )
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public ReferenceCall ( int prio )
@@ -63,8 +68,7 @@ namespace Yama.Parser
             ReferenceCall result = new ReferenceCall (  );
 
             result.Token = request.Token;
-
-            request.Token.Node = result;
+            result.AllTokens.Add(request.Token);
 
             return result;
         }

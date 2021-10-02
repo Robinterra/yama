@@ -37,29 +37,11 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode GenericDefintion
-        {
-            get;
-            set;
-        }
-
         public List<IParseTreeNode> Parameters
         {
             get;
             set;
         }
-
-        public CompileFunktionsDeklaration FunktionsDeklarationCompile
-        {
-            get;
-            set;
-        } = new CompileFunktionsDeklaration();
-
-        public CompileFunktionsEnde FunktionsEndeCompile
-        {
-            get;
-            set;
-        } = new CompileFunktionsEnde();
 
         public GetKey GetStatement
         {
@@ -79,11 +61,6 @@ namespace Yama.Parser
             set;
         }
 
-        public int Prio
-        {
-            get;
-        }
-
         public List<IParseTreeNode> GetAllChilds
         {
             get
@@ -98,11 +75,6 @@ namespace Yama.Parser
             }
         }
 
-        public List<IdentifierKind> Ausnahmen
-        {
-            get;
-        }
-
         public List<string> SetRegisterInUse
         {
             get;
@@ -114,18 +86,6 @@ namespace Yama.Parser
             get;
             set;
         } = new List<string>();
-
-        public CompileContainer CompileContainer
-        {
-            get;
-            set;
-        } = new CompileContainer();
-
-        public int VariabelCounter
-        {
-            get;
-            set;
-        }
 
         public int GetVariabelCounter
         {
@@ -139,13 +99,18 @@ namespace Yama.Parser
             private set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public VektorDeclaration()
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public VektorDeclaration(ParserLayer layer)
@@ -191,6 +156,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
             deklaration.AccessDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -207,6 +173,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
             deklaration.ZusatzDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -222,12 +189,14 @@ namespace Yama.Parser
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
 
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
 
@@ -237,14 +206,13 @@ namespace Yama.Parser
 
             request.Parser.ActivateLayer(this.layer);
 
-            IParseTreeNode parametersVektor = rule.Parse(new Request.RequestParserTreeParser(request.Parser, token));
+            IParseTreeNode parametersVektor = request.Parser.TryToParse ( rule, token );
 
             request.Parser.VorherigesLayer();
 
             if (parametersVektor == null) return null;
             if (!(parametersVektor is Container t)) return null;
 
-            t.Token.ParentNode = deklaration;
             deklaration.Parameters = t.Statements;
 
             token = request.Parser.Peek ( t.Ende, 1);
@@ -257,20 +225,15 @@ namespace Yama.Parser
             if (!(container is Container ab)) return null;
             if (container.GetAllChilds.Count != 2) return null;
 
-            container.Token.Node = deklaration;
+            container.AllTokens.Add(container.Token);
 
             if (container.GetAllChilds[0] is GetKey gk) deklaration.GetStatement = gk;
             if (container.GetAllChilds[1] is SetKey sk) deklaration.SetStatement = sk;
 
-            ab.Token.ParentNode = deklaration;
-
             if (deklaration.GetStatement == null) return null;
             if (deklaration.SetStatement == null) return null;
 
-            if (!(deklaration.GetStatement is GetKey)) return null;
-            if (!(deklaration.SetStatement is SetKey)) return null;
-
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
         private VektorDeclaration CleanUp(VektorDeclaration deklaration)

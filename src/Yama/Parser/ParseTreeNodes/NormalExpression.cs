@@ -30,22 +30,26 @@ namespace Yama.Parser
             }
         }
 
-        public int Prio
+        public List<IdentifierToken> AllTokens
         {
-            get
-            {
-                return 0;
-            }
+            get;
         }
 
         #endregion get/set
 
+        #region ctor
+
+        public NormalExpression ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
+
+        #region methods
+
         public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            //SyntaxToken kind = parser.FindAToken ( token, SyntaxKind.EndOfCommand );
-            
-            //if ( kind == null ) return null;
-            //if ( kind.Node != null ) return null;
             if ( request.Token.Kind != IdentifierKind.EndOfCommand ) return null;
 
             IdentifierToken left = request.Parser.Peek ( request.Token, -1 );
@@ -53,23 +57,17 @@ namespace Yama.Parser
             NormalExpression expression = new NormalExpression (  );
 
             expression.Token = request.Token;
-
-            request.Token.Node = expression;
+            expression.AllTokens.Add(request.Token);
 
             if (left == null) return expression;
 
             List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens ( request.Parser.Start, request.Token.Position );
 
-            IParseTreeNode node = null;
-
             if ( nodes == null ) return null;
-            //if ( nodes.Count > 1 ) return null;
-//            if ( nodes.Count == 1 ) node = nodes[0];
-            node = nodes.LastOrDefault();
+
+            IParseTreeNode node = nodes.LastOrDefault();
 
             expression.ExpressionParent = node;
-
-            if ( node != null ) node.Token.ParentNode = expression;
 
             return expression;
         }
@@ -89,5 +87,8 @@ namespace Yama.Parser
 
             return true;
         }
+
+        #endregion methods
+
     }
 }

@@ -12,12 +12,6 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexMethodReference Reference
-        {
-            get;
-            set;
-        }
-
         public IParseTreeNode LeftNode
         {
             get;
@@ -77,12 +71,18 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public VektorCall ( int prio )
         {
+            this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
 
@@ -122,21 +122,12 @@ namespace Yama.Parser
             node.ParametersNodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
 
             node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
             if (node.LeftNode == null) return null;
 
-            node.LeftNode.Token.ParentNode = node;
             node.Ende = steuerToken;
-
-            node.Token.Node = node;
-
-            steuerToken.ParentNode = node;
-            steuerToken.Node = node;
-
-            foreach ( IParseTreeNode n in node.ParametersNodes )
-            {
-                n.Token.ParentNode = node;
-            }
+            node.AllTokens.Add(steuerToken);
 
             return node;
         }

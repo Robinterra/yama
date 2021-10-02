@@ -77,12 +77,18 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public MethodeCallNode ( int prio )
         {
+            this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
 
@@ -117,26 +123,16 @@ namespace Yama.Parser
 
             MethodeCallNode node = new MethodeCallNode ( this.Prio );
 
+            node.AllTokens.Add ( steuerToken );
+            node.Ende = steuerToken;
             node.LeftNode = request.Parser.ParseCleanToken ( left );
 
             node.ParametersNodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
 
             node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
             if (node.LeftNode == null) return null;
-
-            node.Token.Node = node;
-
-            node.LeftNode.Token.ParentNode = node;
-            node.Ende = steuerToken;
-
-            steuerToken.ParentNode = node;
-            steuerToken.Node = node;
-
-            foreach ( IParseTreeNode n in node.ParametersNodes )
-            {
-                n.Token.ParentNode = node;
-            }
 
             return node;
         }

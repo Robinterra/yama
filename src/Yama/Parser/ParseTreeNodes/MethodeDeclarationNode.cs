@@ -38,12 +38,6 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode GenericDefintion
-        {
-            get;
-            set;
-        }
-
         public List<IParseTreeNode> Parameters
         {
             get;
@@ -74,27 +68,18 @@ namespace Yama.Parser
             set;
         }
 
-        public int Prio
-        {
-            get;
-        }
-
         public List<IParseTreeNode> GetAllChilds
         {
             get
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
+                if (this.Tags != null) result.AddRange(this.Tags);
                 result.AddRange ( this.Parameters );
                 result.Add ( this.Statement );
 
                 return result;
             }
-        }
-
-        public List<IdentifierKind> Ausnahmen
-        {
-            get;
         }
 
         public List<string> RegisterInUse
@@ -146,23 +131,23 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public MethodeDeclarationNode()
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public MethodeDeclarationNode(ParserLayer layer)
         {
             this.layer = layer;
-        }
-
-        public MethodeDeclarationNode ( int prio )
-        {
-            this.Prio = prio;
         }
 
         #endregion ctor
@@ -243,6 +228,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
             deklaration.AccessDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -252,6 +238,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
             deklaration.ZusatzDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -267,12 +254,14 @@ namespace Yama.Parser
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             if ( !this.CheckSonderRegleung ( deklaration.TypeDefinition ) ) token = request.Parser.Peek ( token, 1 );
 
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
 
@@ -282,7 +271,7 @@ namespace Yama.Parser
 
             request.Parser.ActivateLayer(this.layer);
 
-            IParseTreeNode klammer = rule.Parse(new Request.RequestParserTreeParser(request.Parser, token));
+            IParseTreeNode klammer = request.Parser.TryToParse ( rule, token );
 
             request.Parser.VorherigesLayer();
 
@@ -292,15 +281,15 @@ namespace Yama.Parser
             t.Token.ParentNode = deklaration;
             deklaration.Parameters = t.Statements;
 
-            IdentifierToken Statementchild = request.Parser.Peek ( t.Ende, 1);
+            IdentifierToken statementchild = request.Parser.Peek ( t.Ende, 1);
 
-            deklaration.Statement = request.Parser.ParseCleanToken(Statementchild, this.layer);
+            deklaration.Statement = request.Parser.ParseCleanToken(statementchild, this.layer);
 
             if (deklaration.Statement == null) return null;
 
             deklaration.Tags = request.Parser.PopMethodTag (  );
 
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
         private bool CheckSonderRegleung(IdentifierToken typeDefinition)
