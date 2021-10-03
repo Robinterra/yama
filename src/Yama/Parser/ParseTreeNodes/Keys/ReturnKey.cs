@@ -47,6 +47,15 @@ namespace Yama.Parser
 
         #endregion get/set
 
+        #region ctor
+
+        public ReturnKey ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
+
         #region methods
 
         public IParseTreeNode Parse ( Request.RequestParserTreeParser request )

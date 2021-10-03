@@ -327,7 +327,7 @@ namespace Yama.Parser
             {
                 IParseTreeNode node = this.ParsePrimary ( this.Max );
 
-                if ( node != null ) vorgangOhneNeueNodes = false;
+                if ( node != null && !(node is ParserError) ) vorgangOhneNeueNodes = false;
 
                 isok = node != null;
 

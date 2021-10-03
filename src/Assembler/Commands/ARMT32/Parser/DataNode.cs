@@ -87,6 +87,8 @@ namespace Yama.Assembler.ARMT32
             else if (token.Kind == IdentifierKind.NumberToken) node.Data = token;
             else if (!this.TryParseList(request.Parser, token, node)) return null;
 
+            if (node.Data != null) node.AllTokens.Add(node.Data);
+
             return node;
         }
 

@@ -213,6 +213,7 @@ namespace Yama.Parser
             if (parametersVektor == null) return null;
             if (!(parametersVektor is Container t)) return null;
 
+            t.Token.ParentNode = deklaration;
             deklaration.Parameters = t.Statements;
 
             token = request.Parser.Peek ( t.Ende, 1);
@@ -225,7 +226,7 @@ namespace Yama.Parser
             if (!(container is Container ab)) return null;
             if (container.GetAllChilds.Count != 2) return null;
 
-            container.AllTokens.Add(container.Token);
+            ab.Token.ParentNode = deklaration;
 
             if (container.GetAllChilds[0] is GetKey gk) deklaration.GetStatement = gk;
             if (container.GetAllChilds[1] is SetKey sk) deklaration.SetStatement = sk;

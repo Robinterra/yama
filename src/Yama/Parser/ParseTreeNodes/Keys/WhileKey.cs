@@ -107,7 +107,7 @@ namespace Yama.Parser
 
             IParseTreeNode rule = request.Parser.GetRule<ContainerExpression>();
 
-            key.Condition = rule.Parse(new Request.RequestParserTreeParser(request.Parser, conditionkind));
+            key.Condition = request.Parser.TryToParse ( rule, conditionkind );
 
             if (key.Condition == null) return null;
 
