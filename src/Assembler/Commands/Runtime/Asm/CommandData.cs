@@ -138,7 +138,7 @@ namespace Yama.Assembler.Runtime
         public bool Identify(RequestIdentify request)
         {
             if (!(request.Node is DataNode t)) return false;
-            if (t.SupportTokens[0].Text != ".data") return false;
+            if (t.AllTokens[0].Text != ".data") return false;
             if (t.Data.Kind == Lexer.IdentifierKind.NumberToken)
             {
                 this.Size = 4;

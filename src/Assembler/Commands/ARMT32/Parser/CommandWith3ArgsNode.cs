@@ -136,8 +136,6 @@ namespace Yama.Assembler.ARMT32
             request.Parser.VorherigesLayer();
             if (!(deklaration.Argument2 is IContainer ic)) return null;
 
-            token = ic.Ende;
-
             return deklaration;
         }
     }

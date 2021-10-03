@@ -7,16 +7,16 @@ namespace Yama.Assembler.ARMT32
 {
     public class CommandWith1ArgNode : IParseTreeNode
     {
+
+        #region vars
+
         private ParserLayer argumentLayer;
 
-        public CommandWith1ArgNode()
-        {
-        }
-        public CommandWith1ArgNode(ParserLayer argumentLayer)
-        {
-            this.argumentLayer = argumentLayer;
-        }
+        #endregion vars
 
+        #region get/set
+
+        
         public IdentifierToken Token
         {
             get;
@@ -29,11 +29,10 @@ namespace Yama.Assembler.ARMT32
             set;
         }
 
-        public List<IdentifierToken> SupportTokens
+        public List<IdentifierToken> AllTokens
         {
             get;
-            set;
-        } = new List<IdentifierToken>();
+        }
 
         public List<IParseTreeNode> GetAllChilds
         {
@@ -46,6 +45,22 @@ namespace Yama.Assembler.ARMT32
                 return nodes;
             }
         }
+
+        #endregion get/set
+
+        #region ctor
+
+        public CommandWith1ArgNode()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        public CommandWith1ArgNode(ParserLayer argumentLayer)
+        {
+            this.argumentLayer = argumentLayer;
+        }
+
+        #endregion ctor
 
         public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
@@ -63,6 +78,7 @@ namespace Yama.Assembler.ARMT32
 
             CommandWith1ArgNode deklaration = new CommandWith1ArgNode();
             deklaration.Token = request.Token;
+            deklaration.AllTokens.Add(request.Token);
 
             IdentifierToken token = request.Parser.Peek(request.Token, 1);
 
@@ -73,20 +89,8 @@ namespace Yama.Assembler.ARMT32
             request.Parser.VorherigesLayer();
             if (deklaration.Argument0 == null) return null;
 
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
-        private IParseTreeNode CleanUp(CommandWith1ArgNode node)
-        {
-            node.Token.Node = node;
-            node.Argument0.Token.ParentNode = node;
-
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            return node;
-        }
     }
 }

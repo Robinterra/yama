@@ -7,17 +7,19 @@ namespace Yama.Assembler.ARMT32
 {
     public class JumpPointMarker : IParseTreeNode
     {
+
+        #region get/set
+
         public IdentifierToken Token
         {
             get;
             set;
         }
 
-        public List<IdentifierToken> SupportTokens
+        public List<IdentifierToken> AllTokens
         {
             get;
-            set;
-        } = new List<IdentifierToken>();
+        }
 
         public List<IParseTreeNode> GetAllChilds
         {
@@ -26,6 +28,17 @@ namespace Yama.Assembler.ARMT32
                 return new List<IParseTreeNode>();
             }
         }
+        
+        #endregion get/set
+
+        #region ctor
+
+        public JumpPointMarker ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
 
         public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
@@ -43,24 +56,14 @@ namespace Yama.Assembler.ARMT32
 
             JumpPointMarker deklaration = new JumpPointMarker();
             deklaration.Token = request.Token;
+            deklaration.AllTokens.Add(request.Token);
 
             IdentifierToken token = request.Parser.Peek(request.Token, 1);
             if (token.Kind != IdentifierKind.DoublePoint) return null;
-            deklaration.SupportTokens.Add(token);
+            deklaration.AllTokens.Add(token);
 
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
-        private IParseTreeNode CleanUp(JumpPointMarker node)
-        {
-            node.Token.Node = node;
-
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            return node;
-        }
     }
 }

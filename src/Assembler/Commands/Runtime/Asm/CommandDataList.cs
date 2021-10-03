@@ -105,7 +105,7 @@ namespace Yama.Assembler.Runtime
         public bool Identify(RequestIdentify request)
         {
             if (!(request.Node is DataNode t)) return false;
-            if (t.SupportTokens[0].Text != ".datalist") return false;
+            if (t.AllTokens[0].Text != ".datalist") return false;
 
             this.Size = t.Arguments.Count << 2;
             request.IsData = true;
