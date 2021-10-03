@@ -40,10 +40,9 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public List<IdentifierToken> SupportTokens
+        public List<IdentifierToken> AllTokens
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -54,7 +53,7 @@ namespace Yama.ProjectConfig.Nodes
 
         public AssemblerOutputNode (  )
         {
-            this.SupportTokens = new List<IdentifierToken>();
+            this.AllTokens = new List<IdentifierToken>();
         }
 
         // -----------------------------------------------
@@ -96,33 +95,21 @@ namespace Yama.ProjectConfig.Nodes
             if (request.Token.Text.ToLower() != "asmout") return null;
 
             AssemblerOutputNode result = new AssemblerOutputNode();
-            result.SupportTokens.Add(request.Token);
+            result.AllTokens.Add(request.Token);
             result.Token = request.Token;
 
             IdentifierToken token = request.Parser.Peek(result.Token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.DoublePoint) return null;
-            result.SupportTokens.Add(token);
+            result.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Text) return null;
-            result.SupportTokens.Add(token);
+            result.AllTokens.Add(token);
             result.ValueToken = token;
 
-            return this.CleanUp(result);
-        }
-
-        // -----------------------------------------------
-
-        private IParseTreeNode CleanUp(AssemblerOutputNode node)
-        {
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            return node;
+            return result;
         }
 
         // -----------------------------------------------
