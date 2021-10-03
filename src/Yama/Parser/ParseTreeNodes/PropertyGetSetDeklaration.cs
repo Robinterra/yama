@@ -60,38 +60,11 @@ namespace Yama.Parser
             get;
             set;
         } = new List<string>();
-        public CompileFunktionsDeklaration FunktionsDeklarationCompileGet
-        {
-            get;
-            set;
-        } = new CompileFunktionsDeklaration();
-
-        public CompileFunktionsEnde FunktionsEndeCompileSet
-        {
-            get;
-            set;
-        } = new CompileFunktionsEnde();
-        public CompileFunktionsDeklaration FunktionsDeklarationCompileSet
-        {
-            get;
-            set;
-        } = new CompileFunktionsDeklaration();
-
-        public CompileFunktionsEnde FunktionsEndeCompileGet
-        {
-            get;
-            set;
-        } = new CompileFunktionsEnde();
 
         public IdentifierToken Token
         {
             get;
             set;
-        }
-
-        public int Prio
-        {
-            get;
         }
 
         public List<IParseTreeNode> GetAllChilds
@@ -107,22 +80,6 @@ namespace Yama.Parser
             }
         }
 
-        public List<IdentifierKind> Ausnahmen
-        {
-            get;
-        }
-        public CompileContainer CompileContainerGet
-        {
-            get;
-            set;
-        } = new CompileContainer();
-
-        public CompileContainer CompileContainerSet
-        {
-            get;
-            set;
-        } = new CompileContainer();
-
         public int GetVariabelCounter
         {
             get;
@@ -135,23 +92,23 @@ namespace Yama.Parser
             private set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public PropertyGetSetDeklaration()
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public PropertyGetSetDeklaration(ParserLayer layer)
         {
             this.layer = layer;
-        }
-
-        public PropertyGetSetDeklaration ( int prio )
-        {
-            this.Prio = prio;
         }
 
         #endregion ctor
@@ -167,17 +124,6 @@ namespace Yama.Parser
             return false;
         }
 
-        /*private bool CheckAusnahmen ( SyntaxToken token )
-        {
-            if (token == null) return false;
-
-            foreach ( SyntaxKind op in this.Ausnahmen )
-            {
-                if ( op == token.Kind ) return true;
-            }
-
-            return false;
-        }*/
         private bool CheckHashValidTypeDefinition ( IdentifierToken token )
         {
             if (token == null) return false;
@@ -211,6 +157,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
             deklaration.AccessDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -220,6 +167,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
             deklaration.ZusatzDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -235,11 +183,13 @@ namespace Yama.Parser
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
 
@@ -253,20 +203,15 @@ namespace Yama.Parser
             if (!(container is Container ab)) return null;
             if (container.GetAllChilds.Count != 2) return null;
 
-            container.Token.Node = deklaration;
+            deklaration.AllTokens.Add(container.Token);
 
             if (container.GetAllChilds[0] is GetKey gk) deklaration.GetStatement = gk;
             if (container.GetAllChilds[1] is SetKey sk) deklaration.SetStatement = sk;
 
-            ab.Token.ParentNode = deklaration;
-
             if (deklaration.GetStatement == null) return null;
             if (deklaration.SetStatement == null) return null;
 
-            if (!(deklaration.GetStatement is GetKey)) return null;
-            if (!(deklaration.SetStatement is SetKey)) return null;
-
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
         private PropertyGetSetDeklaration CleanUp(PropertyGetSetDeklaration deklaration)

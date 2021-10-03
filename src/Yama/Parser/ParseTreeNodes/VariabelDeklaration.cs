@@ -18,12 +18,6 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode AccessDefinition
-        {
-            get;
-            set;
-        }
-
         public IParseTreeNode TypeDefinition
         {
             get;
@@ -66,7 +60,7 @@ namespace Yama.Parser
             set;
         } = new CompileReferenceCall();
 
-        public List<IdentifierKind> Ausnahmen
+        public List<IdentifierToken> AllTokens
         {
             get;
         }
@@ -77,6 +71,7 @@ namespace Yama.Parser
 
         public VariabelDeklaration ( int prio )
         {
+            this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
 
@@ -93,17 +88,6 @@ namespace Yama.Parser
             return false;
         }
 
-        /*private bool CheckAusnahmen ( SyntaxToken token )
-        {
-            if (token == null) return false;
-
-            foreach ( SyntaxKind op in this.Ausnahmen )
-            {
-                if ( op == token.Kind ) return true;
-            }
-
-            return false;
-        }*/
         private bool CheckHashValidOperator ( IdentifierToken token )
         {
             if (token.Kind == IdentifierKind.Word) return true;
@@ -137,16 +121,13 @@ namespace Yama.Parser
             if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
 
             node.Token = lexerRight;
+            node.AllTokens.Add(lexerRight);
 
             IParseTreeNode callRule = request.Parser.GetRule<ReferenceCall>();
 
-            node.TypeDefinition = callRule.Parse(request);
+            node.TypeDefinition = request.Parser.TryToParse ( callRule, request.Token );
 
             if ( node.TypeDefinition == null ) return null;
-
-            lexerRight.Node = node;
-            node.TypeDefinition.Token.ParentNode = node;
-            if (node.GenericDefintion != null) node.GenericDefintion.Token.ParentNode = node;
 
             return node;
         }

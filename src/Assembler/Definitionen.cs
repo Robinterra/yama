@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Yama.Assembler.ARMT32;
+using Yama.Assembler.Commands.AVR.Asm;
 using Yama.Assembler.Runtime;
 using Yama.Lexer;
 using Yama.Parser;
+using Command1Register = Yama.Assembler.Runtime.Command1Register;
+using Command2Register = Yama.Assembler.Runtime.Command2Register;
 
 namespace Yama.Assembler
 {
@@ -316,6 +319,27 @@ namespace Yama.Assembler
         // -----------------------------------------------
 
         #endregion ARM-T32 Definition
+
+        // -----------------------------------------------
+
+        #region AVR Definition
+
+        // -----------------------------------------------
+
+        private bool AvrFormat1Def(AssemblerDefinition definition)
+        {
+            definition.Formats.Add(new AvrFormat1());
+
+            definition.Commands.Add(new AvrCommand2Register("adc", "Format1", 0x7, 2));
+            definition.Commands.Add(new AvrCommand2Register("add", "Format1", 0x3, 2));
+            definition.Commands.Add(new AvrCommand2Register("and", "Format1", 0x8, 2));
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        #endregion AVR Definition
 
         // -----------------------------------------------
 

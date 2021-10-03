@@ -7,6 +7,9 @@ namespace Yama.Assembler.ARMT32
 {
     public class BedingtesAssemblen : IParseTreeNode
     {
+
+        #region get/set
+
         public IdentifierToken Token
         {
             get;
@@ -20,6 +23,24 @@ namespace Yama.Assembler.ARMT32
                 return new List<IParseTreeNode>();
             }
         }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public BedingtesAssemblen ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
+
+        #region methods
 
         public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
@@ -37,5 +58,8 @@ namespace Yama.Assembler.ARMT32
 
             return null;
         }
+
+        #endregion methods
+
     }
 }

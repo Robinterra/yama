@@ -51,11 +51,15 @@ namespace Yama.Parser
             }
         }
 
-        public List<IdentifierKind> Ausnahmen
+        public ParserLayer NextLayer
         {
             get;
         }
-        public ParserLayer NextLayer { get; }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
 
         #endregion get/set
 
@@ -63,7 +67,7 @@ namespace Yama.Parser
 
         public EnumDeklaration()
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public EnumDeklaration(ParserLayer nextLayer)
@@ -104,6 +108,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
             deklaration.AccessDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -117,33 +122,19 @@ namespace Yama.Parser
             if ( !this.CheckHashValidClass ( token ) ) return null;
 
             deklaration.ClassDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
 
             deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer);
 
             if (deklaration.Statement == null) return null;
-
-            return this.CleanUp(deklaration);
-        }
-
-        private EnumDeklaration CleanUp(EnumDeklaration deklaration)
-        {
-            deklaration.Statement.Token.ParentNode = deklaration;
-
-            if (deklaration.AccessDefinition != null)
-            {
-                deklaration.AccessDefinition.Node = deklaration;
-                deklaration.AccessDefinition.ParentNode = deklaration;
-            }
-            deklaration.ClassDefinition.Node = deklaration;
-            deklaration.ClassDefinition.ParentNode = deklaration;
-            deklaration.Token.Node = deklaration;
 
             return deklaration;
         }

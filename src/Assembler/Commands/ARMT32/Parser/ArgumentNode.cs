@@ -8,17 +8,14 @@ namespace Yama.Assembler.ARMT32
 {
     public class ArgumentNode : IParseTreeNode, IContainer
     {
+
+        #region get/set
+
         public IdentifierToken Token
         {
             get;
             set;
         }
-
-        public List<IdentifierToken> SupportTokens
-        {
-            get;
-            set;
-        } = new List<IdentifierToken>();
 
         public List<IParseTreeNode> GetAllChilds
         {
@@ -33,6 +30,22 @@ namespace Yama.Assembler.ARMT32
             get;
             set;
         }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public ArgumentNode ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion
 
         public bool Compile(RequestParserTreeCompile request)
         {
@@ -51,39 +64,29 @@ namespace Yama.Assembler.ARMT32
             if (request.Token.Kind == IdentifierKind.Word)
             {
                 deklaration.Token = request.Token;
+                deklaration.AllTokens.Add(request.Token);
 
                 deklaration.Ende = request.Token;
 
-                return this.CleanUp(deklaration);
+                return deklaration;
             }
 
             if (request.Token.Kind == IdentifierKind.Gleich || request.Token.Kind == IdentifierKind.Hash)
             {
-                deklaration.SupportTokens.Add(request.Token);
+                deklaration.AllTokens.Add(request.Token);
                 IdentifierToken token = request.Parser.Peek(request.Token, 1);
 
                 if (token == null) return null;
                 if (token.Kind != IdentifierKind.NumberToken && token.Kind != IdentifierKind.Word) return null;
                 deklaration.Token = token;
+                deklaration.AllTokens.Add(token);
 
                 deklaration.Ende = token;
 
-                return this.CleanUp(deklaration);
+                return deklaration;
             }
 
             return null;
-        }
-
-        private IParseTreeNode CleanUp(ArgumentNode node)
-        {
-            node.Token.Node = node;
-
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            return node;
         }
     }
 }

@@ -36,10 +36,9 @@ namespace Yama.Parser
             }
         }
 
-        public int Prio
+        public List<IdentifierToken> AllTokens
         {
             get;
-            set;
         }
 
         #endregion get/set
@@ -48,7 +47,7 @@ namespace Yama.Parser
 
         public EnumKeyValue (  )
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         #endregion ctor
@@ -58,6 +57,7 @@ namespace Yama.Parser
             EnumKeyValue node = new EnumKeyValue();
 
             node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
             IdentifierToken token = request.Parser.Peek ( request.Token, 1 );
 
@@ -65,9 +65,7 @@ namespace Yama.Parser
             if ( token.Kind != IdentifierKind.NumberToken ) return null;
 
             node.Value = token;
-
-            node.Token.Node = node;
-            node.Value.Node = node;
+            node.AllTokens.Add(token);
 
             return node;
         }

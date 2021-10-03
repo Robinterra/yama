@@ -77,7 +77,21 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
+
+        #region ctor
+
+        public ForKey ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
 
         #region methods
 
@@ -88,14 +102,14 @@ namespace Yama.Parser
 
             ForKey key = new ForKey (  );
             key.Token = request.Token;
+            key.AllTokens.Add(request.Token);
 
             IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
 
             IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
 
-            IParseTreeNode klammer = rule.Parse(new Request.RequestParserTreeParser(request.Parser, conditionkind));
+            IParseTreeNode klammer = request.Parser.TryToParse ( rule, conditionkind );
 
-            if (klammer == null) return null;
             if (!(klammer is Container t)) return null;
             if (t.Statements.Count != 3) return null;
 
@@ -110,9 +124,6 @@ namespace Yama.Parser
             key.Statement = request.Parser.ParseCleanToken(Statementchild);
 
             if (key.Statement == null) return null;
-
-            key.Token.Node = key;
-            key.Statement.Token.ParentNode = key;
 
             return key;
         }

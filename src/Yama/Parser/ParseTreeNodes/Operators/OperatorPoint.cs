@@ -67,18 +67,28 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.LeftNode );
-                result.Add ( this.RightNode );
+                if (this.LeftNode != null) result.Add ( this.LeftNode );
+                if (this.RightNode != null) result.Add ( this.RightNode );
 
                 return result;
             }
+        }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
         }
 
         #endregion get/set
 
         #region ctor
 
-        public OperatorPoint ( int prio )
+        public OperatorPoint ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        public OperatorPoint ( int prio ) : this()
         {
             this.Prio = prio;
         }
@@ -99,14 +109,11 @@ namespace Yama.Parser
 
             OperatorPoint node = new OperatorPoint ( this.Prio );
             node.Token = request.Token;
-            node.Token.Node = node;
+            node.AllTokens.Add(request.Token);
 
             node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
 
             node.RightNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, 1 ) );
-
-            node.LeftNode.Token.ParentNode = node;
-            node.RightNode.Token.ParentNode = node;
 
             return node;
         }

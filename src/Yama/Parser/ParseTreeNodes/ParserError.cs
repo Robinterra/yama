@@ -23,7 +23,23 @@ namespace Yama.Parser
             }
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
+
+        #region ctor
+
+        public ParserError ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
+
+        #region methods
 
         public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
@@ -31,7 +47,7 @@ namespace Yama.Parser
 
             result.Token = request.Token;
 
-            result.Token.Node = result;
+            result.AllTokens.Add(request.Token);
 
             return result;
         }
@@ -45,5 +61,7 @@ namespace Yama.Parser
         {
             return false;
         }
+
+        #endregion methods
     }
 }

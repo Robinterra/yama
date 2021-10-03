@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using Yama.Lexer;
 using System.Linq;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -326,7 +327,7 @@ namespace Yama.Parser
             {
                 IParseTreeNode node = this.ParsePrimary ( this.Max );
 
-                if ( node != null ) vorgangOhneNeueNodes = false;
+                if ( node != null && !(node is ParserError) ) vorgangOhneNeueNodes = false;
 
                 isok = node != null;
 
@@ -527,7 +528,11 @@ namespace Yama.Parser
 
                 IParseTreeNode nodet = node.Parse ( request );
 
-                if (nodet != null) return nodet;
+                if (nodet == null) continue;
+
+                this.CleanPareNode ( nodet );
+
+                return nodet;
             }
 
             return null;
@@ -560,7 +565,11 @@ namespace Yama.Parser
 
                 IParseTreeNode result = member.Parse ( request );
 
-                if ( result != null ) return result;
+                if ( result == null ) continue;
+
+                this.CleanPareNode ( result );
+
+                return result;
             }
 
             return null;
@@ -598,12 +607,47 @@ namespace Yama.Parser
 
                 IParseTreeNode result = member.Parse ( request );
 
-                if ( result != null ) return result;
+                if ( result == null ) continue;
+
+                this.CleanPareNode ( result );
+
+                return result;
             }
 
             if (isrekursiv) return this.ParsePrioSystem ( token, prio - 1, isrekursiv );
 
             return null;
+        }
+
+        // -----------------------------------------------
+
+        public IParseTreeNode TryToParse ( IParseTreeNode rule, IdentifierToken token )
+        {
+            IParseTreeNode result = rule.Parse ( new RequestParserTreeParser (this, token) );
+            if ( result == null ) return null;
+
+            this.CleanPareNode ( result );
+
+            return result;
+        }
+        
+        // -----------------------------------------------
+
+        private bool CleanPareNode ( IParseTreeNode result )
+        {
+            if ( result.AllTokens == null ) return false;
+
+            foreach ( IdentifierToken token in result.AllTokens )
+            {
+                token.Node = result;
+            }
+
+            foreach ( IParseTreeNode child in result.GetAllChilds )
+            {
+                child.Token.ParentNode = result;
+            }
+
+            return true;
         }
 
         // -----------------------------------------------

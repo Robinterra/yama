@@ -40,7 +40,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.ChildNode );
+                if (this.ChildNode != null) result.Add ( this.ChildNode );
 
                 return result;
             }
@@ -67,13 +67,28 @@ namespace Yama.Parser
         {
             get;
         }
-        public IndexVariabelnReference VariabelReference { get; private set; }
+
+        public IndexVariabelnReference VariabelReference
+        {
+            get;
+            set;
+        }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
 
         #endregion get/set
 
         #region ctor
 
-        public Operator1ChildLeft ( int prio )
+        public Operator1ChildLeft ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        public Operator1ChildLeft ( int prio ) : this ()
         {
             this.Prio = prio;
         }
@@ -126,14 +141,11 @@ namespace Yama.Parser
 
             Operator1ChildLeft node = new Operator1ChildLeft ( this.Prio );
             node.Token = request.Token;
+            node.AllTokens.Add ( request.Token );
 
             node.ChildNode = request.Parser.ParseCleanToken ( lexerLeft );
 
             if ( node.ChildNode == null ) return null;
-
-            node.Token.Node = node;
-
-            node.ChildNode.Token.ParentNode = node;
 
             return node;
         }

@@ -38,13 +38,18 @@ namespace Yama.Parser
             set;
         } = new CompileRegionAsm();
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public ConditionalCompilationNode (  )
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         #endregion ctor
@@ -53,9 +58,10 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.ConditionalCompilation ) return null;
 
-            ConditionalCompilationNode node = new ConditionalCompilationNode { Token = request.Token };
+            ConditionalCompilationNode node = new ConditionalCompilationNode();
 
-            node.Token.Node = node;
+            node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
             if (!node.Token.Text.Contains("#tag")) return node;
 

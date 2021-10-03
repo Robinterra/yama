@@ -54,13 +54,18 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region  ctor
 
         public Container (  )
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public Container ( IdentifierKind begin, IdentifierKind ende )
@@ -86,10 +91,9 @@ namespace Yama.Parser
             Container expression = new Container (  );
 
             expression.Token = request.Token;
-            expression.Token.Node = expression;
+            expression.AllTokens.Add ( request.Token );
             expression.Ende = kind;
-
-            kind.Node = expression;
+            expression.AllTokens.Add(expression.Ende);
 
             List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, kind.Position );
 
@@ -98,11 +102,6 @@ namespace Yama.Parser
             if ( nodes == null ) return null;
 
             expression.Statements = nodes;
-
-            foreach ( IParseTreeNode node in nodes )
-            {
-                node.Token.ParentNode = expression;
-            }
 
             return expression;
         }

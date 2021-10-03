@@ -41,7 +41,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public List<IdentifierToken> SupportTokens
+        public List<IdentifierToken> AllTokens
         {
             get;
             set;
@@ -71,7 +71,7 @@ namespace Yama.ProjectConfig.Nodes
 
         public PackageGroupNode ( ParserLayer layer )
         {
-            this.SupportTokens = new List<IdentifierToken>();
+            this.AllTokens = new List<IdentifierToken>();
             this.Layer = layer;
         }
 
@@ -117,24 +117,24 @@ namespace Yama.ProjectConfig.Nodes
             if (request.Token.Text.ToLower() != "package") return null;
 
             PackageGroupNode result = new PackageGroupNode ( this.Layer );
-            result.SupportTokens.Add(request.Token);
+            result.AllTokens.Add(request.Token);
             result.Token = request.Token;
 
             IdentifierToken token = request.Parser.Peek(result.Token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.DoublePoint) return null;
-            result.SupportTokens.Add(token);
+            result.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.BeginContainer) return null;
-            result.SupportTokens.Add(token);
+            result.AllTokens.Add(token);
             IdentifierToken begin = token;
 
             token = request.Parser.FindEndToken ( token, IdentifierKind.CloseContainer, IdentifierKind.BeginContainer );
             if (token == null) return null;
 
-            result.SupportTokens.Add ( token );
+            result.AllTokens.Add ( token );
             result.Ende = token;
 
             request.Parser.ActivateLayer ( this.Layer );
@@ -144,19 +144,7 @@ namespace Yama.ProjectConfig.Nodes
 
             request.Parser.VorherigesLayer ();
 
-            return this.CleanUp(result);
-        }
-
-        // -----------------------------------------------
-
-        private IParseTreeNode CleanUp(PackageGroupNode node)
-        {
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            return node;
+            return result;
         }
 
         // -----------------------------------------------

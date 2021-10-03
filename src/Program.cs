@@ -180,6 +180,12 @@ namespace Yama
                 if (file.Exists) file.Delete();
                 request.Stream = file.OpenWrite();
             }
+
+            if ( assembler == null )
+            {
+                Console.Error.WriteLine("No definition found!");
+                return false;
+            }
             if (assembler.Definition == null) assembler = def.GenerateAssembler ( assembler, "runtime" );
 
             bool isok = assembler.Assemble(request);

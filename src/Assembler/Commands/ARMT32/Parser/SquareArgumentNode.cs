@@ -19,11 +19,10 @@ namespace Yama.Assembler.ARMT32
             set;
         }
 
-        public List<IdentifierToken> SupportTokens
+        public List<IdentifierToken> AllTokens
         {
             get;
-            set;
-        } = new List<IdentifierToken>();
+        }
 
         public List<IParseTreeNode> GetAllChilds
         {
@@ -37,6 +36,11 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
+        }
+
+        public SquareArgumentNode ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public bool Compile(Parser.Request.RequestParserTreeCompile request)
@@ -54,52 +58,42 @@ namespace Yama.Assembler.ARMT32
             if (request.Token.Kind != IdentifierKind.OpenSquareBracket) return null;
 
             SquareArgumentNode deklaration = new SquareArgumentNode();
-            deklaration.SupportTokens.Add(request.Token);
+            deklaration.AllTokens.Add(request.Token);
 
             IdentifierToken token = request.Parser.Peek(request.Token, 1);
 
             if (token.Kind != IdentifierKind.Word) return null;
 
             deklaration.Token = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
 
             if (token.Kind == IdentifierKind.Comma)
             {
-                deklaration.SupportTokens.Add(token);
+                deklaration.AllTokens.Add(token);
 
                 token = request.Parser.Peek(token, 1);
 
                 if (token.Kind != IdentifierKind.Hash) return null;
 
-                deklaration.SupportTokens.Add(token);
+                deklaration.AllTokens.Add(token);
                 token = request.Parser.Peek(token, 1);
 
                 if (token.Kind != IdentifierKind.NumberToken) return null;
                 deklaration.Number = token;
+                deklaration.AllTokens.Add(token);
 
                 token = request.Parser.Peek(token, 1);
             }
 
             if (token.Kind != IdentifierKind.CloseSquareBracket) return null;
 
-            deklaration.SupportTokens.Add(token);
+            deklaration.AllTokens.Add(token);
             deklaration.Ende = token;
 
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
-        private IParseTreeNode CleanUp(SquareArgumentNode node)
-        {
-            node.Token.Node = node;
-            if (node.Number != null) node.Number.Node = node;
-
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            return node;
-        }
     }
 }

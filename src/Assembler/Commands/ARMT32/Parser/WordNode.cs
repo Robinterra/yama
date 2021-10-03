@@ -25,23 +25,16 @@ namespace Yama.Assembler.ARMT32
             }
         }
 
-        public List<IdentifierToken> SupportTokens
+        public List<IdentifierToken> AllTokens
         {
             get;
-            set;
-        } = new List<IdentifierToken>();
+        }
 
         public IdentifierToken Data
         {
             get;
             set;
         }
-
-        public List<IdentifierToken> Arguments
-        {
-            get;
-            set;
-        } = new List<IdentifierToken>();
 
         public IdentifierToken AdditionNumberToken
         {
@@ -50,6 +43,15 @@ namespace Yama.Assembler.ARMT32
         }
 
         #endregion get/set
+
+        #region ctor
+
+        public WordNode ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
 
         #region methods
 
@@ -69,7 +71,7 @@ namespace Yama.Assembler.ARMT32
             if (request.Token.Text != ".word") return null;
 
             WordNode node = new WordNode();
-            node.SupportTokens.Add(request.Token);
+            node.AllTokens.Add(request.Token);
             node.Token = request.Token;
 
             IdentifierToken token = request.Parser.Peek(request.Token, 1);
@@ -78,36 +80,19 @@ namespace Yama.Assembler.ARMT32
             if (token.Kind == IdentifierKind.Word) node.Data = token;
 
             if (node.Data == null) return null;
+            node.AllTokens.Add(node.Data);
 
             token = request.Parser.Peek(token, 1);
-            if (token == null) return this.CleanUp(node);
-            if (token.Kind != IdentifierKind.PlusToken) return this.CleanUp(node);
+            if (token == null) return node;
+            if (token.Kind != IdentifierKind.PlusToken) return node;
 
-            node.SupportTokens.Add(token);
+            node.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
-            if (token.Kind != IdentifierKind.NumberToken) return this.CleanUp(node);
+            if (token.Kind != IdentifierKind.NumberToken) return node;
 
             node.AdditionNumberToken = token;
-
-            return this.CleanUp(node);
-        }
-
-        private IParseTreeNode CleanUp(WordNode node)
-        {
-            node.Token.Node = node;
-            if (node.Data != null) node.Data.Node = node;
-            if (node.AdditionNumberToken != null) node.AdditionNumberToken.Node = node;
-
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            foreach (IdentifierToken token in node.Arguments)
-            {
-                token.Node = node;
-            }
+            node.AllTokens.Add(token);
 
             return node;
         }

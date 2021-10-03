@@ -33,11 +33,6 @@ namespace Yama.Parser
             set;
         }
 
-        public List<IdentifierToken> SupportTokens
-        {
-            get;
-        }
-
         public IdentifierToken InheritanceToken
         {
             get;
@@ -56,20 +51,25 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public GenericCall (  )
         {
-            this.SupportTokens = new List<IdentifierToken> ();
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         #endregion ctor
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode Parse ( RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Operator ) return null;
             if ( request.Token.Text != "<" ) return null;
@@ -77,12 +77,14 @@ namespace Yama.Parser
             GenericCall genericCall = new GenericCall();
 
             genericCall.Begin = request.Token;
+            genericCall.AllTokens.Add(request.Token);
 
             IdentifierToken token = request.Parser.Peek(request.Token, 1);
             if (token == null) return null;
             if (!this.ValidNameTokenKind(token.Kind)) return null;
 
             genericCall.Token = token;
+            genericCall.AllTokens.Add(token);
             token = request.Parser.Peek(token, 1);
 
             token = this.TryGetGenericInheritance ( genericCall, request, token ); 
@@ -92,8 +94,9 @@ namespace Yama.Parser
             if (token.Text != ">") return null;
 
             genericCall.Ende = token;
+            genericCall.AllTokens.Add(token);
 
-            return this.CleanUp(genericCall);
+            return genericCall;
         }
 
         private IdentifierToken TryGetGenericInheritance ( GenericCall genericCall, RequestParserTreeParser request, IdentifierToken token )
@@ -101,14 +104,14 @@ namespace Yama.Parser
             if ( token == null ) return null;
             if ( token.Kind != IdentifierKind.DoublePoint ) return token;
 
-            genericCall.SupportTokens.Add ( token );
+            genericCall.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
             if ( token == null ) return null;
             if ( token.Kind != IdentifierKind.Word ) return null;
 
             genericCall.InheritanceToken = token;
-            genericCall.SupportTokens.Add ( token );
+            genericCall.AllTokens.Add(token);
 
             return request.Parser.Peek(token, 1);
         }
@@ -125,17 +128,6 @@ namespace Yama.Parser
             if (kind == IdentifierKind.Float32Bit) return true;
 
             return false;
-        }
-
-        private IParseTreeNode CleanUp(GenericCall genericCall)
-        {
-            genericCall.Token.Node = genericCall;
-
-            genericCall.Begin.Node = genericCall;
-
-            genericCall.Ende.Node = genericCall;
-
-            return genericCall;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)

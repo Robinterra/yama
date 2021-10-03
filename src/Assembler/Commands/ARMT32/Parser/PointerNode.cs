@@ -7,17 +7,19 @@ namespace Yama.Assembler.ARMT32
 {
     public class PointerNode : IParseTreeNode, IContainer
     {
+
+        #region get/set
+
         public IdentifierToken Token
         {
             get;
             set;
         }
 
-        public List<IdentifierToken> SupportTokens
+        public List<IdentifierToken> AllTokens
         {
             get;
-            set;
-        } = new List<IdentifierToken>();
+        }
 
         public List<IParseTreeNode> GetAllChilds
         {
@@ -32,6 +34,17 @@ namespace Yama.Assembler.ARMT32
             get;
             set;
         }
+
+        #endregion get/set
+
+        #region ctor
+
+        public PointerNode ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+        
+        #endregion ctor
 
         public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
@@ -49,29 +62,19 @@ namespace Yama.Assembler.ARMT32
 
             PointerNode deklaration = new PointerNode();
 
-            deklaration.SupportTokens.Add(request.Token);
+            deklaration.AllTokens.Add(request.Token);
 
             IdentifierToken token = request.Parser.Peek(request.Token, 1);
 
             if (token.Kind != IdentifierKind.Word) return null;
 
             deklaration.Token = token;
+            deklaration.AllTokens.Add(token);
 
             deklaration.Ende = token;
 
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
-        private IParseTreeNode CleanUp(PointerNode node)
-        {
-            node.Token.Node = node;
-
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            return node;
-        }
     }
 }

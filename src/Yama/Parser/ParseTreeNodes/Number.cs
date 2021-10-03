@@ -36,13 +36,18 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public Number (  )
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public Number ( int prio )
@@ -56,9 +61,9 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.NumberToken ) return null;
 
-            Number node = new Number { Token = request.Token };
-
-            node.Token.Node = node;
+            Number node = new Number();
+            node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
             return node;
         }

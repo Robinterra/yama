@@ -37,41 +37,6 @@ namespace Yama.Parser
             set;
         }
 
-        public List<string> RegisterInUseGet
-        {
-            get;
-            set;
-        } = new List<string>();
-
-        public List<string> RegisterInUseSet
-        {
-            get;
-            set;
-        } = new List<string>();
-
-        public CompileFunktionsDeklaration FunktionsDeklarationCompileGet
-        {
-            get;
-            set;
-        } = new CompileFunktionsDeklaration();
-
-        public CompileFunktionsEnde FunktionsEndeCompileSet
-        {
-            get;
-            set;
-        } = new CompileFunktionsEnde();
-        public CompileFunktionsDeklaration FunktionsDeklarationCompileSet
-        {
-            get;
-            set;
-        } = new CompileFunktionsDeklaration();
-
-        public CompileFunktionsEnde FunktionsEndeCompileGet
-        {
-            get;
-            set;
-        } = new CompileFunktionsEnde();
-
         public IdentifierToken Token
         {
             get;
@@ -93,21 +58,10 @@ namespace Yama.Parser
             }
         }
 
-        public List<IdentifierKind> Ausnahmen
+        public List<IdentifierToken> AllTokens
         {
             get;
         }
-        public CompileContainer CompileContainerGet
-        {
-            get;
-            set;
-        } = new CompileContainer();
-
-        public CompileContainer CompileContainerSet
-        {
-            get;
-            set;
-        } = new CompileContainer();
 
         #endregion get/set
 
@@ -115,7 +69,7 @@ namespace Yama.Parser
 
         public PropertyDeklaration()
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public PropertyDeklaration(ParserLayer layer)
@@ -202,6 +156,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
             deklaration.AccessDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -211,6 +166,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
             deklaration.ZusatzDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
         }
@@ -226,33 +182,23 @@ namespace Yama.Parser
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
-
-            //IParseTreeNode rule = new Container(SyntaxKind.BeginContainer, SyntaxKind.CloseContainer);
 
             if ( token == null ) return null;
 
             if (token.Kind != IdentifierKind.EndOfCommand) return null;
-            //if (klammer.GetAllChilds.Count != 2) return null;
 
-            //deklaration.GetStatement = klammer.GetAllChilds[0];
-            //deklaration.SetStatement = klammer.GetAllChilds[1];
+            deklaration.AllTokens.Add(token);
 
-            token.Node = deklaration;
-
-            //if (deklaration.GetStatement == null) return null;
-            //if (deklaration.SetStatement == null) return null;
-
-            //if (!(deklaration.GetStatement is GetKey)) return null;
-            //if (!(deklaration.SetStatement is SetKey)) return null;
-
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
         private PropertyDeklaration CleanUp(PropertyDeklaration deklaration)

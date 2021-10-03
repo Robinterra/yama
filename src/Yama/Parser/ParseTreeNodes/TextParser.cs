@@ -30,13 +30,18 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public TextParser (  )
         {
-
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public TextParser ( int prio )
@@ -50,9 +55,10 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.Text ) return null;
 
-            TextParser node = new TextParser { Token = request.Token };
+            TextParser node = new TextParser();
 
-            node.Token.Node = node;
+            node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
             return node;
         }

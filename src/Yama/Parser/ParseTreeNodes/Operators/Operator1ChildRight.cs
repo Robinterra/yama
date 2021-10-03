@@ -72,13 +72,28 @@ namespace Yama.Parser
         {
             get;
         }
-        public IndexVariabelnReference VariabelReference { get; private set; }
+
+        public IndexVariabelnReference VariabelReference
+        {
+            get;
+            set;
+        }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
 
         #endregion get/set
 
         #region ctor
 
-        public Operator1ChildRight ( int prio )
+        public Operator1ChildRight ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        public Operator1ChildRight ( int prio ) : this ()
         {
             this.Prio = prio;
         }
@@ -120,6 +135,8 @@ namespace Yama.Parser
         }
         private bool CheckHashValidOperator ( IdentifierToken token )
         {
+            if ( token == null ) return false;
+
             foreach ( string op in this.ValidOperators )
             {
                 if ( op == token.Text ) return true;
@@ -143,13 +160,11 @@ namespace Yama.Parser
 
             Operator1ChildRight node = new Operator1ChildRight ( this.Prio );
             node.Token = request.Token;
+            node.AllTokens.Add ( request.Token );
 
             node.ChildNode = request.Parser.ParseCleanToken ( lexerRight );
 
             if ( node.ChildNode == null ) return null;
-
-            node.Token.Node = node;
-            node.ChildNode.Token.ParentNode = node;
 
             return node;
         }

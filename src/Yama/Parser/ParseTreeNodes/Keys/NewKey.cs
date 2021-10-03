@@ -80,13 +80,21 @@ namespace Yama.Parser
             set;
         }
 
-        public IdentifierToken SupportToken
+        public List<IdentifierToken> AllTokens
         {
             get;
-            set;
         }
 
         #endregion get/set
+
+        #region ctor
+
+        public NewKey ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
 
         #region methods
 
@@ -111,46 +119,30 @@ namespace Yama.Parser
 
             NewKey newKey = new NewKey();
             newKey.Token = request.Token;
-            newKey.Definition = request.Parser.Peek ( request.Token, 1 );
+            newKey.AllTokens.Add ( request.Token );
 
+            newKey.Definition = request.Parser.Peek ( request.Token, 1 );
+            newKey.AllTokens.Add ( newKey.Definition );
+            if ( newKey.Definition == null ) return null;
             if ( !this.CheckHashValidOperator( newKey.Definition )) return null;
 
             IdentifierToken beginkind = request.Parser.Peek ( newKey.Definition, 1 );
+            if ( beginkind == null ) return null;
 
             beginkind = this.TryParseGeneric(request, newKey, beginkind);
+            if ( beginkind == null ) return null;
 
             if (beginkind.Kind != IdentifierKind.OpenBracket) return null;
 
             IdentifierToken endToken = request.Parser.FindEndToken ( beginkind, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
-
             if ( endToken == null ) return null;
 
             newKey.Parameters = request.Parser.ParseCleanTokens ( beginkind.Position + 1, endToken.Position, true );
-
             if (newKey.Parameters == null) return null;
 
             newKey.Ende = endToken;
-
-            newKey.SupportToken = beginkind;
-
-            return this.Clean(newKey);
-        }
-
-        private IParseTreeNode Clean(NewKey newKey)
-        {
-            newKey.Ende.ParentNode = newKey;
-            newKey.Ende.Node = newKey;
-            newKey.Token.Node = newKey;
-            newKey.Definition.Node = newKey;
-
-            newKey.SupportToken.ParentNode = newKey;
-            newKey.SupportToken.Node = newKey;
-            if (newKey.GenericDefintion != null) newKey.GenericDefintion.Token.ParentNode = newKey;
-
-            foreach ( IParseTreeNode n in newKey.Parameters )
-            {
-                n.Token.ParentNode = newKey;
-            }
+            newKey.AllTokens.Add(endToken);
+            newKey.AllTokens.Add(beginkind);
 
             return newKey;
         }
@@ -160,7 +152,7 @@ namespace Yama.Parser
             GenericCall genericRule = request.Parser.GetRule<GenericCall>();
             if (genericRule == null) return token;
 
-            IParseTreeNode node = genericRule.Parse(new RequestParserTreeParser(request.Parser, token));
+            IParseTreeNode node = request.Parser.TryToParse ( genericRule, token );
             if (!(node is GenericCall genericCall)) return token;
 
             deklaration.GenericDefintion = genericCall;

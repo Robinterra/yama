@@ -65,7 +65,21 @@ namespace Yama.Parser
             set;
         }
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
+
+        #region ctor
+
+        public WhileKey ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
 
         #region methods
 
@@ -87,16 +101,15 @@ namespace Yama.Parser
 
             WhileKey key = new WhileKey (  );
             key.Token = request.Token;
+            key.AllTokens.Add ( request.Token );
 
             IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
 
             IParseTreeNode rule = request.Parser.GetRule<ContainerExpression>();
 
-            key.Condition = rule.Parse(new Request.RequestParserTreeParser(request.Parser, conditionkind));
+            key.Condition = request.Parser.TryToParse ( rule, conditionkind );
 
             if (key.Condition == null) return null;
-
-            key.Condition.Token.ParentNode = key;
 
             IdentifierToken Statementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
             if (!this.IsAllowedStatmentToken (Statementchild)) return null;
@@ -104,9 +117,6 @@ namespace Yama.Parser
             key.Statement = request.Parser.ParseCleanToken(Statementchild);
 
             if (key.Statement == null) return null;
-
-            key.Statement.Token.ParentNode = key;
-            key.Token.Node = key;
 
             return key;
         }

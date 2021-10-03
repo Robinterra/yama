@@ -28,7 +28,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.Statement );
+                if (this.Statement != null) result.Add ( this.Statement );
 
                 return result;
             }
@@ -40,7 +40,21 @@ namespace Yama.Parser
             set;
         } = new CompileJumpTo() { Point = PointMode.RootEnde };
 
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
+
         #endregion get/set
+
+        #region ctor
+
+        public ReturnKey ()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        #endregion ctor
 
         #region methods
 
@@ -63,8 +77,7 @@ namespace Yama.Parser
 
             result.Statement = node;
             result.Token = request.Token;
-            request.Token.Node = result;
-            if ( node != null ) node.Token.ParentNode = result;
+            result.AllTokens.Add ( request.Token );
 
             return result;
         }

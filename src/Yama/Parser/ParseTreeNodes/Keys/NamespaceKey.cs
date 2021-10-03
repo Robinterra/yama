@@ -33,8 +33,21 @@ namespace Yama.Parser
             }
         }
 
-        public ParserLayer NextLayer { get; }
-        public IndexNamespaceDeklaration Deklaration { get; private set; }
+        public ParserLayer NextLayer
+        {
+            get;
+        }
+
+        public IndexNamespaceDeklaration Deklaration
+        {
+            get;
+            set;
+        }
+
+        public List<IdentifierToken> AllTokens
+        {
+            get;
+        }
 
         #endregion get/set
 
@@ -42,7 +55,7 @@ namespace Yama.Parser
 
         public NamespaceKey()
         {
-            
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         public NamespaceKey(ParserLayer nextLayer)
@@ -60,20 +73,18 @@ namespace Yama.Parser
             if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.Text ) return null;
 
             NamespaceKey key = new NamespaceKey (  );
-            request.Token.Node = key;
+            key.AllTokens.Add ( request.Token );
 
             IdentifierToken keyNamenToken = request.Parser.Peek ( request.Token, 1 );
 
             key.Token = keyNamenToken;
-            keyNamenToken.Node = key;
+            key.AllTokens.Add ( keyNamenToken );
 
             IdentifierToken Statementchild = request.Parser.Peek ( keyNamenToken, 1);
 
             key.Statement = request.Parser.ParseCleanToken(Statementchild, this.NextLayer);
 
             if (key.Statement == null) return null;
-
-            key.Statement.Token.ParentNode = key;
 
             return key;
         }

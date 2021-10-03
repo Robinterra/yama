@@ -7,16 +7,14 @@ namespace Yama.Assembler.ARMT32
 {
     public class CommandWith2ArgsNode : IParseTreeNode
     {
+
+        #region vars
+
         private ParserLayer argumentLayer;
 
-        public CommandWith2ArgsNode()
-        {
+        #endregion vars
 
-        }
-        public CommandWith2ArgsNode(ParserLayer argumentLayer)
-        {
-            this.argumentLayer = argumentLayer;
-        }
+        #region get/set
 
         public IdentifierToken Token
         {
@@ -36,11 +34,10 @@ namespace Yama.Assembler.ARMT32
             set;
         }
 
-        public List<IdentifierToken> SupportTokens
+        public List<IdentifierToken> AllTokens
         {
             get;
-            set;
-        } = new List<IdentifierToken>();
+        }
 
         public List<IParseTreeNode> GetAllChilds
         {
@@ -54,6 +51,22 @@ namespace Yama.Assembler.ARMT32
                 return nodes;
             }
         }
+
+        #endregion get/set
+
+        #region ctor
+
+        public CommandWith2ArgsNode()
+        {
+            this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        public CommandWith2ArgsNode(ParserLayer argumentLayer)
+        {
+            this.argumentLayer = argumentLayer;
+        }
+
+        #endregion ctor
 
         public bool Compile(Parser.Request.RequestParserTreeCompile request)
         {
@@ -71,6 +84,7 @@ namespace Yama.Assembler.ARMT32
 
             CommandWith2ArgsNode deklaration = new CommandWith2ArgsNode();
             deklaration.Token = request.Token;
+            deklaration.AllTokens.Add(request.Token);
 
             IdentifierToken token = request.Parser.Peek(request.Token, 1);
 
@@ -86,7 +100,7 @@ namespace Yama.Assembler.ARMT32
             token = request.Parser.Peek(token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Comma) return null;
-            deklaration.SupportTokens.Add(token);
+            deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
 
@@ -97,21 +111,8 @@ namespace Yama.Assembler.ARMT32
             request.Parser.VorherigesLayer();
             if (deklaration.Argument1 == null) return null;
 
-            return this.CleanUp(deklaration);
+            return deklaration;
         }
 
-        private IParseTreeNode CleanUp(CommandWith2ArgsNode node)
-        {
-            node.Token.Node = node;
-            node.Argument0.Token.ParentNode = node;
-            node.Argument1.Token.ParentNode = node;
-
-            foreach (IdentifierToken token in node.SupportTokens)
-            {
-                token.Node = node;
-            }
-
-            return node;
-        }
     }
 }

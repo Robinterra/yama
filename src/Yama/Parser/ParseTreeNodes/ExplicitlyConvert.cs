@@ -46,15 +46,9 @@ namespace Yama.Parser
             }
         }
 
-        public IdentifierKind ValidKind
+        public List<IdentifierToken> AllTokens
         {
             get;
-        }
-
-        public IndexVariabelnDeklaration Deklaration
-        {
-            get;
-            set;
         }
 
         #endregion get/set
@@ -63,6 +57,7 @@ namespace Yama.Parser
 
         public ExplicitlyConvert ( int prio )
         {
+            this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
 
@@ -85,15 +80,14 @@ namespace Yama.Parser
 
             ExplicitlyConvert node = new ExplicitlyConvert ( this.Prio );
             node.Token = request.Token;
+            node.AllTokens.Add(request.Token);
 
             node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
 
             node.RightToken = request.Parser.Peek ( request.Token, 1 );
             if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return null;
 
-            node.Token.Node = node;
-            node.LeftNode.Token.ParentNode = node;
-            node.RightToken.Node = node;
+            node.AllTokens.Add(node.RightToken);
 
             return node;
         }
