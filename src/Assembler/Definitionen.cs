@@ -147,6 +147,16 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
+        public Assembler GenerateAssembler(Assembler assembler, string name)
+        {
+            if (name == "arm-t32") return this.GenerateArmT32Assembler(assembler);
+            if (name == "runtime") return this.GenerateRuntime(assembler);
+
+            return null;
+        }
+
+        // -----------------------------------------------
+
         #region ARM-T32 Definition
 
         // -----------------------------------------------
@@ -308,16 +318,6 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public Assembler GenerateAssembler(Assembler assembler, string name)
-        {
-            if (name == "arm-t32") return this.GenerateArmT32Assembler(assembler);
-            if (name == "runtime") return this.GenerateRuntime(assembler);
-
-            return null;
-        }
-
-        // -----------------------------------------------
-
         #endregion ARM-T32 Definition
 
         // -----------------------------------------------
@@ -333,6 +333,18 @@ namespace Yama.Assembler
             definition.Commands.Add(new AvrCommand2Register("adc", "Format1", 0x7, 2));
             definition.Commands.Add(new AvrCommand2Register("add", "Format1", 0x3, 2));
             definition.Commands.Add(new AvrCommand2Register("and", "Format1", 0x8, 2));
+            definition.Commands.Add(new AvrCommand1Register("asr", "Format1", 0x25, 2, 0x5));
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        private bool AvrFormat2Def ( AssemblerDefinition definition )
+        {
+            definition.Formats.Add(new AvrFormat2());
+
+            definition.Commands.Add(new AvrCommandRelativeJump("breq", "Format2", 0x3c, 2, 0x1));
 
             return true;
         }

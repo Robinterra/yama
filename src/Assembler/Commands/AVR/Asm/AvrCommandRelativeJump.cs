@@ -7,7 +7,7 @@ using Yama.Parser;
 namespace Yama.Assembler.Commands.AVR.Asm
 {
 
-    public class AvrCommand1Register : ICommand
+    public class AvrCommandRelativeJump : ICommand
     {
 
         #region get/set
@@ -38,12 +38,14 @@ namespace Yama.Assembler.Commands.AVR.Asm
             get;
             set;
         }
-        public int Size
+
+        public uint Condition
         {
             get;
             set;
         }
-        public uint Condition
+
+        public int Size
         {
             get;
             set;
@@ -58,7 +60,7 @@ namespace Yama.Assembler.Commands.AVR.Asm
 
         #region ctor
 
-        public AvrCommand1Register(string key, string format, uint id, int size, uint condition = 0)
+        public AvrCommandRelativeJump(string key, string format, uint id, int size, uint condition = 0)
         {
             this.Key = key;
             this.Format = format;
@@ -67,7 +69,7 @@ namespace Yama.Assembler.Commands.AVR.Asm
             this.Condition = condition;
         }
 
-        public AvrCommand1Register(AvrCommand1Register t, IParseTreeNode node, List<byte> bytes)
+        public AvrCommandRelativeJump(AvrCommandRelativeJump t, IParseTreeNode node, List<byte> bytes)
         {
             this.Key = t.Key;
             this.Format = t.Format;
@@ -85,15 +87,20 @@ namespace Yama.Assembler.Commands.AVR.Asm
             if (!(request.Node is CommandWith1ArgNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
+            JumpPointMapper map = request.Assembler.GetJumpPoint(t.Argument0.Token.Value.ToString());
+            if (map == null) return false;
+
+            uint target = request.Assembler.BuildJumpSkipper(request.Position, map.Adresse, (uint)this.Size, true);
+
             IFormat format = request.Assembler.GetFormat(this.Format);
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
+            assembleFormat.Arguments.Add(target);
             assembleFormat.Arguments.Add(this.Condition);
 
             if (!format.Assemble(assembleFormat)) return false;
 
-            if (request.WithMapper) request.Result.Add(new AvrCommand1Register(this, request.Node, assembleFormat.Result));
+            if (request.WithMapper) request.Result.Add(new AvrCommandRelativeJump(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());
 
             return true;
@@ -102,7 +109,7 @@ namespace Yama.Assembler.Commands.AVR.Asm
         public bool Identify(RequestIdentify request)
         {
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
-            if (!(request.Node is CommandWith1ArgNode t)) return false;
+            if (!(request.Node is CommandWith2ArgsNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
             return true;

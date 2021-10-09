@@ -3,13 +3,13 @@
 namespace Yama.Assembler.Commands.AVR.Asm
 {
 
-    public class AvrFormat1 : IFormat
+    public class AvrFormat2 : IFormat
     {
         public string Name
         {
             get
             {
-                return "Format1";
+                return "Format2";
             }
         }
 
@@ -18,9 +18,8 @@ namespace Yama.Assembler.Commands.AVR.Asm
             if (request.Arguments.Count != 2) return false;
 
             uint firstFragment = (request.Command << 10) & 0xfC00;
-            firstFragment |= ( request.Arguments[0] << 4 ) & 0x01F0;
-            firstFragment |= ( request.Arguments[1] ) & 0x000F;
-            firstFragment |= ( request.Arguments[1] << 9 ) & 0x0200;
+            firstFragment |= ( request.Arguments[0] << 3 ) & 0x03F8;
+            firstFragment |= ( request.Arguments[1] ) & 0x0007;
 
             byte[] tmp = BitConverter.GetBytes ( firstFragment );
             request.Result.Add ( tmp[0] );
