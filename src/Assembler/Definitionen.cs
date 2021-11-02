@@ -344,7 +344,22 @@ namespace Yama.Assembler
         {
             definition.Formats.Add(new AvrFormat2());
 
+            definition.Commands.Add(new AvrCommandRelativeJump("brcc", "Format2", 0x3d, 2, 0x0));
+            definition.Commands.Add(new AvrCommandRelativeJump("brcs", "Format2", 0x3c, 2, 0x0));
             definition.Commands.Add(new AvrCommandRelativeJump("breq", "Format2", 0x3c, 2, 0x1));
+            definition.Commands.Add(new AvrCommandRelativeJump("brge", "Format2", 0x3d, 2, 0x4));
+            definition.Commands.Add(new AvrCommandRelativeJump("brhc", "Format2", 0x3d, 2, 0x5));
+            definition.Commands.Add(new AvrCommandRelativeJump("brhs", "Format2", 0x3c, 2, 0x5));
+            definition.Commands.Add(new AvrCommandRelativeJump("brid", "Format2", 0x3d, 2, 0x7));
+            definition.Commands.Add(new AvrCommandRelativeJump("brie", "Format2", 0x3c, 2, 0x7));
+            definition.Commands.Add(new AvrCommandRelativeJump("brlo", "Format2", 0x3c, 2, 0x0));
+            definition.Commands.Add(new AvrCommandRelativeJump("brlt", "Format2", 0x3c, 2, 0x4));
+            definition.Commands.Add(new AvrCommandRelativeJump("brmi", "Format2", 0x3c, 2, 0x2));
+            definition.Commands.Add(new AvrCommandRelativeJump("brpl", "Format2", 0x3d, 2, 0x2));
+            definition.Commands.Add(new AvrCommandRelativeJump("brne", "Format2", 0x3d, 2, 0x1));
+            definition.Commands.Add(new AvrCommandRelativeJump("brsh", "Format2", 0x3d, 2, 0x0));
+            definition.Commands.Add(new AvrCommandRelativeJump("brtc", "Format2", 0x3d, 2, 0x6));
+            definition.Commands.Add(new AvrCommandRelativeJump("brts", "Format2", 0x3c, 2, 0x6));
 
             return true;
         }
