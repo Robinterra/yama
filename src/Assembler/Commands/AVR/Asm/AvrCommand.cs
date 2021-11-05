@@ -7,7 +7,7 @@ using Yama.Parser;
 namespace Yama.Assembler.Commands.AVR.Asm
 {
 
-    public class AvrCommandRelativeJump : ICommand
+    public class AvrCommand: ICommand
     {
 
         #region get/set
@@ -38,13 +38,6 @@ namespace Yama.Assembler.Commands.AVR.Asm
             get;
             set;
         }
-
-        public uint Condition
-        {
-            get;
-            set;
-        }
-
         public int Size
         {
             get;
@@ -60,16 +53,15 @@ namespace Yama.Assembler.Commands.AVR.Asm
 
         #region ctor
 
-        public AvrCommandRelativeJump(string key, string format, uint id, int size, uint condition = 0)
+        public AvrCommand(string key, string format, uint id, int size)
         {
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
-            this.Condition = condition;
         }
 
-        public AvrCommandRelativeJump(AvrCommandRelativeJump t, IParseTreeNode node, List<byte> bytes)
+        public AvrCommand(AvrCommand t, IParseTreeNode node, List<byte> bytes)
         {
             this.Key = t.Key;
             this.Format = t.Format;
@@ -87,20 +79,13 @@ namespace Yama.Assembler.Commands.AVR.Asm
             if (!(request.Node is CommandWith1ArgNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
-            JumpPointMapper map = request.Assembler.GetJumpPoint(t.Argument0.Token.Value.ToString());
-            if (map == null) return false;
-
-            uint target = request.Assembler.BuildJumpSkipper(request.Position, map.Adresse, (uint)this.Size, true);
-
             IFormat format = request.Assembler.GetFormat(this.Format);
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(target);
-            assembleFormat.Arguments.Add(this.Condition);
 
             if (!format.Assemble(assembleFormat)) return false;
 
-            if (request.WithMapper) request.Result.Add(new AvrCommandRelativeJump(this, request.Node, assembleFormat.Result));
+            if (request.WithMapper) request.Result.Add(new AvrCommand(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());
 
             return true;

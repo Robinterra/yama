@@ -334,6 +334,20 @@ namespace Yama.Assembler
             definition.Commands.Add(new AvrCommand2Register("add", "Format1", 0x3, 2));
             definition.Commands.Add(new AvrCommand2Register("and", "Format1", 0x8, 2));
             definition.Commands.Add(new AvrCommand1Register("asr", "Format1", 0x25, 2, 0x5));
+            definition.Commands.Add(new AvrCommand2Register("cp", "Format1", 0x5, 2));
+            definition.Commands.Add(new AvrCommand2Register("cpc", "Format1", 0x1, 2));
+            definition.Commands.Add(new AvrCommand2Register("cpse", "Format1", 0x4, 2));
+            definition.Commands.Add(new AvrCommand1Register("dec", "Format1", 0x25, 2, 0xA));
+            definition.Commands.Add(new AvrCommand2Register("eor", "Format1", 0x9, 2));
+            definition.Commands.Add(new AvrCommand1Register("inc", "Format1", 0x25, 2, 0x3));
+            
+            definition.Formats.Add(new AvrCallFormat());
+            definition.Commands.Add(new AvrCommandFromJumpPoint("call", "CallFormat", 0x4a, 4,0x7));
+            definition.Commands.Add(new AvrCommandFromJumpPoint("jmp", "CallFormat", 0x4a, 4,0x6));
+
+            definition.Formats.Add(new AvrCmdFormat());
+            definition.Commands.Add(new AvrCommand("icall", "CmdFormat", 0x9509, 2));
+            definition.Commands.Add(new AvrCommand("ijmp", "CmdFormat", 0x9409, 2));
 
             return true;
         }
@@ -360,6 +374,8 @@ namespace Yama.Assembler
             definition.Commands.Add(new AvrCommandRelativeJump("brsh", "Format2", 0x3d, 2, 0x0));
             definition.Commands.Add(new AvrCommandRelativeJump("brtc", "Format2", 0x3d, 2, 0x6));
             definition.Commands.Add(new AvrCommandRelativeJump("brts", "Format2", 0x3c, 2, 0x6));
+            definition.Commands.Add(new AvrCommandRelativeJump("brvc", "Format2", 0x3d, 2, 0x3));
+            definition.Commands.Add(new AvrCommandRelativeJump("brvs", "Format2", 0x3c, 2, 0x3));
 
             return true;
         }
