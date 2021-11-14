@@ -99,6 +99,13 @@ namespace Yama.Compiler
             map.Reference = line;
             this.Line = line;
 
+            if ( map.IsNullable )
+            {
+                map.Value = SSAVariableMap.LastValue.Unknown;
+                if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+            }
+            else map.Value = SSAVariableMap.LastValue.NotNull;
+
             //SSACompileArgument arg = new SSACompileArgument(line);
             //compiler.ContainerMgmt.StackArguments.Push(arg);
 

@@ -3,6 +3,7 @@ using Yama.Lexer;
 using Yama.Index;
 using Yama.Compiler;
 using System.Linq;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -75,6 +76,12 @@ namespace Yama.Parser
             get;
         }
 
+        public bool IsNullChecking
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -94,6 +101,7 @@ namespace Yama.Parser
             if (token == null) return false;
 
             if (token.Kind == IdentifierKind.Word) return true;
+            if ( token.Kind == IdentifierKind.Null ) return true;
 
             return false;
         }
@@ -116,12 +124,20 @@ namespace Yama.Parser
 
             node.AllTokens.Add(node.RightToken);
             if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return null;
+            if ( node.RightToken.Kind == IdentifierKind.Null ) return this.ParseNullChecking (node);
 
             node.ReferenceDeklaration = request.Parser.Peek ( node.RightToken, 1 );
             if ( node.ReferenceDeklaration == null ) return null;
             if (node.ReferenceDeklaration.Kind != IdentifierKind.Word) return null;
 
             node.AllTokens.Add(node.ReferenceDeklaration);
+
+            return node;
+        }
+
+        private IParseTreeNode ParseNullChecking ( TypePatternMatching node )
+        {
+            node.IsNullChecking = true;
 
             return node;
         }
@@ -143,6 +159,11 @@ namespace Yama.Parser
             varref.Name = "int";
             container.VariabelnReferences.Add(varref);
 
+            this.BooleascherReturn = new IndexVariabelnReference { Name = "bool", Use = this };
+            container.VariabelnReferences.Add(this.BooleascherReturn);
+
+            if ( this.IsNullChecking ) return true;
+
             IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration();
             reference.Use = this;
             reference.Name = this.ReferenceDeklaration.Text;
@@ -151,9 +172,6 @@ namespace Yama.Parser
             reference.Type = type;
             container.VariabelnReferences.Add(type);
 
-            this.BooleascherReturn = new IndexVariabelnReference { Name = "bool", Use = this };
-            container.VariabelnReferences.Add(this.BooleascherReturn);
-
             this.Deklaration = reference;
 
             return true;
@@ -161,6 +179,7 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if ( this.IsNullChecking ) return this.CompileNullChecking ( request );
             if (!(this.Deklaration.Type.Deklaration is IndexKlassenDeklaration t)) return false;
             if (t.InheritanceBase == null && t.InheritanceChilds.Count == 0) return request.Compiler.AddError("The Is Keyword works only with inheritance.", this);
 
@@ -177,6 +196,21 @@ namespace Yama.Parser
 
             CompileReferenceCall referenceCall = new CompileReferenceCall();
             referenceCall.CompileData(request.Compiler, this, t.DataRef.JumpPointName);
+
+            if (!(this.EqualsReference.Deklaration.Use is MethodeDeclarationNode mdn)) return false;
+
+            this.CompileCopy(request.Compiler, request.Mode, mdn);
+
+            return request.Compiler.Definition.ParaClean();
+        }
+
+        private bool CompileNullChecking ( RequestParserTreeCompile request )
+        {
+            this.Token.Value = 0;
+            this.LeftNode.Compile(new RequestParserTreeCompile(request.Compiler, "nullChecking"));
+
+            CompileNumConst compileNumConst = new CompileNumConst ();
+            compileNumConst.Compile(request.Compiler, new Number { Token = this.Token }, request.Mode);
 
             if (!(this.EqualsReference.Deklaration.Use is MethodeDeclarationNode mdn)) return false;
 

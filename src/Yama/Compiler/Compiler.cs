@@ -386,9 +386,7 @@ namespace Yama.Compiler
                 if (!(parent is IndexVariabelnDeklaration dek)) continue;
                 if (this.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(dek.Name)) continue;
 
-                SSAVariableMap map = new SSAVariableMap();
-                map.Key = dek.Name;
-                map.Deklaration = dek;
+                SSAVariableMap map = new SSAVariableMap(dek);
 
                 this.ContainerMgmt.CurrentMethod.VarMapper.Add(dek.Name, map);
             }

@@ -105,6 +105,14 @@ namespace Yama.Index
 
         // -----------------------------------------------
 
+        public bool IsNullable
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -139,45 +147,61 @@ namespace Yama.Index
         {
             this.ParentUsesSet = uses;
 
-            if (this.Name == "this")
-            {
-                IParent parent = this.ParentUsesSet.Deklarationen.FirstOrDefault(t=>t.Name == "this");
+            if (this.Name == "this") return this.VariableIsThisKeyword ();
 
-                if (!(parent is IndexVariabelnDeklaration dek)) return false;
+            if (this.Name == "base") return this.VariableIsBaseKeyword ();
 
-                this.Type = dek.Type;
-                this.Use = dek.Use;
-
-                return true;
-            }
-
-            if (this.Name == "base")
-            {
-                IParent parent = this.BaseUsesSet.Deklarationen.FirstOrDefault(t=>t.Name == "base");
-
-                if (!(parent is IndexVariabelnDeklaration dek)) return false;
-
-                this.Type = dek.Type;
-                this.Use = dek.Use;
-
-                return true;
-            }
-
-            if (this.Name == "invalue")
-            {
-                this.SetUsesSet = uses;
-
-                IParent parent = this.SetUsesSet.Deklarationen.FirstOrDefault(t=>t.Name == "invalue");
-
-                if (!(parent is IndexVariabelnDeklaration dek)) return false;
-
-                this.Type = dek.Type;
-                this.Use = dek.Use;
-
-                return true;
-            }
+            if (this.Name == "invalue") return this.VariableIsInValueKeyword ( uses );
 
             this.Type.Mappen(uses);
+            if ( this.Type.Deklaration is IndexKlassenDeklaration kd ) return this.TypeIsKlassenDeklaration ( kd );
+
+            return true;
+        }
+
+        private bool VariableIsThisKeyword ()
+        {
+            IParent parent = this.ParentUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "this" );
+
+            if ( !(parent is IndexVariabelnDeklaration dek) ) return false;
+
+            this.Type = dek.Type;
+            this.Use = dek.Use;
+
+            return true;
+        }
+
+        private bool VariableIsBaseKeyword ()
+        {
+            IParent parent = this.BaseUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "base" );
+
+            if ( !(parent is IndexVariabelnDeklaration dek) ) return false;
+
+            this.Type = dek.Type;
+            this.Use = dek.Use;
+
+            return true;
+        }
+
+        private bool VariableIsInValueKeyword ( ValidUses uses )
+        {
+            this.SetUsesSet = uses;
+
+            IParent parent = this.SetUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "invalue" );
+
+            if ( !(parent is IndexVariabelnDeklaration dek) ) return false;
+
+            this.Type = dek.Type;
+            this.Use = dek.Use;
+
+            return true;
+        }
+
+        private bool TypeIsKlassenDeklaration ( IndexKlassenDeklaration kd )
+        {
+            if ( kd.MemberModifier != ClassMemberModifiers.None ) return true;
+
+            this.IsNullable = true;
 
             return true;
         }
