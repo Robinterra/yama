@@ -30,7 +30,15 @@ namespace Yama.Compiler
             set;
         }
 
-        public bool IsChecked
+        public bool IsNullable
+        {
+            get
+            {
+                return this.Deklaration.IsNullable;
+            }
+        }
+
+        public LastValue Value
         {
             get;
             set;
@@ -67,9 +75,11 @@ namespace Yama.Compiler
 
         #region ctor
 
-        public SSAVariableMap()
+        public SSAVariableMap(IndexVariabelnDeklaration dek)
         {
-
+            this.Key = dek.Name;
+            this.Deklaration = dek;
+            this.Value = LastValue.NotSet;
         }
 
         public SSAVariableMap(SSAVariableMap value)
@@ -77,10 +87,21 @@ namespace Yama.Compiler
             this.Key = value.Key;
             this.Reference = value.Reference;
             this.Deklaration = value.Deklaration;
-            this.IsChecked = value.IsChecked;
+            this.Value = value.Value;
         }
 
         #endregion ctor
+
+        public enum LastValue
+        {
+
+            NotSet,
+            Unknown,
+            Null,
+            NotNull
+
+        }
+
     }
 
 }

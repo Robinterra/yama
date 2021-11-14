@@ -302,28 +302,6 @@ namespace Yama.Parser
             return false;
         }
 
-        private MethodeDeclarationNode CleanUp(MethodeDeclarationNode deklaration)
-        {
-            deklaration.Statement.Token.ParentNode = deklaration;
-
-            if (deklaration.AccessDefinition != null)
-            {
-                deklaration.AccessDefinition.Node = deklaration;
-                deklaration.AccessDefinition.ParentNode = deklaration;
-            }
-            if (deklaration.ZusatzDefinition != null)
-            {
-                deklaration.ZusatzDefinition.Node = deklaration;
-                deklaration.ZusatzDefinition.ParentNode = deklaration;
-            }
-            if (!this.CheckSonderRegleung(deklaration.TypeDefinition)) deklaration.TypeDefinition.ParentNode = deklaration;
-
-            deklaration.TypeDefinition.Node = deklaration;
-            deklaration.Token.Node = deklaration;
-
-            return deklaration;
-        }
-
         public MethodeType GetMethodeType()
         {
             MethodeType type = MethodeType.Methode;

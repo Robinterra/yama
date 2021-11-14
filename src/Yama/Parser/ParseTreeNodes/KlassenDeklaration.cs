@@ -30,7 +30,7 @@ namespace Yama.Parser
             set;
         }
 
-        public IdentifierToken ZusatzDefinition
+        public IdentifierToken MemberModifier
         {
             get;
             set;
@@ -207,7 +207,7 @@ namespace Yama.Parser
                 return token;
             }
 
-            deklaration.ZusatzDefinition = token;
+            deklaration.MemberModifier = token;
             deklaration.AllTokens.Add(token);
 
             return parser.Peek(token, 1);
@@ -264,6 +264,12 @@ namespace Yama.Parser
             IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration();
             deklaration.Name = this.Token.Text;
             deklaration.Use = this;
+
+            if ( this.MemberModifier != null )
+            {
+                if ( this.MemberModifier.Kind == IdentifierKind.Static ) deklaration.MemberModifier = ClassMemberModifiers.Static;
+                if ( this.MemberModifier.Kind == IdentifierKind.Primitive ) deklaration.MemberModifier = ClassMemberModifiers.Primitive;
+            }
 
             if (this.GenericDefintion != null)
             {

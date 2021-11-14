@@ -218,6 +218,12 @@ namespace Yama.Index
             set;
         }
 
+        public ClassMemberModifiers MemberModifier
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -399,5 +405,14 @@ namespace Yama.Index
         }
 
         #endregion methods
+    }
+
+    public enum ClassMemberModifiers
+    {
+
+        None,
+        Static,
+        Primitive
+
     }
 }

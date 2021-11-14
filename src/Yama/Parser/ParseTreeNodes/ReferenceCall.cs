@@ -146,6 +146,7 @@ namespace Yama.Parser
 
             if (this.CheckAndCompileBase(request.Compiler, compileReference, moderesult)) return true;
 
+            if ( request.Mode == "nullChecking" ) compileReference.IsNullCheck = true;
             return compileReference.Compile(request.Compiler, this, moderesult);
         }
 
@@ -155,7 +156,6 @@ namespace Yama.Parser
             if (!(this.Reference.Deklaration is IndexVariabelnDeklaration t)) return false;
             if (!(t.Type.Deklaration is IndexKlassenDeklaration u)) return false;
             if (!u.IsMethodsReferenceMode) return false;
-
 
             return compileReference.CompileDek(compiler, compiler.CurrentThis, moderesult);
         }

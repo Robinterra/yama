@@ -67,6 +67,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public bool IsNullCheck
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -236,6 +242,13 @@ namespace Yama.Compiler
                 if (map.Reference != null) map.AllSets.Add(arg.Reference);
                 map.Reference = arg.Reference;
 
+                if ( map.IsNullable )
+                {
+                    map.Value = SSAVariableMap.LastValue.Unknown;
+                    if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+                }
+                else map.Value = SSAVariableMap.LastValue.NotNull;
+
                 arg.Reference.Calls.Remove(lineset);
 
                 return true;
@@ -250,6 +263,13 @@ namespace Yama.Compiler
 
             if (map.Reference != null) map.AllSets.Add(lineset);
             map.Reference = lineset;
+
+            if ( map.IsNullable )
+            {
+                map.Value = SSAVariableMap.LastValue.Unknown;
+                if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+            }
+            else map.Value = SSAVariableMap.LastValue.NotNull;
 
             return true;
         }
@@ -321,8 +341,12 @@ namespace Yama.Compiler
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[deklaration.Name];
 
-            if (map.Reference == null)
-                return compiler.AddError("variable is not set!", deklaration.Use);
+            if ( this.IsNullCheck ) map.Value = SSAVariableMap.LastValue.NotNull;
+            if ( map.Value == SSAVariableMap.LastValue.NotSet ) return compiler.AddError ( "variable is not set!", deklaration.Use );
+            if ( map.Value == SSAVariableMap.LastValue.Null ) return compiler.AddError ( "variable is null", deklaration.Use );
+            if ( map.Value == SSAVariableMap.LastValue.Unknown ) return compiler.AddError ( "null checking for variable is missing", deklaration.Use );
+
+            if (map.Reference == null) return compiler.AddError("variable is not set!", deklaration.Use);
 
             SSACompileArgument arg = new SSACompileArgument(map.Reference);
             compiler.ContainerMgmt.StackArguments.Push(arg);
