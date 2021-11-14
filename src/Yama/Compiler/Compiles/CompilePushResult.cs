@@ -107,6 +107,8 @@ namespace Yama.Compiler
 
             if (mode == "copy")
             {
+                if ( line.Arguments.Count == 0 ) return false;
+
                 SSACompileArgument arg = new SSACompileArgument(line.Arguments[0].Reference);
                 compiler.ContainerMgmt.StackArguments.Push(arg);
             }

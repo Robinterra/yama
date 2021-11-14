@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Yama.Index;
 using Yama.Parser;
 
 namespace Yama.Compiler
@@ -111,10 +112,26 @@ namespace Yama.Compiler
             if (!(line.Owner is CompileReferenceCall rc)) return false;
             if (rc.Node == null) return false;
 
+            string methodName = rc.Node.Token.Text;
+            if (rc.Node is NewKey nk) methodName = string.Format("{0}.{1}", (nk.Reference.Deklaration as IndexMethodDeklaration).Klasse.Name, methodName);
+
+            if ( rc.Node is ReferenceCall rfc ) methodName = IRCodePrintStream.GetMethodeName ( rfc, methodName );
+
             string isNotUseChar = line.IsUsed ? "" : "/!\\";
-            result.AppendFormat("{2}{0}: {3}{1} (  )", line.Order, rc.Node.Token.Text, new string(' ', emptyStrings), isNotUseChar);
+            result.AppendFormat("{2}{0}: {3}{1} (  )", line.Order, methodName, new string(' ', emptyStrings), isNotUseChar);
 
             return true;
+        }
+
+        private static string GetMethodeName ( ReferenceCall rfc, string methodName )
+        {
+            string klasse = null;
+            if ( rfc.Reference.Deklaration is IndexMethodDeklaration md ) klasse = md.Klasse.Name;
+            if ( rfc.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsd ) klasse = pgsd.Klasse.Name;
+            if ( rfc.Reference.Deklaration is IndexPropertyDeklaration pd ) klasse = pd.Klasse.Name;
+
+            if ( klasse == null ) return methodName;
+            return string.Format ( "{0}.{1}", klasse, methodName );
         }
 
         private bool AddFunktionsEnde(SSACompileLine line, StringBuilder result)
@@ -132,7 +149,7 @@ namespace Yama.Compiler
         {
             if (!(line.Owner is CompileFunktionsDeklaration fd)) return false;
 
-            result.AppendFormat("{0} (  )\n{{", fd.Node.Token.Text);
+            result.AppendFormat("{1}.{0} (  )\n{{", fd.Node.Token.Text, (fd.Node as MethodeDeclarationNode).Deklaration.Klasse.Name);
 
             emptyStrings += 4;
 
