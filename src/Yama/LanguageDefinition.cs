@@ -35,7 +35,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public FileInfo OutputAssemblerFile
+        public FileInfo? OutputAssemblerFile
         {
             get;
             set;
@@ -51,7 +51,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public IProcessorDefinition Definition
+        public IProcessorDefinition? Definition
         {
             get;
             set;
@@ -106,13 +106,13 @@ namespace Yama
         } = Optimize.SSA;
 
         // -----------------------------------------------
-        public List<ICommand> Sequence
+        public List<ICommand>? Sequence
         {
             get;
             set;
         }
 
-        public FileInfo IROutputFile
+        public FileInfo? IROutputFile
         {
             get;
             set;
@@ -426,7 +426,9 @@ namespace Yama
 
             List<ParserLayer> layers = this.GetParserRules();
             Lexer.Lexer lexer = this.GetBasicLexer();
-            ParserLayer startlayer = layers.FirstOrDefault(t=>t.Name == "namespace");
+            ParserLayer? startlayer = layers.Find(t=>t.Name == "namespace");
+
+            if (startlayer == null) return false;
 
             foreach (string File in files)
             {
@@ -450,7 +452,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool Indezieren(ref List<IParseTreeNode> nodes, ref MethodeDeclarationNode main)
+        private bool Indezieren(ref List<IParseTreeNode> nodes, ref MethodeDeclarationNode? main)
         {
             Yama.Index.Index index = new Yama.Index.Index();
             index.Roots = nodes;
@@ -473,10 +475,11 @@ namespace Yama
 
             List<IParseTreeNode> nodes = new List<IParseTreeNode>();
             List<ICompileRoot> compileRoots = new List<ICompileRoot>();
-            MethodeDeclarationNode main = null;
+            MethodeDeclarationNode? main = null;
 
             FileInfo file = this.OutputFile;
             if ( file == null ) return this.PrintSimpleError("no output file is set");
+            if (file.Directory == null) return false;
             if (!file.Directory.Exists) file.Directory.Create();
 
             if (!this.Parse(nodes)) return false;
@@ -497,8 +500,10 @@ namespace Yama
         private bool Assemblen(List<ICompileRoot> compileRoots)
         {
             FileInfo file = this.OutputFile;
+            if (file.Directory == null) return false;
             if (!file.Directory.Exists) file.Directory.Create();
             if (file.Exists) file.Delete();
+            if (this.Definition == null) return false;
 
             string def = this.Definition.Name;
             if (this.Defines.Contains("runtime")) def = "runtime";
@@ -525,15 +530,18 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool Compilen(List<IParseTreeNode> nodes, MethodeDeclarationNode main, ref List<ICompileRoot> roots)
+        private bool Compilen(List<IParseTreeNode> nodes, MethodeDeclarationNode? main, ref List<ICompileRoot> roots)
         {
+            if (this.Definition == null) return false;
+
             Compiler.Compiler compiler = new Compiler.Compiler();
             compiler.OptimizeLevel = this.OptimizeLevel;
             compiler.OutputFile = this.OutputAssemblerFile;
             compiler.Definition = this.Definition;
             compiler.MainFunction = main;
             compiler.Defines = this.Defines;
-            compiler.Definition.Compiler = compiler;
+            this.Definition.Compiler = compiler;
+
             this.InitCompilerIrPrinting(compiler);
 
             List<FileInfo> extensionsFiles = new List<FileInfo>();
@@ -746,7 +754,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public bool PrintSyntaxError(IdentifierToken token, string msg, string nexterrormsg = "Syntax error")
+        public bool PrintSyntaxError(IdentifierToken? token, string? msg, string nexterrormsg = "Syntax error")
         {
             //if (token.Kind != SyntaxKind.Unknown) return false;
             if (token == null)
@@ -758,7 +766,10 @@ namespace Yama
             ConsoleColor colr = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
 
-            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, token.FileInfo.FullName, nexterrormsg );
+            string filename = "unknown";
+            if (token.FileInfo != null) filename = token.FileInfo.FullName;
+
+            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, filename, nexterrormsg );
 
             Console.ForegroundColor = colr;
 
@@ -773,7 +784,10 @@ namespace Yama
             {
                 IdentifierToken token = error.Token;
 
-                if (token.Kind == IdentifierKind.Unknown) token = error.Token.ParentNode.Token;
+                if (token.Kind == IdentifierKind.Unknown)
+                {
+                    if (error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
+                }
 
                 p.PrintSyntaxError ( token, token.Text );
             }

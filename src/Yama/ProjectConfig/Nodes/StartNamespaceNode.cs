@@ -43,7 +43,6 @@ namespace Yama.ProjectConfig.Nodes
         public List<IdentifierToken> AllTokens
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -54,6 +53,8 @@ namespace Yama.ProjectConfig.Nodes
 
         public StartNamespaceNode (  )
         {
+            this.Token = new();
+            this.ValueToken = new();
             this.AllTokens = new List<IdentifierToken>();
         }
 
@@ -72,7 +73,9 @@ namespace Yama.ProjectConfig.Nodes
 
         public bool Deserialize(RequestDeserialize request)
         {
-            string text = this.ValueToken.Value.ToString();
+            if (this.ValueToken.Value is null) return false;
+
+            string? text = this.ValueToken.Value.ToString();
 
             request.Project.StartNamespace = text;
 
@@ -88,7 +91,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public IParseTreeNode Parse(RequestParserTreeParser request)
+        public IParseTreeNode? Parse(RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
             if (request.Token.Text.ToLower() != "startnamespace") return null;

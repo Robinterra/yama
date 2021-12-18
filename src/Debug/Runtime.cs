@@ -143,7 +143,7 @@ namespace Yama.Debug
         }
 
         // -----------------------------------------------
-        public List<Assembler.ICommand> Sequence
+        public List<Assembler.ICommand>? Sequence
         {
             get;
             set;

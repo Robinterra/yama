@@ -44,7 +44,6 @@ namespace Yama.ProjectConfig.Nodes
         public List<IdentifierToken> AllTokens
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -55,6 +54,8 @@ namespace Yama.ProjectConfig.Nodes
 
         public PackageGitBranchNode (  )
         {
+            this.Token = new();
+            this.ValueToken = new();
             this.AllTokens = new List<IdentifierToken>();
         }
 
@@ -73,7 +74,10 @@ namespace Yama.ProjectConfig.Nodes
 
         public bool Deserialize(RequestDeserialize request)
         {
-            string define = this.ValueToken.Value.ToString();
+            if (this.ValueToken.Value is null) return false;
+            if (request.Package is null) return false;
+
+            string? define = this.ValueToken.Value.ToString();
 
             request.Package.GitBranch = define;
 
@@ -89,7 +93,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public IParseTreeNode Parse(RequestParserTreeParser request)
+        public IParseTreeNode? Parse(RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
             if (request.Token.Text.ToLower() != "git.branch") return null;

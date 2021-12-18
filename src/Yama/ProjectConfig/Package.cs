@@ -7,7 +7,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        private string name;
+        private string? name;
 
         // -----------------------------------------------
 
@@ -15,14 +15,15 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public string Name
+        public string? Name
         {
             get
             {
                 if ( !string.IsNullOrEmpty ( this.name ) ) return this.name;
+                if (this.GitRepository == null) return null;
 
                 string[] splits = this.GitRepository.Split ( "/" );
-                string result = splits.LastOrDefault ();
+                string? result = splits.LastOrDefault ();
 
                 if ( string.IsNullOrEmpty ( result ) ) return null;
 
@@ -34,7 +35,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public string GitRepository
+        public string? GitRepository
         {
             get;
             set;
@@ -42,7 +43,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public string GitBranch
+        public string? GitBranch
         {
             get;
             set;

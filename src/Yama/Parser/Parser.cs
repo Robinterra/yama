@@ -244,11 +244,11 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public T GetRule<T>() where T : IParseTreeNode
+        public T? GetRule<T>() where T : IParseTreeNode
         {
             foreach (ParserLayer layer in this.ParserLayers)
             {
-                IParseTreeNode rule = layer.ParserMembers.Find(t => t is T);
+                IParseTreeNode? rule = layer.ParserMembers.Find(t => t is T);
 
                 if (rule != null) return (T)rule;
             }
@@ -258,7 +258,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public bool PrintSyntaxError(IdentifierToken token, string msg, string nexterrormsg = "Syntax error")
+        public bool PrintSyntaxError(IdentifierToken token, string? msg, string nexterrormsg = "Syntax error")
         {
             this.SyntaxErrors.Add ( token );
 

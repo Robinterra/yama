@@ -22,7 +22,6 @@ namespace Yama.ProjectConfig
         public DefinitionManager TargetManager
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -30,7 +29,6 @@ namespace Yama.ProjectConfig
         public Dictionary<string, Package> BinPackages
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -43,8 +41,9 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public ConfigDefinition ()
+        public ConfigDefinition (DefinitionManager defs)
         {
+            this.TargetManager = defs;
             this.BinPackages = new Dictionary<string, Package> ();
         }
         
@@ -72,6 +71,7 @@ namespace Yama.ProjectConfig
         {
             List<IDeserialize> nodes = new List<IDeserialize>();
             if (!this.Parse(nodes, file)) return false;
+            if (file.Directory == null) return false;
 
             Project project = this.Deserialize(file.Directory, nodes);
             if (project == null) return false;
@@ -87,6 +87,8 @@ namespace Yama.ProjectConfig
 
         private bool TranslateToDefinitionMain(Project project, FileInfo file, LanguageDefinition definition)
         {
+            if (this.TargetManager == null) return false;
+
             definition.Definition = this.TargetManager.GetDefinition(project.TargetPlattform);
             if (definition.Definition == null) return false;
 
@@ -114,18 +116,28 @@ namespace Yama.ProjectConfig
 
             definition.Extensions.AddRange(project.ExtensionsPaths);
 
-            foreach ( FileInfo langDef in project.LanguageDefinitions )
-            {
-                this.TargetManager.AddDefinition ( langDef );
-            }
+            this.AddTargets(project.LanguageDefinitions);
+
+            if (project.Packages == null) return true;
 
             bool isok = true;
+
             foreach ( Package package in project.Packages )
             {
                 if ( !this.BindPackage ( definition, package ) ) isok = false;
             }
 
             return isok;
+        }
+
+        // -----------------------------------------------
+
+        private void AddTargets(List<FileInfo> languageDefinitions)
+        {
+            foreach ( FileInfo langDef in languageDefinitions )
+            {
+                this.TargetManager.AddDefinition ( langDef );
+            }
         }
 
         // -----------------------------------------------
@@ -304,8 +316,9 @@ namespace Yama.ProjectConfig
         private bool Parse(List<IDeserialize> nodes, FileInfo file)
         {
             Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
-            ParserLayer startlayer = p.ParserLayers.FirstOrDefault(t=>t.Name == "root");
+            ParserLayer? startlayer = p.ParserLayers.Find(t=>t.Name == "root");
 
+            if (startlayer == null) return false;
             p.ErrorNode = new ParserError (  );
 
             if (!p.Parse(startlayer)) return this.PrintingErrors(p);
@@ -329,8 +342,7 @@ namespace Yama.ProjectConfig
 
         private Project Deserialize(DirectoryInfo dir, List<IDeserialize> nodes)
         {
-            RequestDeserialize request = new RequestDeserialize();
-            request.Project = new Project();
+            RequestDeserialize request = new RequestDeserialize(new Project());
             request.Project.Directory = dir;
 
             foreach (IDeserialize node in nodes)
@@ -357,7 +369,10 @@ namespace Yama.ProjectConfig
             {
                 IdentifierToken token = error.Token;
 
-                if (token.Kind == IdentifierKind.Unknown) token = error.Token.ParentNode.Token;
+                if (token.Kind == IdentifierKind.Unknown)
+                {
+                    if (token.ParentNode != null) token = token.ParentNode.Token;
+                }
 
                 p.PrintSyntaxError ( token, token.Text );
             }
@@ -367,7 +382,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        private bool PrintingError(string msg, FileInfo file)
+        private bool PrintingError(string msg, FileInfo? file)
         {
             ConsoleColor colr = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;

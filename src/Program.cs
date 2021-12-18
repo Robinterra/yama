@@ -19,21 +19,19 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static LanguageDefinition yama;
+        private static LanguageDefinition yama = new LanguageDefinition();
 
         // -----------------------------------------------
 
         public static List<ICommandLine> EnabledCommandLines
         {
             get;
-            set;
-        }
+        } = new List<ICommandLine>();
 
         public static DirectoryInfo PackagePath
         {
             get;
-            set;
-        }
+        } = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "packages"));
 
         // -----------------------------------------------
 
@@ -232,8 +230,7 @@ namespace Yama
 
         private static bool BuildWithProjectConfig(FileInfo projectConfigFile, DefinitionManager defs )
         {
-            ConfigDefinition projectConfig = new ConfigDefinition();
-            projectConfig.TargetManager = defs;
+            ConfigDefinition projectConfig = new ConfigDefinition(defs);
 
             if (!projectConfig.Build(yama, projectConfigFile)) return false;
 
@@ -300,8 +297,6 @@ namespace Yama
 
         private static bool Init (  )
         {
-            Program.PackagePath = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "packages"));
-
             Program.InitCommandLines (  );
 
             return true;
@@ -311,8 +306,6 @@ namespace Yama
 
         private static bool InitCommandLines (  )
         {
-            Program.EnabledCommandLines = new List<ICommandLine> (  );
-
             List<ICommandLine> compileArgs = new List<ICommandLine>();
             compileArgs.Add( new FileExpression () );
             compileArgs.Add( new IncludeExpression () );

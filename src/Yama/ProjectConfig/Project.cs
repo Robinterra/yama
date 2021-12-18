@@ -12,7 +12,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public DirectoryInfo Directory
+        public DirectoryInfo? Directory
         {
             get;
             set;
@@ -23,12 +23,11 @@ namespace Yama.ProjectConfig
         public List<DirectoryInfo> SourcePaths
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
 
-        public FileInfo OutputFile
+        public FileInfo? OutputFile
         {
             get;
             set;
@@ -36,7 +35,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public FileInfo IROutputFile
+        public FileInfo? IROutputFile
         {
             get;
             set;
@@ -44,7 +43,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public FileInfo AssemblerOutputFile
+        public FileInfo? AssemblerOutputFile
         {
             get;
             set;
@@ -63,12 +62,11 @@ namespace Yama.ProjectConfig
         public List<DirectoryInfo> ExtensionsPaths
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
 
-        public string TargetPlattform
+        public string? TargetPlattform
         {
             get;
             set;
@@ -76,7 +74,7 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public string StartNamespace
+        public string? StartNamespace
         {
             get;
             set;
@@ -95,7 +93,6 @@ namespace Yama.ProjectConfig
         public List<string> Defines
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -103,7 +100,6 @@ namespace Yama.ProjectConfig
         public List<FileInfo> LanguageDefinitions
         {
             get;
-            set;
         }
         
         // -----------------------------------------------
@@ -111,7 +107,6 @@ namespace Yama.ProjectConfig
         public List<Package> Packages
         {
             get;
-            set;
         }
 
         // -----------------------------------------------

@@ -66,18 +66,16 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public string? Text
+        public string Text
         {
             get
             {
-                if (this.Data == null) return null;
+                if (this.Data == null) return string.Empty;
 
                 return System.Text.Encoding.UTF8.GetString ( this.Data );
             }
             private set
             {
-                if (value == null) return;
-
                 this.Data = System.Text.Encoding.UTF8.GetBytes ( value );
             }
         }
@@ -92,7 +90,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IParseTreeNode ParentNode
+        public IParseTreeNode? ParentNode
         {
             get;
             set;
@@ -100,7 +98,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;

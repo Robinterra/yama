@@ -43,7 +43,6 @@ namespace Yama.ProjectConfig.Nodes
         public List<IdentifierToken> AllTokens
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -54,6 +53,8 @@ namespace Yama.ProjectConfig.Nodes
 
         public SourcePathsNode (  )
         {
+            this.Token = new();
+            this.ValueToken = new();
             this.AllTokens = new List<IdentifierToken>();
         }
 
@@ -72,7 +73,11 @@ namespace Yama.ProjectConfig.Nodes
 
         public bool Deserialize(RequestDeserialize request)
         {
-            string path = this.ValueToken.Value.ToString();
+            if (this.ValueToken.Value is null) return false;
+            if (request.Project.Directory is null) return false;
+
+            string? path = this.ValueToken.Value.ToString();
+            if (path is null) return false;
 
             DirectoryInfo directory = new DirectoryInfo(Path.Combine( request.Project.Directory.FullName, path));
 
@@ -90,7 +95,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public IParseTreeNode Parse(RequestParserTreeParser request)
+        public IParseTreeNode? Parse(RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
             if (request.Token.Text.ToLower() != "source") return null;
