@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Yama.Lexer
 {
@@ -37,10 +38,21 @@ namespace Yama.Lexer
 
             bool isFirst0 = lexer.CurrentChar == '0';
             bool ishex = false;
+            bool hasPoint = false;
 
             while ( this.CheckCurrentChar ( lexer.CurrentChar, ishex ) )
             {
                 lexer.NextChar (  );
+
+                if (!hasPoint)
+                {
+                    if (lexer.CurrentChar == '.')
+                    {
+                        isFirst0 = false;
+                        hasPoint = true;
+                        lexer.NextChar();
+                    }
+                }
 
                 if (!isFirst0) continue;
 
@@ -59,9 +71,9 @@ namespace Yama.Lexer
 
         private bool CheckCurrentChar(char currentChar, bool ishex)
         {
-            if (!ishex) return char.IsDigit ( currentChar );
+            if (ishex) return currentChar.IsHex();
 
-            return currentChar.IsHex();
+            return char.IsDigit ( currentChar );
         }
 
         // -----------------------------------------------
@@ -75,6 +87,13 @@ namespace Yama.Lexer
                 if (text.Contains("0x")) return int.Parse(text.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
             }
             catch { }
+
+            if (text.Contains('.'))
+            {
+                if (!decimal.TryParse(text, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out decimal dRes)) return (decimal)0.0;
+
+                return dRes;
+            }
 
             if (!int.TryParse ( text, out int result )) return 0;
 

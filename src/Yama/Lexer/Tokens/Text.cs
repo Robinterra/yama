@@ -101,6 +101,8 @@ namespace Yama.Lexer
             List<byte> daten = new List<byte>();
             foreach ( IdentifierToken token in lexer )
             {
+                if (token.CleanDaten == null) continue;
+
                 daten.AddRange(token.CleanDaten);
             }
 

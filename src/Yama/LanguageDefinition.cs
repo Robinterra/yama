@@ -409,7 +409,7 @@ namespace Yama
         {
             Lexer.Lexer lexer = new Lexer.Lexer();
 
-            lexer.LexerTokens = this.GetLexerRules();
+            lexer.LexerTokens.AddRange(this.GetLexerRules());
 
             return lexer;
         }

@@ -30,11 +30,11 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        private Stream daten;
+        private Stream? daten;
 
         // -----------------------------------------------
 
-        public Stream Daten
+        public Stream? Daten
         {
             get
             {
@@ -43,7 +43,9 @@ namespace Yama.Lexer
             set
             {
                 this.daten = value;
-                this.CurrentByte = (byte) this.Daten.ReadByte();
+                if (value == null) return;
+
+                this.CurrentByte = (byte) value.ReadByte();
                 this.position = 0;
                 this.column = 0;
                 this.line = 1;
@@ -55,8 +57,7 @@ namespace Yama.Lexer
         public List<ILexerToken> LexerTokens
         {
             get;
-            set;
-        } = new List<ILexerToken> ();
+        }
 
         // -----------------------------------------------
 
@@ -76,7 +77,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public object Current
+        public object? Current
         {
             get;
             set;
@@ -94,12 +95,12 @@ namespace Yama.Lexer
 
         public Lexer (  )
         {
-
+            this.LexerTokens = new List<ILexerToken> ();
         }
 
         // -----------------------------------------------
 
-        public Lexer ( Stream daten )
+        public Lexer ( Stream daten ) : this()
         {
             this.Daten = daten;
         }
@@ -109,7 +110,7 @@ namespace Yama.Lexer
         /**
          * Zum erstellen eines Sub Lexers
          */
-        public Lexer ( Lexer lexer, List<ILexerToken> tokens )
+        public Lexer ( Lexer lexer, List<ILexerToken> tokens ) : this()
         {
             this.daten = lexer.daten;
             this.position = lexer.position;
@@ -127,7 +128,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IdentifierToken NextToken (  )
+        public IdentifierToken? NextToken (  )
         {
             if (this.IsEnde (  ) ) return null;
 
@@ -135,7 +136,7 @@ namespace Yama.Lexer
             {
                 if (lexerToken == null) continue;
 
-                IdentifierToken result = this.ExecuteLexerToken ( lexerToken );
+                IdentifierToken? result = this.ExecuteLexerToken ( lexerToken );
 
                 if (result == null) continue;
 
@@ -153,7 +154,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IdentifierToken NextFindMatch()
+        public IdentifierToken? NextFindMatch()
         {
             foreach (IdentifierToken token in this)
             {
@@ -181,6 +182,8 @@ namespace Yama.Lexer
 
         public bool NextByte (  )
         {
+            if (this.Daten == null) return false;
+
             this.position++;
 
             this.column++;
@@ -210,6 +213,8 @@ namespace Yama.Lexer
 
         public bool CurrentCharMode (  )
         {
+            if (this.Daten == null) return false;
+
             if ( this.position >= this.Daten.Length )
             {
                 this.CurrentChar = '\0';
@@ -231,6 +236,7 @@ namespace Yama.Lexer
 
         public bool NextChar (  )
         {
+            if (this.Daten == null) return false;
 
             this.column++;
 
@@ -265,6 +271,8 @@ namespace Yama.Lexer
 
         private bool IsEnde (  )
         {
+            if (this.Daten == null) return true;
+
             return this.position >= this.Daten.Length;
         }
 
@@ -280,6 +288,7 @@ namespace Yama.Lexer
             TokenState state = token.CheckChar ( this );
 
             if (state == TokenState.Complete) return state;
+            if (this.Daten == null) return TokenState.Cancel;
 
             this.position = start;
             this.column = column;
@@ -293,11 +302,12 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        private IdentifierToken ExecuteLexerToken ( ILexerToken token )
+        private IdentifierToken? ExecuteLexerToken ( ILexerToken token )
         {
             TokenState state = this.ExecuteLexerToken ( token, out int start, out int column, out int line );
 
             if (state != TokenState.Complete) return null;
+            if (this.Daten == null) return null;
 
             byte[] daten = new byte[this.position - start];
 

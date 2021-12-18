@@ -1,5 +1,6 @@
 using System.IO;
 using Yama.Parser;
+
 namespace Yama.Lexer
 {
     public class IdentifierToken
@@ -41,7 +42,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public FileInfo FileInfo
+        public FileInfo? FileInfo
         {
             get;
             set;
@@ -49,7 +50,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public byte[] Data
+        public byte[]? Data
         {
             get;
             private set;
@@ -57,7 +58,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public byte[] CleanDaten
+        public byte[]? CleanDaten
         {
             get;
             set;
@@ -65,21 +66,25 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public string Text
+        public string? Text
         {
             get
             {
+                if (this.Data == null) return null;
+
                 return System.Text.Encoding.UTF8.GetString ( this.Data );
             }
             private set
             {
+                if (value == null) return;
+
                 this.Data = System.Text.Encoding.UTF8.GetBytes ( value );
             }
         }
 
         // -----------------------------------------------
 
-        public object Value
+        public object? Value
         {
             get;
             set;
@@ -118,7 +123,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, string text, object value )
+        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, string text, object value ) : this()
         {
             this.Kind = kind;
             this.Position = position;
@@ -130,7 +135,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, byte[] data, object value )
+        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, byte[] data, object value ) : this()
         {
             this.Kind = kind;
             this.Position = position;
