@@ -10,7 +10,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public Container Statement
+        public Container? Statement
         {
             get;
             set;
@@ -26,6 +26,8 @@ namespace Yama.Parser
         {
             get
             {
+                if (this.Statement is null) return this.Token;
+
                 return (this.Statement is IContainer a) ? a.Ende : this.Statement.Token;
             }
             set
@@ -55,32 +57,30 @@ namespace Yama.Parser
 
         #region ctor
 
-        public GetKey()
-        {
-            this.AllTokens = new List<IdentifierToken> ();
-        }
-
         public GetKey(ParserLayer layer)
         {
+            this.AllTokens = new List<IdentifierToken> ();
             this.layer = layer;
+            this.Token = new();
         }
 
         #endregion ctor
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Get ) return null;
 
-            GetKey key = new GetKey (  );
+            GetKey key = new GetKey ( this.layer );
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
 
-            IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
+            IdentifierToken? conditionkind = request.Parser.Peek ( request.Token, 1 );
+            if (conditionkind is null) return null;
 
-            IParseTreeNode statement = request.Parser.ParseCleanToken ( conditionkind, this.layer );
-            if ( !(statement is Container container) ) return null;
+            IParseTreeNode? statement = request.Parser.ParseCleanToken ( conditionkind, this.layer );
+            if ( statement is not Container container ) return null;
 
             key.Statement = container;
 
@@ -89,6 +89,8 @@ namespace Yama.Parser
 
         private bool IndezierenVektor(Index.Index index, IndexVektorDeklaration parent)
         {
+            if (this.Statement is null) return false;
+
             IndexContainer container = new IndexContainer();
 
             parent.GetContainer = container;
@@ -100,6 +102,8 @@ namespace Yama.Parser
 
         private bool IndezierenPropertyGetSet(Index.Index index, IndexPropertyGetSetDeklaration parent)
         {
+            if (this.Statement is null) return false;
+
             IndexContainer container = new IndexContainer();
 
             parent.GetContainer = container;
@@ -127,9 +131,9 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
-            this.Statement.Compile(request);
+            if (this.Statement is null) return false;
 
-            return true;
+            return this.Statement.Compile(request);
         }
 
         #endregion methods
