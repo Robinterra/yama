@@ -10,23 +10,25 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IParseTreeNode Deklaration
+        public IParseTreeNode? Deklaration
         {
             get;
             set;
         }
 
-        public IParseTreeNode Condition
+        public IParseTreeNode? Condition
         {
             get;
             set;
         }
-        public IParseTreeNode Inkrementation
+
+        public IParseTreeNode? Inkrementation
         {
             get;
             set;
         }
-        public IParseTreeNode Statement
+
+        public IParseTreeNode? Statement
         {
             get;
             set;
@@ -42,6 +44,8 @@ namespace Yama.Parser
         {
             get
             {
+                if (this.Statement is null) return this.Token;
+
                 return (this.Statement is IContainer t) ? t.Ende : this.Statement.Token;
             }
             set
@@ -71,7 +75,7 @@ namespace Yama.Parser
             set;
         } = new CompileContainer();
 
-        public IndexContainer IndexContainer
+        public IndexContainer? IndexContainer
         {
             get;
             set;
@@ -88,6 +92,7 @@ namespace Yama.Parser
 
         public ForKey ()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -95,22 +100,26 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.For ) return null;
-            if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
+
+            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
+            if (token is null) return null;
+            if ( token.Kind != IdentifierKind.OpenBracket ) return null;
 
             ForKey key = new ForKey (  );
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
 
-            IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
+            IdentifierToken? conditionkind = request.Parser.Peek ( request.Token, 1 );
+            if (conditionkind is null) return null;
 
             IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
 
-            IParseTreeNode klammer = request.Parser.TryToParse ( rule, conditionkind );
+            IParseTreeNode? klammer = request.Parser.TryToParse ( rule, conditionkind );
 
-            if (!(klammer is Container t)) return null;
+            if (klammer is not Container t) return null;
             if (t.Statements.Count != 3) return null;
 
             t.Token.ParentNode = key;
@@ -119,18 +128,24 @@ namespace Yama.Parser
             key.Condition = t.Statements[1];
             key.Inkrementation = t.Statements[2];
 
-            IdentifierToken Statementchild = request.Parser.Peek ( t.Ende, 1);
+            IdentifierToken? statementchild = request.Parser.Peek ( t.Ende, 1);
+            if (statementchild is null) return null;
 
-            key.Statement = request.Parser.ParseCleanToken(Statementchild);
+            IParseTreeNode? statement = request.Parser.ParseCleanToken(statementchild);
+            if (statement is null) return null;
 
-            if (key.Statement == null) return null;
+            key.Statement = statement;
 
             return key;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.Statement is null) return request.Index.CreateError(this);
+            if (this.Inkrementation is null) return request.Index.CreateError(this);
+            if (this.Condition is null) return request.Index.CreateError(this);
+            if (this.Deklaration is null) return request.Index.CreateError(this);
 
             this.IndexContainer = container;
 
@@ -145,6 +160,12 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.Statement is null) return false;
+            if (this.Inkrementation is null) return false;
+            if (this.Condition is null) return false;
+            if (this.Deklaration is null) return false;
+            if (this.IndexContainer is null) return false;
+
             this.CompileContainer.Begin = new CompileSprungPunkt();
 
             this.CompileContainer.Ende = new CompileSprungPunkt();

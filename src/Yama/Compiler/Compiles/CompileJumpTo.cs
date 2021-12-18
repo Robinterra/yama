@@ -85,9 +85,9 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, CompileSprungPunkt node, string mode = "default")
+        public bool Compile(Compiler compiler, CompileSprungPunkt? node, string mode = "default")
         {
-            if (node != null) this.Node = node.Node;
+            if (node is not null) this.Node = node.Node;
             compiler.AssemblerSequence.Add(this);
 
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);

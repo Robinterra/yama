@@ -104,13 +104,13 @@ namespace Yama.ProjectConfig.Nodes
             result.AllTokens.Add(request.Token);
             result.Token = request.Token;
 
-            IdentifierToken token = request.Parser.Peek(result.Token, 1);
-            if (token == null) return null;
+            IdentifierToken? token = request.Parser.Peek(result.Token, 1);
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.DoublePoint) return null;
             result.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
-            if (token == null) return null;
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.Text) return null;
             result.AllTokens.Add(token);
             result.ValueToken = token;

@@ -440,7 +440,8 @@ namespace Yama
 
                 if (!p.Parse(startlayer)) return this.PrintingErrors(p);
 
-                IParseTreeNode node = p.ParentContainer;
+                IParseTreeNode? node = p.ParentContainer;
+                if (node is null) return false;
 
                 if (this.PrintParserTree) p.PrintPretty ( node );
 

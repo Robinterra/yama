@@ -52,7 +52,7 @@ namespace Yama.Index
             set;
         }
 
-        public MethodeDeclarationNode MainFunction
+        public MethodeDeclarationNode? MainFunction
         {
             get;
             set;
@@ -70,7 +70,7 @@ namespace Yama.Index
             set;
         }
 
-        public IParent CurrentMethode
+        public IParent? CurrentMethode
         {
             get;
             set;
@@ -88,6 +88,7 @@ namespace Yama.Index
 
         public Index (  )
         {
+            this.RootValidUses = new ValidUses(this);
             this.Roots = new List<IParseTreeNode>();
             this.Register = new List<IndexKlassenDeklaration>();
             this.Errors = new List<IndexError>();
@@ -95,6 +96,7 @@ namespace Yama.Index
             this.ZuCompilenNodes = new List<IParseTreeNode>();
             this.RegisterEnums = new List<IndexEnumDeklaration>();
             this.IndexTypeSafeties = new List<IIndexTypeSafety>();
+            this.AllUseFiles = new List<FileInfo>();
         }
 
         #endregion ctor
@@ -114,8 +116,6 @@ namespace Yama.Index
 
             if (this.Errors.Count != 0) return false;
 
-            this.RootValidUses = new ValidUses(this);
-
             return true;
         }
 
@@ -134,8 +134,7 @@ namespace Yama.Index
 
         private bool ExecuteTypeSafties()
         {
-            RequestTypeSafety request = new RequestTypeSafety();
-            request.Index = this;
+            RequestTypeSafety request = new RequestTypeSafety(this);
 
             foreach (IIndexTypeSafety indexTypeSafety in this.IndexTypeSafeties)
             {
@@ -272,12 +271,9 @@ namespace Yama.Index
             return this.Errors.Count == 0;
         }
 
-        public bool CreateError(IParseTreeNode node, string msg = "The call is not allowed here")
+        public bool CreateError(IParseTreeNode? node, string msg = "The call is not allowed here")
         {
-            IndexError error = new IndexError();
-            error.Use = node;
-            error.Msg = msg;
-            this.Errors.Add(error);
+            this.Errors.Add(new (node, msg));
 
             return false;
         }

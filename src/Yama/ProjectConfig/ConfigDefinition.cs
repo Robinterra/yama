@@ -323,7 +323,8 @@ namespace Yama.ProjectConfig
 
             if (!p.Parse(startlayer)) return this.PrintingErrors(p);
 
-            IParseTreeNode node = p.ParentContainer;
+            IParseTreeNode? node = p.ParentContainer;
+            if (node is null) return false;
 
             nodes.AddRange(node.GetAllChilds.Cast<IDeserialize>());
 

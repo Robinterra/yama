@@ -5,11 +5,28 @@ namespace Yama.Index
     public class IndexError
     {
 
-        public IParseTreeNode Use
+        #region get/set
+
+        public IParseTreeNode? Use
         {
             get;
-            set;
         }
-        public string Msg { get; internal set; }
+
+        public string Msg
+        {
+            get;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public IndexError(IParseTreeNode? use, string msg)
+        {
+            this.Use = use;
+            this.Msg = msg;
+        }
+
+        #endregion ctor
     }
 }

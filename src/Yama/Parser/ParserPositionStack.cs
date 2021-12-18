@@ -13,12 +13,12 @@ namespace Yama.Parser
 
         public List<IParseTreeNode> PossibleParentsTemp;
 
-        public ParserPositionStack(Parser parser)
+        public ParserPositionStack(Parser parser, List<IParseTreeNode> possibleParents)
         {
             this.Position = parser.Position;
             this.Start = parser.Start;
             this.Max = parser.Max;
-            this.PossibleParentsTemp = parser.possibleParents;
+            this.PossibleParentsTemp = possibleParents;
         }
 
         public bool SetToParser(Parser parser)

@@ -13,7 +13,7 @@ namespace Yama.Parser.Request
             set;
         }
 
-        public IParent Parent
+        public IParent? Parent
         {
             get;
             set;
@@ -23,7 +23,7 @@ namespace Yama.Parser.Request
 
         #region ctor
 
-        public RequestParserTreeIndezieren(Index.Index index, IParent indexContainer)
+        public RequestParserTreeIndezieren(Index.Index index, IParent? indexContainer)
         {
             this.Index = index;
             this.Parent = indexContainer;
