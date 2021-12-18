@@ -18,7 +18,7 @@ namespace Yama.Parser
 
         private int grosstePrio = -1;
 
-        public List<IParseTreeNode> possibleParents;
+        public List<IParseTreeNode>? possibleParents;
 
         // -----------------------------------------------
 
@@ -46,7 +46,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public FileInfo Fileinfo
+        public FileInfo? Fileinfo
         {
             get;
             set;
@@ -54,7 +54,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public Stream InputStream
+        public Stream? InputStream
         {
             get;
             set;
@@ -62,7 +62,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private Lexer.Lexer Tokenizer
+        private Lexer.Lexer? Tokenizer
         {
             get;
             set;
@@ -70,7 +70,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private List<IdentifierToken> CleanTokens
+        private List<IdentifierToken>? CleanTokens
         {
             get;
             set;
@@ -86,7 +86,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public Container ParentContainer
+        public Container? ParentContainer
         {
             get;
             private set;
@@ -106,7 +106,7 @@ namespace Yama.Parser
         {
             get;
             set;
-        }
+        } = new ParserError();
 
         // -----------------------------------------------
 
@@ -132,7 +132,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public ParserLayer CurrentLayer
+        public ParserLayer? CurrentLayer
         {
             get
             {
@@ -153,16 +153,19 @@ namespace Yama.Parser
         {
             get
             {
+                if (this.CurrentLayer is null) return new();
+
                 return this.CurrentLayer.ParserMembers;
             }
         }
 
         // -----------------------------------------------
 
-        public IdentifierToken Current
+        public IdentifierToken? Current
         {
             get
             {
+                if (this.CleanTokens is null) return null;
                 if (this.CleanTokens.Count <= this.Position) return null;
 
                 IdentifierToken result = this.CleanTokens[this.Position];
@@ -220,7 +223,7 @@ namespace Yama.Parser
         public bool NewParse()
         {
             this.SyntaxErrors.Clear();
-            this.Tokenizer.Reset();
+            if (this.Tokenizer is not null) this.Tokenizer.Reset();
             if (this.CleanTokens != null) this.CleanTokens.Clear();
 
             return true;
@@ -236,7 +239,7 @@ namespace Yama.Parser
 
             IdentifierToken token = this.GetParent(left);
 
-            if (token != null) result.Add(token.Node);
+            if (token != null && token.Node != null) result.Add(token.Node);
             else result.Add(left.Node);
 
             return result;
@@ -288,6 +291,8 @@ namespace Yama.Parser
 
         private bool CheckTokens()
         {
+            if (this.Tokenizer is null) return false;
+
             this.Tokenizer.Daten = this.InputStream;
             this.CleanTokens = new List<IdentifierToken>();
 
@@ -307,8 +312,10 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public List<IParseTreeNode> ParseCleanTokens ( int von, int bis, bool withlostchilds = false )
+        public List<IParseTreeNode>? ParseCleanTokens ( int von, int bis, bool withlostchilds = false )
         {
+            if (this.CleanTokens is null) return null;
+
             if (this.CleanTokens.Count == 0) return null;
             if ( von == bis ) return new List<IParseTreeNode>();
             if ( von >= bis ) return null;
@@ -331,7 +338,7 @@ namespace Yama.Parser
 
                 isok = node != null;
 
-                this.possibleParents.Add ( node );
+                if (node is not null) this.possibleParents.Add ( node );
 
                 this.NextToken (  );
 
