@@ -320,9 +320,9 @@ namespace Yama.Parser
             if ( von == bis ) return new List<IParseTreeNode>();
             if ( von >= bis ) return null;
             if (bis > this.Max) return null;
-            if (this.possibleParents is null) return null;
 
-            ParserPositionStack pos = new ParserPositionStack(this, this.possibleParents);
+            if (possibleParents is null) possibleParents = new List<IParseTreeNode>();
+            ParserPositionStack pos = new ParserPositionStack(this, possibleParents);
             this.Position = von;
             this.Start = von;
             this.Max = bis;
