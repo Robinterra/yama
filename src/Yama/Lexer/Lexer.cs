@@ -134,22 +134,19 @@ namespace Yama.Lexer
 
             foreach ( ILexerToken lexerToken in this.LexerTokens )
             {
-                if (lexerToken == null) continue;
-
                 IdentifierToken? result = this.ExecuteLexerToken ( lexerToken );
-
-                if (result == null) continue;
+                if (result is null) continue;
 
                 return result;
             }
 
-            IdentifierToken UnknownToken = new IdentifierToken ( IdentifierKind.Unknown, this.position, this.line, this.column, new byte[] { this.CurrentByte }, this.CurrentChar.ToString() );
+            IdentifierToken unknownToken = new IdentifierToken ( IdentifierKind.Unknown, this.position, this.line, this.column, new byte[] { this.CurrentByte }, this.CurrentChar.ToString() );
 
-            UnknownToken.CleanDaten = new byte[] { this.CurrentByte };
+            unknownToken.CleanDaten = new byte[] { this.CurrentByte };
 
             this.NextByte (  );
 
-            return UnknownToken;
+            return unknownToken;
         }
 
         // -----------------------------------------------

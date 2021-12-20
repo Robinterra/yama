@@ -479,7 +479,6 @@ namespace Yama
             MethodeDeclarationNode? main = null;
 
             FileInfo file = this.OutputFile;
-            if ( file == null ) return this.PrintSimpleError("no output file is set");
             if (file.Directory == null) return false;
             if (!file.Directory.Exists) file.Directory.Create();
 

@@ -120,7 +120,7 @@ namespace Yama.Parser
         public List<ParserLayer> ParserLayers
         {
             get;
-        } = new List<ParserLayer>();
+        }
 
         // -----------------------------------------------
 
@@ -238,8 +238,7 @@ namespace Yama.Parser
             List<IParseTreeNode> result = new List<IParseTreeNode>();
 
             IdentifierToken token = this.GetParent(left);
-
-            if (token != null && token.Node != null) result.Add(token.Node);
+            if (token.Node != null) result.Add(token.Node);
             else result.Add(left.Node);
 
             return result;
@@ -501,7 +500,6 @@ namespace Yama.Parser
 
         public IParseTreeNode? ParseCleanToken ( IdentifierToken token, ParserLayer neuerLayer )
         {
-            if ( token == null ) return this.SyntaxErrorToken ( null );
             if ( token.Node != null ) return this.GetNodeFromToken ( token );
 
             this.ActivateLayer(neuerLayer);
@@ -540,7 +538,7 @@ namespace Yama.Parser
 
             foreach ( IParseTreeNode node in this.CurrentParserMembers )
             {
-                if (!(node is IEndExpression)) continue;
+                if (node is not IEndExpression) continue;
 
                 IParseTreeNode? nodet = node.Parse ( request );
                 if (nodet is null) continue;
@@ -681,7 +679,6 @@ namespace Yama.Parser
 
         public bool Parse ( ParserLayer start )
         {
-            if (start is null) return false;
             if (this.Fileinfo is null) return this.FileNotFoundError();
             if (!this.Fileinfo.Exists) return this.FileNotFoundError();
 
@@ -712,8 +709,6 @@ namespace Yama.Parser
 
         public bool Parse ( ParserLayer start, MemoryStream stream )
         {
-            if (start == null) return false;
-
             this.ActivateLayer(start);
 
             this.InputStream = stream;
@@ -778,8 +773,6 @@ namespace Yama.Parser
 
         public bool ActivateLayer(ParserLayer start)
         {
-            if (start == null) return false;
-
             this.ParserStack.Push(start);
 
             return true;
@@ -843,21 +836,16 @@ namespace Yama.Parser
 
         public bool PrintPretty ( IParseTreeNode node, string lebchilds = "" )
         {
-            if (node == null) return true;
-
             Console.Write ( node.Token.Value );
             Console.WriteLine (  );
 
             List<IParseTreeNode> childs = node.GetAllChilds;
-            if ( childs is null ) return true;
 
             string neuchild = lebchilds + "│   ";
             int counter = 0;
             string normalChildPrint = "├── ";
             foreach (IParseTreeNode child in childs)
             {
-                if (child == null) continue;
-
                 if (counter >= childs.Count - 1)
                 {
                     normalChildPrint = "└── ";
@@ -886,7 +874,6 @@ namespace Yama.Parser
                 if ( kind.Kind == zufinden && kind.Node == null ) return kind;
 
                 kind = this.Peek ( von, i );
-                if (kind is null) return null;
             }
 
             return null;
