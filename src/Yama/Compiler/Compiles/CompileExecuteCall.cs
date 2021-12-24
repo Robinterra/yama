@@ -78,7 +78,7 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, MethodeDeclarationNode node, string mode = "default")
+        public bool Compile(Compiler compiler, MethodeDeclarationNode? node, string mode = "default")
         {
             this.Node = node;
 

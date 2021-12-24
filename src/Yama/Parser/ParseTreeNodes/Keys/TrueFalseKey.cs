@@ -42,10 +42,11 @@ namespace Yama.Parser
 
         public TrueFalseKey (  )
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
-        public TrueFalseKey ( int prio )
+        public TrueFalseKey ( int prio ) : this()
         {
             this.Prio = prio;
         }
@@ -53,12 +54,10 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             bool isok = request.Token.Kind == IdentifierKind.True;
-
             if ( !isok ) isok = request.Token.Kind == IdentifierKind.False;
-
             if ( !isok ) return null;
 
             TrueFalseKey result = new TrueFalseKey (  );

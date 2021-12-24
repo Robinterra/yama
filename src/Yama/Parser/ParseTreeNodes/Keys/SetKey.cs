@@ -10,7 +10,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public Container Statement
+        public Container? Statement
         {
             get;
             set;
@@ -26,11 +26,9 @@ namespace Yama.Parser
         {
             get
             {
-                return (this.Statement is IContainer a) ? a.Ende : this.Statement.Token;
-            }
-            set
-            {
+                if (this.Statement is null) return this.Token;
 
+                return (this.Statement is IContainer a) ? a.Ende : this.Statement.Token;
             }
         }
 
@@ -55,13 +53,10 @@ namespace Yama.Parser
 
         #region ctor
 
-        public SetKey()
-        {
-            this.AllTokens = new List<IdentifierToken> ();
-        }
-
         public SetKey(ParserLayer layer)
         {
+            this.Token = new();
+            this.AllTokens = new List<IdentifierToken> ();
             this.layer = layer;
         }
 
@@ -69,25 +64,29 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Set ) return null;
 
-            SetKey key = new SetKey (  );
+            SetKey key = new SetKey ( this.layer );
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
 
-            IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
+            IdentifierToken? conditionkind = request.Parser.Peek ( request.Token, 1 );
+            if (conditionkind is null) return null;
 
-            if (request.Parser.ParseCleanToken(conditionkind, this.layer) is Container container) key.Statement = container;
+            IParseTreeNode? node = request.Parser.ParseCleanToken(conditionkind, this.layer);
+            if (node is not Container c) return null;
 
-            if (key.Statement == null) return null;
+            key.Statement = c;
 
             return key;
         }
 
         private bool IndezierenVektor(Index.Index index, IndexVektorDeklaration parent)
         {
+            if (this.Statement is null) return index.CreateError(this);
+
             IndexContainer container = new IndexContainer();
 
             parent.SetContainer = container;
@@ -99,6 +98,8 @@ namespace Yama.Parser
 
         private bool IndezierenPropertyGetSet(Index.Index index, IndexPropertyGetSetDeklaration parent)
         {
+            if (this.Statement is null) return index.CreateError(this);
+
             IndexContainer container = new IndexContainer();
 
             parent.SetContainer = container;
@@ -126,6 +127,8 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.Statement is null) return false;
+
             this.Statement.Compile(request);
 
             return true;

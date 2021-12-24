@@ -47,17 +47,18 @@ namespace Yama.Parser
 
         public NullKey (  )
         {
+            this.Token = new IdentifierToken();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
-        public NullKey ( int prio )
+        public NullKey ( int prio ) : this()
         {
             this.Prio = prio;
         }
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Null ) return null;
 

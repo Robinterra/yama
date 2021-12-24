@@ -21,7 +21,6 @@ namespace Yama.Parser
         IdentifierToken Ende
         {
             get;
-            set;
         }
 
         // -----------------------------------------------

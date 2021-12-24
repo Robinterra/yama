@@ -30,10 +30,6 @@ namespace Yama.Parser
 
                 return (this.Statement is IContainer a) ? a.Ende : this.Statement.Token;
             }
-            set
-            {
-
-            }
         }
 
         public List<IParseTreeNode> GetAllChilds

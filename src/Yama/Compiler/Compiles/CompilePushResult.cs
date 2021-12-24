@@ -77,7 +77,7 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
+        public bool Compile(Compiler compiler, ReferenceCall? node, string mode = "default")
         {
             this.Node = node;
             compiler.AssemblerSequence.Add(this);
