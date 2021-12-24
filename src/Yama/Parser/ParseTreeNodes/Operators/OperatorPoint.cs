@@ -12,19 +12,19 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexMethodReference Reference
+        public IndexMethodReference? Reference
         {
             get;
             set;
         }
 
-        public IParseTreeNode LeftNode
+        public IParseTreeNode? LeftNode
         {
             get;
             set;
         }
 
-        public IParseTreeNode RightNode
+        public IParseTreeNode? RightNode
         {
             get;
             set;
@@ -85,6 +85,7 @@ namespace Yama.Parser
 
         public OperatorPoint ()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -102,7 +103,7 @@ namespace Yama.Parser
             return token.Kind == IdentifierKind.Point;
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Point ) return null;
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
@@ -111,21 +112,29 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
+            IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
+            if (token is null) return null;
 
-            node.RightNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, 1 ) );
+            node.LeftNode = request.Parser.ParseCleanToken ( token );
+
+            token = request.Parser.Peek ( request.Token, 1 );
+            if (token is null) return null;
+
+            node.RightNode = request.Parser.ParseCleanToken ( token );
 
             return node;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.LeftNode is null) return request.Index.CreateError(this);
+            if (this.RightNode is null) return request.Index.CreateError(this);
 
-            if (!this.LeftNode.Indezieren(request)) return false;
+            if (!this.LeftNode.Indezieren(request)) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = container.VariabelnReferences.LastOrDefault();
-            if (reference == null) return request.Index.CreateError(this);
+            IndexVariabelnReference? reference = container.VariabelnReferences.LastOrDefault();
+            if (reference is null) return request.Index.CreateError(this);
 
             this.RightNode.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, reference));
 
@@ -136,6 +145,8 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.RightNode is null) return false;
+
             if (this.RightNode is ReferenceCall rct)
                 if (rct.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
                     if (!this.CompileNonStaticCallt(request.Compiler, request.Mode, pgsdek)) return true;
@@ -174,6 +185,8 @@ namespace Yama.Parser
 
         private bool CompileLeftNodeIfNotStaticClass(Compiler.Compiler compiler, string mode)
         {
+            if (this.LeftNode is null) return false;
+
             if (this.RightNode is ReferenceCall rct)
             {
                 if (rct.Reference.Deklaration is IndexMethodDeklaration t)
