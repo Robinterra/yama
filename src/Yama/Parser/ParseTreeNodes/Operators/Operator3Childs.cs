@@ -10,25 +10,25 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexVariabelnReference Reference
+        public IndexVariabelnReference? Reference
         {
             get;
             set;
         }
 
-        public IParseTreeNode LeftNode
+        public IParseTreeNode? LeftNode
         {
             get;
             set;
         }
 
-        public IParseTreeNode MiddleNode
+        public IParseTreeNode? MiddleNode
         {
             get;
             set;
         }
 
-        public IParseTreeNode RightNode
+        public IParseTreeNode? RightNode
         {
             get;
             set;
@@ -70,13 +70,7 @@ namespace Yama.Parser
             set;
         }
 
-        public IdentifierToken SteuerToken
-        {
-            get;
-            set;
-        }
-
-        public IndexVariabelnReference VariabelReference
+        public IndexVariabelnReference? VariabelReference
         {
             get;
             set;
@@ -93,6 +87,8 @@ namespace Yama.Parser
 
         public Operator3Childs ()
         {
+            this.ValidOperators = new();
+            this.Token = new IdentifierToken();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -124,7 +120,7 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Operator ) return null;
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
@@ -133,17 +129,25 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            IdentifierToken steuerToken = request.Parser.FindAToken ( request.Token, this.Steuerzeichen );
-
-            if ( steuerToken == null ) return null;
+            IdentifierToken? steuerToken = request.Parser.FindAToken ( request.Token, this.Steuerzeichen );
+            if ( steuerToken is null ) return null;
 
             node.AllTokens.Add(steuerToken);
 
-            node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
-            node.MiddleNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, 1 ) );
-            node.RightNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( steuerToken, 1 ) );
+            IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
+            if (token is null) return null;
 
-            node.SteuerToken = steuerToken;
+            node.LeftNode = request.Parser.ParseCleanToken ( token );
+
+            token = request.Parser.Peek ( request.Token, 1 );
+            if (token is null) return null;
+
+            node.MiddleNode = request.Parser.ParseCleanToken ( token );
+
+            token = request.Parser.Peek ( steuerToken, 1 );
+            if (token is null) return null;
+
+            node.RightNode = request.Parser.ParseCleanToken ( token );
 
             return node;
         }
@@ -151,6 +155,9 @@ namespace Yama.Parser
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (this.LeftNode is null) return request.Index.CreateError(this);
+            if (this.MiddleNode is null) return request.Index.CreateError(this);
+            if (this.RightNode is null) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;

@@ -93,9 +93,9 @@ namespace Yama.Parser
 
         public Operator2Childs ()
         {
-            this.ValidOperators = new();
-            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
+            this.Token = new();
+            this.ValidOperators = new();
         }
 
         public Operator2Childs ( int prio ) : this()
@@ -146,7 +146,7 @@ namespace Yama.Parser
 
             node.LeftNode = request.Parser.ParseCleanToken ( token );
 
-            token = request.Parser.Peek(request.Token, 1);
+            token = request.Parser.Peek ( request.Token, 1 );
             if (token is null) return null;
 
             node.RightNode = request.Parser.ParseCleanToken ( token );
@@ -175,7 +175,7 @@ namespace Yama.Parser
             //container.VariabelnReferences.Add(reference);
 
             if (this.Token.Text == "=") return this.SetIndex(request, varref, container.VariabelnReferences.LastOrDefault());
-            if (varref is null) return request.Index.CreateError(this);
+            if (varref == null) return request.Index.CreateError(this);
 
             varref.ParentCall = reference;
             varref.VariabelnReferences.Add(reference);
@@ -200,7 +200,6 @@ namespace Yama.Parser
         {
             if (this.RightNode is null) return false;
             if (this.LeftNode is null) return false;
-            if (this.Reference is null) return false;
 
             this.RightNode.Compile(request);
 
@@ -211,6 +210,7 @@ namespace Yama.Parser
                 return true;
             }
 
+            if (this.Reference is null) return false;
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {
                 bool isok = this.CompileCopy(request.Compiler, request.Mode, t);
@@ -225,9 +225,9 @@ namespace Yama.Parser
 
         private bool CompileCopy(Compiler.Compiler compiler, string mode, MethodeDeclarationNode t)
         {
+            if (this.LeftNode is null) return false;
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
-            if (this.LeftNode is null) return false;
 
             this.LeftNode.Compile(new Request.RequestParserTreeCompile (compiler, mode));
 

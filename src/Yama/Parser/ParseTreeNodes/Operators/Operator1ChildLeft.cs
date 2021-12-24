@@ -146,8 +146,7 @@ namespace Yama.Parser
             node.AllTokens.Add ( request.Token );
 
             node.ChildNode = request.Parser.ParseCleanToken ( lexerLeft );
-
-            if ( node.ChildNode == null ) return null;
+            if ( node.ChildNode is null ) return null;
 
             return node;
         }
