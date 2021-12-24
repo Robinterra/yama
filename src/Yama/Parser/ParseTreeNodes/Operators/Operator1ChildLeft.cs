@@ -11,13 +11,13 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexVariabelnReference Reference
+        public IndexVariabelnReference? Reference
         {
             get;
             set;
         }
 
-        public IParseTreeNode ChildNode
+        public IParseTreeNode? ChildNode
         {
             get;
             set;
@@ -68,7 +68,7 @@ namespace Yama.Parser
             get;
         }
 
-        public IndexVariabelnReference VariabelReference
+        public IndexVariabelnReference? VariabelReference
         {
             get;
             set;
@@ -85,7 +85,10 @@ namespace Yama.Parser
 
         public Operator1ChildLeft ()
         {
+            this.Token = new();
+            this.ValidOperators = new List<string>();
             this.AllTokens = new List<IdentifierToken> ();
+            this.ValidChilds = new List<IdentifierKind>();
         }
 
         public Operator1ChildLeft ( int prio ) : this ()
@@ -104,9 +107,9 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidChild ( IdentifierToken token )
+        private bool CheckHashValidChild ( IdentifierToken? token )
         {
-            if (token == null) return false;
+            if (token is null) return false;
 
             foreach ( IdentifierKind op in this.ValidChilds )
             {
@@ -126,17 +129,16 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Operator ) return null;
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
-            IdentifierToken lexerRight = request.Parser.Peek ( request.Token, 1 );
-
+            IdentifierToken? lexerRight = request.Parser.Peek ( request.Token, 1 );
             if ( this.CheckHashValidChild ( lexerRight ) ) return null;
 
-            IdentifierToken lexerLeft = request.Parser.Peek ( request.Token, -1 );
-
+            IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
+            if (lexerLeft is null) return null;
             if ( !this.CheckHashValidChild ( lexerLeft ) ) return null;
 
             Operator1ChildLeft node = new Operator1ChildLeft ( this.Prio );
@@ -152,7 +154,8 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.ChildNode is null) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
@@ -172,6 +175,9 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.ChildNode is null) return false;
+            if (this.Reference is null) return false;
+
             this.ChildNode.Compile(request);
 
             CompilePushResult compilePushResult = new CompilePushResult();

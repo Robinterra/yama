@@ -11,13 +11,13 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexVariabelnReference Reference
+        public IndexVariabelnReference? Reference
         {
             get;
             set;
         }
 
-        public IParseTreeNode ChildNode
+        public IParseTreeNode? ChildNode
         {
             get;
             set;
@@ -52,7 +52,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.ChildNode );
+                if (this.ChildNode is not null) result.Add ( this.ChildNode );
 
                 return result;
             }
@@ -73,7 +73,7 @@ namespace Yama.Parser
             get;
         }
 
-        public IndexVariabelnReference VariabelReference
+        public IndexVariabelnReference? VariabelReference
         {
             get;
             set;
@@ -90,6 +90,10 @@ namespace Yama.Parser
 
         public Operator1ChildRight ()
         {
+            this.ValidOperators = new();
+            this.ValidChilds = new();
+            this.Token = new();
+            this.Ausnahmen = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -110,9 +114,9 @@ namespace Yama.Parser
 
         #region methods
 
-        private bool CheckHashValidChild ( IdentifierToken token )
+        private bool CheckHashValidChild ( IdentifierToken? token )
         {
-            if (token == null) return false;
+            if (token is null) return false;
 
             foreach ( IdentifierKind op in this.ValidChilds )
             {
@@ -122,9 +126,9 @@ namespace Yama.Parser
             return false;
         }
 
-        private bool CheckAusnahmen ( IdentifierToken token )
+        private bool CheckAusnahmen ( IdentifierToken? token )
         {
-            if (token == null) return false;
+            if (token is null) return false;
 
             foreach ( IdentifierKind op in this.Ausnahmen )
             {
@@ -133,9 +137,9 @@ namespace Yama.Parser
 
             return false;
         }
-        private bool CheckHashValidOperator ( IdentifierToken token )
+        private bool CheckHashValidOperator ( IdentifierToken? token )
         {
-            if ( token == null ) return false;
+            if ( token is null ) return false;
 
             foreach ( string op in this.ValidOperators )
             {
@@ -145,17 +149,16 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Operator ) return null;
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
-            IdentifierToken lexerLeft = request.Parser.Peek ( request.Token, -1 );
-
+            IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
             if ( this.CheckHashValidChild ( lexerLeft ) && !this.CheckAusnahmen ( lexerLeft ) ) return null;
 
-            IdentifierToken lexerRight = request.Parser.Peek ( request.Token, 1 );
-
+            IdentifierToken? lexerRight = request.Parser.Peek ( request.Token, 1 );
+            if (lexerRight is null) return null;
             if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
 
             Operator1ChildRight node = new Operator1ChildRight ( this.Prio );
@@ -163,22 +166,25 @@ namespace Yama.Parser
             node.AllTokens.Add ( request.Token );
 
             node.ChildNode = request.Parser.ParseCleanToken ( lexerRight );
-
-            if ( node.ChildNode == null ) return null;
+            if ( node.ChildNode is null ) return null;
 
             return node;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.ChildNode is null) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference();
             reference.Use = this;
             reference.Name = this.Token.Text;
             reference.IsOperator = true;
+
             this.ChildNode.Indezieren(request);
-            IndexVariabelnReference varref = container.VariabelnReferences.LastOrDefault();
+
+            IndexVariabelnReference? varref = container.VariabelnReferences.LastOrDefault();
+            if (varref is null) return request.Index.CreateError(this);
 
             this.VariabelReference = reference;
             //container.VariabelnReferences.Add(reference);
@@ -192,6 +198,9 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.Reference is null) return false;
+            if (this.ChildNode is null) return false;
+
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {
                 bool isok = this.CompileCopy(request.Compiler, request.Mode, t);
@@ -215,6 +224,7 @@ namespace Yama.Parser
         {
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
+            if (this.ChildNode is null) return false;
 
             this.ChildNode.Compile(new Request.RequestParserTreeCompile(compiler, mode));
 
