@@ -39,7 +39,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public Escaper Escape
+        public Escaper? Escape
         {
             get;
             set;
@@ -55,7 +55,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public Text ( ZeichenKette begin, ZeichenKette ende, Escaper escape )
+        public Text ( ZeichenKette begin, ZeichenKette ende, Escaper? escape )
         {
             this.Begin = begin;
             this.Ende = ende;
@@ -94,7 +94,7 @@ namespace Yama.Lexer
         public object GetValue ( byte[] data )
         {
             Lexer lexer = new Lexer ( new System.IO.MemoryStream ( data ) );
-            lexer.LexerTokens.Add ( this.Escape );
+            if (this.Escape is not null) lexer.LexerTokens.Add ( this.Escape );
             lexer.LexerTokens.Add ( new Replacer ( this.Begin, string.Empty ) );
             lexer.LexerTokens.Add ( new Replacer ( this.Ende, string.Empty ) );
 
