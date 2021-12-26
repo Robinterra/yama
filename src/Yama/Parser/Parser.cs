@@ -694,7 +694,7 @@ namespace Yama.Parser
             if ( parentNodes is null ) return this.EmptyFileError();
 
             this.ParentContainer = new Container (  );
-            this.ParentContainer.Statements = parentNodes;
+            this.ParentContainer.Statements.AddRange(parentNodes);
             this.ParentContainer.Token = new IdentifierToken ( IdentifierKind.BeginContainer, 0, 0, 0, "File", this.Fileinfo.FullName );
 
             foreach ( IParseTreeNode node in parentNodes )
@@ -721,7 +721,7 @@ namespace Yama.Parser
             if ( parentNodes is null ) parentNodes = new List<IParseTreeNode>();
 
             this.ParentContainer = new Container (  );
-            this.ParentContainer.Statements = parentNodes;
+            this.ParentContainer.Statements.AddRange(parentNodes);
             this.ParentContainer.Token = new IdentifierToken ( IdentifierKind.BeginContainer, 0, 0, 0, "Stream", "stream" );
 
             foreach ( IParseTreeNode node in parentNodes )

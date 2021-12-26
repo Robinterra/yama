@@ -11,13 +11,13 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IParseTreeNode LeftNode
+        public IParseTreeNode? LeftNode
         {
             get;
             set;
         }
 
-        public IdentifierToken RightToken
+        public IdentifierToken? RightToken
         {
             get;
             set;
@@ -40,7 +40,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.LeftNode );
+                if (this.LeftNode is not null) result.Add ( this.LeftNode );
 
                 return result;
             }
@@ -57,6 +57,7 @@ namespace Yama.Parser
 
         public ExplicitlyConvert ( int prio )
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
@@ -67,14 +68,12 @@ namespace Yama.Parser
 
         private bool CheckHashValidTypeDefinition ( IdentifierToken token )
         {
-            if (token == null) return false;
-
             if (token.Kind == IdentifierKind.Word) return true;
 
             return false;
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.As ) return null;
 
@@ -82,9 +81,13 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
+            IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
+            if (token is null) return null;
+
+            node.LeftNode = request.Parser.ParseCleanToken ( token );
 
             node.RightToken = request.Parser.Peek ( request.Token, 1 );
+            if (node.RightToken is null) return null;
             if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return null;
 
             node.AllTokens.Add(node.RightToken);
@@ -94,7 +97,9 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.LeftNode is null) return request.Index.CreateError(this);
+            if (this.RightToken is null) return request.Index.CreateError(this);
 
             this.LeftNode.Indezieren(request);
 
@@ -106,6 +111,8 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.LeftNode is null) return false;
+
             return this.LeftNode.Compile(request);
         }
 

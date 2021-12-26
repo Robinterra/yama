@@ -10,7 +10,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexEnumEntryDeklaration Deklaration
+        public IndexEnumEntryDeklaration? Deklaration
         {
             get;
             set;
@@ -22,7 +22,7 @@ namespace Yama.Parser
             set;
         }
 
-        public IdentifierToken Value
+        public IdentifierToken? Value
         {
             get;
             set;
@@ -47,21 +47,21 @@ namespace Yama.Parser
 
         public EnumKeyValue (  )
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             EnumKeyValue node = new EnumKeyValue();
 
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            IdentifierToken token = request.Parser.Peek ( request.Token, 1 );
-
-            if ( token == null ) return null;
+            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
+            if ( token is null ) return null;
             if ( token.Kind != IdentifierKind.NumberToken ) return null;
 
             node.Value = token;
@@ -72,7 +72,8 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexEnumDeklaration dek)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexEnumDeklaration dek) return request.Index.CreateError(this);
+            if (this.Value is null) return request.Index.CreateError(this);
 
             IndexEnumEntryDeklaration deklaration = new IndexEnumEntryDeklaration();
             deklaration.Name = this.Token.Text;
