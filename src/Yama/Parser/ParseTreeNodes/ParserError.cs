@@ -19,7 +19,7 @@ namespace Yama.Parser
         {
             get
             {
-                return null;
+                return new ();
             }
         }
 
@@ -34,6 +34,7 @@ namespace Yama.Parser
 
         public ParserError ()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 

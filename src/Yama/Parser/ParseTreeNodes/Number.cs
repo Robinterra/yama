@@ -48,16 +48,17 @@ namespace Yama.Parser
         public Number (  )
         {
             this.AllTokens = new List<IdentifierToken> ();
+            this.Token = new();
         }
 
-        public Number ( int prio )
+        public Number ( int prio ) : this()
         {
             this.Prio = prio;
         }
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.NumberToken ) return null;
 

@@ -10,6 +10,8 @@ namespace Yama.Index
     public class IndexMethodDeklaration : IParent, IMethode
     {
 
+        #region get/set
+
         public IParseTreeNode Use
         {
             get;
@@ -22,7 +24,7 @@ namespace Yama.Index
             set;
         }
 
-        public IndexKlassenDeklaration Klasse
+        public IndexKlassenDeklaration? Klasse
         {
             get;
             set;
@@ -55,13 +57,11 @@ namespace Yama.Index
         public List<IndexVariabelnDeklaration> Parameters
         {
             get;
-            set;
         }
 
         public IndexContainer Container
         {
             get;
-            set;
         }
 
         public List<string> Tags
@@ -70,7 +70,7 @@ namespace Yama.Index
             set;
         } = new List<string>();
 
-        private ValidUses thisUses;
+        private ValidUses? thisUses;
 
         public ValidUses ThisUses
         {
@@ -123,8 +123,10 @@ namespace Yama.Index
                 }
 
                 string pattern = "{0}_{1}_{2}{3}";
+                string klassenName = "NULL";
+                if (this.Klasse is not null) klassenName = this.Klasse.Name;
 
-                return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count, build.ToString());
+                return string.Format(pattern, klassenName, this.NameInText, this.Parameters.Count, build.ToString());
             }
         }
 
@@ -164,8 +166,29 @@ namespace Yama.Index
             set;
         }
 
+        #endregion get/set
+
+        #region ctor
+
+        public IndexMethodDeklaration ( IParseTreeNode use, string name, IndexVariabelnReference returnValue )
+        {
+            this.ParentUsesSet = new();
+            this.Container = new IndexContainer();
+            this.ReturnValue = returnValue;
+            this.Name = name;
+            this.Use = use;
+            this.References = new List<IndexVariabelnReference>();
+            this.Parameters = new List<IndexVariabelnDeklaration>();
+        }
+
+        #endregion ctor
+
+        #region methods
+
         public bool IsInUse (int depth)
         {
+            if (this.Klasse is null) return false;
+
             if (depth > 20) return true;
             if (this.Name == "main") return true;
             if (this.Name == "Malloc") return true;
@@ -175,25 +198,19 @@ namespace Yama.Index
 
             foreach (IndexVariabelnReference reference in this.References)
             {
-                if (reference == null) return true;
-
+                if (reference is null) return true;
                 if (reference.IsOwnerInUse(depth)) return true;
             }
 
-            if (this.Klasse.InheritanceBase == null) return false;
-            if (!(this.Klasse.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return false;
-            IMethode parentMethods = dek.Methods.FirstOrDefault(u=>u.KeyName == this.KeyName);
-            if (parentMethods == null) return false;
-            if (!(parentMethods.Use is MethodeDeclarationNode t)) return false;
+            if (this.Klasse.InheritanceBase is null) return false;
+            if (this.Klasse.InheritanceBase.Deklaration is not IndexKlassenDeklaration dek) return false;
+
+            IMethode? parentMethods = dek.Methods.FirstOrDefault(u=>u.KeyName == this.KeyName);
+            if (parentMethods is null) return false;
+            if (parentMethods.Use is not MethodeDeclarationNode t) return false;
             if (t.Equals(this)) return false;
 
             return t.CanCompile(depth);
-        }
-
-        public IndexMethodDeklaration (  )
-        {
-            this.References = new List<IndexVariabelnReference>();
-            this.Parameters = new List<IndexVariabelnDeklaration>();
         }
 
         public bool Mappen()
@@ -225,6 +242,9 @@ namespace Yama.Index
 
             return true;
         }
+
+        #endregion methods
+
     }
 
     public enum MethodeType

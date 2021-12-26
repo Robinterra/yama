@@ -14,25 +14,25 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexMethodDeklaration Deklaration
+        public IndexMethodDeklaration? Deklaration
         {
             get;
             set;
         }
 
-        public IdentifierToken AccessDefinition
+        public IdentifierToken? AccessDefinition
         {
             get;
             set;
         }
 
-        public IdentifierToken ZusatzDefinition
+        public IdentifierToken? ZusatzDefinition
         {
             get;
             set;
         }
 
-        public IdentifierToken TypeDefinition
+        public IdentifierToken? TypeDefinition
         {
             get;
             set;
@@ -41,7 +41,6 @@ namespace Yama.Parser
         public List<IParseTreeNode> Parameters
         {
             get;
-            set;
         }
 
         public CompileFunktionsDeklaration FunktionsDeklarationCompile
@@ -56,7 +55,7 @@ namespace Yama.Parser
             set;
         } = new CompileFunktionsEnde();
 
-        public IParseTreeNode Statement
+        public IParseTreeNode? Statement
         {
             get;
             set;
@@ -76,7 +75,7 @@ namespace Yama.Parser
 
                 if (this.Tags != null) result.AddRange(this.Tags);
                 result.AddRange ( this.Parameters );
-                result.Add ( this.Statement );
+                if (this.Statement is not null) result.Add ( this.Statement );
 
                 return result;
             }
@@ -85,13 +84,11 @@ namespace Yama.Parser
         public List<string> RegisterInUse
         {
             get;
-            set;
         } = new List<string>();
 
         public CompileContainer CompileContainer
         {
             get;
-            set;
         } = new CompileContainer();
 
         public int VariabelCounter
@@ -102,33 +99,17 @@ namespace Yama.Parser
 
         public IndexVariabelnReference Malloc
         {
-            get;set;
-        } = new IndexVariabelnReference
-            {
-                Name = "MemoryManager",
-                ParentCall = new IndexVariabelnReference
-                {
-                    Name = "Malloc"
-                }
-            };
+            get;
+        }
 
         public IndexVariabelnReference MallocFree
         {
             get;
-            set;
-        } = new IndexVariabelnReference
-            {
-                Name = "MemoryManager",
-                ParentCall = new IndexVariabelnReference
-                {
-                    Name = "Free"
-                }
-            };
+        }
 
         public List<IParseTreeNode> Tags
         {
             get;
-            set;
         }
 
         public List<IdentifierToken> AllTokens
@@ -140,14 +121,29 @@ namespace Yama.Parser
 
         #region ctor
 
-        public MethodeDeclarationNode()
-        {
-            this.AllTokens = new List<IdentifierToken> ();
-        }
-
         public MethodeDeclarationNode(ParserLayer layer)
         {
+            this.Token = new();
+            this.Tags = new();
+            this.AllTokens = new List<IdentifierToken> ();
             this.layer = layer;
+            this.MallocFree = new IndexVariabelnReference
+            {
+                Name = "MemoryManager",
+                ParentCall = new IndexVariabelnReference
+                {
+                    Name = "Free"
+                }
+            };
+            this.Malloc = new IndexVariabelnReference
+            {
+                Name = "MemoryManager",
+                ParentCall = new IndexVariabelnReference
+                {
+                    Name = "Malloc"
+                }
+            };
+            this.Parameters = new();
         }
 
         #endregion ctor
@@ -223,7 +219,7 @@ namespace Yama.Parser
             return false;
         }
 
-        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, MethodeDeclarationNode deklaration)
+        private IdentifierToken? MakeAccessValid( Parser parser, IdentifierToken token, MethodeDeclarationNode deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -233,7 +229,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, MethodeDeclarationNode deklaration)
+        private IdentifierToken? MakeZusatzValid( Parser parser, IdentifierToken token, MethodeDeclarationNode deklaration)
         {
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
@@ -243,13 +239,15 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
-            MethodeDeclarationNode deklaration = new MethodeDeclarationNode();
+            MethodeDeclarationNode deklaration = new MethodeDeclarationNode(this.layer);
 
-            IdentifierToken token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
+            IdentifierToken? token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
+            if (token is null) return null;
 
             token = this.MakeZusatzValid ( request.Parser, token, deklaration );
+            if (token is null) return null;
 
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
@@ -257,6 +255,7 @@ namespace Yama.Parser
             deklaration.AllTokens.Add(token);
 
             if ( !this.CheckSonderRegleung ( deklaration.TypeDefinition ) ) token = request.Parser.Peek ( token, 1 );
+            if (token is null) return null;
 
             if ( !this.CheckHashValidName ( token ) ) return null;
 
@@ -264,88 +263,86 @@ namespace Yama.Parser
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
+            if (token is null) return null;
 
             IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
 
-            if ( token == null ) return null;
-
             request.Parser.ActivateLayer(this.layer);
 
-            IParseTreeNode klammer = request.Parser.TryToParse ( rule, token );
+            IParseTreeNode? klammer = request.Parser.TryToParse ( rule, token );
 
             request.Parser.VorherigesLayer();
 
-            if (klammer == null) return null;
-            if (!(klammer is Container t)) return null;
+            if (klammer is null) return null;
+            if (klammer is not Container t) return null;
 
             t.Token.ParentNode = deklaration;
-            deklaration.Parameters = t.Statements;
+            deklaration.Parameters.AddRange(t.Statements);
 
-            IdentifierToken statementchild = request.Parser.Peek ( t.Ende, 1);
+            IdentifierToken? statementchild = request.Parser.Peek ( t.Ende, 1);
+            if (statementchild is null) return null;
 
             deklaration.Statement = request.Parser.ParseCleanToken(statementchild, this.layer);
+            if (deklaration.Statement is null) return null;
 
-            if (deklaration.Statement == null) return null;
-
-            deklaration.Tags = request.Parser.PopMethodTag (  );
+            deklaration.Tags.AddRange(request.Parser.PopMethodTag (  ));
 
             return deklaration;
         }
 
         private bool CheckSonderRegleung(IdentifierToken typeDefinition)
         {
-            if (typeDefinition == null) return false;
-
             if ( typeDefinition.Kind == IdentifierKind.New) return true;
             if ( typeDefinition.Kind == IdentifierKind.Operator && typeDefinition.Text == "~") return true;
 
             return false;
         }
 
-        public MethodeType GetMethodeType()
+        public MethodeType? GetMethodeType(IdentifierToken typeDef)
         {
-            MethodeType type = MethodeType.Methode;
+            if (this.ZusatzDefinition is null) return MethodeType.Methode;
 
-            if (this.ZusatzDefinition != null)
+            if (this.ZusatzDefinition.Kind == IdentifierKind.Static) return MethodeType.Static;
+            if (this.ZusatzDefinition.Kind == IdentifierKind.OperatorKey)
             {
-                if (this.ZusatzDefinition.Kind == IdentifierKind.Static) type = MethodeType.Static;
-                if (this.ZusatzDefinition.Kind == IdentifierKind.OperatorKey)
-                {
-                    type = MethodeType.Operator;
-                    if (this.TypeDefinition.Kind == IdentifierKind.Explicit) type = MethodeType.Explicit;
-                    if (this.TypeDefinition.Kind == IdentifierKind.Implicit) type = MethodeType.Implicit;
-                }
-                if (this.ZusatzDefinition.Kind == IdentifierKind.This)
-                {
-                    if (this.Token.Kind == IdentifierKind.New) type = MethodeType.Ctor;
-                    if (this.Token.Text == "~") type = MethodeType.DeCtor;
-                }
+                if (typeDef.Kind == IdentifierKind.Explicit) return MethodeType.Explicit;
+                if (typeDef.Kind == IdentifierKind.Implicit) return MethodeType.Implicit;
+
+                return MethodeType.Operator;
+            }
+            if (this.ZusatzDefinition.Kind == IdentifierKind.This)
+            {
+                if (this.Token.Kind == IdentifierKind.New) return MethodeType.Ctor;
+                if (this.Token.Text == "~") return MethodeType.DeCtor;
             }
 
-            return type;
+            return null;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexKlassenDeklaration klasse)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexKlassenDeklaration klasse) return request.Index.CreateError(this);
+            if (this.TypeDefinition is null) return request.Index.CreateError(this);
+            if (this.Statement is null) return request.Index.CreateError(this);
 
-            IndexMethodDeklaration deklaration = new IndexMethodDeklaration();
+            IndexVariabelnReference returnValue = this.GetReturnValueIndex(klasse, this.TypeDefinition);
+
+            IndexMethodDeklaration deklaration = new IndexMethodDeklaration(this, this.Token.Text, returnValue);
             this.MakeTags(deklaration);
-            deklaration.Use = this;
-            deklaration.Name = this.Token.Text;
-            deklaration.ReturnValue = this.GetReturnValueIndex(klasse);
             this.Deklaration = deklaration;
 
             AccessModify access = AccessModify.Private;
             if (this.AccessDefinition != null) if (this.AccessDefinition.Kind == IdentifierKind.Public) access = AccessModify.Public;
             deklaration.AccessModify = access;
 
-            deklaration.Type = this.GetMethodeType();
+            MethodeType? type = this.GetMethodeType(this.TypeDefinition);
+            if (type is null) return request.Index.CreateError(this, "invalid method type");
 
-            IndexContainer container = new IndexContainer();
-            deklaration.Container = container;
+            deklaration.Type = (MethodeType)type;
 
-            VariabelDeklaration dek = null;
+            IndexContainer container = deklaration.Container;
+
+            VariabelDeklaration? dek = null;
 
             this.IndezierenNonStaticDek(deklaration);
 
@@ -361,13 +358,13 @@ namespace Yama.Parser
                 if (dek == null) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
 
                 if (!dek.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, container))) continue;
+                if (dek.Deklaration is null) return request.Index.CreateError(this);
 
                 deklaration.Parameters.Add(dek.Deklaration);
             }
 
             if (deklaration.Type == MethodeType.Static)
-            if (this.Token.Text == "main")
-                request.Index.SetMainFunction(this);
+            if (this.Token.Text == "main") request.Index.SetMainFunction(this);
 
             if (deklaration.Type == MethodeType.Ctor) container.VariabelnReferences.Add(this.Malloc);
             if (deklaration.Type == MethodeType.DeCtor) container.VariabelnReferences.Add(this.MallocFree);
@@ -385,7 +382,8 @@ namespace Yama.Parser
 
             foreach (IParseTreeNode node in this.Tags)
             {
-                if (!(node is ConditionalCompilationNode ccn)) continue;
+                if (node is not ConditionalCompilationNode ccn) continue;
+                if (ccn.Tag is null) continue;
 
                 deklaration.Tags.Add(ccn.Tag);
             }
@@ -408,11 +406,11 @@ namespace Yama.Parser
             return true;
         }
 
-        private IndexVariabelnReference GetReturnValueIndex(IndexKlassenDeklaration klasse)
+        private IndexVariabelnReference GetReturnValueIndex(IndexKlassenDeklaration klasse, IdentifierToken typeDef)
         {
-            if (this.CheckSonderRegleung(this.TypeDefinition)) return new IndexVariabelnReference { Name = klasse.Name, Use = this };
+            if (this.CheckSonderRegleung(typeDef)) return new IndexVariabelnReference { Name = klasse.Name, Use = this };
 
-            return new IndexVariabelnReference { Name = this.TypeDefinition.Text, Use = this };
+            return new IndexVariabelnReference { Name = typeDef.Text, Use = this };
         }
 
         private bool AddMethode(IndexKlassenDeklaration klasse, IndexMethodDeklaration deklaration)
@@ -430,6 +428,9 @@ namespace Yama.Parser
 
         public bool CompileCopy(RequestParserTreeCompile request)
         {
+            if (this.Deklaration is null) return false;
+            if (this.Statement is null) return false;
+
             Compiler.Compiler compiler = request.Compiler;
 
             CompileContainer container = new CompileContainer();
@@ -456,6 +457,10 @@ namespace Yama.Parser
         public bool Compile(Request.RequestParserTreeCompile request)
         {
             if (!this.CanCompile(request.Compiler)) return true;
+            if (this.Statement is not Container c) return false;
+            if (c.IndexContainer is null) return false;
+            if (this.Deklaration is null) return false;
+            if (this.Deklaration.Klasse is null) return false;
 
             if (this.AccessDefinition != null)
                 if (this.AccessDefinition.Kind == IdentifierKind.Copy) return true;
@@ -463,7 +468,7 @@ namespace Yama.Parser
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
 
-            request.Compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, ((Container)this.Statement).IndexContainer.ThisUses);
+            request.Compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, c.IndexContainer.ThisUses);
 
             if (this.AccessDefinition != null)
                 if (this.AccessDefinition.Kind == IdentifierKind.Simple) return request.Compiler.AddError("simple keyword is not anymore supported!", this);
@@ -471,7 +476,7 @@ namespace Yama.Parser
             this.FunktionsDeklarationCompile.Compile(request.Compiler, this, request.Mode);
 
             int count = 0;
-            foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
+            foreach (IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
                 if (!this.MakeOneArgument(node, request.Compiler, count)) continue;
 
@@ -493,8 +498,8 @@ namespace Yama.Parser
 
         private bool MakeOneArgument(IndexVariabelnDeklaration node, Compiler.Compiler compiler, int count)
         {
-            if (this.Deklaration.Type == MethodeType.Ctor)
-                if (node.Name == "this") return false;
+            if (this.Deklaration is null) return false;
+            if (this.Deklaration.Type == MethodeType.Ctor) if (node.Name == "this") return false;
 
             CompilePopResult compilePopResult = new CompilePopResult();
             compilePopResult.Position = count;
@@ -505,6 +510,9 @@ namespace Yama.Parser
 
         private bool BaseCompile(Compiler.Compiler compiler)
         {
+            if (this.Deklaration is null) return false;
+            if (this.Deklaration.Klasse is null) return false;
+
             if (!this.Deklaration.Klasse.IsMethodsReferenceMode) return true;
             if (!(this.Deklaration.Klasse.BaseVar.Type.Deklaration is IndexKlassenDeklaration t)) return true;
 
@@ -533,15 +541,18 @@ namespace Yama.Parser
 
         public bool CanCompile(int depth = 0)
         {
+            if (this.Deklaration is null) return false;
             if (this.Deklaration.Name == "main") return true;
+            if (this.Deklaration.Klasse is null) return false;
 
             bool isused = this.Deklaration.IsInUse(depth);
             if (isused) return true;
             if (this.Deklaration.Klasse.InheritanceBase == null) return false;
             if (!(this.Deklaration.Klasse.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return false;
-            IMethode parentMethods = dek.Methods.FirstOrDefault(u=>u.KeyName == this.Deklaration.KeyName);
-            if (parentMethods == null) return false;
-            if (!(parentMethods.Use is MethodeDeclarationNode t)) return false;
+
+            IMethode? parentMethods = dek.Methods.FirstOrDefault(u=>u.KeyName == this.Deklaration.KeyName);
+            if (parentMethods is null) return false;
+            if (parentMethods.Use is not MethodeDeclarationNode t) return false;
             if (t.Equals(this)) return false;
 
             return t.CanCompile();
@@ -549,14 +560,19 @@ namespace Yama.Parser
 
         private bool CompileDeCtor(Compiler.Compiler compiler, string mode)
         {
+            if (this.Deklaration  is null) return false;
+            if (this.Deklaration.Klasse is null) return false;
             if (this.Deklaration.Klasse.GetNonStaticPropCount == 0) return true;
+
+            IndexVariabelnDeklaration? thisDek = this.Deklaration.Parameters.FirstOrDefault();
+            if (thisDek is null) return false;
 
             /*CompilePopResult compilePopResult = new CompilePopResult();
             compilePopResult.Position = 0;
             compilePopResult.Compile(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");*/
 
             CompileReferenceCall refCall = new CompileReferenceCall();
-            refCall.CompileDek(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");
+            refCall.CompileDek(compiler, thisDek, "default");
 
             CompilePushResult compilePushResult = new CompilePushResult();
             compilePushResult.Compile(compiler, null, "default");
@@ -572,6 +588,8 @@ namespace Yama.Parser
 
         private bool CompileCtor(Compiler.Compiler compiler, string mode)
         {
+            if (this.Deklaration is null) return false;
+            if (this.Deklaration.Klasse is null) return false;
             if (this.Deklaration.Klasse.GetNonStaticPropCount == 0) return true;
 
             CompileNumConst num = new CompileNumConst();
@@ -586,7 +604,9 @@ namespace Yama.Parser
             CompileExecuteCall executeCall = new CompileExecuteCall();
             executeCall.Compile(compiler, (MethodeDeclarationNode)this.Malloc.ParentCall.Deklaration.Use);
 
-            IndexVariabelnDeklaration dek = this.Deklaration.Parameters.FirstOrDefault(t=>t.Name == "this");
+            IndexVariabelnDeklaration? dek = this.Deklaration.Parameters.FirstOrDefault(t=>t.Name == "this");
+            if (dek is null) return false;
+
             CompileReferenceCall a = new CompileReferenceCall();
             a.CompileDek(compiler, dek, "set");
 
@@ -607,6 +627,8 @@ namespace Yama.Parser
 
         private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode, int count)
         {
+            if (this.Statement is null) return false;
+
             this.CompileContainer.Begin.Compile(compiler, this, "default");
 
             this.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));

@@ -12,19 +12,19 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexVariabelnDeklaration Deklaration
+        public IndexVariabelnDeklaration? Deklaration
         {
             get;
             set;
         }
 
-        public IParseTreeNode TypeDefinition
+        public IParseTreeNode? TypeDefinition
         {
             get;
             set;
         }
 
-        public GenericCall GenericDefintion
+        public GenericCall? GenericDefintion
         {
             get;
             set;
@@ -47,7 +47,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.TypeDefinition );
+                if (this.TypeDefinition is not null) result.Add ( this.TypeDefinition );
                 if (this.GenericDefintion != null) result.Add ( this.GenericDefintion );
 
                 return result;
@@ -71,6 +71,7 @@ namespace Yama.Parser
 
         public VariabelDeklaration ( int prio )
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
@@ -81,8 +82,6 @@ namespace Yama.Parser
 
         private bool CheckHashValidChild ( IdentifierToken token )
         {
-            if (token == null) return false;
-
             if (token.Kind == IdentifierKind.Word) return true;
 
             return false;
@@ -103,42 +102,42 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( RequestParserTreeParser request )
         {
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
-            IdentifierToken lexerLeft = request.Parser.Peek ( request.Token, -1 );
-
+            IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
+            if (lexerLeft is null) return null;
             if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
 
             VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
 
-            IdentifierToken lexerRight = request.Parser.Peek ( request.Token, 1 );
-            if (lexerRight == null) return null;
+            IdentifierToken? lexerRight = request.Parser.Peek ( request.Token, 1 );
+            if (lexerRight is null) return null;
 
             lexerRight = this.TryParseGeneric(request, node, lexerRight);
-
+            if (lexerRight is null) return null;
             if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
 
             node.Token = lexerRight;
             node.AllTokens.Add(lexerRight);
 
-            IParseTreeNode callRule = request.Parser.GetRule<ReferenceCall>();
+            IParseTreeNode? callRule = request.Parser.GetRule<ReferenceCall>();
+            if (callRule is null) return null;
 
             node.TypeDefinition = request.Parser.TryToParse ( callRule, request.Token );
-
-            if ( node.TypeDefinition == null ) return null;
+            if ( node.TypeDefinition is null ) return null;
 
             return node;
         }
 
-        private IdentifierToken TryParseGeneric(RequestParserTreeParser request, VariabelDeklaration deklaration, IdentifierToken token)
+        private IdentifierToken? TryParseGeneric(RequestParserTreeParser request, VariabelDeklaration deklaration, IdentifierToken token)
         {
-            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
-            if (genericRule == null) return token;
+            GenericCall? genericRule = request.Parser.GetRule<GenericCall>();
+            if (genericRule is null) return token;
 
-            IParseTreeNode node = genericRule.Parse(new RequestParserTreeParser(request.Parser, token));
-            if (!(node is GenericCall genericCall)) return token;
+            IParseTreeNode? node = genericRule.Parse(new RequestParserTreeParser(request.Parser, token));
+            if (node is not GenericCall genericCall) return token;
 
             deklaration.GenericDefintion = genericCall;
 
@@ -147,11 +146,11 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexVariabelnDeklaration reference = this.Deklaration;
+            IndexVariabelnDeklaration? reference = this.Deklaration;
 
-            if (reference == null)
+            if (reference is null)
             {
                 reference = new IndexVariabelnDeklaration();
                 reference.Use = this;
@@ -161,11 +160,12 @@ namespace Yama.Parser
                     reference.GenericDeklaration = this.GenericDefintion;
                     this.GenericDefintion.Indezieren(request);
                 }
+                if (this.TypeDefinition is null) return request.Index.CreateError(this);
 
                 this.TypeDefinition.Indezieren(request);
-                IndexVariabelnReference type = container.VariabelnReferences.LastOrDefault();
 
-                if (type == null) return request.Index.CreateError(this);
+                IndexVariabelnReference? type = container.VariabelnReferences.LastOrDefault();
+                if (type is null) return request.Index.CreateError(this);
 
                 reference.Type = type;
 
@@ -179,15 +179,15 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
-            if (request.Mode == "set")
-            {
-                IndexVariabelnReference varref = new IndexVariabelnReference();
-                varref.Deklaration = this.Deklaration;
-                varref.Use = this;
-                varref.ParentUsesSet = this.Deklaration.ParentUsesSet;
+            if (request.Mode != "set") return true;
+            if (this.Deklaration is null) return false;
 
-                this.Compilen.Compile(request.Compiler, varref, request.Mode);
-            }
+            IndexVariabelnReference varref = new IndexVariabelnReference();
+            varref.Deklaration = this.Deklaration;
+            varref.Use = this;
+            varref.ParentUsesSet = this.Deklaration.ParentUsesSet;
+
+            this.Compilen.Compile(request.Compiler, varref, request.Mode);
 
             return true;
         }

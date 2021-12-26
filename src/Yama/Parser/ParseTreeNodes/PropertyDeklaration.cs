@@ -13,25 +13,25 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexPropertyDeklaration Deklaration
+        public IndexPropertyDeklaration? Deklaration
         {
             get;
             set;
         }
 
-        public IdentifierToken AccessDefinition
+        public IdentifierToken? AccessDefinition
         {
             get;
             set;
         }
 
-        public IdentifierToken ZusatzDefinition
+        public IdentifierToken? ZusatzDefinition
         {
             get;
             set;
         }
 
-        public IdentifierToken TypeDefinition
+        public IdentifierToken? TypeDefinition
         {
             get;
             set;
@@ -41,11 +41,6 @@ namespace Yama.Parser
         {
             get;
             set;
-        }
-
-        public int Prio
-        {
-            get;
         }
 
         public List<IParseTreeNode> GetAllChilds
@@ -67,19 +62,11 @@ namespace Yama.Parser
 
         #region ctor
 
-        public PropertyDeklaration()
-        {
-            this.AllTokens = new List<IdentifierToken> ();
-        }
-
         public PropertyDeklaration(ParserLayer layer)
         {
+            this.AllTokens = new List<IdentifierToken> ();
             this.layer = layer;
-        }
-
-        public PropertyDeklaration ( int prio )
-        {
-            this.Prio = prio;
+            this.Token = new();
         }
 
         #endregion ctor
@@ -88,8 +75,6 @@ namespace Yama.Parser
 
         private bool CheckHashValidName ( IdentifierToken token )
         {
-            if (token == null) return false;
-
             if (token.Kind == IdentifierKind.Word) return true;
             if (token.Kind == IdentifierKind.Operator) return true;
             if (token.Kind == IdentifierKind.Int32Bit) return true;
@@ -117,8 +102,6 @@ namespace Yama.Parser
         }*/
         private bool CheckHashValidTypeDefinition ( IdentifierToken token )
         {
-            if (token == null) return false;
-
             if (token.Kind == IdentifierKind.Word) return true;
             if (token.Kind == IdentifierKind.Int32Bit) return true;
             if (token.Kind == IdentifierKind.Boolean) return true;
@@ -151,7 +134,7 @@ namespace Yama.Parser
             return false;
         }
 
-        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, PropertyDeklaration deklaration)
+        private IdentifierToken? MakeAccessValid( Parser parser, IdentifierToken token, PropertyDeklaration deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -161,7 +144,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, PropertyDeklaration deklaration)
+        private IdentifierToken? MakeZusatzValid( Parser parser, IdentifierToken token, PropertyDeklaration deklaration)
         {
             if ( !this.CheckHashValidZusatzDefinition ( token ) ) return token;
 
@@ -171,51 +154,32 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
-            PropertyDeklaration deklaration = new PropertyDeklaration();
+            PropertyDeklaration deklaration = new PropertyDeklaration(this.layer);
 
-            IdentifierToken token = this.MakeAccessValid( request.Parser, request.Token, deklaration );
+            IdentifierToken? token = this.MakeAccessValid( request.Parser, request.Token, deklaration );
+            if (token is null) return null;
 
             token = this.MakeZusatzValid ( request.Parser, token, deklaration );
-
+            if (token is null) return null;
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
+            if (token is null) return null;
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
-
-            if ( token == null ) return null;
-
+            if ( token is null ) return null;
             if (token.Kind != IdentifierKind.EndOfCommand) return null;
 
             deklaration.AllTokens.Add(token);
-
-            return deklaration;
-        }
-
-        private PropertyDeklaration CleanUp(PropertyDeklaration deklaration)
-        {
-            if (deklaration.AccessDefinition != null)
-            {
-                deklaration.AccessDefinition.Node = deklaration;
-                deklaration.AccessDefinition.ParentNode = deklaration;
-            }
-            if (deklaration.ZusatzDefinition != null)
-            {
-                deklaration.ZusatzDefinition.Node = deklaration;
-                deklaration.ZusatzDefinition.ParentNode = deklaration;
-            }
-            deklaration.TypeDefinition.Node = deklaration;
-            deklaration.TypeDefinition.ParentNode = deklaration;
-            deklaration.Token.Node = deklaration;
 
             return deklaration;
         }
@@ -234,7 +198,8 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexKlassenDeklaration klasse)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexKlassenDeklaration klasse) return request.Index.CreateError(this);
+            if (this.TypeDefinition is null) return request.Index.CreateError(this);
 
             IndexPropertyDeklaration deklaration = new IndexPropertyDeklaration();
             deklaration.Use = this;
@@ -278,6 +243,7 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.Deklaration is null) return false;
             if (this.Deklaration.Zusatz != MethodeType.Static) return true;
 
             CompileData compile = new CompileData();

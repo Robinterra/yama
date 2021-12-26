@@ -10,9 +10,15 @@ namespace Yama.Parser
     public class VektorCall : IParseTreeNode, IEndExpression, IContainer
     {
 
+        #region vars
+
+        private IdentifierToken? ende;
+
+        #endregion vars
+
         #region get/set
 
-        public IParseTreeNode LeftNode
+        public IParseTreeNode? LeftNode
         {
             get;
             set;
@@ -27,7 +33,6 @@ namespace Yama.Parser
         public List<IParseTreeNode> ParametersNodes
         {
             get;
-            set;
         }
 
         public IdentifierToken Token
@@ -47,7 +52,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.LeftNode );
+                if (this.LeftNode is not null) result.Add ( this.LeftNode );
                 result.AddRange ( this.ParametersNodes );
 
                 return result;
@@ -65,10 +70,15 @@ namespace Yama.Parser
             get;
             set;
         }
+
         public IdentifierToken Ende
         {
-            get;
-            set;
+            get
+            {
+                if (this.ende is null) return this.Token;
+
+                return this.ende;
+            }
         }
 
         public List<IdentifierToken> AllTokens
@@ -82,6 +92,8 @@ namespace Yama.Parser
 
         public VektorCall ( int prio )
         {
+            this.ParametersNodes = new();
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
@@ -97,11 +109,12 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != this.BeginZeichen ) return null;
 
-            IdentifierToken left = request.Parser.Peek ( request.Token, -1 );
+            IdentifierToken? left = request.Parser.Peek ( request.Token, -1 );
+            if (left is null) return null;
 
             if ( left.Kind == IdentifierKind.Operator ) return null;
             if ( left.Kind == IdentifierKind.NumberToken ) return null;
@@ -111,22 +124,23 @@ namespace Yama.Parser
             if ( left.Kind == IdentifierKind.EndOfCommand ) return null;
             if ( left.Kind == IdentifierKind.Comma ) return null;
 
-            IdentifierToken steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
-
-            if ( steuerToken == null ) return null;
+            IdentifierToken? steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
+            if ( steuerToken is null ) return null;
 
             VektorCall node = new VektorCall ( this.Prio );
 
             node.LeftNode = request.Parser.ParseCleanToken ( left );
 
-            node.ParametersNodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
+            List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
+            if (nodes is null) return null;
+            node.ParametersNodes.AddRange(nodes);
 
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
             if (node.LeftNode == null) return null;
 
-            node.Ende = steuerToken;
+            node.ende = steuerToken;
             node.AllTokens.Add(steuerToken);
 
             return node;
@@ -134,7 +148,8 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.LeftNode is null) return request.Index.CreateError(this);
 
             foreach (IParseTreeNode node in this.ParametersNodes)
             {
@@ -148,9 +163,11 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.LeftNode is null) return false;
+
             List<IParseTreeNode> copylist = this.ParametersNodes;//.ToArray().ToList();
             copylist.Reverse();
-            IParseTreeNode dek = null;
+            IParseTreeNode? dek = null;
 
             int parasCount = 0;
 
@@ -166,7 +183,7 @@ namespace Yama.Parser
             {
                 dek = par;
                 if (par is EnumartionExpression b) dek = b.ExpressionParent;
-                if (dek == null) continue;
+                if (dek is null) continue;
 
                 dek.Compile(new Request.RequestParserTreeCompile (request.Compiler, "default"));
 
@@ -178,8 +195,9 @@ namespace Yama.Parser
 
             string modeCall = "vektorcall";
             if (request.Mode == "set") modeCall = "setvektorcall";
+
             this.LeftNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, modeCall));
-            if (!(this.LeftNode is OperatorPoint op)) return false;
+            if (this.LeftNode is not OperatorPoint op) return false;
 
             if (op.IsANonStatic) parasCount++;
 

@@ -10,15 +10,21 @@ namespace Yama.Parser
     public class MethodeCallNode : IParseTreeNode, IEndExpression, IContainer
     {
 
+        #region vars
+
+        private IdentifierToken? ende;
+
+        #endregion vars
+
         #region get/set
 
-        public IndexMethodReference Reference
+        public IndexMethodReference? Reference
         {
             get;
             set;
         }
 
-        public IParseTreeNode LeftNode
+        public IParseTreeNode? LeftNode
         {
             get;
             set;
@@ -33,7 +39,6 @@ namespace Yama.Parser
         public List<IParseTreeNode> ParametersNodes
         {
             get;
-            set;
         }
 
         public IdentifierToken Token
@@ -53,7 +58,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.LeftNode );
+                if (this.LeftNode is not null) result.Add ( this.LeftNode );
                 result.AddRange ( this.ParametersNodes );
 
                 return result;
@@ -73,8 +78,12 @@ namespace Yama.Parser
         }
         public IdentifierToken Ende
         {
-            get;
-            set;
+            get
+            {
+                if (this.ende is null) return this.Token;
+
+                return this.ende;
+            }
         }
 
         public List<IdentifierToken> AllTokens
@@ -86,15 +95,12 @@ namespace Yama.Parser
 
         #region ctor
 
-        public MethodeCallNode ( int prio )
+        public MethodeCallNode ( IdentifierKind begin, IdentifierKind end, int prio )
         {
+            this.Token = new();
+            this.ParametersNodes = new List<IParseTreeNode>();
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
-        }
-
-        public MethodeCallNode ( IdentifierKind begin, IdentifierKind end, int prio )
-            : this ( prio )
-        {
             this.BeginZeichen = begin;
             this.EndeZeichen = end;
         }
@@ -103,12 +109,12 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != this.BeginZeichen ) return null;
 
-            IdentifierToken left = request.Parser.Peek ( request.Token, -1 );
-
+            IdentifierToken? left = request.Parser.Peek ( request.Token, -1 );
+            if (left is null) return null;
             if ( left.Kind == IdentifierKind.Operator ) return null;
             if ( left.Kind == IdentifierKind.NumberToken ) return null;
             if ( left.Kind == IdentifierKind.OpenBracket ) return null;
@@ -117,17 +123,19 @@ namespace Yama.Parser
             if ( left.Kind == IdentifierKind.EndOfCommand ) return null;
             if ( left.Kind == IdentifierKind.Comma ) return null;
 
-            IdentifierToken steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
+            IdentifierToken? steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
+            if ( steuerToken is null ) return null;
 
-            if ( steuerToken == null ) return null;
-
-            MethodeCallNode node = new MethodeCallNode ( this.Prio );
+            MethodeCallNode node = new MethodeCallNode ( this.BeginZeichen, this.EndeZeichen, this.Prio );
 
             node.AllTokens.Add ( steuerToken );
-            node.Ende = steuerToken;
+            node.ende = steuerToken;
             node.LeftNode = request.Parser.ParseCleanToken ( left );
 
-            node.ParametersNodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
+            List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
+            if (nodes is null) return null;
+
+            node.ParametersNodes.AddRange(nodes);
 
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
@@ -139,7 +147,8 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.LeftNode is null) return request.Index.CreateError(this);
 
             IndexMethodReference methodReference = new IndexMethodReference();
             methodReference.Use = this;
@@ -148,14 +157,17 @@ namespace Yama.Parser
             {
                 node.Indezieren(request);
 
-                IndexVariabelnReference reference = container.VariabelnReferences.LastOrDefault();
+                IndexVariabelnReference? reference = container.VariabelnReferences.LastOrDefault();
+                if (reference is null) return request.Index.CreateError(this);
 
                 methodReference.Parameters.Add(reference);
             }
 
             this.LeftNode.Indezieren(request);
 
-            IndexVariabelnReference callRef = container.VariabelnReferences.LastOrDefault();
+            IndexVariabelnReference? callRef = container.VariabelnReferences.LastOrDefault();
+            if (callRef is null) return request.Index.CreateError(this);
+
             methodReference.CallRef = callRef;
             this.Reference = methodReference;
 
@@ -166,12 +178,14 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.LeftNode is null) return false;
+
             List<IParseTreeNode> copylist = this.ParametersNodes.ToArray().ToList();
             copylist.Reverse();
 
             //if (this.CompileCopy(copylist, request)) return true;
 
-            IParseTreeNode dek = null;
+            IParseTreeNode? dek = null;
 
             int parasCount = 0;
 
@@ -190,7 +204,7 @@ namespace Yama.Parser
             }
 
             this.LeftNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, "methode"));
-            if (!(this.LeftNode is OperatorPoint op)) return false;
+            if (this.LeftNode is not OperatorPoint op) return false;
 
             if (op.IsANonStatic) parasCount++;
 
@@ -208,7 +222,10 @@ namespace Yama.Parser
 
         private bool CompileCopy(List<IParseTreeNode> copylist, Request.RequestParserTreeCompile request)
         {
-            if (!(this.Reference.Deklaration.Use is MethodeDeclarationNode t)) return false;
+            if (this.Reference is null) return false;
+            if (this.LeftNode is null) return false;
+            if (this.Reference.Deklaration.Use is not MethodeDeclarationNode t) return false;
+            if (t.Deklaration is null) return false;
 
             //TODO: Not in this place
             if (t.Deklaration.References.Count == 2 && t.ZusatzDefinition == null)

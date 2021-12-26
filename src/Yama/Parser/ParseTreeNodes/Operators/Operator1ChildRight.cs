@@ -225,6 +225,7 @@ namespace Yama.Parser
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
             if (this.ChildNode is null) return false;
+            if (t.Statement is null) return false;
 
             this.ChildNode.Compile(new Request.RequestParserTreeCompile(compiler, mode));
 

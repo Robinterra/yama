@@ -299,6 +299,7 @@ namespace Yama.Parser
 
             foreach (IMethode m in this.Deklaration.StaticMethods)
             {
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
@@ -306,6 +307,7 @@ namespace Yama.Parser
 
             foreach (IndexMethodDeklaration m in this.Deklaration.Operators)
             {
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
@@ -314,7 +316,7 @@ namespace Yama.Parser
             foreach (IMethode m in this.Deklaration.Methods)
             {
                 if (this.Deklaration.IsMethodsReferenceMode) this.AddAssemblyName(compile, m);
-
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
@@ -336,6 +338,7 @@ namespace Yama.Parser
 
             foreach (IndexMethodDeklaration m in this.Deklaration.Ctors)
             {
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
@@ -343,6 +346,7 @@ namespace Yama.Parser
 
             foreach (IndexMethodDeklaration m in this.Deklaration.DeCtors)
             {
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);

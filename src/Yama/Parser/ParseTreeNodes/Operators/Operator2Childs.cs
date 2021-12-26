@@ -228,6 +228,7 @@ namespace Yama.Parser
             if (this.LeftNode is null) return false;
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
+            if (t.Statement is null) return false;
 
             this.LeftNode.Compile(new Request.RequestParserTreeCompile (compiler, mode));
 

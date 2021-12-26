@@ -41,17 +41,18 @@ namespace Yama.Parser
 
         public TextParser (  )
         {
+            this.Token = new IdentifierToken();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
-        public TextParser ( int prio )
+        public TextParser ( int prio ) : this()
         {
             this.Prio = prio;
         }
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Text ) return null;
 
