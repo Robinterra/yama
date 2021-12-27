@@ -29,11 +29,6 @@ namespace Yama.Compiler
 
         #region ctor
 
-        public RequestOptimize()
-        {
-
-        }
-
         public RequestOptimize(SSACompileLine line, List<SSACompileLine> toremove, List<SSACompileLine> ircode)
         {
             this.Current = line;

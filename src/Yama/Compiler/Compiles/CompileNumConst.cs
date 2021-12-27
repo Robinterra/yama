@@ -87,7 +87,7 @@ namespace Yama.Compiler
 
             SSACompileLine line = new SSACompileLine(this);
             compiler.AddSSALine(line);
-            line.Arguments.Add(new SSACompileArgument() { Mode = SSACompileArgumentMode.Const, Const = (int)node.Token.Value });
+            line.Arguments.Add(new SSACompileArgument(SSACompileArgumentMode.Const) { Const = (int)node.Token.Value });
             this.Line = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();

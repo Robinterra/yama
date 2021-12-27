@@ -213,7 +213,10 @@ namespace Yama.Compiler
 
                 if (argNew.Mode != orgArg.Mode) return false;
                 if (argNew.Mode == SSACompileArgumentMode.Reference)
+                {
+                    if (argNew.Reference is null) return false;
                     if (!argNew.Reference.Equals(orgArg.Reference)) return false;
+                }
             }
 
             return true;

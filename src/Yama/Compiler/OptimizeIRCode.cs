@@ -35,23 +35,16 @@ namespace Yama.Compiler
         {
             this.IRCode = ircode;
 
-            this.Init();
-        }
-
-        #endregion ctor
-
-        #region methods
-
-        private bool Init()
-        {
             this.Methods = new List<OptimizeMethod>();
             this.Methods.Add(this.RemoveNotNecessaryJumps);
             //this.Methods.Add(this.RemovedUnusedArgs);
             this.Methods.Add(this.RemoveNotUsedLines);
             //this.Methods.Add(this.RemoveJumpPointsWith0Calls);
-
-            return true;
         }
+
+        #endregion ctor
+
+        #region methods
 
         public bool Run()
         {
@@ -126,12 +119,13 @@ namespace Yama.Compiler
         private bool RemoveNotNecessaryJumps(RequestOptimize request)
         {
             SSACompileLine line = request.Current;
-            if (!(line.Owner is CompileJumpTo)) return false;
+            if (line.Owner is not CompileJumpTo) return false;
 
-            SSACompileArgument arg = line.Arguments.FirstOrDefault();
-            if (arg == null) return false;
+            SSACompileArgument? arg = line.Arguments.FirstOrDefault();
+            if (arg is null) return false;
 
             if (arg.Mode != SSACompileArgumentMode.JumpReference) return false;
+            if (arg.CompileReference is null) return false;
             if (arg.CompileReference.Line.Order != line.Order + 1) return false;
 
             arg.CompileReference.Line.Calls.Remove(line);

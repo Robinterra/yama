@@ -115,7 +115,7 @@ namespace Yama.Compiler
             }
             if (this.Point == PointMode.LoopEnde) this.Punkt = compiler.ContainerMgmt.CurrentLoop.Ende;
 
-            line.Arguments.Add(new SSACompileArgument() { Mode = SSACompileArgumentMode.JumpReference, CompileReference = this.Punkt });
+            line.Arguments.Add(new SSACompileArgument(SSACompileArgumentMode.JumpReference) { CompileReference = this.Punkt });
 
             this.PrimaryKeys = new Dictionary<string, string>();
 

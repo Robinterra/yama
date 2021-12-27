@@ -48,9 +48,9 @@ namespace Yama.Compiler
             foreach (SSACompileArgument arg in line.Arguments)
             {
                 if (arg.Mode == SSACompileArgumentMode.Const) result.AppendFormat(" #0x{0:x}", arg.Const);
-                if (arg.Mode == SSACompileArgumentMode.Reference) result.AppendFormat(" {0}", arg.Reference.Order);
-                if (arg.Mode == SSACompileArgumentMode.Variable) result.AppendFormat(" {0}", arg.Variable.Reference.Order);
-                if (arg.Mode == SSACompileArgumentMode.JumpReference) result.AppendFormat(" {0}", arg.CompileReference.Line.Order);
+                if (arg.Mode == SSACompileArgumentMode.Reference && arg.Reference is not null) result.AppendFormat(" {0}", arg.Reference.Order);
+                if (arg.Mode == SSACompileArgumentMode.Variable && arg.Variable is not null && arg.Variable.Reference is not null) result.AppendFormat(" {0}", arg.Variable.Reference.Order);
+                if (arg.Mode == SSACompileArgumentMode.JumpReference && arg.CompileReference is not null) result.AppendFormat(" {0}", arg.CompileReference.Line.Order);
             }
 
             this.Writer.WriteLine(result);
@@ -67,7 +67,7 @@ namespace Yama.Compiler
             if (this.AddFreeLoop(line, result)) return ContinueMode.Break;
             if (this.AddReferenceCall(line, result)) return ContinueMode.Continue;
 
-            string printMode = line.Owner.Algo.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
+            string? printMode = line.Owner.Algo.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
             string isNotUseChar = line.IsUsed ? "" : "/!\\";
             result.AppendFormat("{3}{0}: {4}{1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
 
@@ -113,7 +113,14 @@ namespace Yama.Compiler
             if (rc.Node == null) return false;
 
             string methodName = rc.Node.Token.Text;
-            if (rc.Node is NewKey nk) methodName = string.Format("{0}.{1}", (nk.Reference.Deklaration as IndexMethodDeklaration).Klasse.Name, methodName);
+            if (rc.Node is NewKey nk)
+            {
+                if (nk.Reference is null) return false;
+                if (nk.Reference.Deklaration is not IndexMethodDeklaration method) return false;
+                if (method.Klasse is null) return false;
+
+                methodName = string.Format("{0}.{1}", method.Klasse.Name, methodName);
+            }
 
             if ( rc.Node is ReferenceCall rfc ) methodName = IRCodePrintStream.GetMethodeName ( rfc, methodName );
 
@@ -125,10 +132,12 @@ namespace Yama.Compiler
 
         private static string GetMethodeName ( ReferenceCall rfc, string methodName )
         {
-            string klasse = null;
-            if ( rfc.Reference.Deklaration is IndexMethodDeklaration md ) klasse = md.Klasse.Name;
-            if ( rfc.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsd ) klasse = pgsd.Klasse.Name;
-            if ( rfc.Reference.Deklaration is IndexPropertyDeklaration pd ) klasse = pd.Klasse.Name;
+            string? klasse = null;
+            if (rfc.Reference is null) return methodName;
+
+            if ( rfc.Reference.Deklaration is IndexMethodDeklaration md ) klasse = md.Klasse?.Name;
+            if ( rfc.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsd ) klasse = pgsd.Klasse?.Name;
+            if ( rfc.Reference.Deklaration is IndexPropertyDeklaration pd ) klasse = pd.Klasse?.Name;
 
             if ( klasse == null ) return methodName;
             return string.Format ( "{0}.{1}", klasse, methodName );
@@ -147,9 +156,12 @@ namespace Yama.Compiler
 
         private bool AddFunktionsDeklaration(SSACompileLine line, StringBuilder result)
         {
-            if (!(line.Owner is CompileFunktionsDeklaration fd)) return false;
+            if (line.Owner is not CompileFunktionsDeklaration fd) return false;
+            if (fd.Node is not MethodeDeclarationNode md) return false;
+            if (md.Deklaration is null) return false;
+            if (md.Deklaration.Klasse is null) return false;
 
-            result.AppendFormat("{1}.{0} (  )\n{{", fd.Node.Token.Text, (fd.Node as MethodeDeclarationNode).Deklaration.Klasse.Name);
+            result.AppendFormat("{1}.{0} (  )\n{{", fd.Node.Token.Text, md.Deklaration.Klasse.Name);
 
             emptyStrings += 4;
 

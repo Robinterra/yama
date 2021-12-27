@@ -13,13 +13,13 @@ namespace Yama.Compiler
             set;
         }
 
-        public Dictionary<string, string> Dictionaries
+        public Dictionary<string, string>? Dictionaries
         {
             get;
             set;
         }
 
-        public Dictionary<string, string> PostReplaces
+        public Dictionary<string, string>? PostReplaces
         {
             get;
             set;
