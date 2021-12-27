@@ -301,7 +301,7 @@ namespace Yama.Parser
         {
             if (deklaration.Type != MethodeType.VektorMethode) return true;
 
-            IndexVariabelnReference varref = new IndexVariabelnReference { Name = klasse.Name, Use = this };
+            IndexVariabelnReference varref = new IndexVariabelnReference(this, klasse.Name);
             IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration(this, "this", varref);
 
             deklaration.Parameters.Add(thisdek);
@@ -311,7 +311,7 @@ namespace Yama.Parser
 
         private IndexVariabelnReference GetReturnValueIndex(IndexKlassenDeklaration klasse, IdentifierToken typeDef)
         {
-            return new IndexVariabelnReference { Name = typeDef.Text, Use = this };
+            return new IndexVariabelnReference(this, typeDef.Text);
         }
 
         private bool AddMethode(IndexKlassenDeklaration klasse, IndexVektorDeklaration deklaration)

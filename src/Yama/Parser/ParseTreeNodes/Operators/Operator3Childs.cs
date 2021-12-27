@@ -159,9 +159,7 @@ namespace Yama.Parser
             if (this.MiddleNode is null) return request.Index.CreateError(this);
             if (this.RightNode is null) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             this.LeftNode.Indezieren(request);
             IndexVariabelnReference varref = container.VariabelnReferences.Last();
 

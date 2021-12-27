@@ -176,9 +176,7 @@ namespace Yama.Parser
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
             if (this.ChildNode is null) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             reference.IsOperator = true;
 
             this.ChildNode.Indezieren(request);

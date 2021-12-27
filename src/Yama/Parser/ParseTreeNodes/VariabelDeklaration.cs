@@ -180,7 +180,7 @@ namespace Yama.Parser
             if (request.Mode != "set") return true;
             if (this.Deklaration is null) return false;
 
-            IndexVariabelnReference varref = new IndexVariabelnReference();
+            IndexVariabelnReference varref = new IndexVariabelnReference(this, this.Token.Text);
             varref.Deklaration = this.Deklaration;
             varref.Use = this;
             varref.ParentUsesSet = this.Deklaration.ParentUsesSet;

@@ -68,9 +68,7 @@ namespace Yama.Parser
         {
             if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = "string";
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, "string");
 
             container.VariabelnReferences.Add(reference);
 

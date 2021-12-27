@@ -103,7 +103,7 @@ namespace Yama.Parser
 
             this.LeftNode.Indezieren(request);
 
-            IndexVariabelnReference type = new IndexVariabelnReference { Name = this.RightToken.Text, Use = this };
+            IndexVariabelnReference type = new IndexVariabelnReference (this, this.RightToken.Text);
             container.VariabelnReferences.Add(type);
 
             return true;

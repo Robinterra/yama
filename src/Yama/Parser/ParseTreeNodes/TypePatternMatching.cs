@@ -150,25 +150,22 @@ namespace Yama.Parser
 
             this.LeftNode.Indezieren(request);
 
-            IndexVariabelnReference equalsReference = new IndexVariabelnReference();
-            equalsReference.Use = this;
-            equalsReference.Name = "==";
+            IndexVariabelnReference equalsReference = new IndexVariabelnReference(this, "==");
             this.EqualsReference = equalsReference;
-            IndexVariabelnReference varref = new IndexVariabelnReference();
+
+            IndexVariabelnReference varref = new IndexVariabelnReference(this, "int");
             varref.ParentCall = equalsReference;
             varref.VariabelnReferences.Add(equalsReference);
-            varref.Use = this;
-            varref.Name = "int";
             container.VariabelnReferences.Add(varref);
 
-            this.BooleascherReturn = new IndexVariabelnReference { Name = "bool", Use = this };
+            this.BooleascherReturn = new IndexVariabelnReference(this, "bool");
             container.VariabelnReferences.Add(this.BooleascherReturn);
 
             if ( this.IsNullChecking ) return true;
             if (this.ReferenceDeklaration is null) return false;
             if (this.RightToken is null) return false;
 
-            IndexVariabelnReference type = new IndexVariabelnReference { Name = this.RightToken.Text, Use = this };
+            IndexVariabelnReference type = new IndexVariabelnReference(this, this.RightToken.Text);
             IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration(this, this.ReferenceDeklaration.Text, type);
             reference.Use = this;
             reference.Name = this.ReferenceDeklaration.Text;
@@ -197,7 +194,7 @@ namespace Yama.Parser
             CompileReferenceCall compileReference = new CompileReferenceCall();
             ReferenceCall call = new ReferenceCall();
             call.Token = this.ReferenceDeklaration;
-            call.Reference = new IndexVariabelnReference { Deklaration = this.Deklaration, Name = this.Deklaration.Name, Use = this, ParentUsesSet = this.BooleascherReturn.ThisUses };
+            call.Reference = new IndexVariabelnReference(this, this.Deklaration.Name) { Deklaration = this.Deklaration, ParentUsesSet = this.BooleascherReturn.ThisUses };
             compileReference.Compile(request.Compiler, call, "set");
 
             compileReference = new CompileReferenceCall();

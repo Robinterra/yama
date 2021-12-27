@@ -83,7 +83,7 @@ namespace Yama.Index
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
 
-                IndexVariabelnReference varref = new IndexVariabelnReference { Deklaration = this, Name = this.Name, Use = this.Use };
+                IndexVariabelnReference varref = new IndexVariabelnReference (this.Use, this.Name) { Deklaration = this };
                 IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration(this.Use, "this", varref);
                 dekThisVar.ParentUsesSet = this.thisUses;
 
@@ -98,7 +98,7 @@ namespace Yama.Index
                 if (this.InheritanceBase == null) return this.thisUses;
                 if (this.InheritanceBase.Deklaration is not IndexKlassenDeklaration dek) return this.thisUses;
 
-                varref = new IndexVariabelnReference { Deklaration = dek, Name = dek.Name, Use = dek.Use };
+                varref = new IndexVariabelnReference (dek.Use, dek.Name) { Deklaration = dek };
                 IndexVariabelnDeklaration dekbaseVar = new IndexVariabelnDeklaration(this.Use, "base", varref);
                 dekbaseVar.ParentUsesSet = dek.ThisUses;
                 dekbaseVar.BaseUsesSet = this.thisUses;

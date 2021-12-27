@@ -278,7 +278,7 @@ namespace Yama.Parser
                 deklaration.GenericDeklaration = this.GenericDefintion;
             }
 
-            if (this.InheritanceBase != null) deklaration.InheritanceBase = new IndexVariabelnReference { Name = this.InheritanceBase.Text, Use = this };
+            if (this.InheritanceBase != null) deklaration.InheritanceBase = new IndexVariabelnReference(this, this.InheritanceBase.Text);
 
             this.Deklaration = deklaration;
 

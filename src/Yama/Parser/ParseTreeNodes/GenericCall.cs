@@ -147,9 +147,7 @@ namespace Yama.Parser
             if (request.Parent is IndexKlassenDeklaration idk) return this.IndezKlassenGeneric(request, idk);
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             container.VariabelnReferences.Add(reference);
             this.Reference = reference;
 

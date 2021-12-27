@@ -57,24 +57,10 @@ namespace Yama.Index
             set;
         }
 
-        public List<IMethode> OverloadMethods
+        public List<IMethode>? OverloadMethods
         {
             get;
             set;
-        }
-
-        public bool IsOwnerInUse(int depth)
-        {
-            if (this.Owner == null) return false;
-
-            return this.Owner.IsInUse(depth);
-        }
-
-        public bool IsInUse (int depth)
-        {
-            if (depth > 10) return true;
-
-            return this.IsOwnerInUse(depth + 1);
         }
 
         private IndexVariabelnReference? parentCall;
@@ -138,14 +124,30 @@ namespace Yama.Index
 
         #region ctor
 
-        public IndexVariabelnReference (  )
+        public IndexVariabelnReference ( IParseTreeNode use, string name )
         {
+            this.Use = use;
+            this.Name = name;
             this.VariabelnReferences = new List<IndexVariabelnReference>();
         }
 
         #endregion ctor
 
         #region methods
+
+        public bool IsOwnerInUse(int depth)
+        {
+            if (this.Owner == null) return false;
+
+            return this.Owner.IsInUse(depth);
+        }
+
+        public bool IsInUse (int depth)
+        {
+            if (depth > 10) return true;
+
+            return this.IsOwnerInUse(depth + 1);
+        }
 
         public bool Mappen(IndexVariabelnReference parentCall)
         {

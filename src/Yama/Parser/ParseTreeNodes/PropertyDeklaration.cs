@@ -201,7 +201,7 @@ namespace Yama.Parser
             if (request.Parent is not IndexKlassenDeklaration klasse) return request.Index.CreateError(this);
             if (this.TypeDefinition is null) return request.Index.CreateError(this);
 
-            IndexVariabelnReference varref = new IndexVariabelnReference { Name = this.TypeDefinition.Text, Use = this };
+            IndexVariabelnReference varref = new IndexVariabelnReference(this, this.TypeDefinition.Text);
 
             IndexPropertyDeklaration deklaration = new IndexPropertyDeklaration(this, this.Token.Text, MethodeType.Property, varref);
 

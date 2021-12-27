@@ -89,9 +89,7 @@ namespace Yama.Parser
             if (request.Parent is IndexVariabelnReference varref) return this.RefComb(varref);
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             container.VariabelnReferences.Add(reference);
             this.Reference = reference;
 
@@ -100,9 +98,7 @@ namespace Yama.Parser
 
         private bool RefComb(IndexVariabelnReference varref)
         {
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             reference.RefCombination = varref;
             varref.ParentCall = reference;
             varref.VariabelnReferences.Add(reference);

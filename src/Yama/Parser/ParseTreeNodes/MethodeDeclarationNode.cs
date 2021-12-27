@@ -127,21 +127,13 @@ namespace Yama.Parser
             this.Tags = new();
             this.AllTokens = new List<IdentifierToken> ();
             this.layer = layer;
-            this.MallocFree = new IndexVariabelnReference
+            this.MallocFree = new IndexVariabelnReference(this, "MemoryManager")
             {
-                Name = "MemoryManager",
-                ParentCall = new IndexVariabelnReference
-                {
-                    Name = "Free"
-                }
+                ParentCall = new IndexVariabelnReference(this, "Free")
             };
-            this.Malloc = new IndexVariabelnReference
+            this.Malloc = new IndexVariabelnReference(this, "MemoryManager")
             {
-                Name = "MemoryManager",
-                ParentCall = new IndexVariabelnReference
-                {
-                    Name = "Malloc"
-                }
+                ParentCall = new IndexVariabelnReference(this, "Malloc")
             };
             this.Parameters = new();
         }
@@ -399,7 +391,7 @@ namespace Yama.Parser
             if (!isok) isok = deklaration.Type == MethodeType.DeCtor;
             if (!isok) return false;
 
-            IndexVariabelnReference varref = new IndexVariabelnReference { Name = klasse.Name, Use = this };
+            IndexVariabelnReference varref = new IndexVariabelnReference(this, klasse.Name);
             IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration(this, "this", varref);
             thisdek.Name = "this";
             deklaration.Parameters.Add(thisdek);
@@ -409,9 +401,9 @@ namespace Yama.Parser
 
         private IndexVariabelnReference GetReturnValueIndex(IndexKlassenDeklaration klasse, IdentifierToken typeDef)
         {
-            if (this.CheckSonderRegleung(typeDef)) return new IndexVariabelnReference { Name = klasse.Name, Use = this };
+            if (this.CheckSonderRegleung(typeDef)) return new IndexVariabelnReference(this, klasse.Name);
 
-            return new IndexVariabelnReference { Name = typeDef.Text, Use = this };
+            return new IndexVariabelnReference(this, typeDef.Text);
         }
 
         private bool AddMethode(IndexKlassenDeklaration klasse, IndexMethodDeklaration deklaration)

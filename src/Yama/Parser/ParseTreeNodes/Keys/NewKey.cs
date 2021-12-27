@@ -192,9 +192,8 @@ namespace Yama.Parser
 
             container.MethodReferences.Add(methodReference);
 
-            IndexVariabelnReference typeDeklaration = new IndexVariabelnReference();
-            typeDeklaration.Use = this;
-            typeDeklaration.Name = this.Definition.Text;
+            IndexVariabelnReference typeDeklaration = new IndexVariabelnReference(this, this.Definition.Text);
+
             if (this.GenericDefintion != null)
             {
                 typeDeklaration.GenericDeklaration = this.GenericDefintion;
@@ -202,9 +201,7 @@ namespace Yama.Parser
             }
             container.VariabelnReferences.Add(typeDeklaration);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             reference.Deklaration = typeDeklaration;
             if (this.GenericDefintion != null) reference.GenericDeklaration = this.GenericDefintion;
 

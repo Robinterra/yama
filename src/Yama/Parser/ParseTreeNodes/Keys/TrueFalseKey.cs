@@ -70,11 +70,9 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = "bool";
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, "bool");
             container.VariabelnReferences.Add(reference);
 
             return true;
