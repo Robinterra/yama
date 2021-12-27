@@ -68,14 +68,10 @@ namespace Yama.Parser
         {
             if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieses Usings");
 
-            IndexNamespaceReference deklaration = new IndexNamespaceReference();
-
             string? value = this.Token.Value is null ? null : this.Token.Value.ToString();
             if (value is null) return request.Index.CreateError(this);
 
-            deklaration.Name = value;
-
-            deklaration.Use = this;
+            IndexNamespaceReference deklaration = new IndexNamespaceReference(this, value);
 
             dek.Usings.Add(deklaration);
 

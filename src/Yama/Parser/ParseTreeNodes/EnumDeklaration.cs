@@ -142,9 +142,7 @@ namespace Yama.Parser
             if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieses Enums");
             if (this.Statement is null) return request.Index.CreateError(this);
 
-            IndexEnumDeklaration deklaration = new IndexEnumDeklaration();
-            deklaration.Name = this.Token.Text;
-            deklaration.Use = this;
+            IndexEnumDeklaration deklaration = new IndexEnumDeklaration(this, this.Token.Text);
 
             this.Deklaration = deklaration;
 

@@ -116,8 +116,7 @@ namespace Yama.Parser
             if (request.Parent is IndexNamespaceDeklaration dek) return this.NamespaceIndezi(request);
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexContainer indexContainer = new IndexContainer();
-            indexContainer.Use = this;
+            IndexContainer indexContainer = new IndexContainer(this, "container");
             container.Containers.Add(indexContainer);
             this.IndexContainer = indexContainer;
 

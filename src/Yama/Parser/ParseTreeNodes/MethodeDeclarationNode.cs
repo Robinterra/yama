@@ -344,7 +344,7 @@ namespace Yama.Parser
 
             VariabelDeklaration? dek = null;
 
-            this.IndezierenNonStaticDek(deklaration);
+            this.IndezierenNonStaticDek(deklaration, klasse);
 
             foreach (IParseTreeNode par in this.Parameters)
             {
@@ -391,7 +391,7 @@ namespace Yama.Parser
             return true;
         }
 
-        private bool IndezierenNonStaticDek(IndexMethodDeklaration deklaration)
+        private bool IndezierenNonStaticDek(IndexMethodDeklaration deklaration, IndexKlassenDeklaration klasse)
         {
             bool isok = deklaration.Type == MethodeType.Methode;
             if (!isok) isok = deklaration.Type == MethodeType.Property;
@@ -399,7 +399,8 @@ namespace Yama.Parser
             if (!isok) isok = deklaration.Type == MethodeType.DeCtor;
             if (!isok) return false;
 
-            IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration();
+            IndexVariabelnReference varref = new IndexVariabelnReference { Name = klasse.Name, Use = this };
+            IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration(this, "this", varref);
             thisdek.Name = "this";
             deklaration.Parameters.Add(thisdek);
 
@@ -514,7 +515,9 @@ namespace Yama.Parser
             if (this.Deklaration.Klasse is null) return false;
 
             if (!this.Deklaration.Klasse.IsMethodsReferenceMode) return true;
-            if (!(this.Deklaration.Klasse.BaseVar.Type.Deklaration is IndexKlassenDeklaration t)) return true;
+            if (this.Deklaration.Klasse.BaseVar is null) return false;
+            if (this.Deklaration.Klasse.BaseVar.Type.Deklaration is not IndexKlassenDeklaration t) return true;
+            if (t.DataRef is null) return false;
 
             compiler.CurrentBase = this.Deklaration.Klasse.BaseVar;
 
@@ -612,6 +615,8 @@ namespace Yama.Parser
 
             if (this.Deklaration.Klasse.IsMethodsReferenceMode)
             {
+                if (this.Deklaration.Klasse.DataRef is null) return false;
+
                 CompileReferenceCall referenceCall = new CompileReferenceCall();
                 referenceCall.CompileData(compiler, this, this.Deklaration.Klasse.DataRef.JumpPointName);
 

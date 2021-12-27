@@ -87,7 +87,7 @@ namespace Yama.Parser
         {
             if (this.Statement is null) return index.CreateError(this);
 
-            IndexContainer container = new IndexContainer();
+            IndexContainer container = new IndexContainer(this, "vektor container");
 
             parent.SetContainer = container;
 
@@ -100,7 +100,7 @@ namespace Yama.Parser
         {
             if (this.Statement is null) return index.CreateError(this);
 
-            IndexContainer container = new IndexContainer();
+            IndexContainer container = new IndexContainer(this, "indez get set property");
 
             parent.SetContainer = container;
 
@@ -116,7 +116,7 @@ namespace Yama.Parser
             if (!(request.Parent is IndexPropertyDeklaration propertyDeklaration)) return request.Index.CreateError(this);
             if (this.Statement == null) return request.Index.CreateError(this);
 
-            IndexContainer container = new IndexContainer();
+            IndexContainer container = new IndexContainer(this, "set container");
 
             propertyDeklaration.SetContainer = container;
 

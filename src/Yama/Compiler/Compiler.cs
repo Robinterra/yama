@@ -265,7 +265,8 @@ namespace Yama.Compiler
         {
             foreach (IParseTreeNode node in nodes)
             {
-                if (!(node is KlassenDeklaration k)) continue;
+                if (node is not KlassenDeklaration k) continue;
+                if (k.Deklaration is null) continue;
                 if (!k.Deklaration.IsMethodsReferenceMode) continue;
 
                 k.Deklaration.DataRef = k.compile;

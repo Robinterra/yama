@@ -223,13 +223,12 @@ namespace Yama.Parser
             return new IndexVariabelnReference { Name = typeDef.Text, Use = this };
         }
 
-        private bool IndezierenNonStaticDek(IndexPropertyGetSetDeklaration deklaration)
+        private bool IndezierenNonStaticDek(IndexPropertyGetSetDeklaration deklaration, IndexKlassenDeklaration klasse)
         {
-
             if (deklaration.Type != MethodeType.PropertyGetSet) return true;
 
-            IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration();
-            thisdek.Name = "this";
+            IndexVariabelnReference varref = new IndexVariabelnReference { Name = klasse.Name, Use = this };
+            IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration(this, "this", varref);
             deklaration.Parameters.Add(thisdek);
 
             return true;
@@ -242,10 +241,8 @@ namespace Yama.Parser
             if (this.GetStatement is null) return request.Index.CreateError(this);
             if (this.SetStatement is null) return request.Index.CreateError(this);
 
-            IndexPropertyGetSetDeklaration deklaration = new IndexPropertyGetSetDeklaration();
-            deklaration.Use = this;
-            deklaration.Name = this.Token.Text;
-            deklaration.ReturnValue = this.GetReturnValueIndex(klasse, this.TypeDefinition);
+            IndexPropertyGetSetDeklaration deklaration = new IndexPropertyGetSetDeklaration(this, this.Token.Text, this.GetReturnValueIndex(klasse, this.TypeDefinition));
+
             this.Deklaration = deklaration;
 
             AccessModify access = AccessModify.Private;
@@ -257,10 +254,9 @@ namespace Yama.Parser
             this.GetStatement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
             this.SetStatement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
 
-            this.IndezierenNonStaticDek(deklaration);
+            this.IndezierenNonStaticDek(deklaration, klasse);
 
-            IndexVariabelnDeklaration invaluesdek = new IndexVariabelnDeklaration();
-            invaluesdek.Name = "invalue";
+            IndexVariabelnDeklaration invaluesdek = new IndexVariabelnDeklaration(this, "invalue", deklaration.ReturnValue);
             deklaration.Parameters.Add(invaluesdek);
 
             this.AddMethode(klasse, deklaration);
@@ -332,6 +328,7 @@ namespace Yama.Parser
 
             bool isused = this.Deklaration.IsInUse(depth);
             if (isused) return true;
+            if (this.Deklaration.Klasse is null) return false;
             if (this.Deklaration.Klasse.InheritanceBase == null) return false;
             if (this.Deklaration.Klasse.InheritanceBase.Deklaration is not IndexKlassenDeklaration dek) return false;
 

@@ -102,10 +102,9 @@ namespace Yama.Index
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
 
-                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration();
-                dekThisVar.Name = "invalue";
-                dekThisVar.Type = new IndexVariabelnReference { Deklaration = this.ReturnValue.Deklaration, Name = this.ReturnValue.Deklaration.Name, Use = this.Use };
-                dekThisVar.Use = this.Use;
+                IndexVariabelnReference varref = new IndexVariabelnReference { Deklaration = this.ReturnValue.Deklaration, Name = this.ReturnValue.Deklaration.Name, Use = this.Use };
+                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration(this.Use, "invalue", varref);
+
                 dekThisVar.SetUsesSet = this.thisUses;
 
                 this.References.Add(dekThisVar.Type);

@@ -287,9 +287,9 @@ namespace Yama.Index
             return true;
         }
 
-        public bool ExistTypeInheritanceHistory ( string leftName, IndexVariabelnReference reference )
+        public bool ExistTypeInheritanceHistory ( string leftName, IndexVariabelnReference? reference )
         {
-            if ( reference == null ) return false;
+            if ( reference is null ) return false;
 
             if (reference.Deklaration is IndexVariabelnDeklaration vd) return this.ExistTypeInheritanceHistory ( leftName, vd.Type );
             if (reference.Deklaration is IndexPropertyGetSetDeklaration pgsd) return this.ExistTypeInheritanceHistory ( leftName, pgsd.ReturnValue );
@@ -300,7 +300,7 @@ namespace Yama.Index
 
             if ( t.Name == leftName ) return true;
             if ( this.ExistTypeInheritanceHistory ( leftName, t.InheritanceBase ) ) return true;
-            
+
             return false;
         }
 

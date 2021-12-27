@@ -168,12 +168,11 @@ namespace Yama.Parser
             if (this.ReferenceDeklaration is null) return false;
             if (this.RightToken is null) return false;
 
-            IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration();
+            IndexVariabelnReference type = new IndexVariabelnReference { Name = this.RightToken.Text, Use = this };
+            IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration(this, this.ReferenceDeklaration.Text, type);
             reference.Use = this;
             reference.Name = this.ReferenceDeklaration.Text;
             container.VariabelnDeklarations.Add(reference);
-            IndexVariabelnReference type = new IndexVariabelnReference { Name = this.RightToken.Text, Use = this };
-            reference.Type = type;
             container.VariabelnReferences.Add(type);
 
             this.Deklaration = reference;
@@ -191,6 +190,7 @@ namespace Yama.Parser
             if (this.ReferenceDeklaration is null) return false;
             if (this.EqualsReference is null) return false;
             if (this.BooleascherReturn is null) return false;
+            if (t.DataRef is null) return false;
 
             this.LeftNode.Compile(request);
 

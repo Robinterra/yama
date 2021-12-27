@@ -8,6 +8,8 @@ namespace Yama.Index
     public class IndexNamespaceReference : IIndexReference, IParent
     {
 
+        #region get/set
+
         public IParseTreeNode Use
         {
             get;
@@ -15,12 +17,6 @@ namespace Yama.Index
         }
 
         public string Name
-        {
-            get;
-            set;
-        }
-
-        public IndexNamespaceDeklaration Deklaration
         {
             get;
             set;
@@ -46,16 +42,32 @@ namespace Yama.Index
             set;
         }
 
-        public IndexNamespaceReference (  )
-        {
+        #endregion get/set
 
+        #region ctor
+
+        public IndexNamespaceReference ( IParseTreeNode use, string name )
+        {
+            this.Name = name;
+            this.Use = use;
+            this.ParentUsesSet = new();
         }
 
-        public bool PreMappen(ValidUses uses) {return true;}
+        #endregion ctor
+
+        #region methods
+
+        public bool PreMappen(ValidUses uses)
+        {
+            return true;
+        }
+
         public bool IsInUse (int depth)
         {
             return true;
         }
+
+        #endregion methodss
 
     }
 }

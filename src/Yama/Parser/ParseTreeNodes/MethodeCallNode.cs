@@ -150,8 +150,7 @@ namespace Yama.Parser
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
             if (this.LeftNode is null) return request.Index.CreateError(this);
 
-            IndexMethodReference methodReference = new IndexMethodReference();
-            methodReference.Use = this;
+            IndexMethodReference methodReference = new IndexMethodReference(this, this.Token.Text);
 
             foreach (IParseTreeNode node in this.ParametersNodes)
             {
@@ -224,6 +223,7 @@ namespace Yama.Parser
         {
             if (this.Reference is null) return false;
             if (this.LeftNode is null) return false;
+            if (this.Reference.Deklaration is null) return false;
             if (this.Reference.Deklaration.Use is not MethodeDeclarationNode t) return false;
             if (t.Deklaration is null) return false;
 

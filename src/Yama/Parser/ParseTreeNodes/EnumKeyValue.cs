@@ -75,10 +75,7 @@ namespace Yama.Parser
             if (request.Parent is not IndexEnumDeklaration dek) return request.Index.CreateError(this);
             if (this.Value is null) return request.Index.CreateError(this);
 
-            IndexEnumEntryDeklaration deklaration = new IndexEnumEntryDeklaration();
-            deklaration.Name = this.Token.Text;
-            deklaration.Value = this.Value;
-            deklaration.Use = this;
+            IndexEnumEntryDeklaration deklaration = new IndexEnumEntryDeklaration(this, this.Token.Text, this.Value);
 
             this.Deklaration = deklaration;
 

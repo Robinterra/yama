@@ -98,8 +98,7 @@ namespace Yama.Parser
             string? name = this.Token.Value.ToString ();
             if ( name is null ) return false;
             
-            IndexNamespaceDeklaration dek = new IndexNamespaceDeklaration();
-            dek.Name = name;
+            IndexNamespaceDeklaration dek = new IndexNamespaceDeklaration(this, name);
 
             dek = request.Index.NamespaceAdd(dek);
             this.Deklaration = dek;

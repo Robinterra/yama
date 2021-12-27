@@ -173,7 +173,7 @@ namespace Yama.Index
         public IndexMethodDeklaration ( IParseTreeNode use, string name, IndexVariabelnReference returnValue )
         {
             this.ParentUsesSet = new();
-            this.Container = new IndexContainer();
+            this.Container = new IndexContainer(use, name);
             this.ReturnValue = returnValue;
             this.Name = name;
             this.Use = use;

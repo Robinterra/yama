@@ -152,14 +152,6 @@ namespace Yama.Parser
 
             if (reference is null)
             {
-                reference = new IndexVariabelnDeklaration();
-                reference.Use = this;
-                reference.Name = this.Token.Text;
-                if (this.GenericDefintion != null)
-                {
-                    reference.GenericDeklaration = this.GenericDefintion;
-                    this.GenericDefintion.Indezieren(request);
-                }
                 if (this.TypeDefinition is null) return request.Index.CreateError(this);
 
                 this.TypeDefinition.Indezieren(request);
@@ -167,7 +159,13 @@ namespace Yama.Parser
                 IndexVariabelnReference? type = container.VariabelnReferences.LastOrDefault();
                 if (type is null) return request.Index.CreateError(this);
 
-                reference.Type = type;
+                reference = new IndexVariabelnDeklaration(this, this.Token.Text, type);
+
+                if (this.GenericDefintion != null)
+                {
+                    reference.GenericDeklaration = this.GenericDefintion;
+                    this.GenericDefintion.Indezieren(request);
+                }
 
                 this.Deklaration = reference;
             }

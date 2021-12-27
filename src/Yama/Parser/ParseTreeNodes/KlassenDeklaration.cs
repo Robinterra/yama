@@ -264,9 +264,7 @@ namespace Yama.Parser
             if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
             if (this.Statement is null) return request.Index.CreateError(this);
 
-            IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration();
-            deklaration.Name = this.Token.Text;
-            deklaration.Use = this;
+            IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration(this, this.Token.Text);
 
             if ( this.MemberModifier != null )
             {
@@ -324,6 +322,7 @@ namespace Yama.Parser
 
             foreach (IndexPropertyDeklaration m in this.Deklaration.IndexProperties)
             {
+                if (m.Klasse is null) continue;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
@@ -331,6 +330,7 @@ namespace Yama.Parser
 
             foreach (IndexPropertyDeklaration m in this.Deklaration.IndexStaticProperties)
             {
+                if (m.Klasse is null) continue;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
