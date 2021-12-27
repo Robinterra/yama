@@ -581,6 +581,7 @@ namespace Yama.Parser
             compilePushResult.Compile(compiler, null, "default");
 
             refCall = new CompileReferenceCall();
+            if (this.MallocFree.ParentCall is null) return false;
             refCall.Compile(compiler, this.MallocFree.ParentCall, "methode");
 
             CompileExecuteCall executeCall = new CompileExecuteCall();
@@ -602,6 +603,7 @@ namespace Yama.Parser
             compilePushResult.Compile(compiler, null, "default");
 
             CompileReferenceCall refCall = new CompileReferenceCall();
+            if (this.Malloc.ParentCall is null) return false;
             refCall.Compile(compiler, this.Malloc.ParentCall, "methode");
 
             CompileExecuteCall executeCall = new CompileExecuteCall();
