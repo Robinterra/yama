@@ -24,7 +24,7 @@ namespace Yama.Compiler
         } = new List<SSACompileLine>();
 
         //Die Letzte Reference, bei dem die Variable gesetzt wurde
-        public SSACompileLine Reference
+        public SSACompileLine? Reference
         {
             get;
             set;

@@ -9,13 +9,16 @@ namespace Yama.Compiler
 
     public class CompileContainer
     {
-        public CompileSprungPunkt Begin
+
+        #region get/set
+
+        public CompileSprungPunkt? Begin
         {
             get;
             set;
         }
 
-        public CompileSprungPunkt Ende
+        public CompileSprungPunkt? Ende
         {
             get;
             set;
@@ -51,7 +54,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public List<CompileContainer> Containers
         {
@@ -65,11 +68,15 @@ namespace Yama.Compiler
             set;
         } = new List<SSACompileLine>();
 
-        public SSACompileLine LoopLine
+        public SSACompileLine? LoopLine
         {
             get;
             set;
         }
+
+        #endregion get/set
+
+        #region methods
 
         public string AddDataCall(string jumpPoint, Compiler compiler)
         {
@@ -110,7 +117,7 @@ namespace Yama.Compiler
             return true;
         }
 
-        public Dictionary<string, SSAVariableMap> PopVarMap()
+        public Dictionary<string, SSAVariableMap>? PopVarMap()
         {
             if (this.StackVarMapper.Count == 0) return null;
 
@@ -134,6 +141,9 @@ namespace Yama.Compiler
 
             return false;
         }
+
+        #endregion methods
+
     }
 
 }

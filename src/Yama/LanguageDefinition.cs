@@ -534,12 +534,10 @@ namespace Yama
         {
             if (this.Definition == null) return false;
 
-            Compiler.Compiler compiler = new Compiler.Compiler();
+            Compiler.Compiler compiler = new Compiler.Compiler(this.Definition, this.Defines);
             compiler.OptimizeLevel = this.OptimizeLevel;
             compiler.OutputFile = this.OutputAssemblerFile;
-            compiler.Definition = this.Definition;
             compiler.MainFunction = main;
-            compiler.Defines = this.Defines;
             this.Definition.Compiler = compiler;
 
             this.InitCompilerIrPrinting(compiler);

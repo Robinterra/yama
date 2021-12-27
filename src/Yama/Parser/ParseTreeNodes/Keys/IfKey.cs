@@ -182,6 +182,7 @@ namespace Yama.Parser
             if (this.Condition is null) return false;
             if (this.IfContainer is null) return false;
             if (this.IfStatement is  null) return false;
+            if (request.Compiler.ContainerMgmt.CurrentContainer is null) return false;
 
             CompileContainer ifcontainer = new CompileContainer();
             ifcontainer.Begin = request.Compiler.ContainerMgmt.CurrentContainer.Begin;

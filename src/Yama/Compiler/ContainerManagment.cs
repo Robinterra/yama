@@ -6,13 +6,15 @@ namespace Yama.Compiler
     public class ContainerManagment
     {
 
-        public CompileContainer RootContainer
+        #region get/set
+
+        public CompileContainer? RootContainer
         {
             get;
             set;
         }
 
-        public CompileContainer CurrentContainer
+        public CompileContainer? CurrentContainer
         {
             get
             {
@@ -46,13 +48,13 @@ namespace Yama.Compiler
             set;
         } = new List<CompileContainer>();
 
-        public CompileContainer CurrentMethod
+        public CompileContainer? CurrentMethod
         {
             get;
             set;
         }
 
-        public CompileContainer CurrentLoop
+        public CompileContainer? CurrentLoop
         {
             get
             {
@@ -62,8 +64,14 @@ namespace Yama.Compiler
             }
         }
 
+        #endregion get/set
+
+        #region methods
+
         public string AddDataCall(string jumpPoint, Compiler compiler)
         {
+            if (this.CurrentContainer is null) return string.Empty;
+
             return this.CurrentContainer.AddDataCall(jumpPoint, compiler);
         }
 
@@ -75,5 +83,8 @@ namespace Yama.Compiler
 
             return true;
         }
+
+        #endregion methods
+
     }
 }

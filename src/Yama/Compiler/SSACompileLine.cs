@@ -9,7 +9,7 @@ namespace Yama.Compiler
 
         #region get/set
 
-        public SSACompileLine ReplaceLine
+        public SSACompileLine? ReplaceLine
         {
             get;
             set;

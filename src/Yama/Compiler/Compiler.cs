@@ -34,13 +34,13 @@ namespace Yama.Compiler
             set;
         }
 
-        public FileInfo OutputFile
+        public FileInfo? OutputFile
         {
             get;
             set;
         }
 
-        public StreamWriter Writer
+        public StreamWriter? Writer
         {
             get;
             set;
@@ -63,20 +63,60 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<ICompileRoot>();
-        public MethodeDeclarationNode MainFunction { get; internal set; }
-        public List<CompilerError> Errors { get; set; } = new List<CompilerError>();
 
-        public List<string> Defines { get; set; }
+        public MethodeDeclarationNode? MainFunction
+        {
+            get;
+            set;
+        }
+
+        public List<CompilerError> Errors
+        {
+            get;
+            set;
+        } = new List<CompilerError>();
+
+        public List<string> Defines
+        {
+            get;
+            set;
+        }
+
         public Optimize OptimizeLevel
         {
             get;
             set;
         }
-        public List<ICompileRoot> DataSequence { get; internal set; } = new List<ICompileRoot>();
-        public string LastVariableCall { get; internal set; }
-        public IndexVariabelnDeklaration CurrentThis { get; internal set; }
-        public IndexVariabelnDeklaration CurrentBase { get; internal set; }
-        public List<CompileContainer> Containers { get; private set; } = new List<CompileContainer>();
+
+        public List<ICompileRoot> DataSequence
+        {
+            get;
+            set;
+        } = new List<ICompileRoot>();
+
+        public string? LastVariableCall
+        {
+            get;
+            set;
+        }
+
+        public IndexVariabelnDeklaration? CurrentThis
+        {
+            get;
+            set;
+        }
+
+        public IndexVariabelnDeklaration? CurrentBase
+        {
+            get;
+            set;
+        }
+
+        public List<CompileContainer> Containers
+        {
+            get;
+            set;
+        } = new List<CompileContainer>();
 
         public List<SSACompileLine> SSALines
         {
@@ -84,7 +124,7 @@ namespace Yama.Compiler
             set;
         } = new List<SSACompileLine>();
 
-        public StreamWriter IRCodeStream
+        public StreamWriter? IRCodeStream
         {
             get;
             set;
@@ -92,12 +132,21 @@ namespace Yama.Compiler
 
         #endregion get/set
 
+        #region ctor
+
+        public Compiler(IProcessorDefinition definition, List<string> defines)
+        {
+            this.Defines = defines;
+            this.Definition = definition;
+        }
+
+        #endregion ctor
+
         #region methods
 
-        public CompileAlgo GetAlgo(string algoName, string mode)
+        public CompileAlgo? GetAlgo(string algoName, string mode)
         {
-            CompileAlgo result = this.Definition.Algos.FirstOrDefault(a=> a.Name == algoName && a.Mode == mode);
-
+            CompileAlgo? result = this.Definition.Algos.FirstOrDefault(a=> a.Name == algoName && a.Mode == mode);
             if (result != null) return result;
 
             this.AddError(string.Format("Der Algorithmus {0} mit dem Modus {1} konnte nicht gefunden werden!", algoName, mode));
@@ -125,11 +174,13 @@ namespace Yama.Compiler
             {
                 //this.ContainerMgmt.CurrentContainer.Lines.Add(line);
                 this.SSALines.Add(line);
+                if (this.ContainerMgmt.CurrentMethod is null) return line;
                 this.ContainerMgmt.CurrentMethod.Lines.Add(line);
 
                 return line;
             }
 
+            if (this.ContainerMgmt.CurrentContainer is null) return line;
             foreach (SSACompileLine existLine in this.ContainerMgmt.CurrentContainer.Lines)
             {
                 if (!existLine.Algo.Equals(line.Algo)) continue;
@@ -139,6 +190,7 @@ namespace Yama.Compiler
                 return existLine;
             }
 
+            if (this.ContainerMgmt.CurrentMethod is null) return line;
             this.ContainerMgmt.CurrentMethod.Lines.Add(line);
             this.SSALines.Add(line);
 
@@ -213,6 +265,7 @@ namespace Yama.Compiler
         public bool Compilen(List<IParseTreeNode> nodes)
         {
             if (this.Definition == null) return this.AddError("No assembler defintion for translating found");
+            if (this.MainFunction is null) return false;
             this.Definition.Compiler = this;
 
             this.SetNewContainer(new CompileContainer(), null);
@@ -290,6 +343,7 @@ namespace Yama.Compiler
 
         private bool TranslateIRCodeToAssemblerSequence()
         {
+            if (this.IRCodeStream is null) return false;
             if (this.OutputFile != null)
                 if (this.OutputFile.Exists) this.OutputFile.Delete();
 
@@ -325,7 +379,7 @@ namespace Yama.Compiler
                 this.AssemblerSequence.Remove(root);
             }
 
-            if (this.OutputFile != null)
+            if (this.OutputFile != null && this.Writer is not null)
                 this.Writer.Close();
 
             return this.Errors.Count == 0;
@@ -350,18 +404,16 @@ namespace Yama.Compiler
             return true;
         }*/
 
-        public bool AddError(string msg, IParseTreeNode node = null)
+        public bool AddError(string msg, IParseTreeNode? node = null)
         {
-            CompilerError error = new CompilerError();
-            error.Msg = msg;
-            error.Use = node;
+            CompilerError error = new CompilerError(msg, node);
 
             this.Errors.Add(error);
 
             return false;
         }
 
-        public bool SetNewContainer(CompileContainer compileContainer, ValidUses uses)
+        public bool SetNewContainer(CompileContainer compileContainer, ValidUses? uses)
         {
             this.ContainerMgmt.RootContainer = compileContainer;
             this.PushContainer(compileContainer, uses);
@@ -371,7 +423,7 @@ namespace Yama.Compiler
             return true;
         }
 
-        public bool PushContainer(CompileContainer compileContainer, ValidUses uses, bool isloop = false)
+        public bool PushContainer(CompileContainer compileContainer, ValidUses? uses, bool isloop = false)
         {
             this.ContainerMgmt.ContainerStack.Push(compileContainer);
             if (isloop) this.ContainerMgmt.LoopStack.Push(compileContainer);
@@ -380,11 +432,12 @@ namespace Yama.Compiler
 
             if (this.ContainerMgmt.CurrentMethod != null) this.ContainerMgmt.CurrentMethod.BeginNewContainerVars();
 
-            if (uses == null) return true;
+            if (uses is null) return true;
 
             foreach (IParent parent in uses.Deklarationen)
             {
                 if (!(parent is IndexVariabelnDeklaration dek)) continue;
+                if (this.ContainerMgmt.CurrentMethod is null) continue;
                 if (this.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(dek.Name)) continue;
 
                 SSAVariableMap map = new SSAVariableMap(dek);
@@ -400,11 +453,13 @@ namespace Yama.Compiler
             if (this.ContainerMgmt.ContainerStack.Count == 0) return true;
 
             CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
-            Dictionary<string, SSAVariableMap> containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
+            if (this.ContainerMgmt.CurrentMethod is null) return false;
+
+            Dictionary<string, SSAVariableMap>? containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
 
             bool isloop = false;
 
-            CompileContainer loop = this.ContainerMgmt.CurrentLoop;
+            CompileContainer? loop = this.ContainerMgmt.CurrentLoop;
             if (loop != null) if (isloop = loop.Equals(container)) this.ContainerMgmt.LoopStack.Pop();
 
             if (this.ContainerMgmt.CurrentContainer == null) return true;
@@ -444,13 +499,15 @@ namespace Yama.Compiler
             return true;
         }
 
-        private bool PopContainerIterationContainerMap(CompileContainer loop, bool isloop, Dictionary<string, SSAVariableMap> parentVarMap, KeyValuePair<string, SSAVariableMap> conMap)
+        private bool PopContainerIterationContainerMap(CompileContainer? loop, bool isloop, Dictionary<string, SSAVariableMap> parentVarMap, KeyValuePair<string, SSAVariableMap> conMap)
         {
             if (!parentVarMap.ContainsKey(conMap.Key)) return false;
             if (conMap.Value.Reference == null) return false;
 
             if (isloop)
             {
+                if (loop is null) return false;
+                if (loop.LoopLine is null) return false;
                 conMap.Value.Reference.LoopContainer = loop;
                 conMap.Value.Reference.Calls.Add(loop.LoopLine);
             }
@@ -465,6 +522,8 @@ namespace Yama.Compiler
             //if (containerMaps[orgMap.Key].Reference.ReplaceLine != null) this.CheckForCopy(containerMaps[orgMap.Key].Reference);
 
             SSAVariableMap orig = parentVarMap[conMap.Key];
+            if (orig.Reference is null) return false;
+
             foreach (SSACompileLine line in conMap.Value.AllSets)
             {
                 orig.Reference.PhiMap.AddRange(line.PhiMap);

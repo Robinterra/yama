@@ -373,9 +373,13 @@ namespace Yama.Parser
 
             compiler.Definition.ParaClean();
 
+            if (compileContainer.Begin is null) return false;
+
             compileContainer.Begin.Compile(compiler, this, "default");
 
             this.SetStatement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+
+            if (compileContainer.Ende is null) return false;
 
             compileContainer.Ende.Compile(compiler, this, "default");
 
@@ -409,9 +413,13 @@ namespace Yama.Parser
 
             compiler.Definition.ParaClean();
 
+            if (compileContainer.Begin is null) return false;
+
             compileContainer.Begin.Compile(compiler, this, "default");
 
             this.GetStatement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+
+            if (compileContainer.Ende is null) return false;
 
             compileContainer.Ende.Compile(compiler, this, "default");
 

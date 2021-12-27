@@ -4,19 +4,22 @@ namespace Yama.Compiler
 {
     public class CompileAlgo
     {
-        public string Name
+
+        #region get/set
+
+        public string? Name
         {
             get;
             set;
         }
 
-        public string Mode
+        public string? Mode
         {
             get;
             set;
         }
 
-        public string Description
+        public string? Description
         {
             get;
             set;
@@ -46,11 +49,18 @@ namespace Yama.Compiler
             set;
         }
 
+        #endregion get/set
+
+        #region ctor
+
         public CompileAlgo()
         {
             this.Keys = new List<AlgoKeyCall>();
             this.AssemblyCommands = new List<string>();
             this.PostKeys = new List<AlgoKeyCall>();
         }
+
+        #endregion ctor
+
     }
 }

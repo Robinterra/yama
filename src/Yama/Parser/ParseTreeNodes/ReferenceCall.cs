@@ -160,6 +160,7 @@ namespace Yama.Parser
             if (this.Reference.Deklaration is not IndexVariabelnDeklaration t) return false;
             if (t.Type.Deklaration is not IndexKlassenDeklaration u) return false;
             if (!u.IsMethodsReferenceMode) return false;
+            if (compiler.CurrentThis is null) return false;
 
             return compileReference.CompileDek(compiler, compiler.CurrentThis, moderesult);
         }
@@ -169,7 +170,11 @@ namespace Yama.Parser
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
             if (compiler.LastVariableCall != "base") compileReference.CompilePoint0(compiler);
-            else compileReference.CompileDek(compiler, compiler.CurrentBase, "default");
+            else
+            {
+                if (compiler.CurrentBase is null) return false;
+                compileReference.CompileDek(compiler, compiler.CurrentBase, "default");
+            }
 
             compileReference = new CompileReferenceCall();
 

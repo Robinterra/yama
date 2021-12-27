@@ -633,6 +633,8 @@ namespace Yama.Parser
         private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode, int count)
         {
             if (this.Statement is null) return false;
+            if (this.CompileContainer.Begin is null) return false;
+            if (this.CompileContainer.Ende is null) return false;
 
             this.CompileContainer.Begin.Compile(compiler, this, "default");
 
