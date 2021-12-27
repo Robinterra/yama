@@ -68,7 +68,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        public string AddDataCall(string jumpPoint, Compiler compiler)
+        public string? AddDataCall(string jumpPoint, Compiler compiler)
         {
             if (this.CurrentContainer is null) return string.Empty;
 

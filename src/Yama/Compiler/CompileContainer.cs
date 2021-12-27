@@ -78,7 +78,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        public string AddDataCall(string jumpPoint, Compiler compiler)
+        public string? AddDataCall(string jumpPoint, Compiler compiler)
         {
             DataHold dataHold = new DataHold();
 

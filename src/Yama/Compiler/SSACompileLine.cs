@@ -161,7 +161,8 @@ namespace Yama.Compiler
 
         private bool DoAllocateExist(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
         {
-            RegisterMap map = allocater.GetReferenceRegister(this, this);
+            RegisterMap? map = allocater.GetReferenceRegister(this, this);
+            if (map is null) return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
 
             this.Owner.PrimaryKeys.Add("[SSAPUSH]", map.Name);
 
@@ -190,13 +191,15 @@ namespace Yama.Compiler
             if (arg.Mode == SSACompileArgumentMode.JumpReference) return true;
             if (arg.Reference is null) return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
 
-            RegisterMap map = allocater.GetReferenceRegister(arg.Reference, this);
+            RegisterMap? map = allocater.GetReferenceRegister(arg.Reference, this);
             if (map == null) return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
 
             this.Owner.PrimaryKeys.Add(string.Format("[SSAPOP[{0}]]", counter), map.Name);
 
             if (map.Mode == RegisterUseMode.Free && this.Owner is CompileReferenceCall)
             {
+                if (map.Line is null) return false;
+
                 map.Line.Calls.AddRange(this.Calls);
                 map.Mode = RegisterUseMode.Used;
             }

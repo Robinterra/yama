@@ -256,6 +256,7 @@ namespace Yama.Compiler.Definition
 
             GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "JUMPHELPER");
             if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", "JUMPHELPER")); return null; }
+            if (keyPattern.Pattern is null) return null;
 
             string result = string.Format(keyPattern.Pattern, this.JumpCounter);
 
@@ -395,7 +396,8 @@ namespace Yama.Compiler.Definition
             string? text = query.Value.ToString();
             if (text is null) return null;
 
-            string pointer = this.Compiler!.ContainerMgmt.AddDataCall(text, this.Compiler);
+            string? pointer = this.Compiler!.ContainerMgmt.AddDataCall(text, this.Compiler);
+            if (pointer is null) return null;
 
             return new Dictionary<string, string> { { query.Key.Name, pointer }};
         }
@@ -413,6 +415,7 @@ namespace Yama.Compiler.Definition
 
             string keypattern = "[PROPERTY[{0}]]";
             Dictionary<string, string> result = new Dictionary<string, string>();
+            if (keyPattern.Pattern is null) return null;
 
             result.Add( string.Format(keypattern, 0), string.Format(keyPattern.Pattern, 0) );
 
@@ -454,6 +457,7 @@ namespace Yama.Compiler.Definition
 
                 counter = counter - count;
                 counter = counter * bytes;
+                if (keyPattern.Pattern is null) return null;
 
                 for (int i = 0; i < duration; i++ )
                 {
@@ -536,6 +540,7 @@ namespace Yama.Compiler.Definition
             if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
 
             if (query.Value is not int i) return null;
+            if (keyPattern.Pattern is null) return null;
 
             return string.Format( keyPattern.Pattern, i * this.AdressBytes );
         }
@@ -551,6 +556,7 @@ namespace Yama.Compiler.Definition
             if (query.Value is not int position) return null;
 
             if (this.Name == "arm-t32") position -= 1;
+            if (keyPattern.Pattern is null) return null;
 
             return string.Format( keyPattern.Pattern, (position) * this.AdressBytes );
         }
@@ -595,6 +601,7 @@ namespace Yama.Compiler.Definition
 
             if (dek.Zusatz == MethodeType.Static)
             {
+                if (keyPattern.Pattern is null) return null;
                 result.Add( string.Format(keypattern, 0), string.Format(keyPattern.Pattern, 0) );
 
                 return result;
@@ -616,6 +623,7 @@ namespace Yama.Compiler.Definition
 
                 for (int i = 0; i < duration; i++ )
                 {
+                    if (keyPattern.Pattern is null) return null;
                     result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i) );
                 }
 
@@ -698,6 +706,7 @@ namespace Yama.Compiler.Definition
                 int resultInt = wert & pattern;
 
                 resultInt = resultInt >> bitcounter;
+                if (keyPattern.Pattern is null) return null;
 
                 result.Add(string.Format(keypattern, counter), string.Format(keyPattern.Pattern, resultInt));
 
@@ -869,6 +878,7 @@ namespace Yama.Compiler.Definition
                 counter++;
             }*/
             if (query.Value is not int wert) return null;
+            if (keyPattern.Pattern is null) return null;
 
             return string.Format( keyPattern.Pattern, wert * this.AdressBytes );
         }
@@ -883,16 +893,19 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private string PopReg(IRegisterQuery query)
+        private string? PopReg(IRegisterQuery query)
         {
-            if (!(query.Value is List<string> t)) return null;
+            if (query.Value is not List<string> t) return null;
+            if (this.KeyPatterns is null) return null;
+            if (query.Key is null) return null;
 
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern is null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
             string result = string.Empty;
 
             foreach(string reg in t)
             {
+                if (keyPattern.Pattern is null) return null;
                 result = string.Format(keyPattern.Pattern, reg, result);
             }
 
@@ -901,16 +914,19 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private string PushReg(IRegisterQuery query)
+        private string? PushReg(IRegisterQuery query)
         {
             if (!(query.Value is List<string> t)) return null;
+            if (query.Key is null) return null;
+            if (this.KeyPatterns is null) return null;
 
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
             string result = string.Empty;
 
             foreach(string reg in t)
             {
+                if (keyPattern.Pattern is null) return null;
                 result = string.Format(keyPattern.Pattern, reg, result);
             }
 
@@ -923,9 +939,9 @@ namespace Yama.Compiler.Definition
         {
             foreach (FileInfo file in allFilesinUse)
             {
-                if (!file.Exists) return this.Compiler.AddError(string.Format("Extension {0} can not be found" , file.FullName));
+                if (!file.Exists) return this.Compiler!.AddError(string.Format("Extension {0} can not be found" , file.FullName));
 
-                if (!this.LoadExtension(file)) return this.Compiler.AddError(string.Format("Extension {0} can not be loaded" , file.FullName));
+                if (!this.LoadExtension(file)) return this.Compiler!.AddError(string.Format("Extension {0} can not be loaded" , file.FullName));
             }
 
             return true;
@@ -937,13 +953,14 @@ namespace Yama.Compiler.Definition
         {
             if ( file.Extension != ".json" ) return false;
 
-            List<GenericDefinition> definition = null;
+            List<GenericDefinition>? definition = null;
 
             using ( FileStream stream = file.OpenRead (  ) )
 
             definition = JsonSerializer.DeserializeAsync<List<GenericDefinition>> ( stream ).Result;
+            if (definition is null) return false;
 
-            GenericDefinition correctDefinition = definition.FirstOrDefault ( t=>t.Name == this.Name );
+            GenericDefinition? correctDefinition = definition.FirstOrDefault ( t=>t.Name == this.Name );
 
             if (correctDefinition == null)
             {
@@ -951,10 +968,13 @@ namespace Yama.Compiler.Definition
                 else return false;
             }
 
+            if (this.KeyPatterns is null) this.KeyPatterns = new List<GenericDefinitionKeyPattern>();
             if (correctDefinition.KeyPatterns != null) this.KeyPatterns.AddRange(correctDefinition.KeyPatterns);
 
+            if (this.AdvancedKeyReplaces is null) this.AdvancedKeyReplaces = new List<AdvancedKeyReplaces>();
             if (correctDefinition.AdvancedKeyReplaces != null) this.AdvancedKeyReplaces.AddRange(correctDefinition.AdvancedKeyReplaces);
 
+            if (this.Algos is null) this.Algos = new List<CompileAlgo>();
             if (correctDefinition.Algos != null) this.Algos.AddRange(correctDefinition.Algos);
 
             return true;
@@ -964,6 +984,8 @@ namespace Yama.Compiler.Definition
 
         public string GetRegister(int reg)
         {
+            if (this.AviableRegisters is null) return string.Empty;
+
             return this.AviableRegisters[reg];
         }
 
