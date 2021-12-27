@@ -301,7 +301,11 @@ namespace Yama.Index
             if (this.IsMapped) return true;
             if (this.InheritanceBase != null)
             {
-                if (this.InheritanceBase.Deklaration == null) return this.ThisUses.GetIndex.CreateError(this.Use, string.Format("Inheritance '{0}' Base Class is not found", this.InheritanceBase.Name));
+                if (this.InheritanceBase.Deklaration == null)
+                {
+                    if (this.ThisUses.GetIndex is null) return false;
+                    return this.ThisUses.GetIndex.CreateError(this.Use, string.Format("Inheritance '{0}' Base Class is not found", this.InheritanceBase.Name));
+                }
                 if (!((IndexKlassenDeklaration)this.InheritanceBase.Deklaration).IsMapped) return false;
             }
 

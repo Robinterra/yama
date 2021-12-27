@@ -173,6 +173,7 @@ namespace Yama.Index
 
             if (parentCall.Deklaration is IndexMethodDeklaration md) return this.MethodMappen(md, parentCall);
 
+            if (parentCall.ParentUsesSet.GetIndex is null) return false;
             return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / regular");
         }
 
@@ -208,7 +209,12 @@ namespace Yama.Index
             if (parentCall.Name == parentCall.Deklaration.Name) dek = this.GetStaticFound(md.Klasse);
             else dek = this.GetKlassenFound(md.Klasse, parentCall);
 
-            if (dek == null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / method");
+            if (dek == null)
+            {
+                if (parentCall.ParentUsesSet.GetIndex is null) return false;
+
+                return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / method");
+            }
 
             this.Deklaration = dek;
 
@@ -223,7 +229,12 @@ namespace Yama.Index
             //else 
 
             IParent? dek = this.GetKlassenFound(pgsd.ReturnValue.Deklaration as IndexKlassenDeklaration, parentCall);
-            if (dek is null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / prop dek");
+            if (dek is null)
+            {
+                if (parentCall.ParentUsesSet.GetIndex is null) return false;
+
+                return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / prop dek");
+            }
 
             this.Deklaration = dek;
 
@@ -239,7 +250,12 @@ namespace Yama.Index
 
             IParent? dek = this.GetKlassenFound(pd.Type.Deklaration as IndexKlassenDeklaration, parentCall);
 
-            if (dek is null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / property dek");
+            if (dek is null)
+            {
+                if (parentCall.ParentUsesSet.GetIndex is null) return false;
+
+                return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / property dek");
+            }
             this.Deklaration = dek;
 
             if (this.ParentCall != null) this.ParentCall.Mappen(this);
@@ -251,7 +267,12 @@ namespace Yama.Index
         {
             IParent? dek = this.GetEnumFound(ed);
 
-            if (dek is null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / enum dek");
+            if (dek is null)
+            {
+                if (parentCall.ParentUsesSet.GetIndex is null) return false;
+
+                return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / enum dek");
+            }
             this.Deklaration = dek;
 
             if (this.ParentCall != null) this.ParentCall.Mappen(this);
@@ -263,7 +284,12 @@ namespace Yama.Index
         {
             IParent? dek = this.GetStaticFound(kd);
 
-            if (dek is null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / call dek");
+            if (dek is null)
+            {
+                if (parentCall.ParentUsesSet.GetIndex is null) return false;
+
+                return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / call dek");
+            }
             this.Deklaration = dek;
 
             if (this.ParentCall != null) this.ParentCall.Mappen(this);
@@ -273,10 +299,20 @@ namespace Yama.Index
 
         private bool VariableDeklarationMappen(IndexVariabelnReference parentCall, IndexVariabelnDeklaration vd)
         {
-            if (vd.Type.Deklaration is not IndexKlassenDeklaration kdd) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no support type definition");
+            if (vd.Type.Deklaration is not IndexKlassenDeklaration kdd)
+            {
+                if (parentCall.ParentUsesSet.GetIndex is null) return false;
+
+                return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no support type definition");
+            }
 
             IParent? dek = this.GetKlassenFound(kdd, parentCall);
-            if (dek is null) return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / variable dek");
+            if (dek is null)
+            {
+                if (parentCall.ParentUsesSet.GetIndex is null) return false;
+
+                return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / variable dek");
+            }
             this.Deklaration = dek;
 
             this.ClassGenericDefinition = kdd.GenericDeklaration;
@@ -360,8 +396,8 @@ namespace Yama.Index
         public bool Mappen(ValidUses uses)
         {
             if ( this.IsMapped ) return true;
-
             if ( this.ChildUse != null ) return this.Mappen ( this.ChildUse );
+            if (uses.GetIndex is null) return false;
 
             this.Owner = uses.GetIndex.CurrentMethode;
 
@@ -399,7 +435,12 @@ namespace Yama.Index
 
         private bool VariableDeklarationMappen(IndexVariabelnDeklaration vd)
         {
-            if (vd.Type.Deklaration is not IndexKlassenDeklaration kdd) return this.ParentUsesSet.GetIndex.CreateError(this.Use, "no support type definition");
+            if (vd.Type.Deklaration is not IndexKlassenDeklaration kdd)
+            {
+                if (this.ParentUsesSet.GetIndex is null) return false;
+
+                 return this.ParentUsesSet.GetIndex.CreateError(this.Use, "no support type definition");
+            }
 
             this.GenericDeklaration = vd.GenericDeklaration;
             this.ClassGenericDefinition = kdd.GenericDeklaration;

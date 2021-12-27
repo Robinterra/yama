@@ -142,7 +142,11 @@ namespace Yama.Index
         public bool Mappen(ValidUses thisUses)
         {
             this.Index = thisUses.GetIndex;
-            if (!this.FindDeklaration()) return thisUses.GetIndex.CreateError(this.Use, "methoden declaretion can not be found");
+            if (!this.FindDeklaration())
+            {
+                if (thisUses.GetIndex is null) return false;
+                return thisUses.GetIndex.CreateError(this.Use, "methoden declaretion can not be found");
+            }
             if (this.Deklaration is null) return false;
             if (this.CallRef is null) return false;
 
@@ -150,13 +154,18 @@ namespace Yama.Index
 
             int expectedParaCount = this.Deklaration.Parameters.Count;
             if ( this.Use is NewKey ) expectedParaCount -= 1;
-            if ( expectedParaCount != this.ParametersCount) return thisUses.GetIndex.CreateError(this.CallRef.ParentCall == null ? this.Use : this.CallRef.ParentCall.Use, "parameter count is not equals with the declaration");
+            if ( expectedParaCount != this.ParametersCount)
+            {
+                if (thisUses.GetIndex is null) return false;
+                return thisUses.GetIndex.CreateError(this.CallRef.ParentCall == null ? this.Use : this.CallRef.ParentCall.Use, "parameter count is not equals with the declaration");
+            }
 
             int count = 0;
             for (int i = 0; i < this.Deklaration.Parameters.Count; i++)
             {
                 IndexVariabelnDeklaration dek = this.Deklaration.Parameters[i];
                 if (dek.Name == "this") continue;
+                if (thisUses.GetIndex is null) return false;
 
                 thisUses.GetIndex.IndexTypeSafeties.Add(new IndexParameterType(dek, this.Parameters[count], count, this.Deklaration, this.CallRef));
 

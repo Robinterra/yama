@@ -195,6 +195,8 @@ namespace Yama.Index
         public bool Mappen()
         {
             if (this.IsMapped) return false;
+            if (this.ThisUses.GetIndex is null) return false;
+
             this.ThisUses.GetIndex.CurrentMethode = this;
 
             if (this.SetContainer is not null) this.SetContainer.Mappen(this.SetUses);
@@ -206,6 +208,7 @@ namespace Yama.Index
         public bool PreMappen(ValidUses uses)
         {
             if (this.IsMapped) return false;
+            if (uses.GetIndex is null) return false;
 
             uses.GetIndex.CurrentMethode = this;
             this.ParentUsesSet = uses;

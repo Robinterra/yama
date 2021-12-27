@@ -48,7 +48,7 @@ namespace Yama.Index
 
                 foreach (IndexVariabelnDeklaration dek in this.VariabelnDeklarations)
                 {
-                    if (this.thisUses.Deklarationen.Exists(t=>t.Name == dek.Name)) this.thisUses.GetIndex.CreateError(dek.Use, "Die Deklaration kann nicht vorgenommen werden, eine Deklaration mit diesen Namen existiert schon");
+                    if (this.thisUses.Deklarationen.Exists(t=>t.Name == dek.Name)) this.thisUses.GetIndex?.CreateError(dek.Use, "Die Deklaration kann nicht vorgenommen werden, eine Deklaration mit diesen Namen existiert schon");
 
                     this.thisUses.Add(dek);
                 }

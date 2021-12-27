@@ -251,10 +251,7 @@ namespace Yama.Parser
             if (this.SetStatement is null) return request.Index.CreateError(this);
             if (this.TypeDefinition is null) return request.Index.CreateError(this);
 
-            IndexVektorDeklaration deklaration = new IndexVektorDeklaration();
-            deklaration.Use = this;
-            deklaration.Name = this.Token.Text;
-            deklaration.ReturnValue = this.GetReturnValueIndex(klasse, this.TypeDefinition);
+            IndexVektorDeklaration deklaration = new IndexVektorDeklaration(this, this.Token.Text, this.GetReturnValueIndex(klasse, this.TypeDefinition));
             this.Deklaration = deklaration;
 
             AccessModify access = AccessModify.Private;
@@ -378,6 +375,7 @@ namespace Yama.Parser
 
             bool isused = this.Deklaration.IsInUse(depth);
             if (isused) return true;
+            if (this.Deklaration.Klasse is null) return false;
             if (this.Deklaration.Klasse.InheritanceBase is null) return false;
             if (this.Deklaration.Klasse.InheritanceBase.Deklaration is not IndexKlassenDeklaration dek) return false;
 

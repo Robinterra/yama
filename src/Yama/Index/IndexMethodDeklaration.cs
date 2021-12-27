@@ -217,6 +217,7 @@ namespace Yama.Index
         {
             if (this.IsMapped) return false;
 
+            if (this.ThisUses.GetIndex is null) return false;
             this.ThisUses.GetIndex.CurrentMethode = this;
 
             this.Container.Mappen(this.ThisUses);
@@ -228,6 +229,7 @@ namespace Yama.Index
         {
             if (this.IsMapped) return false;
 
+            if (uses.GetIndex is null) return false;
             uses.GetIndex.CurrentMethode = this;
 
             this.ParentUsesSet = uses;
