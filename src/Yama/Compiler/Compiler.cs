@@ -146,6 +146,8 @@ namespace Yama.Compiler
 
         public CompileAlgo? GetAlgo(string algoName, string mode)
         {
+            if (this.Definition.Algos is null) return null;
+
             CompileAlgo? result = this.Definition.Algos.FirstOrDefault(a=> a.Name == algoName && a.Mode == mode);
             if (result != null) return result;
 

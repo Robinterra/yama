@@ -11,7 +11,7 @@ namespace Yama.Compiler
 
         #region get/set
 
-        string Name
+        string? Name
         {
             get;
             set;
@@ -29,7 +29,7 @@ namespace Yama.Compiler
             set;
         }
 
-        List<CompileAlgo> Algos
+        List<CompileAlgo>? Algos
         {
             get;
             set;
@@ -43,7 +43,7 @@ namespace Yama.Compiler
 
         // -----------------------------------------------
 
-        Compiler Compiler
+        Compiler? Compiler
         {
             get;
             set;
@@ -68,12 +68,12 @@ namespace Yama.Compiler
 
         int GetNextFreeRegister();
 
-        string PostKeyReplace(IRegisterQuery key);
+        string? PostKeyReplace(IRegisterQuery key);
 
-        Dictionary<string,string> KeyMapping(IRegisterQuery query);
+        Dictionary<string,string>? KeyMapping(IRegisterQuery query);
 
         bool ParaClean();
-        string GenerateJumpPointName();
+        string? GenerateJumpPointName();
         bool LoadExtensions(List<FileInfo> allFilesinUse);
         string GetRegister(int reg);
 

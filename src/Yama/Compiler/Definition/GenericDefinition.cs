@@ -18,7 +18,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public string Name
+        public string? Name
         {
             get;
             set;
@@ -82,7 +82,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public List<CompileAlgo> Algos
+        public List<CompileAlgo>? Algos
         {
             get;
             set;
@@ -90,7 +90,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public List<string> AviableRegisters
+        public List<string>? AviableRegisters
         {
             get;
             set;
@@ -98,7 +98,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public List<AdvancedKeyReplaces> AdvancedKeyReplaces
+        public List<AdvancedKeyReplaces>? AdvancedKeyReplaces
         {
             get;
             set;
@@ -106,7 +106,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public List<GenericDefinitionKeyPattern> KeyPatterns
+        public List<GenericDefinitionKeyPattern>? KeyPatterns
         {
             get;
             set;
@@ -160,7 +160,7 @@ namespace Yama.Compiler.Definition
         // -----------------------------------------------
 
         [System.Text.Json.Serialization.JsonIgnore]
-        public Compiler Compiler
+        public Compiler? Compiler
         {
             get;
             set;
@@ -190,6 +190,13 @@ namespace Yama.Compiler.Definition
         // -----------------------------------------------
 
         #region ctor
+
+        // -----------------------------------------------
+
+        public GenericDefinition()
+        {
+            this.RegisterUses = new();
+        }
 
         // -----------------------------------------------
 
@@ -243,10 +250,12 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public string GenerateJumpPointName()
+        public string? GenerateJumpPointName()
         {
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "JUMPHELPER");
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", "JUMPHELPER")); return null; }
+            if (this.KeyPatterns is null) return null;
+
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "JUMPHELPER");
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", "JUMPHELPER")); return null; }
 
             string result = string.Format(keyPattern.Pattern, this.JumpCounter);
 
@@ -257,8 +266,10 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public Dictionary<string,string> KeyMapping(IRegisterQuery query)
+        public Dictionary<string,string>? KeyMapping(IRegisterQuery query)
         {
+            if (query.Key is null) return null;
+
             if (query.Key.Values == null) query.Key.Values = new List<string>();
 
             if (query.Key.Name == "[VAR]") return this.VarQuery(query);
@@ -280,8 +291,12 @@ namespace Yama.Compiler.Definition
             return this.MakeAdvanedKeyReplaces(query);
         }
 
-        private Dictionary<string, string> MethodTag(IRegisterQuery query)
+        private Dictionary<string, string>? MethodTag(IRegisterQuery query)
         {
+            if (query.Key is null) return null;
+            if (query.Key.Values is null) return null;
+            if (query.Uses is null) return null;
+
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             foreach (string tag in query.Key.Values)
@@ -302,11 +317,11 @@ namespace Yama.Compiler.Definition
             {
                 if (!(parent is IndexKlassenDeklaration kd)) continue;
 
-                IMethode md = kd.StaticMethods.Find(t=>t.Tags.Contains(tag));
+                IMethode? md = kd.StaticMethods.Find(t=>t.Tags.Contains(tag));
                 if (!(md is IndexMethodDeklaration imd)) continue;
 
                 result.Add(string.Format(patternKey, tag), imd.AssemblyName);
-                imd.References.Add(null);
+                imd.References.Add(new IndexVariabelnReference(imd.Use, "tagReference"));
 
                 return true;
             }
@@ -326,7 +341,7 @@ namespace Yama.Compiler.Definition
 
             SSACompileArgument arg = new SSACompileArgument(request.Target);
 
-            this.Compiler.ContainerMgmt.StackArguments.Push(arg);
+            this.Compiler!.ContainerMgmt.StackArguments.Push(arg);
 
             request.Target.HasReturn = true;
 
@@ -335,13 +350,17 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string, string> DataContainerQuery(IRegisterQuery query)
+        private Dictionary<string, string>? DataContainerQuery(IRegisterQuery query)
         {
+            if (this.Compiler!.ContainerMgmt.CurrentContainer is null) return null;
+            if (query.Key is null) return null;
+            if (query.Key.Name is null) return null;
+
             List<DataHold> dataHolds = this.Compiler.ContainerMgmt.CurrentContainer.DataHolds;
 
             StringBuilder builder = new StringBuilder();
 
-            CompileAlgo algo = this.Compiler.GetAlgo("wordMarker", "default");
+            CompileAlgo? algo = this.Compiler.GetAlgo("wordMarker", "default");
             if (algo == null) return null;
 
             bool isfirst = true;
@@ -350,7 +369,8 @@ namespace Yama.Compiler.Definition
             {
                 if (!isfirst) builder.AppendLine();
 
-                string cmd = algo.AssemblyCommands.FirstOrDefault();
+                string? cmd = algo.AssemblyCommands.FirstOrDefault();
+                if (cmd is null) return null;
 
                 cmd = cmd.Replace("[JUMPTO]", dataHold.JumpPoint);
                 cmd = cmd.Replace("[DATA]", dataHold.DatenValue);
@@ -365,21 +385,31 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string, string> NameCallQuery(IRegisterQuery query)
+        private Dictionary<string, string>? NameCallQuery(IRegisterQuery query)
         {
-            Index.Index index = query.Uses.GetIndex;
+            //Index.Index? index = query.Uses.GetIndex;
+            if (query.Value is null) return null;
+            if (query.Key is null) return null;
+            if (query.Key.Name is null) return null;
 
-            string pointer = this.Compiler.ContainerMgmt.AddDataCall(query.Value.ToString(), this.Compiler);
+            string? text = query.Value.ToString();
+            if (text is null) return null;
+
+            string pointer = this.Compiler!.ContainerMgmt.AddDataCall(text, this.Compiler);
 
             return new Dictionary<string, string> { { query.Key.Name, pointer }};
         }
 
         // -----------------------------------------------
 
-        private Dictionary<string, string> Point0(IRegisterQuery query)
+        private Dictionary<string, string>? Point0(IRegisterQuery query)
         {
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            if (query.Key is null) return null;
+            if (query.Key.Name is null) return null;
+            if (this.KeyPatterns is null) return null;
+
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
 
             string keypattern = "[PROPERTY[{0}]]";
             Dictionary<string, string> result = new Dictionary<string, string>();
@@ -389,12 +419,18 @@ namespace Yama.Compiler.Definition
             return result;
         }
 
-        private Dictionary<string, string> FuncRef(IRegisterQuery query)
+        private Dictionary<string, string>? FuncRef(IRegisterQuery query)
         {
+            if (query.Key is null) return null;
+            if (query.Key.Name is null) return null;
+            if (this.KeyPatterns is null) return null;
+            if (query.Key.Values is null) return null;
+
             string keypattern = "[PROPERTY[{0}]]";
             bool isset = query.Kategorie == "setref";
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
             Dictionary<string,string> result = new Dictionary<string,string>();
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
@@ -403,6 +439,7 @@ namespace Yama.Compiler.Definition
             int count = 0;
 
             if (!(query.Value is IMethode dek)) return null;
+            if (dek.Klasse is null) return null;
 
             foreach (IMethode a in dek.Klasse.Methods)
             {
@@ -431,14 +468,19 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string, string> MakeAdvanedKeyReplaces(IRegisterQuery query)
+        private Dictionary<string, string>? MakeAdvanedKeyReplaces(IRegisterQuery query)
         {
+            if (this.AdvancedKeyReplaces is null) return null;
+            if (query.Key is null) return null;
+
             List<AdvancedKeyReplaces> foundedList = this.AdvancedKeyReplaces.Where(t=>t.Key == query.Key.Name).ToList();
             if (foundedList.Count == 0) return null;
 
             foreach (AdvancedKeyReplaces keymap in foundedList)
             {
                 if (!this.AdvancedKeyReplacesIsOk(keymap)) continue;
+                if (keymap.Key is null) continue;
+                if (keymap.Value is null) continue;
 
                 return new Dictionary<string, string> { { keymap.Key, keymap.Value } };
             }
@@ -452,15 +494,17 @@ namespace Yama.Compiler.Definition
         {
             if (keymap.Defines == null) return true;
             if (keymap.Defines.Count == 0) return true;
-            if (keymap.Defines.Any(t=>this.Compiler.Defines.Contains(t))) return true;
+            if (keymap.Defines.Any(t=>this.Compiler!.Defines.Contains(t))) return true;
 
             return false;
         }
 
         // -----------------------------------------------
 
-        public string PostKeyReplace(IRegisterQuery query)
+        public string? PostKeyReplace(IRegisterQuery query)
         {
+            if (query.Key is null) return null;
+
             if (query.Key.Name == "[PUSHREG]") return this.PushReg(query);
             if (query.Key.Name == "[POPREG]") return this.PopReg(query);
             if (query.Key.Name == "[VARCOUNT]") return this.VarCountQuery(query);
@@ -469,12 +513,12 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[virtuelRegister]") return this.StackCountQuery(query);
             if (query.Key.Name == "[stackpushcount]") return this.StackPushCount(query);
 
-            this.Compiler.AddError("Post Key not supported");
+            this.Compiler!.AddError("Post Key not supported");
 
             return null;
         }
 
-        private string StackPushCount(IRegisterQuery query)
+        private string? StackPushCount(IRegisterQuery query)
         {
             if (!(query.Value is List<string> t)) return null;
 
@@ -483,20 +527,29 @@ namespace Yama.Compiler.Definition
             return this.StackCountQuery(query);
         }
 
-        private string StackCountQuery(IRegisterQuery query)
+        private string? StackCountQuery(IRegisterQuery query)
         {
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            if (this.KeyPatterns is null) return null;
+            if (query.Key is null) return null;
 
-            return string.Format( keyPattern.Pattern, ((int)query.Value) * this.AdressBytes );
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
+            if (query.Value is not int i) return null;
+
+            return string.Format( keyPattern.Pattern, i * this.AdressBytes );
         }
 
-        private string StackPositionQuery(IRegisterQuery query)
+        private string? StackPositionQuery(IRegisterQuery query)
         {
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            if (this.KeyPatterns is null) return null;
+            if (query.Key is null) return null;
 
-            int position = (int)query.Value;
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
+            if (query.Value is not int position) return null;
+
             if (this.Name == "arm-t32") position -= 1;
 
             return string.Format( keyPattern.Pattern, (position) * this.AdressBytes );
@@ -508,18 +561,30 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string, string> NameQuery(IRegisterQuery query)
+        private Dictionary<string, string>? NameQuery(IRegisterQuery query)
         {
-            return new Dictionary<string, string> { { query.Key.Name, query.Value.ToString() }};
+            if (query.Value is null) return null;
+            if (query.Key is null) return null;
+            if (query.Key.Name is null) return null;
+
+            string? value = query.Value.ToString();
+            if (value is null) return null;
+
+            return new Dictionary<string, string> { { query.Key.Name, value }};
         }
 
         // -----------------------------------------------
 
-        private Dictionary<string, string> PropertyQuery(IRegisterQuery query)
+        private Dictionary<string, string>? PropertyQuery(IRegisterQuery query)
         {
+            if (this.KeyPatterns is null) return null;
+            if (query.Key is null) return null;
+            if (query.Key.Values is null) return null;
+
             string keypattern = "[PROPERTY[{0}]]";
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
             Dictionary<string,string> result = new Dictionary<string,string>();
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
@@ -534,6 +599,7 @@ namespace Yama.Compiler.Definition
 
                 return result;
             }
+            if (dek.Klasse is null) return null;
 
             if (dek.Klasse.IsMethodsReferenceMode) counter += 1;
 
@@ -561,28 +627,38 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string,string> JumpToQuery(IRegisterQuery query)
+        private Dictionary<string,string>? JumpToQuery(IRegisterQuery query)
         {
+            if (query.Key is null) return null;
+            if (query.Key.Name is null) return null;
+
             if (query.Key.Values != null && query.Key.Values.Count > 0) return this.JumpToQueryWithValues(query);
             if (!(query.Value is CompileSprungPunkt t))
                 return null;
 
-            t.Add(this.Compiler, t);
+            t.Add(this.Compiler!, t);
 
             return new Dictionary<string, string> { { query.Key.Name, t.JumpPointName } };
         }
 
         // -----------------------------------------------
 
-        private Dictionary<string, string> JumpToQueryWithValues(IRegisterQuery query)
+        private Dictionary<string, string>? JumpToQueryWithValues(IRegisterQuery query)
         {
+            if (query.Key is null) return null;
+            if (query.Key.Values is null) return null;
+            if (query.Key.Values.Count == 0) return null;
+
             string pattern = "[JUMPTO[{0}]]";
             int duration = Convert.ToInt32(query.Key.Values[0]);
             Dictionary<string, string> result = new Dictionary<string, string>();
 
-            for (int i=0; i < duration; i++)
+            for (int i = 0; i < duration; i++)
             {
-                result.Add(string.Format(pattern, i), this.GenerateJumpPointName());
+                string? jumpointname = this.GenerateJumpPointName();
+                if (jumpointname is null) return null;
+
+                result.Add(string.Format(pattern, i), jumpointname);
             }
 
             return result;
@@ -590,14 +666,19 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string,string> MethodeNumConst(IRegisterQuery query)
+        private Dictionary<string,string>? MethodeNumConst(IRegisterQuery query)
         {
+            if (this.KeyPatterns is null) return null;
+            if (query.Key is null) return null;
+
             Dictionary<string, string> result = new Dictionary<string, string>();
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
             string keypattern = "[NUMCONST[{0}]]";
 
-            int wert = (int)query.Value;
+            if (query.Value is not int wert) return null;
+
             int vorlage = 0xFF;
             int pattern = 0;
             int bitcounter = 0;
@@ -631,8 +712,12 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string,string> MethodePara(IRegisterQuery query)
+        private Dictionary<string,string>? MethodePara(IRegisterQuery query)
         {
+            if (query.Key is null) return null;
+            if (query.Key.Values is null) return null;
+            if (this.AviableRegisters is null) return null;
+
             string keypattern = "[PARA[{0}]]";
             Dictionary<string, string> result = new Dictionary<string, string>();
 
@@ -645,7 +730,7 @@ namespace Yama.Compiler.Definition
                 this.CurrentWorkingRegister += bytes;
 
                 if (registerStart > this.WorkingRegisterLast)
-                { this.Compiler.AddError("Arbeitsregister voll Ausgelastet"); return null; }
+                { this.Compiler!.AddError("Arbeitsregister voll Ausgelastet"); return null; }
 
                 string reg = this.AviableRegisters[registerStart];
 
@@ -659,20 +744,22 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string,string> SsaPop(IRegisterQuery query)
+        private Dictionary<string,string>? SsaPop(IRegisterQuery query)
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             if (!(query.Value is RequestSSAArgument request)) return result;
+            if (query.Key is null) return null;
+            if (query.Key.Values is null) return null;
 
-            string countStr = query.Key.Values.FirstOrDefault();
+            string? countStr = query.Key.Values.FirstOrDefault();
             int count = Convert.ToInt32(countStr);
 
             for (int i = 0; i < count; i++)
             {
                 try
                 {
-                    SSACompileArgument arg = this.Compiler.ContainerMgmt.StackArguments.Pop();
+                    SSACompileArgument arg = this.Compiler!.ContainerMgmt.StackArguments.Pop();
 
                     request.Target.AddArgument(arg);
                 }
@@ -687,8 +774,12 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private Dictionary<string,string> RegisterQuery(IRegisterQuery query)
+        private Dictionary<string,string>? RegisterQuery(IRegisterQuery query)
         {
+            if (query.Key is null) return null;
+            if (query.Key.Values is null) return null;
+            if (this.AviableRegisters is null) return null;
+
             string keypattern = "[REG[{0}]]";
             Dictionary<string,string> result = new Dictionary<string,string>();
 
@@ -703,7 +794,7 @@ namespace Yama.Compiler.Definition
                 int registerStart = this.CurrentPlaceToKeepRegister;
                 this.CurrentPlaceToKeepRegister += einzelbyte;
 
-                if (registerStart < this.PlaceToKeepRegisterStart ) { this.Compiler.AddError("Ablageregister voll Ausgelastet"); return null; }
+                if (registerStart < this.PlaceToKeepRegisterStart ) { this.Compiler!.AddError("Ablageregister voll Ausgelastet"); return null; }
 
                 string reg = this.AviableRegisters[registerStart];
 
@@ -758,10 +849,13 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private string VarCountQuery(IRegisterQuery query)
+        private string? VarCountQuery(IRegisterQuery query)
         {
-            GenericDefinitionKeyPattern keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
-            if (keyPattern == null) { this.Compiler.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+            if (query.Key is null) return null;
+            if (this.KeyPatterns is null) return null;
+
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == query.Key.Name);
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
 
             /*Dictionary<string,string> result = new Dictionary<string,string>();
             int bytes = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
@@ -774,8 +868,9 @@ namespace Yama.Compiler.Definition
 
                 counter++;
             }*/
+            if (query.Value is not int wert) return null;
 
-            return string.Format( keyPattern.Pattern, ((int)query.Value) * this.AdressBytes );
+            return string.Format( keyPattern.Pattern, wert * this.AdressBytes );
         }
 
         // -----------------------------------------------
