@@ -100,6 +100,8 @@ namespace Yama.Index
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
 
+                if (this.ReturnValue.Deklaration is null) return this.thisUses;
+
                 IndexVariabelnReference varref = new IndexVariabelnReference (this.Use, this.ReturnValue.Deklaration.Name) { Deklaration = this.ReturnValue.Deklaration };
                 IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration(this.Use, "invalue", varref);
 

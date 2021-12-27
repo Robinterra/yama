@@ -577,7 +577,10 @@ namespace Yama.Parser
             refCall.Compile(compiler, this.MallocFree.ParentCall, "methode");
 
             CompileExecuteCall executeCall = new CompileExecuteCall();
-            executeCall.Compile(compiler, (MethodeDeclarationNode)this.MallocFree.ParentCall.Deklaration.Use);
+            if (this.MallocFree.ParentCall.Deklaration is null) return false;
+            if (this.MallocFree.ParentCall.Deklaration.Use is not MethodeDeclarationNode md) return false;
+
+            executeCall.Compile(compiler, md);
 
             return compiler.Definition.ParaClean();
         }
@@ -599,7 +602,10 @@ namespace Yama.Parser
             refCall.Compile(compiler, this.Malloc.ParentCall, "methode");
 
             CompileExecuteCall executeCall = new CompileExecuteCall();
-            executeCall.Compile(compiler, (MethodeDeclarationNode)this.Malloc.ParentCall.Deklaration.Use);
+            if (this.Malloc.ParentCall.Deklaration is null) return false;
+            if (this.Malloc.ParentCall.Deklaration.Use is not MethodeDeclarationNode md) return false;
+
+            executeCall.Compile(compiler, md);
 
             IndexVariabelnDeklaration? dek = this.Deklaration.Parameters.FirstOrDefault(t=>t.Name == "this");
             if (dek is null) return false;

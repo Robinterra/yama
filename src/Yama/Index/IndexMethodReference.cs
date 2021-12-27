@@ -93,6 +93,7 @@ namespace Yama.Index
         private bool OverrideMethodsDeklaration(IndexVariabelnReference functionRef, IndexMethodDeklaration firstDek)
         {
             if (this.Index is null) return false;
+            if (functionRef.OverloadMethods is null) return true;
 
             foreach (IMethode methode in functionRef.OverloadMethods)
             {

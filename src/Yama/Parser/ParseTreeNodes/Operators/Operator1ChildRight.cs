@@ -198,6 +198,7 @@ namespace Yama.Parser
         {
             if (this.Reference is null) return false;
             if (this.ChildNode is null) return false;
+            if (this.Reference.Deklaration is null) return false;
 
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {

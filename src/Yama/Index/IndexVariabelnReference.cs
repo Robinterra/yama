@@ -19,13 +19,13 @@ namespace Yama.Index
             set;
         }
 
-        public IParent Deklaration
+        public IParent? Deklaration
         {
             get;
             set;
         }
 
-        public IParent Owner
+        public IParent? Owner
         {
             get;
             set;
@@ -82,6 +82,8 @@ namespace Yama.Index
         {
             get
             {
+                if (this.Deklaration is null) return "null";
+
                 if (this.Deklaration is IndexMethodDeklaration t) return t.AssemblyName;
                 if (this.Deklaration is IndexPropertyDeklaration pd) return pd.AssemblyName;
                 //if (this.Deklaration is IndexPropertyGetSetDeklaration pgsd) return pgsd.AssemblyName;
@@ -96,25 +98,25 @@ namespace Yama.Index
             set;
         }
 
-        public GenericCall GenericDeklaration
+        public GenericCall? GenericDeklaration
         {
             get;
             set;
         }
 
-        public GenericCall ClassGenericDefinition
+        public GenericCall? ClassGenericDefinition
         {
             get;
             set;
         }
 
-        public IndexVariabelnReference RefCombination
+        public IndexVariabelnReference? RefCombination
         {
             get;
             set;
         }
 
-        public IndexVariabelnReference ChildUse
+        public IndexVariabelnReference? ChildUse
         {
             get;
             set;
@@ -128,6 +130,7 @@ namespace Yama.Index
         {
             this.Use = use;
             this.Name = name;
+            this.ParentUsesSet = new();
             this.VariabelnReferences = new List<IndexVariabelnReference>();
         }
 
@@ -185,7 +188,10 @@ namespace Yama.Index
         {
             IParent? dek = null;
 
-            if (this.IsOperator) dek = this.GetStaticFound((IndexKlassenDeklaration)md.ReturnValue.Deklaration);
+            if (this.IsOperator && md.ReturnValue.Deklaration is IndexKlassenDeklaration klasse)
+            {
+                dek = this.GetStaticFound(klasse);
+            }
 
             if (dek != null)
             {
@@ -197,6 +203,7 @@ namespace Yama.Index
             }
 
             if (md.Klasse is null) return false;
+            if (parentCall.Deklaration is null) return false;
 
             if (parentCall.Name == parentCall.Deklaration.Name) dek = this.GetStaticFound(md.Klasse);
             else dek = this.GetKlassenFound(md.Klasse, parentCall);

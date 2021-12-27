@@ -203,6 +203,7 @@ namespace Yama.Parser
             CompileReferenceCall referenceCall = new CompileReferenceCall();
             referenceCall.CompileData(request.Compiler, this, t.DataRef.JumpPointName);
 
+            if (this.EqualsReference.Deklaration is null) return false;
             if (this.EqualsReference.Deklaration.Use is not MethodeDeclarationNode mdn) return false;
 
             this.CompileCopy(request.Compiler, request.Mode, mdn);
@@ -221,6 +222,7 @@ namespace Yama.Parser
             CompileNumConst compileNumConst = new CompileNumConst ();
             compileNumConst.Compile(request.Compiler, new Number { Token = this.Token }, request.Mode);
 
+            if (this.EqualsReference.Deklaration is null) return false;
             if (this.EqualsReference.Deklaration.Use is not MethodeDeclarationNode mdn) return false;
 
             this.CompileCopy(request.Compiler, request.Mode, mdn);

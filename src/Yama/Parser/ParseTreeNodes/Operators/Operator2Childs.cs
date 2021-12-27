@@ -209,6 +209,7 @@ namespace Yama.Parser
             }
 
             if (this.Reference is null) return false;
+            if (this.Reference.Deklaration is null) return false;
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {
                 bool isok = this.CompileCopy(request.Compiler, request.Mode, t);
