@@ -30,13 +30,7 @@ namespace Yama.Assembler.Runtime
         {
             get;
             set;
-        }
-
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
+        } = new byte[0];
         public int Size
         {
             get;
@@ -55,6 +49,7 @@ namespace Yama.Assembler.Runtime
 
         public CommandF3List(string key, string format, uint id, int size, int max)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -79,7 +74,9 @@ namespace Yama.Assembler.Runtime
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
             if (!(request.Node is CommandWithList t)) return false;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
 

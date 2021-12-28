@@ -30,13 +30,7 @@ namespace Yama.Assembler.Runtime
         {
             get;
             set;
-        }
-
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
+        } = new byte[0];
         public int Size
         {
             get;
@@ -60,6 +54,7 @@ namespace Yama.Assembler.Runtime
 
         public CommandJumpPoint(string key, string format, uint id, int size, uint max, uint condition = 0)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -86,7 +81,11 @@ namespace Yama.Assembler.Runtime
             if (!(request.Node is CommandWith1ArgNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
-            JumpPointMapper map = request.Assembler.GetJumpPoint(t.Argument0.Token.Value.ToString());
+            string? datenstring = null;
+            if (t.Argument0.Token.Value is not null) datenstring = t.Argument0.Token.Value.ToString();
+            if (datenstring is null) return false;
+
+            JumpPointMapper? map = request.Assembler.GetJumpPoint(datenstring);
             if (map == null) return false;
 
             uint target = request.Assembler.BuildJumpSkipper(request.Position, map.Adresse, (uint)this.Size, true);
@@ -101,7 +100,9 @@ namespace Yama.Assembler.Runtime
                 if (target < smaleentity) return false;
             }
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.Arguments.Add(this.Condition);
