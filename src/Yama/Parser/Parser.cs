@@ -204,7 +204,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public Parser ( FileInfo file, List<ParserLayer> layers, Lexer.Lexer lexer )
+        public Parser ( FileInfo? file, List<ParserLayer> layers, Lexer.Lexer lexer )
             : this ( layers, lexer )
         {
             this.Fileinfo = file;

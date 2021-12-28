@@ -6,6 +6,9 @@ namespace Yama.Assembler
 {
     public class AssemblerCompilerMap
     {
+
+        #region get/set
+
         public ICompileRoot Root
         {
             get;
@@ -17,5 +20,17 @@ namespace Yama.Assembler
             get;
             set;
         }
+
+        #endregion get/set
+
+        #region ctor
+
+        public AssemblerCompilerMap(ICompileRoot root, List<IParseTreeNode> nodes)
+        {
+            this.Root = root;
+            this.Nodes = nodes;
+        }
+
+        #endregion ctor
     }
 }

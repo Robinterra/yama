@@ -7,19 +7,22 @@ namespace Yama.Assembler
 {
     public class RequestAssemble
     {
-        public FileInfo InputFile
+
+        #region get/set
+
+        public FileInfo? InputFile
         {
             get;
             set;
         }
 
-        public List<ICompileRoot> Roots
+        public List<ICompileRoot>? Roots
         {
             get;
             set;
         }
 
-        public Stream Stream
+        public Stream? Stream
         {
             get;
             set;
@@ -30,10 +33,23 @@ namespace Yama.Assembler
             get;
             set;
         }
+
         public bool IsSkipper
         {
             get;
             set;
         }
+
+        #endregion get/set
+
+        #region ctor
+
+        public RequestAssemble()
+        {
+
+        }
+
+        #endregion ctor
+
     }
 }

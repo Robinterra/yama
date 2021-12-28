@@ -6,6 +6,9 @@ namespace Yama.Assembler
 {
     public class RequestAssembleCommand
     {
+
+        #region get/set
+
         public IParseTreeNode Node
         {
             get;
@@ -35,10 +38,27 @@ namespace Yama.Assembler
             get;
             set;
         } = new List<ICommand>();
+
         public uint Position
         {
             get;
             set;
         }
+
+        #endregion get/set
+
+        #region ctor
+
+        public RequestAssembleCommand(IParseTreeNode node, Assembler assembler, Stream stream, bool withMapper, uint position)
+        {
+            this.Node = node;
+            this.Assembler = assembler;
+            this.Stream = stream;
+            this.WithMapper = withMapper;
+            this.Position = position;
+        }
+
+        #endregion ctor
+
     }
 }

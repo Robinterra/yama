@@ -21,7 +21,7 @@ namespace Yama.Assembler
             set;
         }
 
-        public AssemblerCompilerMap Map
+        public AssemblerCompilerMap? Map
         {
             get;
             set;

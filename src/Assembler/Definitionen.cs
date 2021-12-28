@@ -68,7 +68,7 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public Parser.Parser GetParser(FileInfo file)
+        public Parser.Parser GetParser(FileInfo? file)
         {
             Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
             p.ErrorNode = new ParserError();
@@ -308,8 +308,10 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public Assembler GenerateAssembler(Assembler assembler, string name)
+        public Assembler? GenerateAssembler(Assembler? assembler, string name)
         {
+            if (assembler is null) return null;
+
             if (name == "arm-t32") return this.GenerateArmT32Assembler(assembler);
             if (name == "runtime") return this.GenerateRuntime(assembler);
 

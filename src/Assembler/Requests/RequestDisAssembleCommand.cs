@@ -2,12 +2,12 @@ namespace Yama.Assembler
 {
     public class RequestDisAssembleCommand
     {
-        public Assembler Assembler
+        public Assembler? Assembler
         {
             get;
             set;
         }
-        public string Command
+        public string? Command
         {
             get;
             set;

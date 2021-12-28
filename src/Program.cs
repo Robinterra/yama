@@ -154,7 +154,7 @@ namespace Yama
         private static bool Assemble ( List<ICommandLine> commands )
         {
             Definitionen def = new Definitionen();
-            Assembler.Assembler assembler = new Assembler.Assembler();
+            Assembler.Assembler? assembler = new Assembler.Assembler();
             RequestAssemble request = new RequestAssemble();
             if (Program.yama == null) Program.yama = new LanguageDefinition();
 
@@ -162,7 +162,7 @@ namespace Yama
             {
                 if (command is DefinitionExpression) assembler = def.GenerateAssembler ( assembler, command.Value! );
                 if (command is FileExpression) request.InputFile = new FileInfo ( command.Value! );
-                if (command is SkipExpression) assembler.Position = Program.ParseSkipExpressionHex(command.Value!);
+                if (command is SkipExpression && assembler is not null) assembler.Position = Program.ParseSkipExpressionHex(command.Value!);
                 if (command is OutputFileExpression)
                 {
                     FileInfo file = new FileInfo ( command.Value! );
@@ -179,12 +179,12 @@ namespace Yama
                 request.Stream = file.OpenWrite();
             }
 
-            if ( assembler == null )
+            if (assembler?.Definition == null) assembler = def.GenerateAssembler ( assembler, "runtime" );
+            if (assembler is null)
             {
                 Console.Error.WriteLine("No definition found!");
                 return false;
             }
-            if (assembler.Definition == null) assembler = def.GenerateAssembler ( assembler, "runtime" );
 
             bool isok = assembler.Assemble(request);
 
