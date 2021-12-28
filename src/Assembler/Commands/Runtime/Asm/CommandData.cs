@@ -30,13 +30,7 @@ namespace Yama.Assembler.Runtime
         {
             get;
             set;
-        }
-
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
+        } = new byte[0];
 
         public int Size
         {
@@ -56,7 +50,9 @@ namespace Yama.Assembler.Runtime
 
         public CommandData()
         {
-
+            this.Key = string.Empty;
+            this.Format = string.Empty;
+            this.Node = new ParserError();
         }
 
         public CommandData(CommandData t, IParseTreeNode node, List<byte> bytes)

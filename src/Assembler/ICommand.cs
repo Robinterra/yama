@@ -40,12 +40,6 @@ namespace Yama.Assembler
             set;
         }
 
-        ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
-
         bool Assemble(RequestAssembleCommand request);
 
         bool Identify(RequestIdentify request);
