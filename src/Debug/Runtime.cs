@@ -88,7 +88,7 @@ namespace Yama.Debug
 
         // -----------------------------------------------
 
-        public FileInfo Input
+        public FileInfo? Input
         {
             get;
             set;
@@ -181,6 +181,7 @@ namespace Yama.Debug
 
         public Runtime()
         {
+            this.Memory = new byte[0];
             this.Init();
         }
 
@@ -374,6 +375,8 @@ namespace Yama.Debug
 
         private bool ReadFile()
         {
+            if (this.Input is null) return false;
+
             this.Memory = new byte[this.MemorySize];
 
             Array.Copy(File.ReadAllBytes(this.Input.FullName), this.Memory, this.Input.Length);
@@ -388,6 +391,8 @@ namespace Yama.Debug
 
         private uint MakeArguments()
         {
+            if (this.Input is null) return 0;
+
             uint length = (uint)this.Input.Length;
             uint adresseArgumentsArray = length;
             this.Register[1] = adresseArgumentsArray;
@@ -470,7 +475,7 @@ namespace Yama.Debug
 
         private bool PrintCmdFromSequence(uint index)
         {
-            IParseTreeNode node = this.FindSequence((int)index);
+            IParseTreeNode? node = this.FindSequence((int)index);
             if (node == null) return this.WriteError("Out of bounds");;
 
             Console.Write("{0}: {1} ", node.Token.Line, node.Token.Text);
@@ -485,8 +490,10 @@ namespace Yama.Debug
             return true;
         }
 
-        private IParseTreeNode FindSequence(int index)
+        private IParseTreeNode? FindSequence(int index)
         {
+            if (this.Sequence is null) return null;
+
             int counter = 0;
             foreach (Assembler.ICommand command in this.Sequence)
             {
@@ -511,7 +518,8 @@ namespace Yama.Debug
             while (notContinue)
             {
                 Console.Write("> ");
-                string cmd = Console.ReadLine();
+                string? cmd = Console.ReadLine();
+                if (cmd is null) continue;
 
                 if (cmd == "continue")
                 {
@@ -584,7 +592,7 @@ namespace Yama.Debug
         private bool Inspect()
         {
             Console.Write("inspect> ");
-            string cmd = Console.ReadLine();
+            string? cmd = Console.ReadLine();
 
             return true;
         }
