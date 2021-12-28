@@ -2,6 +2,9 @@ namespace Yama.Assembler
 {
     public class JumpPointMapper
     {
+
+        #region get/set
+
         public uint Adresse
         {
             get;
@@ -13,5 +16,18 @@ namespace Yama.Assembler
             get;
             set;
         }
+
+        #endregion get/set
+
+        #region ctor
+
+        public JumpPointMapper(uint adresse, string key)
+        {
+            this.Adresse = adresse;
+            this.Key = key;
+        }
+
+        #endregion ctor
+
     }
 }

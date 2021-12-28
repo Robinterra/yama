@@ -27,7 +27,7 @@ namespace LearnCsStuf.CommandLines
 
         // -----------------------------------------------
 
-        public ICommandLine Default
+        public ICommandLine? Default
         {
             get;
             set;
@@ -35,7 +35,7 @@ namespace LearnCsStuf.CommandLines
 
         // -----------------------------------------------
 
-        private ICommandLine LastCommand
+        private ICommandLine? LastCommand
         {
             get;
             set;
@@ -53,6 +53,7 @@ namespace LearnCsStuf.CommandLines
 
         public ParseCommandLine()
         {
+            this.CommandLines = new();
             this.Result = new List<ICommandLine> (  );
         }
 
@@ -75,9 +76,12 @@ namespace LearnCsStuf.CommandLines
 
         private bool SetLastCommandValue ( string arg )
         {
-                this.LastCommand.Value = arg;
-                this.LastCommand = null;
-                return true;
+            if (this.LastCommand is null) return false;
+
+            this.LastCommand.Value = arg;
+            this.LastCommand = null;
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -92,7 +96,7 @@ namespace LearnCsStuf.CommandLines
             {
                 if (command == null) continue;
 
-                ICommandLine test = command.Check ( arg );
+                ICommandLine? test = command.Check ( arg );
 
                 if ( test == null ) continue;
 
@@ -105,7 +109,8 @@ namespace LearnCsStuf.CommandLines
 
             if (this.Default == null) return false;
 
-            ICommandLine result = this.Default.Check(this.Default.Key);
+            ICommandLine? result = this.Default.Check(this.Default.Key);
+            if (result is null) return false;
 
             result.Value = arg;
 
@@ -134,7 +139,7 @@ namespace LearnCsStuf.CommandLines
 
         // -----------------------------------------------
 
-        public static bool TestArg(string arg, string para, ref string Variable)
+        public static bool TestArg(string arg, string para, ref string? Variable)
         {
             string Test = arg.Replace(para, string.Empty);
             if (Test == arg) return false;

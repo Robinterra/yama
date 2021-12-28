@@ -33,13 +33,13 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<folder>", "You can set a framework to compile, it is the folder name, they must in same  folder with compiler" );
+                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, "<folder>", "You can set a framework to compile, it is the folder name, they must in same  folder with compiler" );
             }
         }
 
         // -----------------------------------------------
 
-        public string Value
+        public string? Value
         {
             get;
             set;
@@ -55,7 +55,7 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
-        public ICommandLine Check ( string command )
+        public ICommandLine? Check ( string command )
         {
             if (string.Format ( "{0}", this.Key ) != command) return null;
 

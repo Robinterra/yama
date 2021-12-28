@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.CommandLines
 {
-    public class Help
+    public class HelpController
     {
 
         // -----------------------------------------------
@@ -36,6 +36,13 @@ namespace LearnCsStuf.CommandLines
         // -----------------------------------------------
 
         #endregion get/set
+
+        // -----------------------------------------------
+
+        public HelpController(List<ICommandLine> lines)
+        {
+            this.CommandLines = lines;
+        }
 
         // -----------------------------------------------
 

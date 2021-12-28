@@ -35,13 +35,13 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, this.Key, string.Empty, "Debug a Yama Source File" );
+                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, string.Empty, "Debug a Yama Source File" );
             }
         }
 
         // -----------------------------------------------
 
-        public string Value
+        public string? Value
         {
             get;
             set;
@@ -65,13 +65,6 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
-        public DebugExpression (  )
-        {
-
-        }
-
-        // -----------------------------------------------
-
         public DebugExpression ( List<ICommandLine> commands )
         {
             this.Childs = commands;
@@ -87,11 +80,11 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
-        public ICommandLine Check ( string command )
+        public ICommandLine? Check ( string command )
         {
             if (this.Key != command) return null;
 
-            return new DebugExpression (  );
+            return new DebugExpression ( this.Childs );
         }
 
         public bool Execute(RequestExecuteArgs request)

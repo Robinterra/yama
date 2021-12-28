@@ -384,9 +384,7 @@ namespace Yama.Assembler
 
         private bool Mappen (string key, uint position)
         {
-            JumpPointMapper map = new JumpPointMapper();
-            map.Key = key;
-            map.Adresse = position;
+            JumpPointMapper map = new JumpPointMapper(position, key);
 
             this.Mapper.Add(map);
 

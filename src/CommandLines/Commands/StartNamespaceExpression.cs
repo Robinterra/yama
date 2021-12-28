@@ -33,13 +33,13 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<namespace>", "The start namespace that is to compile (default:Program)" );
+                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, "<namespace>", "The start namespace that is to compile (default:Program)" );
             }
         }
 
         // -----------------------------------------------
 
-        public string Value
+        public string? Value
         {
             get;
             set;
@@ -55,7 +55,7 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
-        public ICommandLine Check ( string command )
+        public ICommandLine? Check ( string command )
         {
             if (string.Format ( "{0}", this.Key ) != command) return null;
 

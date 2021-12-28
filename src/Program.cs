@@ -69,7 +69,7 @@ namespace Yama
 
             ICommandLine firstCommand = commands[0];
 
-            if (firstCommand is FileExpression) return Program.RunSofort ( firstCommand.Value, commands );
+            if (firstCommand is FileExpression) return Program.RunSofort ( firstCommand.Value!, commands );
             System.Console.WriteLine("Remember Yama, old friend?");
             if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
             if (firstCommand is DebugExpression) return Program.Debug ( commands, defs );
@@ -100,8 +100,8 @@ namespace Yama
             bool isfirst = true;
             foreach ( ICommandLine command in commands )
             {
-                if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
-                if (command is FileExpression && !isfirst) runtime.Arguments.Add(command.Value);
+                if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value!.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+                if (command is FileExpression && !isfirst) runtime.Arguments.Add(command.Value!);
                 if (command is FileExpression && isfirst) isfirst = false;
             }
 
@@ -122,8 +122,8 @@ namespace Yama
 
             foreach ( ICommandLine command in commands )
             {
-                if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
-                if (command is FileExpression) runtime.Arguments.Add(command.Value);
+                if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value!.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
+                if (command is FileExpression) runtime.Arguments.Add(command.Value!);
             }
 
             return runtime.Execute();
@@ -138,9 +138,9 @@ namespace Yama
             bool isfirst = true;
             foreach ( ICommandLine command in commands )
             {
-                if (command is FileExpression) runtime.Input = new FileInfo ( command.Value );
-                if (command is SizeExpression) runtime.MemorySize = Program.ParseSkipExpressionHex(command.Value);
-                if (command is FileExpression && !isfirst) runtime.Arguments.Add(command.Value);
+                if (command is FileExpression) runtime.Input = new FileInfo ( command.Value! );
+                if (command is SizeExpression) runtime.MemorySize = Program.ParseSkipExpressionHex(command.Value!);
+                if (command is FileExpression && !isfirst) runtime.Arguments.Add(command.Value!);
                 if (command is FileExpression && isfirst) isfirst = false;
             }
 
@@ -160,12 +160,12 @@ namespace Yama
 
             foreach ( ICommandLine command in commands )
             {
-                if (command is DefinitionExpression) assembler = def.GenerateAssembler ( assembler, command.Value );
-                if (command is FileExpression) request.InputFile = new FileInfo ( command.Value );
-                if (command is SkipExpression) assembler.Position = Program.ParseSkipExpressionHex(command.Value);
+                if (command is DefinitionExpression) assembler = def.GenerateAssembler ( assembler, command.Value! );
+                if (command is FileExpression) request.InputFile = new FileInfo ( command.Value! );
+                if (command is SkipExpression) assembler.Position = Program.ParseSkipExpressionHex(command.Value!);
                 if (command is OutputFileExpression)
                 {
-                    FileInfo file = new FileInfo ( command.Value );
+                    FileInfo file = new FileInfo ( command.Value! );
                     if (file.Exists) file.Delete();
                     request.Stream = file.OpenWrite();
                 }
@@ -206,18 +206,18 @@ namespace Yama
 
             foreach ( ICommandLine command in commands )
             {
-                if (command is FileExpression) yama.Files.Add ( command.Value );
-                if (command is IncludeExpression) yama.Includes.Add ( new DirectoryInfo( command.Value ));
-                if ( command is AssemblerOutputFileExpression ) yama.OutputAssemblerFile = new FileInfo ( command.Value );
-                if (command is OutputFileExpression) yama.OutputFile = new FileInfo(command.Value);
-                if (command is OptimizingExpression) yama.OptimizeLevel = Program.GetOptimizeLevel ( command.Value );
+                if (command is FileExpression) yama.Files.Add ( command.Value! );
+                if (command is IncludeExpression) yama.Includes.Add ( new DirectoryInfo( command.Value! ));
+                if ( command is AssemblerOutputFileExpression ) yama.OutputAssemblerFile = new FileInfo ( command.Value! );
+                if (command is OutputFileExpression) yama.OutputFile = new FileInfo(command.Value!);
+                if (command is OptimizingExpression) yama.OptimizeLevel = Program.GetOptimizeLevel ( command.Value! );
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
-                if (command is DefinesExpression) yama.Defines.Add(command.Value);
+                if (command is DefinesExpression) yama.Defines.Add(command.Value!);
                 if (command is Print t) Program.CheckPrint ( yama, t );
-                if (command is SkipExpression) yama.StartPosition = Program.ParseSkipExpressionHex(command.Value);
-                if (command is StartNamespace) yama.StartNamespace = command.Value;
-                if (command is IROutputExpression) yama.IROutputFile = new FileInfo(command.Value);
-                if (command is ExtensionDirectoryExpression) yama.Extensions.Add(new DirectoryInfo(command.Value));
+                if (command is SkipExpression) yama.StartPosition = Program.ParseSkipExpressionHex(command.Value!);
+                if (command is StartNamespace) yama.StartNamespace = command.Value!;
+                if (command is IROutputExpression) yama.IROutputFile = new FileInfo(command.Value!);
+                if (command is ExtensionDirectoryExpression) yama.Extensions.Add(new DirectoryInfo(command.Value!));
             }
 
             DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
@@ -277,6 +277,8 @@ namespace Yama
 
         private static bool RunAuto(ICommandLine command)
         {
+            if (command.Value is null) return false;
+
             AutomatenTest test = new AutomatenTest();
 
             return test.Run(command.Value);
@@ -286,7 +288,7 @@ namespace Yama
 
         private static int HelpPrinten (  )
         {
-            LearnCsStuf.CommandLines.Help hilfe = new LearnCsStuf.CommandLines.Help { CommandLines = Program.EnabledCommandLines };
+            LearnCsStuf.CommandLines.HelpController hilfe = new LearnCsStuf.CommandLines.HelpController(Program.EnabledCommandLines);
 
             hilfe.Print (  );
 
