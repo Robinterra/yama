@@ -17,7 +17,7 @@ namespace Yama.Compiler
             set;
         } = "NumConst";
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -35,7 +35,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -45,7 +45,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public bool IsUsed
         {
@@ -55,7 +55,7 @@ namespace Yama.Compiler
             }
         }
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -87,7 +87,9 @@ namespace Yama.Compiler
 
             SSACompileLine line = new SSACompileLine(this);
             compiler.AddSSALine(line);
-            line.Arguments.Add(new SSACompileArgument(SSACompileArgumentMode.Const) { Const = (int)node.Token.Value });
+            if (node.Token.Value is not int constI) return compiler.AddError("keine Zahl gefunden", node);
+
+            line.Arguments.Add(new SSACompileArgument(SSACompileArgumentMode.Const) { Const = constI });
             this.Line = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();
@@ -96,9 +98,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -111,6 +112,7 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.Algo is null) return false;
 
             foreach (string str in this.AssemblyCommands)
             {
