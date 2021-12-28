@@ -29,13 +29,8 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
-        }
+        } = new byte[0];
 
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
         public int Size
         {
             get;
@@ -55,6 +50,7 @@ namespace Yama.Assembler.ARMT32
 
         public T3RegisterCommand(string key, string format, uint id, int size, bool sonder = false, bool sonder2 = false)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -81,7 +77,9 @@ namespace Yama.Assembler.ARMT32
             if (!(request.Node is CommandWith3ArgsNode t)) return false;
             if (t.Argument2.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));

@@ -29,13 +29,7 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
-        }
-
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
+        } = new byte[0];
         public int Size
         {
             get;
@@ -54,6 +48,7 @@ namespace Yama.Assembler.ARMT32
 
         public T2LdrConstCommand(string key, string format, uint id, int size)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -79,9 +74,14 @@ namespace Yama.Assembler.ARMT32
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
-            IFormat branch = request.Assembler.GetFormat("T2BranchImmediate");
-            IFormat constFormat = request.Assembler.GetFormat("Const");
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
+            IFormat? branch = request.Assembler.GetFormat("T2BranchImmediate");
+            if (branch is null) return false;
+
+            IFormat? constFormat = request.Assembler.GetFormat("Const");
+            if (constFormat is null) return false;
 
             //uint valuePosition = request.Assembler.BuildJumpSkipper(request.Position, request.Position + 4 + 2, 4);
             uint valuePosition = (request.Position & 0x3) == 0 ? (uint)2 : 4;

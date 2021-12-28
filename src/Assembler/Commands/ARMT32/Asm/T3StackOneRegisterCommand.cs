@@ -29,13 +29,8 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
-        }
+        } = new byte[0];
 
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
         public int Size
         {
             get;
@@ -60,6 +55,7 @@ namespace Yama.Assembler.ARMT32
 
         public T3StackOneRegisterCommand(string key, string format, uint id, int size, uint zusatz)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -85,7 +81,9 @@ namespace Yama.Assembler.ARMT32
             if (!(request.Node is CommandWithList t)) return false;
             if (t.Arguments.Count != 1) return false;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
 
