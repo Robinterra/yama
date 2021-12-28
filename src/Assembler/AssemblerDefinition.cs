@@ -5,7 +5,7 @@ namespace Yama.Assembler
     public class AssemblerDefinition
     {
 
-        public string Name
+        public string? Name
         {
             get;
             set;

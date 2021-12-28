@@ -13,15 +13,6 @@ namespace Yama.Compiler.Definition
         #region get/set
 
         // -----------------------------------------------
-
-        public Stack<VarCallRegister> VarCallStack
-        {
-            get;
-            set;
-        } = new Stack<VarCallRegister>();
-
-        // -----------------------------------------------
-
         public List<RegisterMap> RegisterMaps
         {
             get;
@@ -30,11 +21,11 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public RegisterMap ResultRegister
+        /*public RegisterMap ResultRegister
         {
             get;
             set;
-        }
+        }*/
 
         public List<RegisterMap> VirtuellRegister
         {
@@ -48,7 +39,7 @@ namespace Yama.Compiler.Definition
             set;
         }
 
-        public GenericDefinition Defintion
+        public GenericDefinition? Defintion
         {
             get;
             set;
@@ -93,14 +84,18 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public RegisterMap GetReferenceRegister(SSACompileLine line, SSACompileLine from)
+        public RegisterMap? GetReferenceRegister(SSACompileLine? line, SSACompileLine from)
         {
+            if (this.Defintion is null) return null;
+            if (line is null) return null;
+
             line = this.GetOriginal(line);
+            if (line is null) return null;
 
             foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
-
+                if (map.Line is null) continue;
                 if (!map.Line.FindEquals(line)) continue;
 
                 this.CheckToFreeRegister(map, line, from);
@@ -113,14 +108,13 @@ namespace Yama.Compiler.Definition
             foreach (RegisterMap map in this.VirtuellRegister)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
-
+                if (map.Line is null) continue;
                 if (!map.Line.FindEquals(line)) continue;
 
                 this.CheckToFreeRegister(map, line, from);
 
-                RegisterMap res = new RegisterMap(RegisterType.Stack, RegisterUseMode.UsedAblage);
-                res.Name = this.LastVirtuell ? this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterStart) : this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterLast);
-                res.RegisterId = map.RegisterId;
+                string name = this.LastVirtuell ? this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterStart) : this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterLast);
+                RegisterMap res = new RegisterMap(name, map.RegisterId, RegisterType.Stack, RegisterUseMode.UsedAblage);
                 res.Line = map.Line;
                 this.LastVirtuell = !this.LastVirtuell;
 
@@ -137,6 +131,7 @@ namespace Yama.Compiler.Definition
             foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
+                if (map.Line is null) continue;
                 if (map.Line.LoopContainer == null)
                 {
                     this.CheckToFreePhiLoops(map, loopContainer, line);
@@ -155,7 +150,9 @@ namespace Yama.Compiler.Definition
         {
             if (!this.HasALoopContainer(map)) return true;
 
-            SSACompileLine phiLoopOwner = null;
+            SSACompileLine? phiLoopOwner = null;
+            if (map.Line is null) return false;
+
             foreach (SSACompileLine line in map.Line.PhiMap)
             {
                 if (line.LoopContainer == null) continue;
@@ -173,6 +170,8 @@ namespace Yama.Compiler.Definition
 
         private bool CheckLoopForFree(RegisterMap map, SSACompileLine line)
         {
+            if (map.Line is null) return false;
+
             int greatOrder = -1;
 
             for (int i = 0; i < map.Line.Calls.Count; i++)
@@ -187,7 +186,7 @@ namespace Yama.Compiler.Definition
             return true;
         }
 
-        private SSACompileLine GetOriginal(SSACompileLine line)
+        private SSACompileLine? GetOriginal(SSACompileLine line)
         {
             if (line == null) return null;
             if (line.ReplaceLine == null) return line;
@@ -200,6 +199,7 @@ namespace Yama.Compiler.Definition
             foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
+                if (map.Line is null) continue;
 
                 if (map.Line.FindEquals(line)) return true;
             }
@@ -207,6 +207,7 @@ namespace Yama.Compiler.Definition
             foreach (RegisterMap map in this.VirtuellRegister)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
+                if (map.Line is null) continue;
 
                 if (map.Line.FindEquals(line)) return true;
             }
@@ -219,6 +220,7 @@ namespace Yama.Compiler.Definition
         private bool CheckToFreeRegister(RegisterMap map, SSACompileLine line, SSACompileLine from)
         {
             if (this.HasALoopContainer(map)) return true;
+            if (map.Line is null) return false;
 
             SSACompileLine checkCalls = map.Line;
             if (!checkCalls.Equals(line)) checkCalls = line;
@@ -253,7 +255,9 @@ namespace Yama.Compiler.Definition
 
         private bool HasALoopContainer(RegisterMap map)
         {
-            if (map.Line.LoopContainer != null) return this.IsUsedAfterBeginOfLoop(map.Line.LoopContainer.LoopLine, map.Line.Calls);
+            if (map.Line is null) return false;
+
+            if (map.Line.LoopContainer != null && map.Line.LoopContainer.LoopLine is not null) return this.IsUsedAfterBeginOfLoop(map.Line.LoopContainer.LoopLine, map.Line.Calls);
 
             foreach (SSACompileLine line in map.Line.PhiMap)
             {
@@ -269,13 +273,14 @@ namespace Yama.Compiler.Definition
         {
             if (calls.Count == 0) return false;
 
-            SSACompileArgument arg = loopLine.Arguments.FirstOrDefault();
+            SSACompileArgument? arg = loopLine.Arguments.FirstOrDefault();
             if (arg == null) return true;
+            if (arg.Reference is null) return false;
 
             List<SSACompileLine> find = calls.Where(t=>t.Order > arg.Reference.Order).ToList();
             if (find.Count > 1) return true;
 
-            SSACompileLine lastMatch = find.FirstOrDefault();
+            SSACompileLine? lastMatch = find.FirstOrDefault();
             if (lastMatch == null) return false;
             if (lastMatch.Order != loopLine.Order) return true;
 
@@ -302,10 +307,9 @@ namespace Yama.Compiler.Definition
                 if (map.Mode == RegisterUseMode.Free) return map;
             }
 
-            RegisterMap mapneu = new RegisterMap(RegisterType.Stack, RegisterUseMode.Free);
-
-            mapneu.RegisterId = this.VirtuellRegister.Count + 1;
-            mapneu.Name = this.Defintion.GetRegister(this.Defintion.ResultRegister);
+            string name = this.Defintion!.GetRegister(this.Defintion.ResultRegister);
+            int id = this.VirtuellRegister.Count + 1;
+            RegisterMap mapneu = new RegisterMap(name, id, RegisterType.Stack, RegisterUseMode.Free);
 
             this.VirtuellRegister.Add(mapneu);
 
@@ -317,6 +321,7 @@ namespace Yama.Compiler.Definition
             foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
+                if (map.Line is null) continue;
 
                 this.CheckToFreeRegister(map, map.Line, line);
             }

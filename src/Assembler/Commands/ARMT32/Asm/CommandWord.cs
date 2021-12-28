@@ -30,13 +30,7 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
-        }
-
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
+        } = new byte[0];
 
         public int Size
         {
@@ -56,7 +50,9 @@ namespace Yama.Assembler.ARMT32
 
         public CommandWord()
         {
-
+            this.Node = new ParserError();
+            this.Key = string.Empty;
+            this.Format = string.Empty;
         }
 
         public CommandWord(CommandWord t, IParseTreeNode node, List<byte> bytes)
@@ -93,10 +89,11 @@ namespace Yama.Assembler.ARMT32
 
         private uint GetDatenValue(RequestAssembleCommand request, WordNode t)
         {
+            if (t.Data is null) return 0;
             if (t.Data.Kind == Lexer.IdentifierKind.NumberToken) return Convert.ToUInt32(t.Data.Value);
             if (t.Data.Kind != Lexer.IdentifierKind.Word) return 0;
 
-            JumpPointMapper map = request.Assembler.GetJumpPoint(t.Data.Value.ToString());
+            JumpPointMapper? map = request.Assembler.GetJumpPoint(t.Data.Value!.ToString()!);
             if (map == null)
             {
                 request.Assembler.Errors.Add(request.Node);
@@ -108,7 +105,7 @@ namespace Yama.Assembler.ARMT32
 
             if (t.AdditionNumberToken != null && result != 0)
             {
-                result = (uint)(result + ((int)t.AdditionNumberToken.Value));
+                result = (uint)(result + ((int)t.AdditionNumberToken.Value!));
             }
 
             return result;

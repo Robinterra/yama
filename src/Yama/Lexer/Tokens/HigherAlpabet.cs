@@ -34,8 +34,10 @@ namespace Yama.Lexer
             lexer.CurrentCharMode (  );
 
             if (!char.IsLetter ( lexer.CurrentChar )) return TokenState.Cancel;
+            if (!char.IsUpper ( lexer.CurrentChar )) return TokenState.Cancel;
 
-            return char.IsUpper ( lexer.CurrentChar ) ? TokenState.CompleteOne : TokenState.Cancel;
+            lexer.NextChar();
+            return TokenState.Complete;
         }
 
         // -----------------------------------------------

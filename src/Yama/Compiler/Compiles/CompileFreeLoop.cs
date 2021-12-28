@@ -23,13 +23,13 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
         }
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -39,7 +39,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public bool IsUsed
         {
@@ -61,7 +61,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -75,6 +75,15 @@ namespace Yama.Compiler
 
         #endregion get/set
 
+        #region ctor
+
+        public CompileFreeLoop(SSACompileLine begin)
+        {
+            this.Begin = begin;
+        }
+
+        #endregion ctor
+
         #region methods
 
         public bool Compile(Compiler compiler, IParseTreeNode node, string mode = "default")
@@ -83,6 +92,8 @@ namespace Yama.Compiler
 
             SSACompileLine line = new SSACompileLine(this, true);
             line.LoopContainer = compiler.ContainerMgmt.CurrentContainer;
+            if (line.LoopContainer is null) return compiler.AddError("ende des loop konnte nicht gefunden werden", node);
+
             line.LoopContainer.LoopLine = line;
             this.Line = line;
             line.AddArgument(new SSACompileArgument(this.Begin));

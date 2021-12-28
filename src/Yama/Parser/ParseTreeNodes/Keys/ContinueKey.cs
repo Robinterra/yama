@@ -44,13 +44,14 @@ namespace Yama.Parser
         public ContinueKey()
         {
             this.AllTokens = new List<IdentifierToken> ();
+            this.Token = new();
         }
 
         #endregion ctor
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Continue ) return null;
 

@@ -13,13 +13,13 @@ namespace Yama.Compiler
             set;
         }
 
-        public Dictionary<string, string> Dictionaries
+        public Dictionary<string, string>? Dictionaries
         {
             get;
             set;
         }
 
-        public Dictionary<string, string> PostReplaces
+        public Dictionary<string, string>? PostReplaces
         {
             get;
             set;
@@ -63,14 +63,14 @@ namespace Yama.Compiler
             this.AssemblyCode = assemblyCode;
         }
 
-        public RequestAddLine(ICompileRoot root, string assemblyCode, Dictionary<string, string> dictionary)
+        public RequestAddLine(ICompileRoot root, string assemblyCode, Dictionary<string, string>? dictionary)
         {
             this.Dictionaries = dictionary;
             this.AssemblyCode = assemblyCode;
             this.Root = root;
         }
 
-        public RequestAddLine(ICompileRoot root, string assemblyCode, Dictionary<string, string> dictionary, Dictionary<string, string> postreplaces)
+        public RequestAddLine(ICompileRoot root, string assemblyCode, Dictionary<string, string>? dictionary, Dictionary<string, string> postreplaces)
         : this(root, assemblyCode, dictionary)
         {
             this.PostReplaces = postreplaces;

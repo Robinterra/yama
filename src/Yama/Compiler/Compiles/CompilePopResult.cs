@@ -23,13 +23,13 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
         }
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -39,7 +39,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public bool IsUsed
         {
@@ -61,7 +61,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -88,6 +88,7 @@ namespace Yama.Compiler
             this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
 
+            if (compiler.ContainerMgmt.CurrentMethod is null) return compiler.AddError("no current method found", node.Use);
             if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("Variable not found in mapper", node.Use);
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
 
@@ -115,9 +116,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node.Use, key, mode, line);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -130,6 +130,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.Algo is null) return false;
+
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));
@@ -139,11 +141,14 @@ namespace Yama.Compiler
 
             foreach (AlgoKeyCall key in this.Algo.PostKeys)
             {
+                if (key.Name is null) continue;
+
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
                 query.Value = this.Position + 1;
 
-                string value = compiler.Definition.PostKeyReplace(query);
+                string? value = compiler.Definition.PostKeyReplace(query);
+                if (value is null) return compiler.AddError("no postkeyreplace found", this.Node);
 
                 postreplaces.Add(key.Name, value);
             }

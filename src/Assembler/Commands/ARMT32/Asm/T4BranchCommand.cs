@@ -29,13 +29,8 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
-        }
+        } = new byte[0];
 
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
         public int Size
         {
             get;
@@ -54,6 +49,7 @@ namespace Yama.Assembler.ARMT32
 
         public T4BranchCommand(string key, string format, uint id, int size, uint max)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -79,7 +75,7 @@ namespace Yama.Assembler.ARMT32
             if (!(request.Node is CommandWith1ArgNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
-            JumpPointMapper map = request.Assembler.GetJumpPoint(t.Argument0.Token.Value.ToString());
+            JumpPointMapper? map = request.Assembler.GetJumpPoint(t.Argument0.Token.Value!.ToString()!);
             if (map == null) return false;
 
             uint target = request.Assembler.BuildJumpSkipper(request.Position, map.Adresse, (uint)this.Size);
@@ -96,7 +92,8 @@ namespace Yama.Assembler.ARMT32
 
             //target = target >> this.BitSkipper;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
 
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;

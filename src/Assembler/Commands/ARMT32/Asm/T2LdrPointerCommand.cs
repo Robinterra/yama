@@ -29,13 +29,8 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
-        }
+        } = new byte[0];
 
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
         public int Size
         {
             get;
@@ -56,6 +51,7 @@ namespace Yama.Assembler.ARMT32
 
         public T2LdrPointerCommand(string key, string format, uint id, int size, int maxregister, uint teiler, bool issptwo = false)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -84,13 +80,16 @@ namespace Yama.Assembler.ARMT32
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (!(t.Argument1 is PointerNode s)) return false;
             if (request.Assembler.GetRegister(t.Argument0.Token.Text) > this.MaxRegister) return false;
-            JumpPointMapper map = request.Assembler.GetJumpPoint(s.Token.Value.ToString());
 
+            JumpPointMapper? map = request.Assembler.GetJumpPoint(s.Token.Value!.ToString()!);
             if (map == null) return false;
+
             uint target = request.Assembler.BuildJumpSkipper(request.Position, map.Adresse, (uint)this.Size, true);
             if ((request.Position & 0x3) != 0 && target == 2) target = 4;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));

@@ -33,13 +33,13 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<file>", "One file which to Compile" );
+                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, "<file>", "One file which to Compile" );
             }
         }
 
         // -----------------------------------------------
 
-        public string Value
+        public string? Value
         {
             get;
             set;
@@ -55,7 +55,7 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
-        public ICommandLine Check ( string command )
+        public ICommandLine? Check ( string command )
         {
             if (string.Format ( "{0}", this.Key ) != command) return null;
 

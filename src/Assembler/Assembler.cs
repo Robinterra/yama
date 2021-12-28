@@ -19,7 +19,7 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public AssemblerDefinition Definition
+        public AssemblerDefinition? Definition
         {
             get;
             set;
@@ -27,7 +27,7 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public Parser.Parser Parser
+        public Parser.Parser? Parser
         {
             get;
             set;
@@ -35,7 +35,7 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public Stream Stream
+        public Stream? Stream
         {
             get;
             set;
@@ -107,9 +107,9 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public IFormat GetFormat(string key)
+        public IFormat? GetFormat(string key)
         {
-            return this.Definition.Formats.FirstOrDefault(t=>t.Name == key);
+            return this.Definition?.Formats.FirstOrDefault(t=>t.Name == key);
         }
 
         // -----------------------------------------------
@@ -122,7 +122,8 @@ namespace Yama.Assembler
 
             this.Parser = definition.GetParser(request.InputFile);
 
-            ParserLayer startlayer = this.Parser.ParserLayers.FirstOrDefault(t=>t.Name == "main");
+            ParserLayer? startlayer = this.Parser.ParserLayers.Find(t=>t.Name == "main");
+            if (startlayer is null) return false;
 
             if (!this.Parse(startlayer, request)) return this.PrintParserErrors();
 
@@ -135,6 +136,7 @@ namespace Yama.Assembler
 
         private bool Parse(ParserLayer startlayer, RequestAssemble request)
         {
+            if (this.Parser is null) return false;
             if (request.InputFile != null) return this.Parser.Parse(startlayer);
             if (request.Roots == null) return false;
 
@@ -148,6 +150,7 @@ namespace Yama.Assembler
 
         public bool AddError(IParseTreeNode t, string v)
         {
+            if (this.Parser is null) return false;
             this.Parser.PrintSyntaxError(t.Token, v, "Assembler error");
 
             return false;
@@ -164,6 +167,7 @@ namespace Yama.Assembler
 
             MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString()));
 
+            if (this.Parser is null) return false;
             this.Parser.NewParse();
 
             if (!this.Parser.Parse(startlayer, stream))
@@ -173,9 +177,9 @@ namespace Yama.Assembler
                 return false;
             }
 
-            AssemblerCompilerMap map = new AssemblerCompilerMap();
-            map.Root = root;
-            map.Nodes = this.Parser.ParentContainer.Statements;
+            if (this.Parser.ParentContainer is null) return false;
+
+            AssemblerCompilerMap map = new AssemblerCompilerMap(root, this.Parser.ParentContainer.Statements);
 
             this.AsmCompilerMap.Add(map);
 
@@ -186,6 +190,8 @@ namespace Yama.Assembler
 
         public uint BuildJumpSkipper(uint position, uint adresse, uint size, bool isnormal = false)
         {
+            if (this.Definition is null) return 999999999;
+
             uint orgpos = position;
             position = position + this.Definition.ProgramCounterIncress;
 
@@ -213,9 +219,9 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public JumpPointMapper GetJumpPoint(string key)
+        public JumpPointMapper? GetJumpPoint(string key)
         {
-            JumpPointMapper map = this.Mapper.FirstOrDefault(t=>t.Key == key);
+            JumpPointMapper? map = this.Mapper.FirstOrDefault(t=>t.Key == key);
             if (map == null) return null;
 
             //if (map.Key == "__start") map.Adresse = map.Adresse | 0x1;
@@ -229,7 +235,7 @@ namespace Yama.Assembler
         {
             foreach (IParseTreeNode node in this.Errors)
             {
-                this.Parser.PrintSyntaxError(node.Token, "Assembler error", "Assembler error");
+                this.Parser?.PrintSyntaxError(node.Token, "Assembler error", "Assembler error");
             }
 
             return false;
@@ -240,6 +246,8 @@ namespace Yama.Assembler
         
         private bool PrintParserErrors()
         {
+            if (this.Parser is null) return false;
+
             foreach (IParseTreeNode node in this.Parser.ParserErrors)
             {
                 this.Parser.PrintSyntaxError(node.Token, "Parser error", "Assembler error");
@@ -252,6 +260,8 @@ namespace Yama.Assembler
 
         private bool Skipper()
         {
+            if (this.Stream is null) return false;
+
             byte[] result = new byte[this.Position];
 
             this.Stream.Write(result);
@@ -267,7 +277,12 @@ namespace Yama.Assembler
 
             List<CommandCompilerMap> maptranslate = new List<CommandCompilerMap>();
 
-            if (this.AsmCompilerMap.Count == 0) this.IdentifyCommandFromNodes(this.Parser.ParentContainer.Statements, maptranslate);
+            if (this.AsmCompilerMap.Count == 0)
+            {
+                if (this.Parser?.ParentContainer is null) return false;
+
+                this.IdentifyCommandFromNodes(this.Parser.ParentContainer.Statements, maptranslate);
+            }
             else
             {
                 foreach (AssemblerCompilerMap map in this.AsmCompilerMap)
@@ -307,7 +322,7 @@ namespace Yama.Assembler
 
                 RequestIdentify request = new RequestIdentify(node, this);
 
-                ICommand command = this.Identify(request);
+                ICommand? command = this.Identify(request);
                 if (command == null)
                 {
                     this.Errors.Add(node);
@@ -352,7 +367,7 @@ namespace Yama.Assembler
 
                 RequestIdentify request = new RequestIdentify(node, this);
 
-                ICommand command = this.Identify(request);
+                ICommand? command = this.Identify(request);
                 if (command == null)
                 {
                     this.Errors.Add(node);
@@ -384,9 +399,7 @@ namespace Yama.Assembler
 
         private bool Mappen (string key, uint position)
         {
-            JumpPointMapper map = new JumpPointMapper();
-            map.Key = key;
-            map.Adresse = position;
+            JumpPointMapper map = new JumpPointMapper(position, key);
 
             this.Mapper.Add(map);
 
@@ -395,7 +408,7 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        private ICommand Identify(RequestIdentify request)
+        private ICommand? Identify(RequestIdentify request)
         {
             if (this.Definition == null) return null;
 
@@ -415,12 +428,9 @@ namespace Yama.Assembler
 
         private bool AssembleStep(CommandCompilerMap assmblepair, uint position)
         {
-            RequestAssembleCommand request = new RequestAssembleCommand();
-            request.Node = assmblepair.Node;
-            request.Assembler = this;
-            request.Stream = this.Stream;
-            request.WithMapper = true;
-            request.Position = position;
+            if (this.Stream is null) return false;
+
+            RequestAssembleCommand request = new RequestAssembleCommand(assmblepair.Node, this, this.Stream, true, position);
 
             if (assmblepair.Skip != 0) this.Stream.Write(new byte[assmblepair.Skip]);
 
@@ -440,7 +450,7 @@ namespace Yama.Assembler
 
         public uint GetRegister(string text)
         {
-            Register register = this.Definition.Registers.FirstOrDefault(t=>t.Name == text);
+            Register? register = this.Definition?.Registers.FirstOrDefault(t=>t.Name == text);
             if (register == null) return 0; // todo print error
 
             return register.BinaryId;

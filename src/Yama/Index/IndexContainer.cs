@@ -8,28 +8,26 @@ namespace Yama.Index
     public class IndexContainer : IParent
     {
 
+        #region get/set
+
         public List<IndexContainer> Containers
         {
             get;
-            set;
         }
 
         public List<IndexVariabelnDeklaration> VariabelnDeklarations
         {
             get;
-            set;
         }
 
         public List<IndexMethodReference> MethodReferences
         {
             get;
-            set;
         }
 
         public List<IndexVariabelnReference> VariabelnReferences
         {
             get;
-            set;
         }
 
         public bool FunktionContainer
@@ -38,19 +36,19 @@ namespace Yama.Index
             set;
         }
 
-        private ValidUses thisUses;
+        private ValidUses? thisUses;
 
         public ValidUses ThisUses
         {
             get
             {
-                if (this.thisUses != null) return this.thisUses;
+                if (this.thisUses is not null) return this.thisUses;
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
 
                 foreach (IndexVariabelnDeklaration dek in this.VariabelnDeklarations)
                 {
-                    if (this.thisUses.Deklarationen.Exists(t=>t.Name == dek.Name)) this.thisUses.GetIndex.CreateError(dek.Use, "Die Deklaration kann nicht vorgenommen werden, eine Deklaration mit diesen Namen existiert schon");
+                    if (this.thisUses.Deklarationen.Exists(t=>t.Name == dek.Name)) this.thisUses.GetIndex?.CreateError(dek.Use, "Die Deklaration kann nicht vorgenommen werden, eine Deklaration mit diesen Namen existiert schon");
 
                     this.thisUses.Add(dek);
                 }
@@ -64,11 +62,13 @@ namespace Yama.Index
             get;
             set;
         }
+
         public string Name
         {
             get;
             set;
         }
+
         public IParseTreeNode Use
         {
             get;
@@ -81,15 +81,25 @@ namespace Yama.Index
             set;
         }
 
-        public IndexContainer()
+        #endregion get/set
+
+        #region ctor
+
+        public IndexContainer(IParseTreeNode use, string name)
         {
+            this.ParentUsesSet = new();
+            this.Use = use;
+            this.Name = name;
             this.VariabelnReferences = new List<IndexVariabelnReference>();
             this.VariabelnDeklarations = new List<IndexVariabelnDeklaration>();
             this.MethodReferences = new List<IndexMethodReference>();
             this.Containers = new List<IndexContainer>();
         }
 
-        
+        #endregion ctor
+
+        #region methods
+
         public bool IsInUse (int depth)
         {
             return true;
@@ -126,5 +136,8 @@ namespace Yama.Index
 
             return true;
         }
+
+        #endregion methods
+
     }
 }

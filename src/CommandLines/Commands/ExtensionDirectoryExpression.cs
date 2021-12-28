@@ -33,13 +33,13 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<file>", "A Directory with .json Extensions for the Compiler definition" );
+                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, "<file>", "A Directory with .json Extensions for the Compiler definition" );
             }
         }
 
         // -----------------------------------------------
 
-        public string Value
+        public string? Value
         {
             get;
             set;
@@ -55,7 +55,7 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
-        public ICommandLine Check ( string command )
+        public ICommandLine? Check ( string command )
         {
             if (this.Key == command) return new ExtensionDirectoryExpression (  );
             if ("ext" == command) return new ExtensionDirectoryExpression (  );

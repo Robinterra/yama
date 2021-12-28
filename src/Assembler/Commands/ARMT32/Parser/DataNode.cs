@@ -48,6 +48,8 @@ namespace Yama.Assembler.ARMT32
 
         public DataNode ()
         {
+            this.Token = new();
+            this.Data = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -63,26 +65,28 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
+        public IParseTreeNode? Parse(Parser.Request.RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Base) return null;
 
             DataNode node = new DataNode();
             node.AllTokens.Add(request.Token);
 
-            IdentifierToken token = request.Parser.Peek(request.Token, 1);
+            IdentifierToken? token = request.Parser.Peek(request.Token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Word) return null;
 
             node.Token = token;
             node.AllTokens.Add(token);
-            token = request.Parser.Peek(token, 1);
 
+            token = request.Parser.Peek(token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.Gleich) return null;
+
             node.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
+            if (token is null) return null;
             if (token.Kind == IdentifierKind.Text) node.Data = token;
             else if (token.Kind == IdentifierKind.NumberToken) node.Data = token;
             else if (!this.TryParseList(request.Parser, token, node)) return null;
@@ -96,24 +100,28 @@ namespace Yama.Assembler.ARMT32
         {
             if (token.Kind != IdentifierKind.BeginContainer) return false;
             deklaration.AllTokens.Add(token);
-            token = parser.Peek(token, 1);
 
-            while (token.Kind == IdentifierKind.Word)
+            IdentifierToken? tokem = parser.Peek(token, 1);
+            if (tokem is null) return false;
+
+            while (tokem.Kind == IdentifierKind.Word)
             {
-                deklaration.Arguments.Add(token);
-                deklaration.AllTokens.Add(token);
+                deklaration.Arguments.Add(tokem);
+                deklaration.AllTokens.Add(tokem);
 
-                token = parser.Peek(token, 1);
+                tokem = parser.Peek(tokem, 1);
+                if (tokem is null) return false;
 
-                if (token.Kind != IdentifierKind.Comma) continue;
+                if (tokem.Kind != IdentifierKind.Comma) continue;
 
-                deklaration.AllTokens.Add(token);
+                deklaration.AllTokens.Add(tokem);
 
-                token = parser.Peek(token, 1);
+                tokem = parser.Peek(tokem, 1);
+                if (tokem is null) return false;
             }
 
-            if (token.Kind != IdentifierKind.CloseContainer) return false;
-            deklaration.AllTokens.Add(token);
+            if (tokem.Kind != IdentifierKind.CloseContainer) return false;
+            deklaration.AllTokens.Add(tokem);
 
             return true;
         }

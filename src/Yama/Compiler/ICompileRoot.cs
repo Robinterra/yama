@@ -20,7 +20,7 @@ namespace Yama.Compiler
             set;
         }
 
-        IParseTreeNode Node
+        IParseTreeNode? Node
         {
             get;
             set;
@@ -31,7 +31,7 @@ namespace Yama.Compiler
             get;
         }
 
-        CompileAlgo Algo
+        CompileAlgo? Algo
         {
             get;
             set;

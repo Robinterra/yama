@@ -56,13 +56,12 @@ namespace Yama.Assembler.ARMT32
 
         #region ctor
 
-        public CommandWith2ArgsNode()
-        {
-            this.AllTokens = new List<IdentifierToken> ();
-        }
-
         public CommandWith2ArgsNode(ParserLayer argumentLayer)
         {
+            this.Argument0 = new WordNode();
+            this.Argument1 = new WordNode();
+            this.AllTokens = new List<IdentifierToken> ();
+            this.Token = new();
             this.argumentLayer = argumentLayer;
         }
 
@@ -78,22 +77,25 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
+        public IParseTreeNode? Parse(Parser.Request.RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
 
-            CommandWith2ArgsNode deklaration = new CommandWith2ArgsNode();
+            CommandWith2ArgsNode deklaration = new CommandWith2ArgsNode(this.argumentLayer);
             deklaration.Token = request.Token;
             deklaration.AllTokens.Add(request.Token);
 
-            IdentifierToken token = request.Parser.Peek(request.Token, 1);
+            IdentifierToken? token = request.Parser.Peek(request.Token, 1);
+            if (token is null) return null;
 
             request.Parser.ActivateLayer(this.argumentLayer);
 
-            deklaration.Argument0 = request.Parser.ParseCleanToken(token);
+            IParseTreeNode? arg0 = request.Parser.ParseCleanToken(token);
 
             request.Parser.VorherigesLayer();
-            if (deklaration.Argument0 == null) return null;
+            if (arg0 is null) return null;
+
+            deklaration.Argument0 = arg0;
             if (!(deklaration.Argument0 is IContainer ic)) return null;
             token = ic.Ende;
 
@@ -103,13 +105,16 @@ namespace Yama.Assembler.ARMT32
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
+            if (token is null) return null;
 
             request.Parser.ActivateLayer(this.argumentLayer);
 
-            deklaration.Argument1 = request.Parser.ParseCleanToken(token);
+            IParseTreeNode? arg1 = request.Parser.ParseCleanToken(token);
 
             request.Parser.VorherigesLayer();
-            if (deklaration.Argument1 == null) return null;
+            if (arg1 is null) return null;
+
+            deklaration.Argument1 = arg1;
 
             return deklaration;
         }

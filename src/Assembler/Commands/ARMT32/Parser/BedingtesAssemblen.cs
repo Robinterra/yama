@@ -35,6 +35,7 @@ namespace Yama.Assembler.ARMT32
 
         public BedingtesAssemblen ()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -52,7 +53,7 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
+        public IParseTreeNode? Parse(Parser.Request.RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Point) return null;
 

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -48,7 +44,7 @@ namespace Yama.Index
             set;
         }
 
-        private ValidUses thisUses;
+        private ValidUses? thisUses;
 
         public ValidUses ThisUses
         {
@@ -84,14 +80,21 @@ namespace Yama.Index
 
         #region ctor
 
-        public IndexNamespaceDeklaration (  )
+        public IndexNamespaceDeklaration ( IParseTreeNode use, string name )
         {
+            this.Use = use;
+            this.Name = name;
+            this.ParentUsesSet = new();
             this.References = new List<IndexNamespaceReference>();
             this.KlassenDeklarationen = new List<IndexKlassenDeklaration>();
             this.Usings = new List<IndexNamespaceReference>();
             this.Files = new List<FileInfo>();
             this.EnumDeklarationen = new List<IndexEnumDeklaration>();
         }
+
+        #endregion ctor
+
+        #region methods
 
         public bool IsInUse (int depth)
         {
@@ -114,6 +117,7 @@ namespace Yama.Index
             return true;
         }
 
-        #endregion ctor
+
+        #endregion methods
     }
 }

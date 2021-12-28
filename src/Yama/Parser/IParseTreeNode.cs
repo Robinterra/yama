@@ -43,7 +43,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        IParseTreeNode Parse ( Request.RequestParserTreeParser request );
+        IParseTreeNode? Parse ( Request.RequestParserTreeParser request );
 
         // -----------------------------------------------
 

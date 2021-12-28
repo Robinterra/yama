@@ -16,7 +16,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -28,7 +28,7 @@ namespace Yama.Compiler
             set;
         } = "RegionAsm";
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -46,19 +46,13 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public List<string> PostAssemblyCommands
         {
             get;
             set;
         } = new List<string>();
-
-        public SSACompileLine Line
-        {
-            get;
-            set;
-        }
 
         #endregion get/set
 
@@ -72,13 +66,19 @@ namespace Yama.Compiler
 
             this.Algo = new CompileAlgo();
 
-            this.Algo.AssemblyCommands.Add(node.Token.Value.ToString());
+            string? wert = null;
+            if (node.Token.Value is not null) wert = node.Token.Value.ToString();
+            if (wert is null) return compiler.AddError("null", node);
+
+            this.Algo.AssemblyCommands.Add(wert);
 
             return true;
         }
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.Algo is null) return false;
+
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));

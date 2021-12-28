@@ -25,22 +25,20 @@ namespace Yama.Index
         public List<IndexVariabelnReference> References
         {
             get;
-            set;
         }
 
         public List<IndexEnumEntryDeklaration> Entries
         {
             get;
-            set;
         }
 
-        private ValidUses thisUses;
+        private ValidUses? thisUses;
 
         public ValidUses ThisUses
         {
             get
             {
-                if (this.thisUses != null) return this.thisUses;
+                if (this.thisUses is not null) return this.thisUses;
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
 
@@ -60,7 +58,23 @@ namespace Yama.Index
             set;
         }
 
-        
+        #endregion get/set
+
+        #region ctor
+
+        public IndexEnumDeklaration ( IParseTreeNode use, string name )
+        {
+            this.Use = use;
+            this.Name = name;
+            this.ParentUsesSet = new();
+            this.Entries = new List<IndexEnumEntryDeklaration>();
+            this.References = new List<IndexVariabelnReference>();
+        }
+
+        #endregion ctor
+
+        #region methods
+
         public bool IsInUse (int depth)
         {
             if (depth > 10) return true;
@@ -75,20 +89,6 @@ namespace Yama.Index
 
             return false;
         }
-
-        #endregion get/set
-
-        #region ctor
-
-        public IndexEnumDeklaration (  )
-        {
-            this.Entries = new List<IndexEnumEntryDeklaration>();
-            this.References = new List<IndexVariabelnReference>();
-        }
-
-        #endregion ctor
-
-        #region methods
 
         public bool PreMappen(ValidUses uses)
         {

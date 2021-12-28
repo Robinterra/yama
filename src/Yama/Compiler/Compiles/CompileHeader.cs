@@ -16,7 +16,7 @@ namespace Yama.Compiler
             set;
         } = "CompileHeader";
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -26,14 +26,15 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
+
         public List<string> AssemblyCommands
         {
             get;
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -53,7 +54,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -66,6 +67,8 @@ namespace Yama.Compiler
         private DefaultRegisterQuery BuildQuery(MethodeDeclarationNode node, AlgoKeyCall key, string mode)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
+            if (node.Deklaration is null) return query;
+
             query.Key = key;
             query.Kategorie = mode;
             query.Uses = node.Deklaration.ThisUses;
@@ -92,7 +95,7 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
@@ -100,11 +103,14 @@ namespace Yama.Compiler
                     if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
                 }
             }
+
             return true;
         }
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.Algo is null) return false;
+
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));

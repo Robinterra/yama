@@ -13,19 +13,19 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexVariabelnReference VariabelReference
+        public IndexVariabelnReference? VariabelReference
         {
             get;
             set;
         }
 
-        public IParseTreeNode LeftNode
+        public IParseTreeNode? LeftNode
         {
             get;
             set;
         }
 
-        public IParseTreeNode RightNode
+        public IParseTreeNode? RightNode
         {
             get;
             set;
@@ -76,7 +76,7 @@ namespace Yama.Parser
             get;
         }
 
-        public IndexVariabelnReference Reference
+        public IndexVariabelnReference? Reference
         {
             get;
             set;
@@ -94,6 +94,8 @@ namespace Yama.Parser
         public Operator2Childs ()
         {
             this.AllTokens = new List<IdentifierToken> ();
+            this.Token = new();
+            this.ValidOperators = new();
         }
 
         public Operator2Childs ( int prio ) : this()
@@ -130,7 +132,7 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != this.ValidKind ) return null;
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
@@ -139,25 +141,31 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            node.LeftNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, -1 ) );
+            IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
+            if (token is null) return null;
 
-            node.RightNode = request.Parser.ParseCleanToken ( request.Parser.Peek ( request.Token, 1 ) );
+            node.LeftNode = request.Parser.ParseCleanToken ( token );
+
+            token = request.Parser.Peek ( request.Token, 1 );
+            if (token is null) return null;
+
+            node.RightNode = request.Parser.ParseCleanToken ( token );
 
             return node;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.LeftNode is null) return request.Index.CreateError(this);
+            if (this.RightNode is null) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             reference.IsOperator = true;
             int anzahl = container.VariabelnReferences.Count;
 
             this.LeftNode.Indezieren(request);
-            IndexVariabelnReference varref = container.VariabelnReferences.LastOrDefault();
+            IndexVariabelnReference? varref = container.VariabelnReferences.LastOrDefault();
             if (anzahl == container.VariabelnReferences.Count) varref = null;
 
             this.RightNode.Indezieren(request);
@@ -176,8 +184,10 @@ namespace Yama.Parser
             return true;
         }
 
-        private bool SetIndex(RequestParserTreeIndezieren request, IndexVariabelnReference varref, IndexVariabelnReference indexVariabelnReference)
+        private bool SetIndex(RequestParserTreeIndezieren request, IndexVariabelnReference? varref, IndexVariabelnReference? indexVariabelnReference)
         {
+            if (varref is null) return false;
+            if (indexVariabelnReference is null) return false;
 
             request.Index.IndexTypeSafeties.Add(new IndexSetValue(varref, indexVariabelnReference));
 
@@ -186,6 +196,9 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.RightNode is null) return false;
+            if (this.LeftNode is null) return false;
+
             this.RightNode.Compile(request);
 
             if (this.Token.Text == "=")
@@ -195,6 +208,8 @@ namespace Yama.Parser
                 return true;
             }
 
+            if (this.Reference is null) return false;
+            if (this.Reference.Deklaration is null) return false;
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {
                 bool isok = this.CompileCopy(request.Compiler, request.Mode, t);
@@ -209,8 +224,10 @@ namespace Yama.Parser
 
         private bool CompileCopy(Compiler.Compiler compiler, string mode, MethodeDeclarationNode t)
         {
+            if (this.LeftNode is null) return false;
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
+            if (t.Statement is null) return false;
 
             this.LeftNode.Compile(new Request.RequestParserTreeCompile (compiler, mode));
 
@@ -221,6 +238,9 @@ namespace Yama.Parser
 
         private bool FunctionsCall(Compiler.Compiler compiler, string mode)
         {
+            if (this.LeftNode is null) return false;
+            if (this.Reference is null) return false;
+
             CompilePushResult compilePushResult = new CompilePushResult();
             compilePushResult.Compile(compiler, null, "default");
 

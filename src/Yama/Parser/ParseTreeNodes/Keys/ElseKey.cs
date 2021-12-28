@@ -9,7 +9,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IParseTreeNode Statement
+        public IParseTreeNode? Statement
         {
             get;
             set;
@@ -25,11 +25,9 @@ namespace Yama.Parser
         {
             get
             {
-                return (this.Statement is IContainer t) ? t.Ende : this.Statement.Token;
-            }
-            set
-            {
+                if (this.Statement is null) return this.Token;
 
+                return (this.Statement is IContainer t) ? t.Ende : this.Statement.Token;
             }
         }
 
@@ -56,6 +54,7 @@ namespace Yama.Parser
 
         public ElseKey ()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -63,7 +62,7 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Else ) return null;
 
@@ -71,10 +70,10 @@ namespace Yama.Parser
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
 
-            IdentifierToken statementchild = request.Parser.Peek ( request.Token, 1);
+            IdentifierToken? statementchild = request.Parser.Peek ( request.Token, 1);
+            if (statementchild is null) return null;
 
             key.Statement = request.Parser.ParseCleanToken(statementchild);
-
             if (key.Statement == null) return null;
 
             return key;
@@ -82,7 +81,8 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.Statement is null) return request.Index.CreateError(this);
 
             this.Statement.Indezieren(request);
 
@@ -91,6 +91,8 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.Statement is null) return false;
+
             this.Statement.Compile(request);
 
             return true;

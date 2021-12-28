@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Yama.Lexer;
 using Yama.Parser;
 
 namespace Yama.Index
 {
     public class IndexVektorDeklaration : IParent, IMethode
     {
+
+        #region get/set
 
         public IParseTreeNode Use
         {
@@ -21,7 +19,7 @@ namespace Yama.Index
             set;
         }
 
-        public IndexKlassenDeklaration Klasse
+        public IndexKlassenDeklaration? Klasse
         {
             get;
             set;
@@ -65,20 +63,20 @@ namespace Yama.Index
             set;
         }
 
-        public IndexContainer SetContainer
+        public IndexContainer? SetContainer
         {
             get;
             set;
         }
 
-        public IndexContainer GetContainer
+        public IndexContainer? GetContainer
         {
             get;
             set;
         }
 
-        private ValidUses thisUses;
-        private ValidUses getUses;
+        private ValidUses? thisUses;
+        private ValidUses? getUses;
 
         public ValidUses ThisUses
         {
@@ -102,10 +100,11 @@ namespace Yama.Index
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
 
-                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration();
-                dekThisVar.Name = "invalue";
-                dekThisVar.Type = new IndexVariabelnReference { Deklaration = this.ReturnValue.Deklaration, Name = this.ReturnValue.Deklaration.Name, Use = this.Use };
-                dekThisVar.Use = this.Use;
+                if (this.ReturnValue.Deklaration is null) return this.thisUses;
+
+                IndexVariabelnReference varref = new IndexVariabelnReference (this.Use, this.ReturnValue.Deklaration.Name) { Deklaration = this.ReturnValue.Deklaration };
+                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration(this.Use, "invalue", varref);
+
                 dekThisVar.SetUsesSet = this.thisUses;
 
                 this.References.Add(dekThisVar.Type);
@@ -139,9 +138,12 @@ namespace Yama.Index
         {
             get
             {
+                string klasseName = "null";
+                if (this.Klasse is not null) klasseName = this.Klasse.Name;
+
                 string pattern = "{0}_{1}_{2}_Get";
 
-                return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count);
+                return string.Format(pattern, klasseName, this.NameInText, this.Parameters.Count);
             }
         }
 
@@ -149,9 +151,12 @@ namespace Yama.Index
         {
             get
             {
+                string klasseName = "null";
+                if (this.Klasse is not null) klasseName = this.Klasse.Name;
+
                 string pattern = "{0}_{1}_{2}_Set";
 
-                return string.Format(pattern, this.Klasse.Name, this.NameInText, this.Parameters.Count);
+                return string.Format(pattern, klasseName, this.NameInText, this.Parameters.Count);
             }
         }
 
@@ -169,19 +174,33 @@ namespace Yama.Index
             set;
         }
 
-        public IndexVektorDeklaration (  )
+        #endregion get/set
+
+        #region ctor
+
+        public IndexVektorDeklaration ( IParseTreeNode use, string name, IndexVariabelnReference returnValue )
         {
+            this.Use = use;
+            this.Name = name;
+            this.ReturnValue = returnValue;
+            this.ParentUsesSet = new();
             this.References = new List<IndexVariabelnReference>();
             this.Parameters = new List<IndexVariabelnDeklaration>();
         }
 
+        #endregion ctor
+
+        #region methods
+
         public bool Mappen()
         {
             if (this.IsMapped) return false;
+            if (this.ThisUses.GetIndex is null) return false;
+
             this.ThisUses.GetIndex.CurrentMethode = this;
 
-            this.SetContainer.Mappen(this.SetUses);
-            this.GetContainer.Mappen(this.GetUses);
+            if (this.SetContainer is not null) this.SetContainer.Mappen(this.SetUses);
+            if (this.GetContainer is not null) this.GetContainer.Mappen(this.GetUses);
 
             return this.IsMapped = true;
         }
@@ -189,6 +208,8 @@ namespace Yama.Index
         public bool PreMappen(ValidUses uses)
         {
             if (this.IsMapped) return false;
+            if (uses.GetIndex is null) return false;
+
             uses.GetIndex.CurrentMethode = this;
 
             this.ParentUsesSet = uses;
@@ -207,7 +228,6 @@ namespace Yama.Index
             return true;
         }
 
-        
         public bool IsInUse (int depth)
         {
             if (depth > 10) return true;
@@ -222,5 +242,8 @@ namespace Yama.Index
 
             return false;
         }
+
+        #endregion methods
+
     }
 }

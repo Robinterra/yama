@@ -19,7 +19,7 @@ namespace Yama.Compiler
             set;
         } = "ReferenceCall";
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -29,7 +29,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public List<string> AssemblyCommands
         {
@@ -37,7 +37,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -61,7 +61,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -77,7 +77,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(IndexVariabelnReference node, AlgoKeyCall key, string mode, SSACompileLine line)
+        private DefaultRegisterQuery BuildQuery(IndexVariabelnReference? node, AlgoKeyCall key, string mode, SSACompileLine line)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
@@ -113,7 +113,7 @@ namespace Yama.Compiler
                 if (mode == "setpoint") assemblyName = pdek.AssemblyNameSetMethode;
             }
 
-            object queryValue = assemblyName;
+            object? queryValue = assemblyName;
             if ("[REG]" == key.Name) queryValue = 1;
             if (node != null) if ("[PROPERTY]" == key.Name) queryValue = node.Deklaration;
             //if ("setpoint" == mode) queryValue = node.Deklaration;
@@ -128,6 +128,7 @@ namespace Yama.Compiler
         public bool Compile(Compiler compiler, ReferenceCall node, string mode = "default")
         {
             this.Node = node;
+            if (node.Reference is null) return false;
             return this.Compile(compiler, node.Reference, mode);
         }
 
@@ -152,9 +153,8 @@ namespace Yama.Compiler
 
                 DefaultRegisterQuery query = this.BuildQuery(null, key, "default", line);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -188,9 +188,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQueryDek(node, key, mode, line);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -205,6 +204,7 @@ namespace Yama.Compiler
         {
             if (node.Use == null) return compiler.AddError("Darf nicht null sein");
 
+            if (compiler.ContainerMgmt.CurrentMethod is null) return compiler.AddError("no method found", node.Use);
             if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("variable not in varmapper", node.Use);
 
             this.Algo = compiler.GetAlgo(this.AlgoName, "set");
@@ -223,9 +223,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQueryDek(node, key, "set", lineset);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -233,8 +232,9 @@ namespace Yama.Compiler
                 }
             }
 
-            SSACompileArgument arg = lineset.Arguments.FirstOrDefault();
+            SSACompileArgument? arg = lineset.Arguments.FirstOrDefault();
             if (arg == null) return compiler.AddError("variable is not set", this.Node);
+            if (arg.Reference is null) return compiler.AddError("no reference", this.Node);
 
             compiler.ContainerMgmt.StackArguments.Push(new SSACompileArgument(arg.Reference));
             if (!compiler.ContainerMgmt.CurrentMethod.IsReferenceInVarsContains(arg.Reference))
@@ -258,6 +258,7 @@ namespace Yama.Compiler
             this.IsUsed = false;
             compiler.AssemblerSequence.Add(this);
             compiler.AddSSALine(lineset);
+            if (compiler.ContainerMgmt.CurrentContainer is null) return false;
 
             compiler.ContainerMgmt.CurrentContainer.PhiSetNewVar.Add(lineset);
 
@@ -296,9 +297,8 @@ namespace Yama.Compiler
         {
             if (this.CheckRelevanz(compiler, node, mode)) return true;
 
-            if (mode == "set") return this.SetVariableCompile(compiler, (IndexVariabelnDeklaration)node.Deklaration);
-
-            if (mode == "default") return this.GetVariableCompile(compiler, (IndexVariabelnDeklaration)node.Deklaration, node.Use);
+            if (mode == "set" && node.Deklaration is IndexVariabelnDeklaration vd) return this.SetVariableCompile(compiler, vd);
+            if (mode == "default" && node.Deklaration is IndexVariabelnDeklaration ivd) return this.GetVariableCompile(compiler, ivd, node.Use);
 
             this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
@@ -322,9 +322,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -337,6 +336,7 @@ namespace Yama.Compiler
 
         private bool GetVariableCompile(Compiler compiler, IndexVariabelnDeklaration deklaration, IParseTreeNode use)
         {
+            if (compiler.ContainerMgmt.CurrentMethod is null) return compiler.AddError("no method found", deklaration.Use);
             if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(deklaration.Name)) return compiler.AddError("variable not in varmapper", deklaration.Use);
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[deklaration.Name];
@@ -387,6 +387,8 @@ namespace Yama.Compiler
                 return true;
             }
 
+            if (this.Algo is null) return false;
+
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
                 compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], this.PrimaryKeys));
@@ -411,12 +413,13 @@ namespace Yama.Compiler
             SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
             this.Line = line;
+            if (this.Algo is null) return false;
 
             foreach (AlgoKeyCall key in this.Algo.Keys)
             {
                 DefaultRegisterQuery query = this.BuildQuery(null, key, "point0", line);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)

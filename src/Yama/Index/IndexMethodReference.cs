@@ -21,7 +21,7 @@ namespace Yama.Index
             set;
         }
 
-        public IndexMethodDeklaration Deklaration
+        public IndexMethodDeklaration? Deklaration
         {
             get;
             set;
@@ -33,7 +33,7 @@ namespace Yama.Index
             set;
         }
 
-        public IndexVariabelnReference CallRef
+        public IndexVariabelnReference? CallRef
         {
             get;
             set;
@@ -45,13 +45,15 @@ namespace Yama.Index
             {
                 int result = this.Parameters.Count;
 
+                if (this.Deklaration is null) return result;
+
                 if (this.Deklaration.Type == MethodeType.Methode) result += 1;
 
                 return result;
             }
         }
 
-        public Index Index
+        public Index? Index
         {
             get;
             set;
@@ -61,8 +63,10 @@ namespace Yama.Index
 
         #region ctor
 
-        public IndexMethodReference (  )
+        public IndexMethodReference ( IParseTreeNode use, string name )
         {
+            this.Name = name;
+            this.Use = use;
             this.Parameters = new List<IndexVariabelnReference> (  );
         }
 
@@ -88,6 +92,9 @@ namespace Yama.Index
 
         private bool OverrideMethodsDeklaration(IndexVariabelnReference functionRef, IndexMethodDeklaration firstDek)
         {
+            if (this.Index is null) return false;
+            if (functionRef.OverloadMethods is null) return true;
+
             foreach (IMethode methode in functionRef.OverloadMethods)
             {
                 if (!(methode is IndexMethodDeklaration imd)) continue;
@@ -108,6 +115,9 @@ namespace Yama.Index
 
         private bool OverrideMethodTypeCheck()
         {
+            if (this.Deklaration is null) return false;
+            if (this.Index is null) return false;
+
             int count = 0;
             for (int i = 0; i < this.Deklaration.Parameters.Count; i++)
             {
@@ -132,19 +142,30 @@ namespace Yama.Index
         public bool Mappen(ValidUses thisUses)
         {
             this.Index = thisUses.GetIndex;
-            if (!this.FindDeklaration()) return thisUses.GetIndex.CreateError(this.Use, "methoden declaretion can not be found");
+            if (!this.FindDeklaration())
+            {
+                if (thisUses.GetIndex is null) return false;
+                return thisUses.GetIndex.CreateError(this.Use, "methoden declaretion can not be found");
+            }
+            if (this.Deklaration is null) return false;
+            if (this.CallRef is null) return false;
 
             if (this.Deklaration.Type == MethodeType.Operator) return true;
 
             int expectedParaCount = this.Deklaration.Parameters.Count;
             if ( this.Use is NewKey ) expectedParaCount -= 1;
-            if ( expectedParaCount != this.ParametersCount) return thisUses.GetIndex.CreateError(this.CallRef.ParentCall == null ? this.Use : this.CallRef.ParentCall.Use, "parameter count is not equals with the declaration");
+            if ( expectedParaCount != this.ParametersCount)
+            {
+                if (thisUses.GetIndex is null) return false;
+                return thisUses.GetIndex.CreateError(this.CallRef.ParentCall == null ? this.Use : this.CallRef.ParentCall.Use, "parameter count is not equals with the declaration");
+            }
 
             int count = 0;
             for (int i = 0; i < this.Deklaration.Parameters.Count; i++)
             {
                 IndexVariabelnDeklaration dek = this.Deklaration.Parameters[i];
                 if (dek.Name == "this") continue;
+                if (thisUses.GetIndex is null) return false;
 
                 thisUses.GetIndex.IndexTypeSafeties.Add(new IndexParameterType(dek, this.Parameters[count], count, this.Deklaration, this.CallRef));
 

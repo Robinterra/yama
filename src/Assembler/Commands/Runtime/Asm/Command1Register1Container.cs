@@ -30,13 +30,8 @@ namespace Yama.Assembler.Runtime
         {
             get;
             set;
-        }
+        } = new byte[0];
 
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
         public int Size
         {
             get;
@@ -57,6 +52,7 @@ namespace Yama.Assembler.Runtime
 
         public Command1Register1Container(string key, string format, uint id, int size, int maxregister, uint teiler, bool issptwo = false)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -85,9 +81,12 @@ namespace Yama.Assembler.Runtime
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (!(t.Argument1 is SquareArgumentNode s)) return false;
             if (request.Assembler.GetRegister(t.Argument0.Token.Text) > this.MaxRegister) return false;
+            if (s.Number is null) return false;
             if (Convert.ToUInt32(s.Number.Value) % this.Teiler != 0) return false;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.Arguments.Add(0);

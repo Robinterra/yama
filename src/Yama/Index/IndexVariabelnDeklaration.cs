@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Yama.Compiler;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -73,7 +69,7 @@ namespace Yama.Index
 
         // -----------------------------------------------
 
-        public ValidUses BaseUsesSet
+        public ValidUses? BaseUsesSet
         {
             get;
             set;
@@ -81,7 +77,7 @@ namespace Yama.Index
 
         // -----------------------------------------------
 
-        public ValidUses SetUsesSet
+        public ValidUses? SetUsesSet
         {
             get;
             set;
@@ -89,15 +85,7 @@ namespace Yama.Index
 
         // -----------------------------------------------
 
-        public SSAVariableMap SSAMap
-        {
-            get;
-            set;
-        }
-
-        // -----------------------------------------------
-
-        public GenericCall GenericDeklaration
+        public GenericCall? GenericDeklaration
         {
             get;
             set;
@@ -121,8 +109,12 @@ namespace Yama.Index
 
         // -----------------------------------------------
 
-        public IndexVariabelnDeklaration (  )
+        public IndexVariabelnDeklaration ( IParseTreeNode use, string name, IndexVariabelnReference varType )
         {
+            this.Use = use;
+            this.Name = name;
+            this.Type = varType;
+            this.ParentUsesSet = new();
             this.References = new List<IndexVariabelnReference>();
         }
 
@@ -161,9 +153,9 @@ namespace Yama.Index
 
         private bool VariableIsThisKeyword ()
         {
-            IParent parent = this.ParentUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "this" );
+            IParent? parent = this.ParentUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "this" );
 
-            if ( !(parent is IndexVariabelnDeklaration dek) ) return false;
+            if (parent is not IndexVariabelnDeklaration dek) return false;
 
             this.Type = dek.Type;
             this.Use = dek.Use;
@@ -173,9 +165,11 @@ namespace Yama.Index
 
         private bool VariableIsBaseKeyword ()
         {
-            IParent parent = this.BaseUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "base" );
+            if (this.BaseUsesSet is null) return false;
 
-            if ( !(parent is IndexVariabelnDeklaration dek) ) return false;
+            IParent? parent = this.BaseUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "base" );
+
+            if (parent is not IndexVariabelnDeklaration dek) return false;
 
             this.Type = dek.Type;
             this.Use = dek.Use;
@@ -187,9 +181,8 @@ namespace Yama.Index
         {
             this.SetUsesSet = uses;
 
-            IParent parent = this.SetUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "invalue" );
-
-            if ( !(parent is IndexVariabelnDeklaration dek) ) return false;
+            IParent? parent = this.SetUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "invalue" );
+            if (parent is not IndexVariabelnDeklaration dek) return false;
 
             this.Type = dek.Type;
             this.Use = dek.Use;

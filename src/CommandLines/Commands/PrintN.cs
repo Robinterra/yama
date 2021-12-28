@@ -33,13 +33,13 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, string.Format ( "--{0}:<Text>", this.Key ), string.Empty, "Gibt <text> in der Console aus" );
+                return string.Format (CommandLines.HelpController.HilfePattern, string.Format ( "--{0}:<Text>", this.Key ), string.Empty, "Gibt <text> in der Console aus" );
             }
         }
 
         // -----------------------------------------------
 
-        public string Value
+        public string? Value
         {
             get;
             set;
@@ -55,9 +55,9 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
-        public ICommandLine Check ( string command )
+        public ICommandLine? Check ( string command )
         {
-            string value = null;
+            string? value = null;
 
             if ( !ParseCommandLine.TestArg ( command, string.Format ( "--{0}:", this.Key ), ref value ) ) return null;
 

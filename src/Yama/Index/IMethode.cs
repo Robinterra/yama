@@ -23,7 +23,7 @@ namespace Yama.Index
             set;
         }
 
-        IndexKlassenDeklaration Klasse
+        IndexKlassenDeklaration? Klasse
         {
             get;
             set;

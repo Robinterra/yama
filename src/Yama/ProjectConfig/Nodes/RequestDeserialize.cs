@@ -12,12 +12,11 @@ namespace Yama.ProjectConfig.Nodes
         public Project Project
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
 
-        public Package Package
+        public Package? Package
         {
             get;
             set;
@@ -26,6 +25,21 @@ namespace Yama.ProjectConfig.Nodes
         // -----------------------------------------------
 
         #endregion get/set
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public RequestDeserialize(Project project)
+        {
+            this.Project = project;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
 
         // -----------------------------------------------
 

@@ -8,6 +8,12 @@ namespace Yama.Assembler.ARMT32
     public class PointerNode : IParseTreeNode, IContainer
     {
 
+        #region vars
+
+        private IdentifierToken? ende;
+
+        #endregion vars
+
         #region get/set
 
         public IdentifierToken Token
@@ -31,8 +37,12 @@ namespace Yama.Assembler.ARMT32
 
         public IdentifierToken Ende
         {
-            get;
-            set;
+            get
+            {
+                if (this.ende is null) return this.Token;
+
+                return this.ende;
+            }
         }
 
         #endregion get/set
@@ -41,6 +51,7 @@ namespace Yama.Assembler.ARMT32
 
         public PointerNode ()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
         
@@ -56,7 +67,7 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
+        public IParseTreeNode? Parse(Parser.Request.RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.StarToken) return null;
 
@@ -64,14 +75,14 @@ namespace Yama.Assembler.ARMT32
 
             deklaration.AllTokens.Add(request.Token);
 
-            IdentifierToken token = request.Parser.Peek(request.Token, 1);
-
+            IdentifierToken? token = request.Parser.Peek(request.Token, 1);
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.Word) return null;
 
             deklaration.Token = token;
             deklaration.AllTokens.Add(token);
 
-            deklaration.Ende = token;
+            deklaration.ende = token;
 
             return deklaration;
         }

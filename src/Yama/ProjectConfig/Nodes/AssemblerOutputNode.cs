@@ -54,6 +54,8 @@ namespace Yama.ProjectConfig.Nodes
         public AssemblerOutputNode (  )
         {
             this.AllTokens = new List<IdentifierToken>();
+            this.Token = new IdentifierToken();
+            this.ValueToken = new IdentifierToken();
         }
 
         // -----------------------------------------------
@@ -71,7 +73,10 @@ namespace Yama.ProjectConfig.Nodes
 
         public bool Deserialize(RequestDeserialize request)
         {
-            string path = this.ValueToken.Value.ToString();
+            if (this.ValueToken.Value == null) return false;
+
+            string? path = this.ValueToken.Value.ToString();
+            if (path == null) return false;
 
             FileInfo directory = new FileInfo(path);
 
@@ -89,7 +94,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public IParseTreeNode Parse(RequestParserTreeParser request)
+        public IParseTreeNode? Parse(RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
             if (request.Token.Text.ToLower() != "asmout") return null;
@@ -98,8 +103,8 @@ namespace Yama.ProjectConfig.Nodes
             result.AllTokens.Add(request.Token);
             result.Token = request.Token;
 
-            IdentifierToken token = request.Parser.Peek(result.Token, 1);
-            if (token == null) return null;
+            IdentifierToken? token = request.Parser.Peek(result.Token, 1);
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.DoublePoint) return null;
             result.AllTokens.Add(token);
 

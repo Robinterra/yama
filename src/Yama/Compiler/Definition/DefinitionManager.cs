@@ -18,7 +18,6 @@ namespace Yama.Compiler.Definition
         public List<IProcessorDefinition> AviableDefinitions
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -33,6 +32,8 @@ namespace Yama.Compiler.Definition
 
         public DefinitionManager (  )
         {
+            this.AviableDefinitions = new List<IProcessorDefinition>();
+
             this.Init (  );
         }
 
@@ -48,8 +49,6 @@ namespace Yama.Compiler.Definition
 
         private bool Init (  )
         {
-            this.AviableDefinitions = new List<IProcessorDefinition>();
-
             this.GetAllDefinitions (  );
 
             return true;
@@ -87,8 +86,7 @@ namespace Yama.Compiler.Definition
 
         public bool AddDefinition ( FileInfo file )
         {
-            IProcessorDefinition def = this.DeserializesDef ( file );
-
+            IProcessorDefinition? def = this.DeserializesDef ( file );
             if (def == null) return false;
 
             this.AviableDefinitions.Add ( def );
@@ -114,9 +112,9 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public IProcessorDefinition GetDefinition ( string name )
+        public IProcessorDefinition? GetDefinition ( string? name )
         {
-            IProcessorDefinition def = this.AviableDefinitions.FirstOrDefault ( t => t.Name == name );
+            IProcessorDefinition? def = this.AviableDefinitions.FirstOrDefault ( t => t.Name == name );
 
             if (def == null) this.PrintSimpleError(string.Format("The definition {0} can not be found!", name));
 
@@ -125,7 +123,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        private IProcessorDefinition DeserializesDef ( FileInfo file )
+        private IProcessorDefinition? DeserializesDef ( FileInfo file )
         {
             if ( !file.Exists ) return null;
             if ( file.Extension != ".json" ) return null;

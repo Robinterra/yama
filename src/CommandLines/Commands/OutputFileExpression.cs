@@ -33,13 +33,13 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.Help.HilfePattern, this.Key, "<file>", "The output Filename (Default:out.bin) Shortcut:out" );
+                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, "<file>", "The output Filename (Default:out.bin) Shortcut:out" );
             }
         }
 
         // -----------------------------------------------
 
-        public string Value
+        public string? Value
         {
             get;
             set;
@@ -55,7 +55,7 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
-        public ICommandLine Check ( string command )
+        public ICommandLine? Check ( string command )
         {
             if (string.Format ( "{0}", this.Key ) == command) return new OutputFileExpression (  );
             if (string.Format ( "out", this.Key ) == command) return new OutputFileExpression (  );

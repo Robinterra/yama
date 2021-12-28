@@ -16,7 +16,7 @@ namespace Yama.Compiler
             set;
         } = "MallocFree";
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -26,7 +26,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new Dictionary<string, string>();
 
         public List<string> AssemblyCommands
         {
@@ -34,7 +34,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -54,7 +54,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -92,9 +92,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -107,6 +106,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.Algo is null) return false;
+
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));

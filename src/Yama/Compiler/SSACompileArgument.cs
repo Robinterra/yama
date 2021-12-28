@@ -8,13 +8,13 @@ namespace Yama.Compiler
 
         #region get/set
 
-        public SSACompileLine Reference
+        public SSACompileLine? Reference
         {
             get;
             set;
         }
 
-        public SSAVariableMap Variable
+        public SSAVariableMap? Variable
         {
             get;
             set;
@@ -32,20 +32,25 @@ namespace Yama.Compiler
             set;
         }
 
-        public ICompileRoot Root
+        public ICompileRoot? Root
         {
             get;
             set;
         }
-        public CompileSprungPunkt CompileReference { get; internal set; }
+
+        public CompileSprungPunkt? CompileReference
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
         #region ctor
 
-        public SSACompileArgument()
+        public SSACompileArgument(SSACompileArgumentMode mode)
         {
-
+            this.Mode = mode;
         }
 
         public SSACompileArgument(SSACompileLine line)

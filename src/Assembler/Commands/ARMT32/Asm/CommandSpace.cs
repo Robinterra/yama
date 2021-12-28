@@ -30,13 +30,7 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
-        }
-
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
+        } = new byte[0];
 
         public int Size
         {
@@ -56,7 +50,9 @@ namespace Yama.Assembler.ARMT32
 
         public CommandSpace()
         {
-
+            this.Node = new ParserError();
+            this.Key = string.Empty;
+            this.Format = string.Empty;
         }
 
         public CommandSpace(CommandSpace t, IParseTreeNode node, List<byte> bytes)

@@ -23,23 +23,25 @@ namespace Yama.Compiler
             set;
         }
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
         }
 
-        public CompileSprungPunkt Punkt
+        public CompileSprungPunkt? Punkt
         {
             get;
             set;
         }
+
         public List<string> AssemblyCommands
         {
             get;
             set;
         } = new List<string>();
-        public IParseTreeNode Node
+
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -49,7 +51,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public bool IsUsed
         {
@@ -65,7 +67,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -101,10 +103,11 @@ namespace Yama.Compiler
             this.Line = line;
 
             if (this.Point == PointMode.Custom) this.Punkt = node;
-            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Begin;
-            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Ende;
-            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer.Begin;
-            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
+            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer?.Begin;
+            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer?.Ende;
+            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer?.Begin;
+            if (this.Point == PointMode.RootEnde) this.Punkt = compiler.ContainerMgmt.RootContainer?.Ende;
+            if (this.Punkt is null) return compiler.AddError("sprunkpunktw konnte nicht ermittelt werden");
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -112,9 +115,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(this.Punkt, key, mode, line);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -127,6 +129,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.Algo is null) return false;
+
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));

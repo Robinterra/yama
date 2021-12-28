@@ -30,13 +30,7 @@ namespace Yama.Assembler.Runtime
         {
             get;
             set;
-        }
-
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
+        } = new byte[0];
 
         public int Size
         {
@@ -56,7 +50,9 @@ namespace Yama.Assembler.Runtime
 
         public CommandData()
         {
-
+            this.Key = string.Empty;
+            this.Format = string.Empty;
+            this.Node = new ParserError();
         }
 
         public CommandData(CommandData t, IParseTreeNode node, List<byte> bytes)
@@ -77,7 +73,12 @@ namespace Yama.Assembler.Runtime
             if (t.Data.Kind == Lexer.IdentifierKind.NumberToken) return this.AssembleNumberData(request);
 
             List<byte> daten = new List<byte>();
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
+
+            string? datenstring = null;
+            if (t.Data.Value is not null) datenstring = t.Data.Value.ToString();
+            if (datenstring is null) return false;
+
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(datenstring);
 
             int orgsize = data.Length;
 
@@ -88,10 +89,10 @@ namespace Yama.Assembler.Runtime
 
             for (int i = 0; i < 4 - (temp == 0 ? 4 : temp); i++)
             {
-                t.Data.Value = t.Data.Value.ToString() + "\0";
+                datenstring = datenstring + "\0";
             }
 
-            data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
+            data = System.Text.Encoding.UTF8.GetBytes(datenstring);
 
             daten.AddRange(BitConverter.GetBytes(orgsize));
             daten.AddRange(data);
@@ -127,7 +128,11 @@ namespace Yama.Assembler.Runtime
             if (t.Data.Kind == Lexer.IdentifierKind.NumberToken) return Convert.ToUInt32(t.Data.Value);
             if (t.Data.Kind != Lexer.IdentifierKind.Word) return 0;
 
-            JumpPointMapper map = request.Assembler.GetJumpPoint(t.Data.Value.ToString());
+            string? datenstring = null;
+            if (t.Data.Value is not null) datenstring = t.Data.Value.ToString();
+            if (datenstring is null) return 0;
+
+            JumpPointMapper? map = request.Assembler.GetJumpPoint(datenstring);
             if (map != null) return map.Adresse;
 
             request.Assembler.Errors.Add(request.Node);
@@ -147,7 +152,11 @@ namespace Yama.Assembler.Runtime
                 return true;
             }
 
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(t.Data.Value.ToString());
+            string? datenstring = null;
+            if (t.Data.Value is not null) datenstring = t.Data.Value.ToString();
+            if (datenstring is null) return false;
+
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(datenstring);
 
             this.Size = data.Length + 4;
             int temp = this.Size & 0x3;

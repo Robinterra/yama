@@ -7,7 +7,7 @@ namespace LearnCsStuf.Automaten
 
         #region get/set
 
-        List<Relation> Relationen
+        List<Relation>? Relationen
         {
             get;
             set;
@@ -17,7 +17,7 @@ namespace LearnCsStuf.Automaten
 
         #region methods
 
-        Zustand Check ( Token token, Automat automat );
+        Zustand? Check ( Token token, Automat automat );
 
         #endregion methods
 

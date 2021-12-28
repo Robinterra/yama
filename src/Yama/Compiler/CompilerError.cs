@@ -5,11 +5,30 @@ namespace Yama.Compiler
     public class CompilerError
     {
 
-        public IParseTreeNode Use
+        #region get/set
+
+        public IParseTreeNode? Use
         {
             get;
             set;
         }
-        public string Msg { get; set; }
+
+        public string Msg
+        {
+            get;
+            set;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public CompilerError(string msg, IParseTreeNode? use)
+        {
+            this.Use = use;
+            this.Msg = msg;
+        }
+
+        #endregion ctor
     }
 }

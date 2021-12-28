@@ -44,7 +44,6 @@ namespace Yama.ProjectConfig.Nodes
         public List<IdentifierToken> AllTokens
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -60,7 +59,6 @@ namespace Yama.ProjectConfig.Nodes
         public List<IDeserialize> Childs
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -71,6 +69,9 @@ namespace Yama.ProjectConfig.Nodes
 
         public PackageGroupNode ( ParserLayer layer )
         {
+            this.Token = new();
+            this.Childs = new();
+            this.Ende = new();
             this.AllTokens = new List<IdentifierToken>();
             this.Layer = layer;
         }
@@ -111,7 +112,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public IParseTreeNode Parse(RequestParserTreeParser request)
+        public IParseTreeNode? Parse(RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
             if (request.Token.Text.ToLower() != "package") return null;
@@ -120,13 +121,13 @@ namespace Yama.ProjectConfig.Nodes
             result.AllTokens.Add(request.Token);
             result.Token = request.Token;
 
-            IdentifierToken token = request.Parser.Peek(result.Token, 1);
-            if (token == null) return null;
+            IdentifierToken? token = request.Parser.Peek(result.Token, 1);
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.DoublePoint) return null;
             result.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
-            if (token == null) return null;
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.BeginContainer) return null;
             result.AllTokens.Add(token);
             IdentifierToken begin = token;
@@ -139,8 +140,10 @@ namespace Yama.ProjectConfig.Nodes
 
             request.Parser.ActivateLayer ( this.Layer );
 
-            List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens ( begin.Position + 1, result.Ende.Position );
-            result.Childs = nodes.Cast<IDeserialize>().ToList();
+            List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( begin.Position + 1, result.Ende.Position );
+            if (nodes is null) return null;
+
+            result.Childs.AddRange(nodes.Cast<IDeserialize>());
 
             request.Parser.VorherigesLayer ();
 

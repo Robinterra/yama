@@ -36,6 +36,7 @@ namespace Yama.Parser
 
         public UsingKey()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -43,15 +44,19 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Using ) return null;
-            if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.Text ) return null;
+
+            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
+            if (token is null) return null;
+            if (token.Kind != IdentifierKind.Text) return null;
 
             UsingKey key = new UsingKey (  );
             key.AllTokens.Add ( request.Token );
 
-            IdentifierToken keyNamenToken = request.Parser.Peek ( request.Token, 1 );
+            IdentifierToken? keyNamenToken = request.Parser.Peek ( request.Token, 1 );
+            if (keyNamenToken is null) return null;
 
             key.Token = keyNamenToken;
             key.AllTokens.Add ( keyNamenToken );
@@ -61,11 +66,12 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexNamespaceDeklaration dek)) return request.Index.CreateError(this, "Kein Namespace als Parent dieses Usings");
+            if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieses Usings");
 
-            IndexNamespaceReference deklaration = new IndexNamespaceReference();
-            deklaration.Name = this.Token.Value.ToString();
-            deklaration.Use = this;
+            string? value = this.Token.Value is null ? null : this.Token.Value.ToString();
+            if (value is null) return request.Index.CreateError(this);
+
+            IndexNamespaceReference deklaration = new IndexNamespaceReference(this, value);
 
             dek.Usings.Add(deklaration);
 

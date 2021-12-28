@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
@@ -10,9 +8,15 @@ namespace Yama.Parser
     public class NewKey : IParseTreeNode, IEndExpression, IContainer
     {
 
+        #region vars
+
+        private IdentifierToken? ende;
+
+        #endregion vars
+
         #region get/set
 
-        public IndexVariabelnReference Reference
+        public IndexVariabelnReference? Reference
         {
             get;
             set;
@@ -24,13 +28,13 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode Zuweisung
+        public IParseTreeNode? Zuweisung
         {
             get;
             set;
         }
 
-        public IdentifierToken Definition
+        public IdentifierToken? Definition
         {
             get;
             set;
@@ -39,13 +43,11 @@ namespace Yama.Parser
         public CompileReferenceCall CtorCall
         {
             get;
-            set;
         } = new CompileReferenceCall();
 
         public CompileExecuteCall FunctionExecute
         {
             get;
-            set;
         } = new CompileExecuteCall();
 
         public IdentifierToken Token
@@ -54,7 +56,7 @@ namespace Yama.Parser
             set;
         }
 
-        public GenericCall GenericDefintion
+        public GenericCall? GenericDefintion
         {
             get;
             set;
@@ -67,7 +69,7 @@ namespace Yama.Parser
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
                 if (this.GenericDefintion != null) result.Add(this.GenericDefintion);
-                if (this.Parameters != null) result.AddRange ( this.Parameters );
+                result.AddRange ( this.Parameters );
                 if (this.Zuweisung != null) result.Add ( this.Zuweisung );
 
                 return result;
@@ -76,8 +78,12 @@ namespace Yama.Parser
 
         public IdentifierToken Ende
         {
-            get;
-            set;
+            get
+            {
+                if (this.ende is null) return this.Token;
+
+                return this.ende;
+            }
         }
 
         public List<IdentifierToken> AllTokens
@@ -91,7 +97,9 @@ namespace Yama.Parser
 
         public NewKey ()
         {
+            this.Parameters = new List<IParseTreeNode>();
             this.AllTokens = new List<IdentifierToken> ();
+            this.Token = new IdentifierToken();
         }
 
         #endregion ctor
@@ -113,7 +121,7 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.New ) return null;
 
@@ -121,39 +129,43 @@ namespace Yama.Parser
             newKey.Token = request.Token;
             newKey.AllTokens.Add ( request.Token );
 
-            newKey.Definition = request.Parser.Peek ( request.Token, 1 );
-            newKey.AllTokens.Add ( newKey.Definition );
-            if ( newKey.Definition == null ) return null;
-            if ( !this.CheckHashValidOperator( newKey.Definition )) return null;
+            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
+            if (token is null) return null;
 
-            IdentifierToken beginkind = request.Parser.Peek ( newKey.Definition, 1 );
-            if ( beginkind == null ) return null;
+            newKey.Definition = token;
+            newKey.AllTokens.Add ( token );
+            if ( !this.CheckHashValidOperator( token )) return null;
+
+            IdentifierToken? beginkind = request.Parser.Peek ( newKey.Definition, 1 );
+            if ( beginkind is null ) return null;
 
             beginkind = this.TryParseGeneric(request, newKey, beginkind);
-            if ( beginkind == null ) return null;
+            if ( beginkind is null ) return null;
 
             if (beginkind.Kind != IdentifierKind.OpenBracket) return null;
 
-            IdentifierToken endToken = request.Parser.FindEndToken ( beginkind, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
-            if ( endToken == null ) return null;
+            IdentifierToken? endToken = request.Parser.FindEndToken ( beginkind, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
+            if ( endToken is null ) return null;
 
-            newKey.Parameters = request.Parser.ParseCleanTokens ( beginkind.Position + 1, endToken.Position, true );
-            if (newKey.Parameters == null) return null;
+            List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( beginkind.Position + 1, endToken.Position, true );
+            if (nodes is null) return null;
 
-            newKey.Ende = endToken;
+            newKey.Parameters = nodes;
+
+            newKey.ende = endToken;
             newKey.AllTokens.Add(endToken);
             newKey.AllTokens.Add(beginkind);
 
             return newKey;
         }
 
-        private IdentifierToken TryParseGeneric(RequestParserTreeParser request, NewKey deklaration, IdentifierToken token)
+        private IdentifierToken? TryParseGeneric(RequestParserTreeParser request, NewKey deklaration, IdentifierToken token)
         {
-            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
-            if (genericRule == null) return token;
+            GenericCall? genericRule = request.Parser.GetRule<GenericCall>();
+            if (genericRule is null) return token;
 
-            IParseTreeNode node = request.Parser.TryToParse ( genericRule, token );
-            if (!(node is GenericCall genericCall)) return token;
+            IParseTreeNode? node = request.Parser.TryToParse ( genericRule, token );
+            if (node is not GenericCall genericCall) return token;
 
             deklaration.GenericDefintion = genericCall;
 
@@ -163,25 +175,25 @@ namespace Yama.Parser
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             //if (parent is IndexVariabelnReference varref) return this.RefComb(varref);
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.Definition is null) return request.Index.CreateError(this);
 
-            IndexMethodReference methodReference = new IndexMethodReference();
-            methodReference.Use = this;
+            IndexMethodReference methodReference = new IndexMethodReference(this, this.Token.Text);
 
             foreach (IParseTreeNode node in this.Parameters)
             {
                 node.Indezieren(request);
 
-                IndexVariabelnReference parRef = container.VariabelnReferences.LastOrDefault();
+                IndexVariabelnReference? parRef = container.VariabelnReferences.LastOrDefault();
+                if (parRef is null) return request.Index.CreateError(this);
 
                 methodReference.Parameters.Add(parRef);
             }
 
             container.MethodReferences.Add(methodReference);
 
-            IndexVariabelnReference typeDeklaration = new IndexVariabelnReference();
-            typeDeklaration.Use = this;
-            typeDeklaration.Name = this.Definition.Text;
+            IndexVariabelnReference typeDeklaration = new IndexVariabelnReference(this, this.Definition.Text);
+
             if (this.GenericDefintion != null)
             {
                 typeDeklaration.GenericDeklaration = this.GenericDefintion;
@@ -189,9 +201,7 @@ namespace Yama.Parser
             }
             container.VariabelnReferences.Add(typeDeklaration);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             reference.Deklaration = typeDeklaration;
             if (this.GenericDefintion != null) reference.GenericDeklaration = this.GenericDefintion;
 
@@ -205,9 +215,12 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.Reference is null) return false;
+
             List<IParseTreeNode> copylist = this.Parameters;
             copylist.Reverse();
-            IParseTreeNode dek = null;
+
+            IParseTreeNode? dek = null;
 
             int parasCount = 0;
 

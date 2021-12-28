@@ -1,5 +1,6 @@
 using System.IO;
 using Yama.Parser;
+
 namespace Yama.Lexer
 {
     public class IdentifierToken
@@ -41,7 +42,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public FileInfo FileInfo
+        public FileInfo? FileInfo
         {
             get;
             set;
@@ -49,7 +50,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public byte[] Data
+        public byte[]? Data
         {
             get;
             private set;
@@ -57,7 +58,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public byte[] CleanDaten
+        public byte[]? CleanDaten
         {
             get;
             set;
@@ -69,6 +70,8 @@ namespace Yama.Lexer
         {
             get
             {
+                if (this.Data == null) return string.Empty;
+
                 return System.Text.Encoding.UTF8.GetString ( this.Data );
             }
             private set
@@ -79,7 +82,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public object Value
+        public object? Value
         {
             get;
             set;
@@ -87,7 +90,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IParseTreeNode ParentNode
+        public IParseTreeNode? ParentNode
         {
             get;
             set;
@@ -95,7 +98,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -118,7 +121,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, string text, object value )
+        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, string text, object value ) : this()
         {
             this.Kind = kind;
             this.Position = position;
@@ -130,7 +133,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, byte[] data, object value )
+        public IdentifierToken ( IdentifierKind kind, int position, int line, int column, byte[] data, object value ) : this()
         {
             this.Kind = kind;
             this.Position = position;

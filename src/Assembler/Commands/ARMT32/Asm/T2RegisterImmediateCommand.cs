@@ -29,13 +29,8 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
-        }
+        } = new byte[0];
 
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
         public int Size
         {
             get;
@@ -59,6 +54,7 @@ namespace Yama.Assembler.ARMT32
 
         public T2RegisterImmediateCommand(string key, string format, uint id, int size, int max)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -85,7 +81,9 @@ namespace Yama.Assembler.ARMT32
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             if (this.Key == "cmp") assembleFormat.Arguments.Add(0xf);

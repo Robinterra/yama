@@ -28,14 +28,16 @@ namespace Yama.Compiler.Definition
             set;
         }
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
         }
 
-        public RegisterMap(RegisterType type, RegisterUseMode mode)
+        public RegisterMap(string name, int id, RegisterType type, RegisterUseMode mode)
         {
+            this.Name = name;
+            this.RegisterId = id;
             this.Type = type;
             this.Mode = mode;
         }

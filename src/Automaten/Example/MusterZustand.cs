@@ -7,7 +7,7 @@ namespace LearnCsStuf.Automaten
 
         #region get/set
 
-        public List<Relation> Relationen
+        public List<Relation>? Relationen
         {
             get;
             set;
@@ -15,9 +15,13 @@ namespace LearnCsStuf.Automaten
 
         #endregion get/set
 
+        #region ctor
+
+        #endregion ctor
+
         #region methods
 
-        public Zustand Check ( Token token, Automat automat )
+        public Zustand? Check ( Token token, Automat automat )
         {
             if ( this.Relationen == null ) return null;
             if ( token == null ) return null;

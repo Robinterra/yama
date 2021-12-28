@@ -41,6 +41,7 @@ namespace Yama.Assembler.ARMT32
 
         public CommandWithList ()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -56,7 +57,7 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
+        public IParseTreeNode? Parse(Parser.Request.RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
 
@@ -64,10 +65,14 @@ namespace Yama.Assembler.ARMT32
             deklaration.Token = request.Token;
             deklaration.AllTokens.Add(request.Token);
 
-            IdentifierToken token = request.Parser.Peek(request.Token, 1);
+            IdentifierToken? token = request.Parser.Peek(request.Token, 1);
+            if (token is null) return null;
+
             if (token.Kind != IdentifierKind.BeginContainer) return null;
+
             deklaration.AllTokens.Add(token);
             token = request.Parser.Peek(token, 1);
+            if (token is null) return null;
 
             while (token.Kind == IdentifierKind.Word)
             {
@@ -75,12 +80,14 @@ namespace Yama.Assembler.ARMT32
                 deklaration.AllTokens.Add(token);
 
                 token = request.Parser.Peek(token, 1);
+                if (token is null) return null;
 
                 if (token.Kind != IdentifierKind.Comma) continue;
 
                 deklaration.AllTokens.Add(token);
 
                 token = request.Parser.Peek(token, 1);
+                if (token is null) return null;
             }
 
             if (token.Kind != IdentifierKind.CloseContainer) return null;

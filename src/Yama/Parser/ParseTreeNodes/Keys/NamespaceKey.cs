@@ -9,7 +9,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IParseTreeNode Statement
+        public IParseTreeNode? Statement
         {
             get;
             set;
@@ -27,7 +27,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                if (this.Statement != null) result.Add ( this.Statement );
+                if (this.Statement is not null) result.Add ( this.Statement );
 
                 return result;
             }
@@ -38,7 +38,7 @@ namespace Yama.Parser
             get;
         }
 
-        public IndexNamespaceDeklaration Deklaration
+        public IndexNamespaceDeklaration? Deklaration
         {
             get;
             set;
@@ -53,36 +53,38 @@ namespace Yama.Parser
 
         #region ctor
 
-        public NamespaceKey()
-        {
-            this.AllTokens = new List<IdentifierToken> ();
-        }
-
         public NamespaceKey(ParserLayer nextLayer)
         {
             this.NextLayer = nextLayer;
+            this.Token = new();
+            this.AllTokens = new List<IdentifierToken> ();
         }
 
         #endregion ctor
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Namespace ) return null;
-            if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.Text ) return null;
 
-            NamespaceKey key = new NamespaceKey (  );
+            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
+            if ( token is null ) return null;
+            if ( token.Kind != IdentifierKind.Text ) return null;
+
+            NamespaceKey key = new NamespaceKey ( this.NextLayer );
             key.AllTokens.Add ( request.Token );
 
-            IdentifierToken keyNamenToken = request.Parser.Peek ( request.Token, 1 );
+            IdentifierToken? keyNamenToken = request.Parser.Peek ( request.Token, 1 );
 
+            if ( keyNamenToken is null ) return null;
             key.Token = keyNamenToken;
             key.AllTokens.Add ( keyNamenToken );
 
-            IdentifierToken Statementchild = request.Parser.Peek ( keyNamenToken, 1);
+            IdentifierToken? statementchild = request.Parser.Peek ( keyNamenToken, 1);
+            if ( statementchild is null ) return null;
 
-            key.Statement = request.Parser.ParseCleanToken(Statementchild, this.NextLayer);
+            key.Statement = request.Parser.ParseCleanToken(statementchild, this.NextLayer);
 
             if (key.Statement == null) return null;
 
@@ -91,14 +93,19 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            IndexNamespaceDeklaration dek = new IndexNamespaceDeklaration();
-            dek.Name = this.Token.Value.ToString();
+            if ( this.Token.Value is null ) return false;
+
+            string? name = this.Token.Value.ToString ();
+            if ( name is null ) return false;
+            
+            IndexNamespaceDeklaration dek = new IndexNamespaceDeklaration(this, name);
 
             dek = request.Index.NamespaceAdd(dek);
             this.Deklaration = dek;
 
-            dek.Files.Add(this.Token.FileInfo);
+            if (this.Token.FileInfo is not null) dek.Files.Add(this.Token.FileInfo);
 
+            if ( this.Statement is null ) return false;
             this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, dek));
 
             return true;

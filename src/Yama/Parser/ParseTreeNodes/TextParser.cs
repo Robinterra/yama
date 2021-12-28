@@ -41,17 +41,18 @@ namespace Yama.Parser
 
         public TextParser (  )
         {
+            this.Token = new IdentifierToken();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
-        public TextParser ( int prio )
+        public TextParser ( int prio ) : this()
         {
             this.Prio = prio;
         }
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Text ) return null;
 
@@ -67,9 +68,7 @@ namespace Yama.Parser
         {
             if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = "string";
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, "string");
 
             container.VariabelnReferences.Add(reference);
 
@@ -85,7 +84,7 @@ namespace Yama.Parser
             compile.Compile(request.Compiler, this);
 
             CompileReferenceCall referenceCall = new CompileReferenceCall();
-            referenceCall.CompileData(request.Compiler, this, compile.JumpPointName);
+            referenceCall.CompileData(request.Compiler, this, compile.JumpPointName!);
 
             return true;
         }

@@ -43,7 +43,6 @@ namespace Yama.ProjectConfig.Nodes
         public List<IdentifierToken> AllTokens
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -54,6 +53,8 @@ namespace Yama.ProjectConfig.Nodes
 
         public DefineNode (  )
         {
+            this.ValueToken = new();
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken>();
         }
 
@@ -72,7 +73,10 @@ namespace Yama.ProjectConfig.Nodes
 
         public bool Deserialize(RequestDeserialize request)
         {
-            string define = this.ValueToken.Value.ToString();
+            if (this.ValueToken.Value == null) return false;
+
+            string? define = this.ValueToken.Value.ToString();
+            if (define == null) return false;
 
             request.Project.Defines.Add(define);
 
@@ -88,7 +92,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public IParseTreeNode Parse(RequestParserTreeParser request)
+        public IParseTreeNode? Parse(RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
             if (request.Token.Text.ToLower() != "define") return null;
@@ -97,8 +101,8 @@ namespace Yama.ProjectConfig.Nodes
             result.AllTokens.Add(request.Token);
             result.Token = request.Token;
 
-            IdentifierToken token = request.Parser.Peek(result.Token, 1);
-            if (token == null) return null;
+            IdentifierToken? token = request.Parser.Peek(result.Token, 1);
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.DoublePoint) return null;
             result.AllTokens.Add(token);
 

@@ -27,19 +27,20 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<string>();
-        public IParseTreeNode Node
+
+        public IParseTreeNode? Node
         {
             get;
             set;
         }
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
         }
 
-        public CompileSprungPunkt Punkt
+        public CompileSprungPunkt? Punkt
         {
             get;
             set;
@@ -49,7 +50,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public bool IsUsed
         {
@@ -65,7 +66,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -85,9 +86,9 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, CompileSprungPunkt node, string mode = "default")
+        public bool Compile(Compiler compiler, CompileSprungPunkt? node, string mode = "default")
         {
-            if (node != null) this.Node = node.Node;
+            if (node is not null) this.Node = node.Node;
             compiler.AssemblerSequence.Add(this);
 
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
@@ -99,23 +100,24 @@ namespace Yama.Compiler
             this.Line = line;
 
             if (this.Point == PointMode.Custom) this.Punkt = node;
-            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Begin;
-            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer.Ende;
-            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer.Begin;
+            if (this.Point == PointMode.CurrentBegin) this.Punkt = compiler.ContainerMgmt.CurrentContainer?.Begin;
+            if (this.Point == PointMode.CurrentEnde) this.Punkt = compiler.ContainerMgmt.CurrentContainer?.Ende;
+            if (this.Point == PointMode.RootBegin) this.Punkt = compiler.ContainerMgmt.RootContainer?.Begin;
             if (this.Point == PointMode.RootEnde)
             {
-                this.Punkt = compiler.ContainerMgmt.RootContainer.Ende;
+                this.Punkt = compiler.ContainerMgmt.RootContainer?.Ende;
 
                 try
                 {
                     SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
-                    arg.Reference.IsReturn = true;
+                    arg.Reference!.IsReturn = true;
                 }
                 catch{}
             }
-            if (this.Point == PointMode.LoopEnde) this.Punkt = compiler.ContainerMgmt.CurrentLoop.Ende;
+            if (this.Point == PointMode.LoopEnde) this.Punkt = compiler.ContainerMgmt.CurrentLoop?.Ende;
 
-            line.Arguments.Add(new SSACompileArgument() { Mode = SSACompileArgumentMode.JumpReference, CompileReference = this.Punkt });
+            line.Arguments.Add(new SSACompileArgument(SSACompileArgumentMode.JumpReference) { CompileReference = this.Punkt });
+            if (this.Punkt is null) return compiler.AddError("sprungpunkt konnte nicht ermittelt werden");
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -123,7 +125,7 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(this.Punkt, key, mode);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
@@ -137,6 +139,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.Algo is null) return false;
+        
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));

@@ -18,7 +18,7 @@ namespace Yama.Compiler
             set;
         } = "ExecuteCall";
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -36,7 +36,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -56,7 +56,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -64,9 +64,18 @@ namespace Yama.Compiler
 
         #endregion get/set
 
+        #region ctor
+
+        public CompileExecuteCall()
+        {
+
+        }
+
+        #endregion ctor
+
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(MethodeDeclarationNode node, AlgoKeyCall key, string mode, SSACompileLine line)
+        private DefaultRegisterQuery BuildQuery(MethodeDeclarationNode? node, AlgoKeyCall key, string mode, SSACompileLine line)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
@@ -78,7 +87,7 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, MethodeDeclarationNode node, string mode = "default")
+        public bool Compile(Compiler compiler, MethodeDeclarationNode? node, string mode = "default")
         {
             this.Node = node;
 
@@ -95,9 +104,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -116,6 +124,7 @@ namespace Yama.Compiler
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));
             }
+            if (this.Algo is null) return false;
 
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
@@ -138,7 +147,7 @@ namespace Yama.Compiler
             if (!(compiler.Definition is GenericDefinition t)) return true;
             if (register == t.GetRegister(t.ResultRegister)) return true;
 
-            CompileAlgo algo = compiler.GetAlgo(this.AlgoName, "result");
+            CompileAlgo? algo = compiler.GetAlgo(this.AlgoName, "result");
             if (algo == null) return false;
 
             this.PostAssemblyCommands.AddRange(algo.AssemblyCommands);

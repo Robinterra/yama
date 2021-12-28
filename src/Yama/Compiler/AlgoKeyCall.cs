@@ -4,16 +4,22 @@ namespace Yama.Compiler
 {
     public class AlgoKeyCall
     {
-        public string Name
+
+        #region get/set
+
+        public string? Name
         {
             get;
             set;
         }
 
-        public List<string> Values
+        public List<string>? Values
         {
             get;
             set;
         }
+
+        #endregion get/set
+
     }
 }

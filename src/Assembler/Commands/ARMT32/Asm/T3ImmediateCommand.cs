@@ -29,13 +29,7 @@ namespace Yama.Assembler.ARMT32
         {
             get;
             set;
-        }
-
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
+        } = new byte[0];
         public int Size
         {
             get;
@@ -54,6 +48,7 @@ namespace Yama.Assembler.ARMT32
 
         public T3ImmediateCommand(string key, string format, uint id, int size, int mode = -1)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -82,7 +77,9 @@ namespace Yama.Assembler.ARMT32
             if (t.Argument2.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
             if (this.CanBeIgnore(t, request.Assembler)) return true;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             if (this.Mode != -1) assembleFormat.Arguments.Add((uint)this.Mode);
@@ -101,8 +98,8 @@ namespace Yama.Assembler.ARMT32
         private bool CanBeIgnore(CommandWith3ArgsNode t, Assembler assembler)
         {
             if (!assembler.IsOptimizeActive) return false;
-            if ((int)t.Argument2.Token.Value != 0) return false;
-            if (t.Argument0.Token.Value.ToString() != t.Argument1.Token.Value.ToString()) return false;
+            if ((int)t.Argument2.Token.Value! != 0) return false;
+            if (t.Argument0.Token.Value!.ToString() != t.Argument1.Token.Value!.ToString()) return false;
             if (!this.IsKeyValid()) return false;
 
             return true;

@@ -5,25 +5,25 @@ namespace Yama.Compiler
     public interface IRegisterQuery
     {
 
-        AlgoKeyCall Key
+        AlgoKeyCall? Key
         {
             get;
             set;
         }
 
-        object Value
+        object? Value
         {
             get;
             set;
         }
 
-        string Kategorie
+        string? Kategorie
         {
             get;
             set;
         }
 
-        ValidUses Uses
+        ValidUses? Uses
         {
             get;
             set;

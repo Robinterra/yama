@@ -91,7 +91,7 @@ namespace Yama.Debug
         {
             string path = runtime.GetStringFromRegister(2);
 
-            FileStream stream = null;
+            FileStream? stream = null;
             try
             {
                 stream = File.OpenRead(path);
@@ -110,7 +110,7 @@ namespace Yama.Debug
         {
             string path = runtime.GetStringFromRegister(2);
 
-            FileStream stream = null;
+            FileStream? stream = null;
             try
             {
                 if (File.Exists(path)) File.Delete(path);

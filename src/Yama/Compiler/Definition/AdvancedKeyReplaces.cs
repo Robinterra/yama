@@ -12,7 +12,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public string Key
+        public string? Key
         {
             get;
             set;
@@ -23,7 +23,7 @@ namespace Yama.Compiler.Definition
         /**
          *
          */
-        public string Value
+        public string? Value
         {
             get;
             set;
@@ -35,7 +35,7 @@ namespace Yama.Compiler.Definition
          * Defines for conditional compilation
          * if a define is contains in this list then this key can be used
          */
-        public List<string> Defines
+        public List<string>? Defines
         {
             get;
             set;

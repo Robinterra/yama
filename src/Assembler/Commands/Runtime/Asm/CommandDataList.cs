@@ -30,13 +30,8 @@ namespace Yama.Assembler.Runtime
         {
             get;
             set;
-        }
+        } = new byte[0];
 
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
         public int Size
         {
             get;
@@ -66,6 +61,9 @@ namespace Yama.Assembler.Runtime
 
         public CommandDataList(uint subtraction)
         {
+            this.Key = string.Empty;
+            this.Format = string.Empty;
+            this.Node = new ParserError();
             this.Subtraction = subtraction;
         }
 
@@ -90,7 +88,7 @@ namespace Yama.Assembler.Runtime
 
             foreach (Lexer.IdentifierToken token in t.Arguments)
             {
-                JumpPointMapper map = request.Assembler.GetJumpPoint(token.Text);
+                JumpPointMapper? map = request.Assembler.GetJumpPoint(token.Text);
                 uint target = 4;
                 if (map != null) target = map.Adresse;
                 daten.AddRange(BitConverter.GetBytes(target - this.Subtraction));

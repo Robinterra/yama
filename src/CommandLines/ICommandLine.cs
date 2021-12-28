@@ -30,7 +30,7 @@ namespace LearnCsStuf.CommandLines
 
         // -----------------------------------------------
 
-        string Value
+        string? Value
         {
             get;
             set;
@@ -46,7 +46,7 @@ namespace LearnCsStuf.CommandLines
 
         // -----------------------------------------------
 
-        ICommandLine Check ( string command );
+        ICommandLine? Check ( string command );
 
         // -----------------------------------------------
 

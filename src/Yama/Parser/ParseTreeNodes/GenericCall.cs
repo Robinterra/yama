@@ -9,6 +9,12 @@ namespace Yama.Parser
     public class GenericCall : IParseTreeNode, IEndExpression, IContainer
     {
 
+        #region vars
+
+        private IdentifierToken? ende;
+
+        #endregion vars
+
         #region get/set
 
         public IdentifierToken Token
@@ -29,23 +35,27 @@ namespace Yama.Parser
 
         public IdentifierToken Ende
         {
-            get;
-            set;
+            get
+            {
+                if (this.ende is null) return this.Token;
+
+                return this.ende;
+            }
         }
 
-        public IdentifierToken InheritanceToken
+        public IdentifierToken? InheritanceToken
         {
             get;
             set;
         }
 
-        public IdentifierToken Begin
+        public IdentifierToken? Begin
         {
             get;
             set;
         }
 
-        public IndexVariabelnReference Reference
+        public IndexVariabelnReference? Reference
         {
             get;
             set;
@@ -62,6 +72,7 @@ namespace Yama.Parser
 
         public GenericCall (  )
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -69,7 +80,7 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Operator ) return null;
             if ( request.Token.Text != "<" ) return null;
@@ -79,29 +90,30 @@ namespace Yama.Parser
             genericCall.Begin = request.Token;
             genericCall.AllTokens.Add(request.Token);
 
-            IdentifierToken token = request.Parser.Peek(request.Token, 1);
-            if (token == null) return null;
+            IdentifierToken? token = request.Parser.Peek(request.Token, 1);
+            if (token is null) return null;
             if (!this.ValidNameTokenKind(token.Kind)) return null;
 
             genericCall.Token = token;
             genericCall.AllTokens.Add(token);
+
             token = request.Parser.Peek(token, 1);
 
-            token = this.TryGetGenericInheritance ( genericCall, request, token ); 
+            token = this.TryGetGenericInheritance ( genericCall, request, token );
 
-            if ( token == null ) return null;
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.Operator) return null;
             if (token.Text != ">") return null;
 
-            genericCall.Ende = token;
+            genericCall.ende = token;
             genericCall.AllTokens.Add(token);
 
             return genericCall;
         }
 
-        private IdentifierToken TryGetGenericInheritance ( GenericCall genericCall, RequestParserTreeParser request, IdentifierToken token )
+        private IdentifierToken? TryGetGenericInheritance ( GenericCall genericCall, RequestParserTreeParser request, IdentifierToken? token )
         {
-            if ( token == null ) return null;
+            if ( token is null ) return null;
             if ( token.Kind != IdentifierKind.DoublePoint ) return token;
 
             genericCall.AllTokens.Add(token);
@@ -133,11 +145,9 @@ namespace Yama.Parser
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             if (request.Parent is IndexKlassenDeklaration idk) return this.IndezKlassenGeneric(request, idk);
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             container.VariabelnReferences.Add(reference);
             this.Reference = reference;
 

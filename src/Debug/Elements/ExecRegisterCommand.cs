@@ -39,7 +39,7 @@ namespace Yama.Debug
 
             if (runtime.Register[runtime.A] == 2)
             {
-                string input = System.Console.ReadLine();
+                string? input = System.Console.ReadLine();
                 if (!int.TryParse(input, out int number))
                 {
                     System.Console.WriteLine("Failed to Parse int, default is 0");
@@ -69,9 +69,9 @@ namespace Yama.Debug
             }
             if (runtime.Register[runtime.A] == 5)
             {
-                string text = Console.ReadLine();
+                string? text = Console.ReadLine();
 
-                byte[] data = Encoding.UTF8.GetBytes(text);
+                byte[] data = text is null ? new byte[0] : Encoding.UTF8.GetBytes(text);
 
                 byte[] result = new byte[data.Length + 4];
 

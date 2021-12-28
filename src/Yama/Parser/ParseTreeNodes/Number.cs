@@ -48,16 +48,17 @@ namespace Yama.Parser
         public Number (  )
         {
             this.AllTokens = new List<IdentifierToken> ();
+            this.Token = new();
         }
 
-        public Number ( int prio )
+        public Number ( int prio ) : this()
         {
             this.Prio = prio;
         }
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.NumberToken ) return null;
 
@@ -70,11 +71,9 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = "int";
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, "int");
 
             container.VariabelnReferences.Add(reference);
 

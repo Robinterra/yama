@@ -18,43 +18,43 @@ namespace Yama.Parser
             set;
         } = new CompileData();
 
-        public IndexKlassenDeklaration Deklaration
+        public IndexKlassenDeklaration? Deklaration
         {
             get;
             set;
         }
 
-        public IdentifierToken AccessDefinition
+        public IdentifierToken? AccessDefinition
         {
             get;
             set;
         }
 
-        public IdentifierToken MemberModifier
+        public IdentifierToken? MemberModifier
         {
             get;
             set;
         }
 
-        public IdentifierToken ClassDefinition
+        public IdentifierToken? ClassDefinition
         {
             get;
             set;
         }
 
-        public GenericCall GenericDefintion
+        public GenericCall? GenericDefintion
         {
             get;
             set;
         }
 
-        public IdentifierToken InheritanceBase
+        public IdentifierToken? InheritanceBase
         {
             get;
             set;
         }
 
-        public IParseTreeNode Statement
+        public IParseTreeNode? Statement
         {
             get;
             set;
@@ -72,8 +72,8 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                if (this.GenericDefintion != null) result.Add ( this.GenericDefintion );
-                result.Add ( this.Statement );
+                if (this.GenericDefintion is not null) result.Add ( this.GenericDefintion );
+                if (this.Statement is not null) result.Add ( this.Statement );
 
                 return result;
             }
@@ -93,13 +93,10 @@ namespace Yama.Parser
 
         #region ctor
 
-        public KlassenDeklaration()
-        {
-            this.AllTokens = new List<IdentifierToken> ();
-        }
-
         public KlassenDeklaration(ParserLayer nextLayer)
         {
+            this.Token = new();
+            this.AllTokens = new List<IdentifierToken> ();
             this.NextLayer = nextLayer;
         }
 
@@ -109,8 +106,6 @@ namespace Yama.Parser
 
         private bool CheckHashValidName ( IdentifierToken token )
         {
-            if (token == null) return false;
-
             if (token.Kind == IdentifierKind.Word) return true;
             if (token.Kind == IdentifierKind.Operator) return true;
             if (token.Kind == IdentifierKind.Int32Bit) return true;
@@ -172,7 +167,7 @@ namespace Yama.Parser
             return false;
         }
 
-        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
+        private IdentifierToken? MakeAccessValid( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -182,13 +177,15 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private IdentifierToken MakeInheritanceBase( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
+        private IdentifierToken? MakeInheritanceBase( Parser parser, IdentifierToken? token, KlassenDeklaration deklaration)
         {
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.DoublePoint) return token;
 
             deklaration.AllTokens.Add(token);
             token = parser.Peek(token, 1);
 
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.Word) return token;
 
             deklaration.InheritanceBase = token;
@@ -197,7 +194,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        private IdentifierToken MakeZusatzValid( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
+        private IdentifierToken? MakeZusatzValid( Parser parser, IdentifierToken token, KlassenDeklaration deklaration)
         {
             if ( !this.CheckHashValidZusatzDefinition ( token ) )
             {
@@ -213,44 +210,49 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( RequestParserTreeParser request )
         {
-            KlassenDeklaration deklaration = new KlassenDeklaration();
+            KlassenDeklaration deklaration = new KlassenDeklaration(this.NextLayer);
 
-            IdentifierToken token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
+            IdentifierToken? token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
+            if (token is null) return null;
 
             token = this.MakeZusatzValid ( request.Parser, token, deklaration );
-
+            if (token is null) return null;
             if ( !this.CheckHashValidClass ( token ) ) return null;
 
             deklaration.ClassDefinition = token;
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
+            if (token is null) return null;
             if ( !this.CheckHashValidName ( token ) ) return null;
+
             deklaration.Token = token;
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
+            if (token is null) return null;
 
             token = this.TryParseGeneric ( request, deklaration, token );
 
             token = this.MakeInheritanceBase ( request.Parser, token, deklaration );
+            if (token is null) return null;
 
             deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer);
 
-            if (deklaration.Statement == null) return null;
+            if (deklaration.Statement is null) return null;
 
             return deklaration;
         }
 
-        private IdentifierToken TryParseGeneric(RequestParserTreeParser request, KlassenDeklaration deklaration, IdentifierToken token)
+        private IdentifierToken? TryParseGeneric(RequestParserTreeParser request, KlassenDeklaration deklaration, IdentifierToken token)
         {
-            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
-            if (genericRule == null) return token;
+            GenericCall? genericRule = request.Parser.GetRule<GenericCall>();
+            if (genericRule is null) return token;
 
-            IParseTreeNode node = request.Parser.TryToParse ( genericRule, token );
-            if (!(node is GenericCall genericCall)) return token;
+            IParseTreeNode? node = request.Parser.TryToParse ( genericRule, token );
+            if (node is not GenericCall genericCall) return token;
 
             deklaration.GenericDefintion = genericCall;
 
@@ -259,11 +261,10 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexNamespaceDeklaration dek)) return request.Index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
+            if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
+            if (this.Statement is null) return request.Index.CreateError(this);
 
-            IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration();
-            deklaration.Name = this.Token.Text;
-            deklaration.Use = this;
+            IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration(this, this.Token.Text);
 
             if ( this.MemberModifier != null )
             {
@@ -277,7 +278,7 @@ namespace Yama.Parser
                 deklaration.GenericDeklaration = this.GenericDefintion;
             }
 
-            if (this.InheritanceBase != null) deklaration.InheritanceBase = new IndexVariabelnReference { Name = this.InheritanceBase.Text, Use = this };
+            if (this.InheritanceBase != null) deklaration.InheritanceBase = new IndexVariabelnReference(this, this.InheritanceBase.Text);
 
             this.Deklaration = deklaration;
 
@@ -292,52 +293,60 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
-            foreach(IMethode m in this.Deklaration.StaticMethods)
+            if (this.Deklaration is null) return false;
+
+            foreach (IMethode m in this.Deklaration.StaticMethods)
             {
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
             }
 
-            foreach(IndexMethodDeklaration m in this.Deklaration.Operators)
+            foreach (IndexMethodDeklaration m in this.Deklaration.Operators)
             {
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
             }
 
-            foreach(IMethode m in this.Deklaration.Methods)
+            foreach (IMethode m in this.Deklaration.Methods)
             {
                 if (this.Deklaration.IsMethodsReferenceMode) this.AddAssemblyName(compile, m);
-
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
             }
 
-            foreach(IndexPropertyDeklaration m in this.Deklaration.IndexProperties)
+            foreach (IndexPropertyDeklaration m in this.Deklaration.IndexProperties)
             {
+                if (m.Klasse is null) continue;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
             }
 
-            foreach(IndexPropertyDeklaration m in this.Deklaration.IndexStaticProperties)
+            foreach (IndexPropertyDeklaration m in this.Deklaration.IndexStaticProperties)
             {
+                if (m.Klasse is null) continue;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
             }
 
-            foreach(IndexMethodDeklaration m in this.Deklaration.Ctors)
+            foreach (IndexMethodDeklaration m in this.Deklaration.Ctors)
             {
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);
             }
 
-            foreach(IndexMethodDeklaration m in this.Deklaration.DeCtors)
+            foreach (IndexMethodDeklaration m in this.Deklaration.DeCtors)
             {
+                if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 m.Use.Compile(request);

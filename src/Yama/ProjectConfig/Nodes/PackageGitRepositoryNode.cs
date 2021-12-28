@@ -43,7 +43,6 @@ namespace Yama.ProjectConfig.Nodes
         public List<IdentifierToken> AllTokens
         {
             get;
-            set;
         }
 
         // -----------------------------------------------
@@ -54,6 +53,8 @@ namespace Yama.ProjectConfig.Nodes
 
         public PackageGitRepositoryNode (  )
         {
+            this.Token = new();
+            this.ValueToken = new();
             this.AllTokens = new List<IdentifierToken>();
         }
 
@@ -72,7 +73,10 @@ namespace Yama.ProjectConfig.Nodes
 
         public bool Deserialize(RequestDeserialize request)
         {
-            string define = this.ValueToken.Value.ToString();
+            if (this.ValueToken.Value is null) return false;
+            if (request.Package is null) return false;
+
+            string? define = this.ValueToken.Value.ToString();
 
             request.Package.GitRepository = define;
 
@@ -88,7 +92,7 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public IParseTreeNode Parse(RequestParserTreeParser request)
+        public IParseTreeNode? Parse(RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
             if (request.Token.Text.ToLower() != "git.repository") return null;
@@ -97,13 +101,13 @@ namespace Yama.ProjectConfig.Nodes
             result.AllTokens.Add(request.Token);
             result.Token = request.Token;
 
-            IdentifierToken token = request.Parser.Peek(result.Token, 1);
-            if (token == null) return null;
+            IdentifierToken? token = request.Parser.Peek(result.Token, 1);
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.DoublePoint) return null;
             result.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
-            if (token == null) return null;
+            if (token is null) return null;
             if (token.Kind != IdentifierKind.Text) return null;
             result.AllTokens.Add(token);
             result.ValueToken = token;

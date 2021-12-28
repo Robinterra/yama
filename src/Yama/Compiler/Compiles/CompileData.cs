@@ -16,7 +16,7 @@ namespace Yama.Compiler
             set;
         } = "Data";
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -28,7 +28,7 @@ namespace Yama.Compiler
             set;
         } = new List<ICompileRoot>();
 
-        public string JumpPointName
+        public string? JumpPointName
         {
             get;
             set;
@@ -38,7 +38,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new DataObject();
 
         public List<string> AssemblyCommands
         {
@@ -46,7 +46,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -64,19 +64,13 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public List<string> PostAssemblyCommands
         {
             get;
             set;
         } = new List<string>();
-
-        public SSACompileLine Line
-        {
-            get;
-            set;
-        }
 
         #endregion get/set
 
@@ -111,9 +105,9 @@ namespace Yama.Compiler
                 compiler.AddLine(new RequestAddLine(this, str, false));
             }
 
-            for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
+            for (int i = 0; i < this.Algo!.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName }, {"[DATA]", this.Data.GetData()} }));
+                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName! }, {"[DATA]", this.Data.GetData()!} }));
             }
 
             foreach (string str in this.PostAssemblyCommands)

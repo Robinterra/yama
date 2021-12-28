@@ -11,7 +11,7 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexVariabelnReference Reference
+        public IndexVariabelnReference? Reference
         {
             get;
             set;
@@ -50,18 +50,20 @@ namespace Yama.Parser
 
         public ReferenceCall (  )
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
-        public ReferenceCall ( int prio )
+        public ReferenceCall ( int prio ) : this()
         {
             this.Prio = prio;
         }
+
         #endregion ctor
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( !this.CheckValidTokens ( request.Token ) ) return null;
 
@@ -85,11 +87,9 @@ namespace Yama.Parser
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             if (request.Parent is IndexVariabelnReference varref) return this.RefComb(varref);
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             container.VariabelnReferences.Add(reference);
             this.Reference = reference;
 
@@ -98,9 +98,7 @@ namespace Yama.Parser
 
         private bool RefComb(IndexVariabelnReference varref)
         {
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = this.Token.Text;
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             reference.RefCombination = varref;
             varref.ParentCall = reference;
             varref.VariabelnReferences.Add(reference);
@@ -111,12 +109,16 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
+            if (this.Reference is null) return false;
+
             string moderesult = "default";
             if (request.Mode == "set") moderesult = request.Mode;
             if (request.Mode == "point") moderesult = request.Mode;
             if (request.Mode == "setpoint") moderesult = request.Mode;
             if (this.Reference.Deklaration is IMethode dek)
             {
+                if (dek.Klasse is null) return false;
+
                 if (dek.Klasse.IsMethodsReferenceMode && dek.Klasse.Methods.Contains(dek)) return this.RefNameCall(request.Compiler, dek, request.Mode);
                 moderesult = "methode";
             }
@@ -152,10 +154,13 @@ namespace Yama.Parser
 
         private bool CheckAndCompileBase(Compiler.Compiler compiler, CompileReferenceCall compileReference, string moderesult)
         {
+            if (this.Reference is null) return false;
+
             if (compiler.LastVariableCall != "base") return false;
-            if (!(this.Reference.Deklaration is IndexVariabelnDeklaration t)) return false;
-            if (!(t.Type.Deklaration is IndexKlassenDeklaration u)) return false;
+            if (this.Reference.Deklaration is not IndexVariabelnDeklaration t) return false;
+            if (t.Type.Deklaration is not IndexKlassenDeklaration u) return false;
             if (!u.IsMethodsReferenceMode) return false;
+            if (compiler.CurrentThis is null) return false;
 
             return compileReference.CompileDek(compiler, compiler.CurrentThis, moderesult);
         }
@@ -165,7 +170,11 @@ namespace Yama.Parser
             CompileReferenceCall compileReference = new CompileReferenceCall();
 
             if (compiler.LastVariableCall != "base") compileReference.CompilePoint0(compiler);
-            else compileReference.CompileDek(compiler, compiler.CurrentBase, "default");
+            else
+            {
+                if (compiler.CurrentBase is null) return false;
+                compileReference.CompileDek(compiler, compiler.CurrentBase, "default");
+            }
 
             compileReference = new CompileReferenceCall();
 

@@ -9,25 +9,25 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexEnumDeklaration Deklaration
+        public IndexEnumDeklaration? Deklaration
         {
             get;
             set;
         }
 
-        public IdentifierToken AccessDefinition
+        public IdentifierToken? AccessDefinition
         {
             get;
             set;
         }
 
-        public IdentifierToken ClassDefinition
+        public IdentifierToken? ClassDefinition
         {
             get;
             set;
         }
 
-        public IParseTreeNode Statement
+        public IParseTreeNode? Statement
         {
             get;
             set;
@@ -45,7 +45,7 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
-                result.Add ( this.Statement );
+                if (this.Statement is not null) result.Add ( this.Statement );
 
                 return result;
             }
@@ -65,13 +65,10 @@ namespace Yama.Parser
 
         #region ctor
 
-        public EnumDeklaration()
-        {
-            this.AllTokens = new List<IdentifierToken> ();
-        }
-
         public EnumDeklaration(ParserLayer nextLayer)
         {
+            this.Token = new();
+            this.AllTokens = new List<IdentifierToken> ();
             this.NextLayer = nextLayer;
         }
 
@@ -103,7 +100,7 @@ namespace Yama.Parser
             return false;
         }
 
-        private IdentifierToken MakeAccessValid( Parser parser, IdentifierToken token, EnumDeklaration deklaration)
+        private IdentifierToken? MakeAccessValid( Parser parser, IdentifierToken token, EnumDeklaration deklaration)
         {
             if ( !this.CheckHashValidAccessDefinition ( token ) ) return token;
 
@@ -113,39 +110,39 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
-            EnumDeklaration deklaration = new EnumDeklaration();
+            EnumDeklaration deklaration = new EnumDeklaration(this.NextLayer);
 
-            IdentifierToken token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
-
+            IdentifierToken? token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
+            if (token is null) return null;
             if ( !this.CheckHashValidClass ( token ) ) return null;
 
             deklaration.ClassDefinition = token;
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
+            if (token is null) return null;
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
+            if (token is null) return null;
 
             deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer);
-
-            if (deklaration.Statement == null) return null;
+            if (deklaration.Statement is null) return null;
 
             return deklaration;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexNamespaceDeklaration dek)) return request.Index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
+            if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieses Enums");
+            if (this.Statement is null) return request.Index.CreateError(this);
 
-            IndexEnumDeklaration deklaration = new IndexEnumDeklaration();
-            deklaration.Name = this.Token.Text;
-            deklaration.Use = this;
+            IndexEnumDeklaration deklaration = new IndexEnumDeklaration(this, this.Token.Text);
 
             this.Deklaration = deklaration;
 

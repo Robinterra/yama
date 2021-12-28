@@ -30,13 +30,8 @@ namespace Yama.Assembler.Runtime
         {
             get;
             set;
-        }
+        } = new byte[0];
 
-        public ICompileRoot CompileElement
-        {
-            get;
-            set;
-        }
         public int Size
         {
             get;
@@ -54,6 +49,7 @@ namespace Yama.Assembler.Runtime
 
         public Command3Register(string key, string format, uint id, int size)
         {
+            this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
@@ -80,7 +76,9 @@ namespace Yama.Assembler.Runtime
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument2.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
-            IFormat format = request.Assembler.GetFormat(this.Format);
+            IFormat? format = request.Assembler.GetFormat(this.Format);
+            if (format is null) return false;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.Arguments.Add(0);

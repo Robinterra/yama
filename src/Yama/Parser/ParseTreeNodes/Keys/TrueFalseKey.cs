@@ -42,10 +42,11 @@ namespace Yama.Parser
 
         public TrueFalseKey (  )
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
-        public TrueFalseKey ( int prio )
+        public TrueFalseKey ( int prio ) : this()
         {
             this.Prio = prio;
         }
@@ -53,12 +54,10 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             bool isok = request.Token.Kind == IdentifierKind.True;
-
             if ( !isok ) isok = request.Token.Kind == IdentifierKind.False;
-
             if ( !isok ) return null;
 
             TrueFalseKey result = new TrueFalseKey (  );
@@ -71,11 +70,9 @@ namespace Yama.Parser
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference();
-            reference.Use = this;
-            reference.Name = "bool";
+            IndexVariabelnReference reference = new IndexVariabelnReference(this, "bool");
             container.VariabelnReferences.Add(reference);
 
             return true;

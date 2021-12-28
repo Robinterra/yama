@@ -12,7 +12,7 @@ namespace Yama.Compiler.Definition
 
         // -----------------------------------------------
 
-        public string Key
+        public string? Key
         {
             get;
             set;
@@ -23,7 +23,7 @@ namespace Yama.Compiler.Definition
         /**
          *
          */
-        public string Pattern
+        public string? Pattern
         {
             get;
             set;

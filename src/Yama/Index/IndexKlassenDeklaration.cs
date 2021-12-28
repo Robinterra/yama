@@ -26,54 +26,54 @@ namespace Yama.Index
         public List<IndexVariabelnReference> References
         {
             get;
-            set;
+            private set;
         }
 
         public List<IndexMethodDeklaration> Operators
         {
             get;
-            set;
+            private set;
         }
 
         public List<IndexMethodDeklaration> Ctors
         {
             get;
-            set;
+            private set;
         }
 
         public List<IndexPropertyDeklaration> IndexProperties
         {
             get;
-            set;
+            private set;
         }
 
         public List<IndexPropertyDeklaration> IndexStaticProperties
         {
             get;
-            set;
+            private set;
         }
 
         public List<IndexMethodDeklaration> DeCtors
         {
             get;
-            set;
+            private set;
         }
 
         public List<IMethode> Methods
         {
             get;
-            set;
+            private set;
         }
 
         public List<IMethode> StaticMethods
         {
             get;
-            set;
+            private set;
         }
 
         //public List<IndexVektorDeklaration> VektorDeclaration { get; set; }
 
-        private ValidUses thisUses;
+        private ValidUses? thisUses;
 
         public ValidUses ThisUses
         {
@@ -83,10 +83,8 @@ namespace Yama.Index
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
 
-                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration();
-                dekThisVar.Name = "this";
-                dekThisVar.Type = new IndexVariabelnReference { Deklaration = this, Name = this.Name, Use = this.Use };
-                dekThisVar.Use = this.Use;
+                IndexVariabelnReference varref = new IndexVariabelnReference (this.Use, this.Name) { Deklaration = this };
+                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration(this.Use, "this", varref);
                 dekThisVar.ParentUsesSet = this.thisUses;
 
                 this.References.Add(dekThisVar.Type);
@@ -98,12 +96,10 @@ namespace Yama.Index
                 this.thisUses.Deklarationen = dekList;
 
                 if (this.InheritanceBase == null) return this.thisUses;
-                if (!(this.InheritanceBase.Deklaration is IndexKlassenDeklaration dek)) return this.thisUses;
+                if (this.InheritanceBase.Deklaration is not IndexKlassenDeklaration dek) return this.thisUses;
 
-                IndexVariabelnDeklaration dekbaseVar = new IndexVariabelnDeklaration();
-                dekbaseVar.Name = "base";
-                dekbaseVar.Type = new IndexVariabelnReference { Deklaration = dek, Name = dek.Name, Use = dek.Use };
-                dekbaseVar.Use = this.Use;
+                varref = new IndexVariabelnReference (dek.Use, dek.Name) { Deklaration = dek };
+                IndexVariabelnDeklaration dekbaseVar = new IndexVariabelnDeklaration(this.Use, "base", varref);
                 dekbaseVar.ParentUsesSet = dek.ThisUses;
                 dekbaseVar.BaseUsesSet = this.thisUses;
                 dekList.Add(dekbaseVar);
@@ -111,21 +107,6 @@ namespace Yama.Index
 
                 return this.thisUses;
             }
-        }
-
-        private bool CreateGenericForThisUses(List<IParent> dekList)
-        {
-            if (this.GenericDeklaration == null) return false;
-
-            IndexKlassenDeklaration dekThisVar = new IndexKlassenDeklaration();
-            dekThisVar.Name = this.GenericDeklaration.Token.Text;
-            dekThisVar.Use = this.GenericDeklaration;
-            dekThisVar.ParentUsesSet = this.thisUses;
-            dekThisVar.IsGeneric = true;
-
-            dekList.Add(dekThisVar);
-
-            return true;
         }
 
         public ValidUses ParentUsesSet
@@ -167,7 +148,7 @@ namespace Yama.Index
             }
         }
 
-        public IndexVariabelnReference InheritanceBase
+        public IndexVariabelnReference? InheritanceBase
         {
             get;
             set;
@@ -176,8 +157,7 @@ namespace Yama.Index
         public List<IndexKlassenDeklaration> InheritanceChilds
         {
             get;
-            set;
-        } = new List<IndexKlassenDeklaration>();
+        }
 
         public bool IsMapped
         {
@@ -185,17 +165,53 @@ namespace Yama.Index
             set;
         }
 
-        public IndexVariabelnDeklaration BaseVar
+        public IndexVariabelnDeklaration? BaseVar
         {
             get;
             set;
         }
 
-        public CompileData DataRef
+        public CompileData? DataRef
         {
             get;
             set;
         }
+
+        public GenericCall? GenericDeklaration
+        {
+            get;
+            set;
+        }
+
+        public ClassMemberModifiers MemberModifier
+        {
+            get;
+            set;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public IndexKlassenDeklaration ( IParseTreeNode use, string name )
+        {
+            this.Use = use;
+            this.Name = name;
+            this.ParentUsesSet = new();
+            this.References = new List<IndexVariabelnReference>();
+            this.Ctors = new List<IndexMethodDeklaration>();
+            this.DeCtors = new List<IndexMethodDeklaration>();
+            this.Methods = new List<IMethode>();
+            this.Operators = new List<IndexMethodDeklaration>();
+            this.IndexProperties = new List<IndexPropertyDeklaration>();
+            this.StaticMethods = new List<IMethode>();
+            this.IndexStaticProperties = new List<IndexPropertyDeklaration>();
+            this.InheritanceChilds = new List<IndexKlassenDeklaration>();
+        }
+
+        #endregion ctor
+
+        #region methods
 
         public bool IsInUse (int depth)
         {
@@ -212,37 +228,19 @@ namespace Yama.Index
             return false;
         }
 
-        public GenericCall GenericDeklaration
+        private bool CreateGenericForThisUses(List<IParent> dekList)
         {
-            get;
-            set;
+            if (this.GenericDeklaration == null) return false;
+            if (this.thisUses is null) return false;//TODO: fehler erfassen
+
+            IndexKlassenDeklaration dekThisVar = new (this.GenericDeklaration, this.GenericDeklaration.Token.Text);
+            dekThisVar.ParentUsesSet = this.thisUses;
+            dekThisVar.IsGeneric = true;
+
+            dekList.Add(dekThisVar);
+
+            return true;
         }
-
-        public ClassMemberModifiers MemberModifier
-        {
-            get;
-            set;
-        }
-
-        #endregion get/set
-
-        #region ctor
-
-        public IndexKlassenDeklaration (  )
-        {
-            this.References = new List<IndexVariabelnReference>();
-            this.Ctors = new List<IndexMethodDeklaration>();
-            this.DeCtors = new List<IndexMethodDeklaration>();
-            this.Methods = new List<IMethode>();
-            this.Operators = new List<IndexMethodDeklaration>();
-            this.IndexProperties = new List<IndexPropertyDeklaration>();
-            this.StaticMethods = new List<IMethode>();
-            this.IndexStaticProperties = new List<IndexPropertyDeklaration>();
-        }
-
-        #endregion ctor
-
-        #region methods
 
         public bool PreMappen(ValidUses uses)
         {
@@ -269,8 +267,8 @@ namespace Yama.Index
             List<IMethode> sortMethods = new List<IMethode>();
             foreach (IMethode met in dek.Methods)
             {
-                IMethode setmet = this.Methods.FirstOrDefault(q=>q.KeyName == met.KeyName);
-                if (setmet == null) setmet = met;
+                IMethode? setmet = this.Methods.FirstOrDefault(q=>q.KeyName == met.KeyName);
+                if (setmet is null) setmet = met;
 
                 sortMethods.Add(setmet);
             }
@@ -303,7 +301,11 @@ namespace Yama.Index
             if (this.IsMapped) return true;
             if (this.InheritanceBase != null)
             {
-                if (this.InheritanceBase.Deklaration == null) return this.ThisUses.GetIndex.CreateError(this.Use, string.Format("Inheritance '{0}' Base Class is not found", this.InheritanceBase.Name));
+                if (this.InheritanceBase.Deklaration == null)
+                {
+                    if (this.ThisUses.GetIndex is null) return false;
+                    return this.ThisUses.GetIndex.CreateError(this.Use, string.Format("Inheritance '{0}' Base Class is not found", this.InheritanceBase.Name));
+                }
                 if (!((IndexKlassenDeklaration)this.InheritanceBase.Deklaration).IsMapped) return false;
             }
 

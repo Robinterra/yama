@@ -29,10 +29,6 @@ namespace Yama.Lexer
         {
             get
             {
-                if (this.operators != null) return this.operators;
-
-                this.operators = new List<ILexerToken>();
-
                 return this.operators;
             }
         }
@@ -49,6 +45,8 @@ namespace Yama.Lexer
 
         public Operator ( params ZeichenKette[] param )
         {
+            this.operators = new List<ILexerToken>();
+
             foreach (ZeichenKette zeichen in param)
             {
                 this.Operators.Add ( zeichen );

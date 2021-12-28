@@ -8,12 +8,6 @@ namespace Yama.Index
     {
         #region get/set
 
-        public IndexKlassenDeklaration Parent
-        {
-            get;
-            set;
-        }
-
         public List<IndexVariabelnReference> References
         {
             get;
@@ -30,9 +24,12 @@ namespace Yama.Index
         {
             get
             {
+                string klassenName = "null";
+                if (this.Klasse is not null) klassenName = this.Klasse.Name;
+
                 string pattern = "{0}_{1}_StaticProperty";
 
-                return string.Format(pattern, this.Klasse.Name, this.Name);
+                return string.Format(pattern, klassenName, this.Name);
             }
         }
 
@@ -54,13 +51,13 @@ namespace Yama.Index
             set;
         }
 
-        public IndexContainer GetContainer
+        public IndexContainer? GetContainer
         {
             get;
             set;
         }
 
-        public IndexContainer SetContainer
+        public IndexContainer? SetContainer
         {
             get;
             set;
@@ -72,19 +69,19 @@ namespace Yama.Index
             set;
         }
 
-        private IndexVariabelnDeklaration Value
+        private IndexVariabelnDeklaration? Value
         {
             get;
             set;
         }
 
-        private IndexVariabelnDeklaration InValue
+        private IndexVariabelnDeklaration? InValue
         {
             get;
             set;
         }
 
-        private ValidUses thisUses;
+        private ValidUses? thisUses;
 
         public ValidUses ThisUses
         {
@@ -92,19 +89,13 @@ namespace Yama.Index
             {
                 if (this.thisUses != null) return this.thisUses;
 
-                IndexVariabelnDeklaration dekValue = new IndexVariabelnDeklaration();
-                dekValue.Name = "value";
-                dekValue.Type = this.Type;
-                dekValue.Use = this.Use;
-                dekValue.ParentUsesSet = this.thisUses;
+                IndexVariabelnDeklaration dekValue = new IndexVariabelnDeklaration(this.Use, "value", this.Type);
+                dekValue.ParentUsesSet = this.ParentUsesSet;
 
                 this.Value = dekValue;
 
-                IndexVariabelnDeklaration dekinValue = new IndexVariabelnDeklaration();
-                dekinValue.Name = "invalue";
-                dekinValue.Type = this.Type;
-                dekinValue.Use = this.Use;
-                dekinValue.ParentUsesSet = this.thisUses;
+                IndexVariabelnDeklaration dekinValue = new IndexVariabelnDeklaration(this.Use, "invalue", this.Type);
+                dekinValue.ParentUsesSet = this.ParentUsesSet;
 
                 this.InValue = dekinValue;
 
@@ -121,7 +112,7 @@ namespace Yama.Index
             set;
         }
 
-        public IndexKlassenDeklaration Klasse
+        public IndexKlassenDeklaration? Klasse
         {
             get;
             set;
@@ -133,10 +124,23 @@ namespace Yama.Index
             set;
         }
 
-        public IndexPropertyDeklaration (  )
+        #endregion get/set
+
+        #region ctor
+
+        public IndexPropertyDeklaration ( IParseTreeNode use, string name, MethodeType methodeType, IndexVariabelnReference varTyp )
         {
+            this.ParentUsesSet = new();
+            this.Type = varTyp;
+            this.Zusatz = methodeType;
+            this.Use = use;
+            this.Name = name;
             this.References = new List<IndexVariabelnReference>();
         }
+
+        #endregion ctor
+
+        #region methods
 
         public bool PreMappen(ValidUses uses)
         {
@@ -174,6 +178,7 @@ namespace Yama.Index
             return false;
         }
 
-        #endregion get/set
+        #endregion methods
+
     }
 }

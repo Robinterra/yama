@@ -10,13 +10,13 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IParseTreeNode Condition
+        public IParseTreeNode? Condition
         {
             get;
             set;
         }
 
-        public IParseTreeNode Statement
+        public IParseTreeNode? Statement
         {
             get;
             set;
@@ -32,11 +32,9 @@ namespace Yama.Parser
         {
             get
             {
-                return (this.Statement is IContainer t) ? t.Ende : this.Statement.Token;
-            }
-            set
-            {
+                if (this.Statement is null) return this.Token;
 
+                return (this.Statement is IContainer t) ? t.Ende : this.Statement.Token;
             }
         }
 
@@ -59,7 +57,7 @@ namespace Yama.Parser
             set;
         } = new CompileContainer();
 
-        public IndexContainer IndexContainer
+        public IndexContainer? IndexContainer
         {
             get;
             set;
@@ -76,6 +74,7 @@ namespace Yama.Parser
 
         public WhileKey ()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -94,36 +93,44 @@ namespace Yama.Parser
             return false;
         }
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.While ) return null;
-            if ( request.Parser.Peek ( request.Token, 1 ).Kind != IdentifierKind.OpenBracket ) return null;
+
+            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
+            if (token is null) return null;
+            if (token.Kind != IdentifierKind.OpenBracket) return null;
 
             WhileKey key = new WhileKey (  );
             key.Token = request.Token;
             key.AllTokens.Add ( request.Token );
 
-            IdentifierToken conditionkind = request.Parser.Peek ( request.Token, 1 );
+            IdentifierToken? conditionkind = request.Parser.Peek ( request.Token, 1 );
+            IParseTreeNode? rule = request.Parser.GetRule<ContainerExpression>();
 
-            IParseTreeNode rule = request.Parser.GetRule<ContainerExpression>();
+            if (conditionkind is null) return null;
+            if (rule is null) return null;
 
             key.Condition = request.Parser.TryToParse ( rule, conditionkind );
 
-            if (key.Condition == null) return null;
+            if (key.Condition is null) return null;
 
-            IdentifierToken Statementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
-            if (!this.IsAllowedStatmentToken (Statementchild)) return null;
+            IdentifierToken? statementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
+            if (statementchild is null) return null;
 
-            key.Statement = request.Parser.ParseCleanToken(Statementchild);
+            if (!this.IsAllowedStatmentToken (statementchild)) return null;
 
-            if (key.Statement == null) return null;
+            key.Statement = request.Parser.ParseCleanToken(statementchild);
+            if (key.Statement is null) return null;
 
             return key;
         }
 
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
+            if (this.Statement is null) return request.Index.CreateError(this);
+            if (this.Condition is null) return request.Index.CreateError(this);
 
             this.IndexContainer =  container;
 
@@ -137,8 +144,11 @@ namespace Yama.Parser
 
         public bool Compile(Request.RequestParserTreeCompile request)
         {
-            this.CompileContainer.Begin = new CompileSprungPunkt();
+            if (this.IndexContainer is null) return false;
+            if (this.Condition is null) return false;
+            if (this.Statement is null) return false;
 
+            this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
 
             request.Compiler.PushContainer(this.CompileContainer, this.IndexContainer.ThisUses, true);
@@ -164,8 +174,9 @@ namespace Yama.Parser
 
             this.CompileContainer.Ende.Compile(request.Compiler, this, request.Mode);
 
-            CompileFreeLoop freeLoop = new CompileFreeLoop();
-            freeLoop.Begin = this.CompileContainer.Begin.Line;
+            if (this.CompileContainer.Begin.Line is null) return false;
+            CompileFreeLoop freeLoop = new CompileFreeLoop(this.CompileContainer.Begin.Line);
+
             freeLoop.Compile(request.Compiler, this, request.Mode);
 
             request.Compiler.PopContainer();

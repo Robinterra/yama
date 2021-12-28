@@ -8,6 +8,8 @@ namespace Yama.Parser
     public class Container : IParseTreeNode, IContainer
     {
 
+        private IdentifierToken? ende;
+
         #region get/set
 
         public IdentifierToken Token
@@ -19,7 +21,6 @@ namespace Yama.Parser
         public List<IParseTreeNode> Statements
         {
             get;
-            set;
         }
 
         public IdentifierKind BeginKind
@@ -36,8 +37,12 @@ namespace Yama.Parser
 
         public IdentifierToken Ende
         {
-            get;
-            set;
+            get
+            {
+                if (this.ende is null) return this.Token;
+
+                return this.ende;
+            }
         }
 
         public List<IParseTreeNode> GetAllChilds
@@ -48,7 +53,7 @@ namespace Yama.Parser
             }
         }
 
-        public IndexContainer IndexContainer
+        public IndexContainer? IndexContainer
         {
             get;
             set;
@@ -66,9 +71,11 @@ namespace Yama.Parser
         public Container (  )
         {
             this.AllTokens = new List<IdentifierToken> ();
+            this.Token = new();
+            this.Statements = new();
         }
 
-        public Container ( IdentifierKind begin, IdentifierKind ende )
+        public Container ( IdentifierKind begin, IdentifierKind ende ) : this()
         {
             this.BeginKind = begin;
             this.EndeKind = ende;
@@ -78,30 +85,28 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != this.BeginKind ) return null;
 
-            IdentifierToken kind = request.Parser.FindEndTokenWithoutParse ( request.Token, this.EndeKind, this.BeginKind );
-
-            if ( kind == null ) return null;
-
-            if ( kind.Node != null ) return null;
+            IdentifierToken? kind = request.Parser.FindEndTokenWithoutParse ( request.Token, this.EndeKind, this.BeginKind );
+            if ( kind is null ) return null;
+            if ( kind.Node is not null ) return null;
 
             Container expression = new Container (  );
 
             expression.Token = request.Token;
             expression.AllTokens.Add ( request.Token );
-            expression.Ende = kind;
+            expression.ende = kind;
             expression.AllTokens.Add(expression.Ende);
 
-            List<IParseTreeNode> nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, kind.Position );
+            List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, kind.Position );
 
             request.Parser.Repleace ( request.Token, kind.Position );
 
-            if ( nodes == null ) return null;
+            if ( nodes is null ) return null;
 
-            expression.Statements = nodes;
+            expression.Statements.AddRange(nodes);
 
             return expression;
         }
@@ -109,10 +114,9 @@ namespace Yama.Parser
         public bool Indezieren(Request.RequestParserTreeIndezieren request)
         {
             if (request.Parent is IndexNamespaceDeklaration dek) return this.NamespaceIndezi(request);
-            if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
+            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexContainer indexContainer = new IndexContainer();
-            indexContainer.Use = this;
+            IndexContainer indexContainer = new IndexContainer(this, "container");
             container.Containers.Add(indexContainer);
             this.IndexContainer = indexContainer;
 

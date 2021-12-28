@@ -26,7 +26,7 @@ namespace Yama.Parser
             }
         }
 
-        public string Tag
+        public string? Tag
         {
             get;
             set;
@@ -49,12 +49,13 @@ namespace Yama.Parser
 
         public ConditionalCompilationNode (  )
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
         #endregion ctor
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.ConditionalCompilation ) return null;
 
@@ -71,8 +72,9 @@ namespace Yama.Parser
             Lexer.Lexer lexer = new Lexer.Lexer(stream);
             lexer.LexerTokens.Add(new Lexer.Text(new ZeichenKette("("), new ZeichenKette(")"), null));
 
-            IdentifierToken token = lexer.NextFindMatch();
-            if (token == null) return null;
+            IdentifierToken? token = lexer.NextFindMatch();
+            if (token is null) return null;
+            if (token.Value is null) return null;
 
             node.Tag = token.Value.ToString();
 
