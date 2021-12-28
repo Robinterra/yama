@@ -174,6 +174,7 @@ namespace Yama.Parser
 
             this.CompileContainer.Ende.Compile(request.Compiler, this, request.Mode);
 
+            if (this.CompileContainer.Begin.Line is null) return false;
             CompileFreeLoop freeLoop = new CompileFreeLoop(this.CompileContainer.Begin.Line);
 
             freeLoop.Compile(request.Compiler, this, request.Mode);

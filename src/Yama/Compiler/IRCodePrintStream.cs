@@ -50,7 +50,7 @@ namespace Yama.Compiler
                 if (arg.Mode == SSACompileArgumentMode.Const) result.AppendFormat(" #0x{0:x}", arg.Const);
                 if (arg.Mode == SSACompileArgumentMode.Reference && arg.Reference is not null) result.AppendFormat(" {0}", arg.Reference.Order);
                 if (arg.Mode == SSACompileArgumentMode.Variable && arg.Variable is not null && arg.Variable.Reference is not null) result.AppendFormat(" {0}", arg.Variable.Reference.Order);
-                if (arg.Mode == SSACompileArgumentMode.JumpReference && arg.CompileReference is not null) result.AppendFormat(" {0}", arg.CompileReference.Line.Order);
+                if (arg.Mode == SSACompileArgumentMode.JumpReference && arg.CompileReference is not null) result.AppendFormat(" {0}", arg.CompileReference.Line?.Order);
             }
 
             this.Writer.WriteLine(result);

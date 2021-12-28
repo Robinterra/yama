@@ -126,6 +126,7 @@ namespace Yama.Compiler
 
             if (arg.Mode != SSACompileArgumentMode.JumpReference) return false;
             if (arg.CompileReference is null) return false;
+            if (arg.CompileReference.Line is null) return false;
             if (arg.CompileReference.Line.Order != line.Order + 1) return false;
 
             arg.CompileReference.Line.Calls.Remove(line);

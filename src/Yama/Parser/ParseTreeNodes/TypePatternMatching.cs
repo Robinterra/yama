@@ -201,7 +201,7 @@ namespace Yama.Parser
             compileReference.CompilePoint0(request.Compiler);
 
             CompileReferenceCall referenceCall = new CompileReferenceCall();
-            referenceCall.CompileData(request.Compiler, this, t.DataRef.JumpPointName);
+            referenceCall.CompileData(request.Compiler, this, t.DataRef.JumpPointName!);
 
             if (this.EqualsReference.Deklaration is null) return false;
             if (this.EqualsReference.Deklaration.Use is not MethodeDeclarationNode mdn) return false;

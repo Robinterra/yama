@@ -24,13 +24,13 @@ namespace Yama.Compiler
             set;
         }
 
-        public string Text
+        public string? Text
         {
             get;
             set;
         }
 
-        public string GetData()
+        public string? GetData()
         {
             if (this.Mode == DataMode.Int) return string.Format("0x{0:x}", this.IntValue);
             if (this.Mode == DataMode.Text) return this.Text;

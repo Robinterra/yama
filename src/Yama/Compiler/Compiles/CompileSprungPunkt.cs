@@ -16,7 +16,7 @@ namespace Yama.Compiler
             set;
         } = "SprungPunkt";
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -28,7 +28,7 @@ namespace Yama.Compiler
             set;
         } = new List<ICompileRoot>();
 
-        public string JumpPointName
+        public string? JumpPointName
         {
             get;
             set;
@@ -40,7 +40,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -58,7 +58,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public List<string> PostAssemblyCommands
         {
@@ -66,7 +66,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -105,6 +105,7 @@ namespace Yama.Compiler
         public bool InFileCompilen(Compiler compiler)
         {
             if (this.Calls.Count == 0) return true;
+            if (this.Algo is null) return false;
 
             foreach (string str in this.AssemblyCommands)
             {
@@ -113,7 +114,7 @@ namespace Yama.Compiler
 
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName } }));
+                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName! } }));
             }
 
             foreach (string str in this.PostAssemblyCommands)

@@ -514,7 +514,7 @@ namespace Yama.Parser
             compiler.CurrentBase = this.Deklaration.Klasse.BaseVar;
 
             CompileReferenceCall referenceCall = new CompileReferenceCall();
-            referenceCall.CompileData(compiler, this, t.DataRef.JumpPointName);
+            referenceCall.CompileData(compiler, this, t.DataRef.JumpPointName!);
 
             CompileReferenceCall compileReference = new CompileReferenceCall();
             compileReference.CompileDek(compiler, this.Deklaration.Klasse.BaseVar, "set");
@@ -618,7 +618,7 @@ namespace Yama.Parser
                 if (this.Deklaration.Klasse.DataRef is null) return false;
 
                 CompileReferenceCall referenceCall = new CompileReferenceCall();
-                referenceCall.CompileData(compiler, this, this.Deklaration.Klasse.DataRef.JumpPointName);
+                referenceCall.CompileData(compiler, this, this.Deklaration.Klasse.DataRef.JumpPointName!);
 
                 CompileReferenceCall compileReference = new CompileReferenceCall();
                 compileReference.CompileDek(compiler, dek);

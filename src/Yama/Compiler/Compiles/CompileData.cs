@@ -107,7 +107,7 @@ namespace Yama.Compiler
 
             for (int i = 0; i < this.Algo!.AssemblyCommands.Count; i++)
             {
-                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName! }, {"[DATA]", this.Data.GetData()} }));
+                compiler.AddLine(new RequestAddLine(this, this.Algo.AssemblyCommands[i], null, new Dictionary<string, string> { { "[NAME]", this.JumpPointName! }, {"[DATA]", this.Data.GetData()!} }));
             }
 
             foreach (string str in this.PostAssemblyCommands)

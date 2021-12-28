@@ -84,7 +84,7 @@ namespace Yama.Parser
             compile.Compile(request.Compiler, this);
 
             CompileReferenceCall referenceCall = new CompileReferenceCall();
-            referenceCall.CompileData(request.Compiler, this, compile.JumpPointName);
+            referenceCall.CompileData(request.Compiler, this, compile.JumpPointName!);
 
             return true;
         }

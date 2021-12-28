@@ -505,9 +505,10 @@ namespace Yama
             if (file.Exists) file.Delete();
             if (this.Definition == null) return false;
 
-            string def = this.Definition.Name;
+            string? def = this.Definition.Name;
             if (this.Defines.Contains("runtime")) def = "runtime";
             if (def == "avr") return true;
+            if (def is null) return false;
 
             Assembler.Assembler assembler = new Assembler.Assembler();
             Assembler.Definitionen definitionen = new Assembler.Definitionen();

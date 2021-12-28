@@ -646,7 +646,7 @@ namespace Yama.Compiler.Definition
 
             t.Add(this.Compiler!, t);
 
-            return new Dictionary<string, string> { { query.Key.Name, t.JumpPointName } };
+            return new Dictionary<string, string> { { query.Key.Name, t.JumpPointName! } };
         }
 
         // -----------------------------------------------

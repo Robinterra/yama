@@ -15,9 +15,9 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = "notdefined";
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -27,7 +27,7 @@ namespace Yama.Compiler
         {
             get;
             set;
-        }
+        } = new();
 
         public List<string> AssemblyCommands
         {
@@ -35,7 +35,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public IParseTreeNode Node
+        public IParseTreeNode? Node
         {
             get;
             set;
@@ -55,7 +55,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -86,7 +86,11 @@ namespace Yama.Compiler
             this.Node = node;
             compiler.AssemblerSequence.Add(this);
 
-            string algo = node.Token.Value.ToString (  ).Replace(" ", string.Empty);
+            string? wert = null;
+            if (node.Token.Value is not null) wert = node.Token.Value.ToString (  );
+            if (wert is null) return compiler.AddError("null", node);
+
+            string algo = wert.Replace(" ", string.Empty);
             if (algo.Contains(","))
             {
                 string[] split = algo.Split(",");
@@ -108,9 +112,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -123,6 +126,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.Algo is null) return false;
+
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));
