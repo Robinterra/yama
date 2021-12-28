@@ -16,7 +16,6 @@ namespace Yama.Assembler.ARMT32
 
         #region get/set
 
-        
         public IdentifierToken Token
         {
             get;
@@ -40,7 +39,7 @@ namespace Yama.Assembler.ARMT32
             {
                 List<IParseTreeNode> nodes = new List<IParseTreeNode>();
 
-                nodes.Add(this.Argument0);
+                if (this.Argument0 is not null) nodes.Add(this.Argument0);
 
                 return nodes;
             }
@@ -50,13 +49,11 @@ namespace Yama.Assembler.ARMT32
 
         #region ctor
 
-        public CommandWith1ArgNode()
-        {
-            this.AllTokens = new List<IdentifierToken> ();
-        }
-
         public CommandWith1ArgNode(ParserLayer argumentLayer)
         {
+            this.Argument0 = new WordNode();
+            this.Token = new();
+            this.AllTokens = new List<IdentifierToken> ();
             this.argumentLayer = argumentLayer;
         }
 
@@ -72,22 +69,25 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
+        public IParseTreeNode? Parse(Parser.Request.RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;
 
-            CommandWith1ArgNode deklaration = new CommandWith1ArgNode();
+            CommandWith1ArgNode deklaration = new CommandWith1ArgNode(this.argumentLayer);
             deklaration.Token = request.Token;
             deklaration.AllTokens.Add(request.Token);
 
-            IdentifierToken token = request.Parser.Peek(request.Token, 1);
+            IdentifierToken? token = request.Parser.Peek(request.Token, 1);
+            if (token is null) return null;
 
             request.Parser.ActivateLayer(this.argumentLayer);
 
-            deklaration.Argument0 = request.Parser.ParseCleanToken(token);
+            IParseTreeNode? arg0 = request.Parser.ParseCleanToken(token);
 
             request.Parser.VorherigesLayer();
-            if (deklaration.Argument0 == null) return null;
+            if (arg0 is null) return null;
+
+            deklaration.Argument0 = arg0;
 
             return deklaration;
         }

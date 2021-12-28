@@ -26,12 +26,19 @@ namespace Yama.Assembler.ARMT32
         {
             get;
         }
-        public IdentifierToken Data { get; private set; }
+
+        public IdentifierToken Data
+        {
+            get;
+            private set;
+        }
 
         #region ctor
 
         public SpaceNode ()
         {
+            this.Token = new();
+            this.Data = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -47,7 +54,7 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
+        public IParseTreeNode? Parse(Parser.Request.RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Base) return null;
             if (request.Token.Text != ".space") return null;
@@ -56,7 +63,7 @@ namespace Yama.Assembler.ARMT32
             node.AllTokens.Add(request.Token);
             node.Token = request.Token;
 
-            IdentifierToken token = request.Parser.Peek(request.Token, 1);
+            IdentifierToken? token = request.Parser.Peek(request.Token, 1);
             if (token == null) return null;
             if (token.Kind != IdentifierKind.NumberToken) return null;
 

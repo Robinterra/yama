@@ -30,13 +30,13 @@ namespace Yama.Assembler.ARMT32
             get;
         }
 
-        public IdentifierToken Data
+        public IdentifierToken? Data
         {
             get;
             set;
         }
 
-        public IdentifierToken AdditionNumberToken
+        public IdentifierToken? AdditionNumberToken
         {
             get;
             set;
@@ -48,6 +48,7 @@ namespace Yama.Assembler.ARMT32
 
         public WordNode ()
         {
+            this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -65,7 +66,7 @@ namespace Yama.Assembler.ARMT32
             return true;
         }
 
-        public IParseTreeNode Parse(Parser.Request.RequestParserTreeParser request)
+        public IParseTreeNode? Parse(Parser.Request.RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Base) return null;
             if (request.Token.Text != ".word") return null;
@@ -74,7 +75,7 @@ namespace Yama.Assembler.ARMT32
             node.AllTokens.Add(request.Token);
             node.Token = request.Token;
 
-            IdentifierToken token = request.Parser.Peek(request.Token, 1);
+            IdentifierToken? token = request.Parser.Peek(request.Token, 1);
             if (token == null) return null;
             if (token.Kind == IdentifierKind.NumberToken) node.Data = token;
             if (token.Kind == IdentifierKind.Word) node.Data = token;
@@ -89,6 +90,7 @@ namespace Yama.Assembler.ARMT32
             node.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
+            if (token is null) return node;
             if (token.Kind != IdentifierKind.NumberToken) return node;
 
             node.AdditionNumberToken = token;
