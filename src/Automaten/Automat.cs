@@ -7,6 +7,10 @@ namespace LearnCsStuf.Automaten
     {
         // -----------------------------------------------
 
+        private Zustand? current;
+
+        // -----------------------------------------------
+
         #region get/set
 
         // -----------------------------------------------
@@ -21,8 +25,16 @@ namespace LearnCsStuf.Automaten
 
         public Zustand Current
         {
-            get;
-            set;
+            get
+            {
+                if (this.current is null) return this.Start;
+
+                return this.current;
+            }
+            set
+            {
+                this.current = value;
+            }
         }
 
         // -----------------------------------------------
@@ -131,7 +143,7 @@ namespace LearnCsStuf.Automaten
 
         public Status Next ( Token token )
         {
-            Zustand zustand = this.Current.Check ( token, this );
+            Zustand? zustand = this.Current.Check ( token, this );
 
             if ( zustand == null ) return Status.Failed;
 
