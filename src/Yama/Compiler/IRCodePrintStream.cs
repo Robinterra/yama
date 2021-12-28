@@ -67,7 +67,7 @@ namespace Yama.Compiler
             if (this.AddFreeLoop(line, result)) return ContinueMode.Break;
             if (this.AddReferenceCall(line, result)) return ContinueMode.Continue;
 
-            string? printMode = line.Owner.Algo.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
+            string? printMode = line.Owner.Algo!.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
             string isNotUseChar = line.IsUsed ? "" : "/!\\";
             result.AppendFormat("{3}{0}: {4}{1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
 

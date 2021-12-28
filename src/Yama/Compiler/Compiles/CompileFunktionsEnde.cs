@@ -22,19 +22,20 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<string>();
-        public IParseTreeNode Node
+
+        public IParseTreeNode? Node
         {
             get;
             set;
         }
 
-        public MethodeDeclarationNode MethodNode
+        public MethodeDeclarationNode? MethodNode
         {
             get;
             set;
         }
 
-        public CompileAlgo Algo
+        public CompileAlgo? Algo
         {
             get;
             set;
@@ -44,14 +45,31 @@ namespace Yama.Compiler
         {
             get;
             set;
+        } = new();
+
+        public VektorDeclaration? GetNode
+        {
+            get;
+            private set;
         }
 
-        
-        public VektorDeclaration GetNode { get; private set; }
-        public VektorDeclaration SetNode { get; private set; }
+        public VektorDeclaration? SetNode
+        {
+            get;
+            private set;
+        }
 
-        public PropertyGetSetDeklaration PGetNode { get; private set; }
-        public PropertyGetSetDeklaration PSetNode { get; private set; }
+        public PropertyGetSetDeklaration? PGetNode
+        {
+            get;
+            private set;
+        }
+
+        public PropertyGetSetDeklaration? PSetNode
+        {
+            get;
+            private set;
+        }
 
         public bool IsUsed
         {
@@ -79,7 +97,7 @@ namespace Yama.Compiler
             set;
         } = new List<string>();
 
-        public SSACompileLine Line
+        public SSACompileLine? Line
         {
             get;
             set;
@@ -95,13 +113,13 @@ namespace Yama.Compiler
             query.Key = key;
             query.Kategorie = "default";
 
-            if (mode == "set")
+            if (mode == "set" && node.Deklaration is not null)
             {
                 query.Uses = node.Deklaration.SetUses;
                 query.Value = (object)node.Deklaration.AssemblyNameSetMethode;
             }
 
-            if (mode == "get")
+            if (mode == "get" && node.Deklaration is not null)
             {
                 query.Uses = node.Deklaration.GetUses;
                 query.Value = (object)node.Deklaration.AssemblyNameGetMethode;
@@ -116,13 +134,13 @@ namespace Yama.Compiler
             query.Key = key;
             query.Kategorie = "default";
 
-            if (mode == "set")
+            if (mode == "set" && node.Deklaration is not null)
             {
                 query.Uses = node.Deklaration.SetUses;
                 query.Value = (object)node.Deklaration.AssemblyNameSetMethode;
             }
 
-            if (mode == "get")
+            if (mode == "get" && node.Deklaration is not null)
             {
                 query.Uses = node.Deklaration.GetUses;
                 query.Value = (object)node.Deklaration.AssemblyNameGetMethode;
@@ -134,6 +152,8 @@ namespace Yama.Compiler
         private DefaultRegisterQuery BuildQuery(MethodeDeclarationNode node, AlgoKeyCall key, string mode)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
+            if (node.Deklaration is null) return query;
+
             query.Key = key;
             query.Kategorie = mode;
             query.Uses = node.Deklaration.ThisUses;
@@ -163,9 +183,8 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
-                if (result == null)
-                    return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -198,7 +217,7 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
@@ -232,7 +251,7 @@ namespace Yama.Compiler
             {
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode);
 
-                Dictionary<string, string> result = compiler.Definition.KeyMapping(query);
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
                 if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
@@ -246,6 +265,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (this.Algo is null) return false;
+
             Dictionary<string, string> postreplaces = new Dictionary<string, string>();
 
             int varcount = 0;
@@ -255,7 +276,7 @@ namespace Yama.Compiler
             if (this.PSetNode != null) varcount = this.PSetNode.SetVariabelCounter;
             if (this.PGetNode != null) varcount = this.PGetNode.GetVariabelCounter;
 
-            List<string> registerInUse = null;
+            List<string>? registerInUse = null;
             if (this.MethodNode != null) registerInUse = this.MethodNode.RegisterInUse;
             if (this.SetNode != null) registerInUse = this.SetNode.SetRegisterInUse;
             if (this.GetNode != null) registerInUse = this.GetNode.GetRegisterInUse;
@@ -264,13 +285,16 @@ namespace Yama.Compiler
 
             foreach (AlgoKeyCall key in this.Algo.PostKeys)
             {
+                if (key.Name is null) continue;
+
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
                 query.Value = registerInUse;
                 if (key.Name == "[stackcount]") query.Value = this.ArgsCount;
                 if (key.Name == "[virtuelRegister]") query.Value = this.VirtuellRegister.Count;
 
-                string value = compiler.Definition.PostKeyReplace(query);
+                string? value = compiler.Definition.PostKeyReplace(query);
+                if (value is null) return compiler.AddError("postkeyreplace konnte nicht ermittelt werden", this.Node);
 
                 postreplaces.Add(key.Name, value);
             }
@@ -292,7 +316,7 @@ namespace Yama.Compiler
 
         private bool MakeVirtuelAdvnced(Compiler compiler, Dictionary<string, string> postreplaces)
         {
-            CompileAlgo algo = compiler.GetAlgo(this.AlgoName, "virtuel");
+            CompileAlgo? algo = compiler.GetAlgo(this.AlgoName, "virtuel");
             if (algo == null) return false;
 
             foreach (string str in algo.AssemblyCommands)

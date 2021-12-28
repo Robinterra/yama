@@ -19,7 +19,7 @@ namespace Yama.Compiler
         {
             get
             {
-                return this.Owner.Algo;
+                return this.Owner.Algo!;
             }
         }
 
