@@ -5,6 +5,8 @@ using System.Linq;
 using Yama.Assembler;
 using Yama.Compiler;
 using Yama.Index;
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
 using Yama.Parser;
 
@@ -123,6 +125,13 @@ namespace Yama
             get;
             set;
         } = new List<DirectoryInfo>();
+
+        // -----------------------------------------------
+
+        public OutputController Output
+        {
+            get;
+        } = new OutputController();
 
         // -----------------------------------------------
 
@@ -430,15 +439,27 @@ namespace Yama
 
             if (startlayer == null) return false;
 
+            bool isfailed = false;
+
             foreach (string File in files)
             {
                 System.IO.FileInfo file = new System.IO.FileInfo ( File );
 
                 Parser.Parser p = new Parser.Parser ( file, layers, lexer );
 
-                p.ErrorNode = new ParserError (  );
+                this.Output.Print(new ParseFileStart(file));
+                System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+                stopwatch.Start();
 
-                if (!p.Parse(startlayer)) return this.PrintingErrors(p);
+                if (!p.Parse(startlayer))
+                {
+                    this.PrintingErrors(p, stopwatch);
+                    isfailed = true;
+                    continue;
+                }
+
+                stopwatch.Stop();
+                this.Output.Print(new ParseFileEnde(stopwatch));
 
                 IParseTreeNode? node = p.ParentContainer;
                 if (node is null) return false;
@@ -448,7 +469,7 @@ namespace Yama
                 nodes.AddRange(node.GetAllChilds);
             }
 
-            return true;
+            return !isfailed;
         }
 
         // -----------------------------------------------
@@ -777,9 +798,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool PrintingErrors(Parser.Parser p)
+        private bool PrintingErrors(Parser.Parser p, System.Diagnostics.Stopwatch stopWatch)
         {
-            foreach ( IParseTreeNode error in p.ParserErrors )
+            this.Output.Print(new ParseFileEnde(stopWatch, true));
+
+            foreach ( ParserError error in p.ParserErrors )
             {
                 IdentifierToken token = error.Token;
 
@@ -788,8 +811,10 @@ namespace Yama
                     if (error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
                 }
 
-                p.PrintSyntaxError ( token, token.Text );
+                //p.PrintSyntaxError ( token, token.Text );
             }
+
+            this.Output.Print(p.ParserErrors.Select(t=>t.OutputNode));
 
             return false;
         }
