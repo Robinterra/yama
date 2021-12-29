@@ -1,3 +1,5 @@
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -7,12 +9,7 @@ namespace Yama.Index
 
         #region get/set
 
-        public IParseTreeNode? Use
-        {
-            get;
-        }
-
-        public string Msg
+        public IOutputNode Output
         {
             get;
         }
@@ -21,10 +18,14 @@ namespace Yama.Index
 
         #region ctor
 
-        public IndexError(IParseTreeNode? use, string msg)
+        public IndexError(IParseTreeNode use, string msg)
         {
-            this.Use = use;
-            this.Msg = msg;
+            this.Output = new IndexErrorOutput(msg, use);
+        }
+
+        public IndexError(IOutputNode outputNode)
+        {
+            this.Output = outputNode;
         }
 
         #endregion ctor

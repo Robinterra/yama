@@ -768,14 +768,7 @@ namespace Yama
 
         private bool PrintingIndexErrors(Yama.Index.Index index)
         {
-            foreach ( IndexError error in index.Errors )
-            {
-                if (error.Use == null) return this.PrintSyntaxError ( null, error.Msg, "Index error" );
-
-                IdentifierToken token = error.Use.Token;
-
-                this.PrintSyntaxError ( token, error.Msg, "Index error" );
-            }
+            this.Output.Print(index.Errors.Select(t=>t.Output));
 
             return false;
         }
