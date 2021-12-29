@@ -110,10 +110,10 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public List<IParseTreeNode> ParserErrors
+        public List<ParserError> ParserErrors
         {
             get;
-        } = new List<IParseTreeNode> ();
+        } = new List<ParserError> ();
 
         // -----------------------------------------------
 
@@ -558,9 +558,9 @@ namespace Yama.Parser
             if ( token == null ) token = new IdentifierToken ( IdentifierKind.Unknown, -1, -1, -1, "Unexpectet Error", "Unexpectet Error" );
 
             IParseTreeNode? error = this.ErrorNode.Parse ( new Request.RequestParserTreeParser ( this, token ) );
-            if (error == null) return null;
+            if (error is not ParserError pe) return null;
 
-            this.ParserErrors.Add ( error );
+            this.ParserErrors.Add ( pe );
 
             return error;
         }
@@ -645,7 +645,7 @@ namespace Yama.Parser
 
         private bool CleanPareNode ( IParseTreeNode result )
         {
-            if ( result.AllTokens == null ) return false;
+            if (result is ParserError pe) this.ParserErrors.Add(pe);
 
             foreach ( IdentifierToken token in result.AllTokens )
             {

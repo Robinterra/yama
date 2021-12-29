@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using LibGit2Sharp;
 using Yama.Compiler.Definition;
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
 using Yama.Parser;
 using Yama.ProjectConfig.Nodes;
@@ -30,6 +32,13 @@ namespace Yama.ProjectConfig
         {
             get;
         }
+
+        // -----------------------------------------------
+
+        public OutputController Output
+        {
+            get;
+        } = new OutputController();
 
         // -----------------------------------------------
 
@@ -152,7 +161,18 @@ namespace Yama.ProjectConfig
             string packagePath = Path.Combine ( Program.PackagePath.FullName, package.Name );
             DirectoryInfo packDir = new DirectoryInfo ( packagePath );
 
-            if ( !this.TryCloneOrPullRepository ( packDir, package ) ) return this.PrintingError(string.Format("can not get newest git repository {0}", package.Name), null);
+            this.Output.Print(new ConfigPackageRefreshStart(package));
+
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
+            bool isok = this.TryCloneOrPullRepository ( packDir, package );
+
+            stopwatch.Stop();
+
+            this.Output.Print(new OutputEnde(stopwatch, isok));
+
+            if (!isok) return false;
 
             FileInfo projectConfig = new FileInfo ( Path.Combine ( packDir.FullName, "config.yproj" ) );
             if ( !projectConfig.Exists ) return this.PrintingError("Project config file can not be found", projectConfig);

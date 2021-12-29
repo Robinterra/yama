@@ -70,7 +70,7 @@ namespace Yama
             ICommandLine firstCommand = commands[0];
 
             if (firstCommand is FileExpression) return Program.RunSofort ( firstCommand.Value!, commands );
-            System.Console.WriteLine("Remember Yama, old friend?");
+            //System.Console.WriteLine("Remember Yama, old friend?");
             if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
             if (firstCommand is DebugExpression) return Program.Debug ( commands, defs );
             if (firstCommand is AssembleExpression) return Program.Assemble ( commands );

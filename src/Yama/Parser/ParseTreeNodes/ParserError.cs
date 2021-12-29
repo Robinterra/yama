@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Yama.Index;
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
 
 namespace Yama.Parser
@@ -23,6 +25,12 @@ namespace Yama.Parser
             }
         }
 
+        public IOutputNode OutputNode
+        {
+            get;
+            set;
+        }
+
         public List<IdentifierToken> AllTokens
         {
             get;
@@ -35,7 +43,15 @@ namespace Yama.Parser
         public ParserError ()
         {
             this.Token = new();
+            this.OutputNode = new ParserSyntaxError("error", new IdentifierToken());
             this.AllTokens = new List<IdentifierToken> ();
+        }
+
+        public ParserError(IdentifierToken token)
+        {
+            this.Token = token;
+            this.OutputNode = new ParserSyntaxError(token.Text, token);
+            this.AllTokens = new() { token };
         }
 
         #endregion ctor
@@ -44,13 +60,7 @@ namespace Yama.Parser
 
         public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
-            ParserError result = new ParserError ();
-
-            result.Token = request.Token;
-
-            result.AllTokens.Add(request.Token);
-
-            return result;
+            return new ParserError(request.Token);
         }
 
         public bool Indezieren ( Request.RequestParserTreeIndezieren request )

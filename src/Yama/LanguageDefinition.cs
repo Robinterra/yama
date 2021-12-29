@@ -5,6 +5,8 @@ using System.Linq;
 using Yama.Assembler;
 using Yama.Compiler;
 using Yama.Index;
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
 using Yama.Parser;
 
@@ -123,6 +125,13 @@ namespace Yama
             get;
             set;
         } = new List<DirectoryInfo>();
+
+        // -----------------------------------------------
+
+        public OutputController Output
+        {
+            get;
+        } = new OutputController();
 
         // -----------------------------------------------
 
@@ -430,15 +439,30 @@ namespace Yama
 
             if (startlayer == null) return false;
 
+            bool isfailed = false;
+
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
             foreach (string File in files)
             {
                 System.IO.FileInfo file = new System.IO.FileInfo ( File );
 
                 Parser.Parser p = new Parser.Parser ( file, layers, lexer );
 
-                p.ErrorNode = new ParserError (  );
+                //this.Output.Print(new ParseFileStart(file));
 
-                if (!p.Parse(startlayer)) return this.PrintingErrors(p);
+                stopwatch.Restart();
+
+                if (!p.Parse(startlayer))
+                {
+                    stopwatch.Stop();
+                    this.PrintingErrors(p, file, stopwatch);
+                    isfailed = true;
+                    continue;
+                }
+
+                stopwatch.Stop();
+                //this.Output.Print(new OutputEnde(stopwatch, true));
 
                 IParseTreeNode? node = p.ParentContainer;
                 if (node is null) return false;
@@ -448,7 +472,7 @@ namespace Yama
                 nodes.AddRange(node.GetAllChilds);
             }
 
-            return true;
+            return !isfailed;
         }
 
         // -----------------------------------------------
@@ -482,15 +506,20 @@ namespace Yama
             if (file.Directory == null) return false;
             if (!file.Directory.Exists) file.Directory.Create();
 
-            if (!this.Parse(nodes)) return false;
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
 
-            if (!this.Indezieren(ref nodes, ref main)) return false;
+            if (!this.Parse(nodes)) return this.Output.Print(new BuildEnde(stopwatch, false));
 
-            if (!this.Compilen(nodes, main, ref compileRoots)) return false;
+            if (!this.Indezieren(ref nodes, ref main)) return this.Output.Print(new BuildEnde(stopwatch, false));
 
-            if (!this.Assemblen(compileRoots)) return false;
+            if (!this.Compilen(nodes, main, ref compileRoots)) return this.Output.Print(new BuildEnde(stopwatch, false));
 
-            Console.WriteLine("Those blasted swamps... eating bugs... wading through filth... complete compilation");
+            if (!this.Assemblen(compileRoots)) return this.Output.Print(new BuildEnde(stopwatch, false));
+
+            this.Output.Print(new BuildEnde(stopwatch, true));
+
+            //Console.WriteLine("Those blasted swamps... eating bugs... wading through filth... complete compilation");
 
             return true;
         }
@@ -777,19 +806,31 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool PrintingErrors(Parser.Parser p)
+        private bool PrintingErrors(Parser.Parser p, FileInfo file, System.Diagnostics.Stopwatch stopWatch)
         {
-            foreach ( IParseTreeNode error in p.ParserErrors )
+            this.Output.Print(new ParseFileStart(file));
+            this.Output.Print(new OutputEnde(stopWatch, false));
+
+            List<ParserError> removes = new();
+            IdentifierToken? previous = null;
+
+            foreach ( ParserError error in p.ParserErrors )
             {
                 IdentifierToken token = error.Token;
+
+                if (previous == token) removes.Add(error);
+
+                previous = token;
 
                 if (token.Kind == IdentifierKind.Unknown)
                 {
                     if (error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
                 }
 
-                p.PrintSyntaxError ( token, token.Text );
+                //p.PrintSyntaxError ( token, token.Text );
             }
+
+            this.Output.Print(p.ParserErrors.Where(q=>!removes.Contains(q)).Select(t=>t.OutputNode));
 
             return false;
         }
