@@ -4,7 +4,7 @@ using Yama.Lexer;
 namespace Yama.InformationOutput.Nodes
 {
 
-    public class OutputEnde : IOutputNode
+    public class BuildEnde : IOutputNode
     {
 
         #region get/set
@@ -23,7 +23,7 @@ namespace Yama.InformationOutput.Nodes
 
         #region ctor
 
-        public OutputEnde(Stopwatch stopwatch, bool isok)
+        public BuildEnde(Stopwatch stopwatch, bool isok)
         {
             this.Stopwatch = stopwatch;
             this.IsOK = isok;
@@ -37,10 +37,14 @@ namespace Yama.InformationOutput.Nodes
         {
             string printMessage = $"{this.Stopwatch.ElapsedMilliseconds} ms";
 
-            if (this.IsOK) o.Info.Write("DONE ", foreColor: ConsoleColor.Green);
-            else o.Info.Write("FAILED ", foreColor: ConsoleColor.Red);
+            o.Info.Write(null, true);
+
+            if (this.IsOK) o.Info.Write("Build succeeeded ", foreColor: ConsoleColor.Green);
+            else o.Info.Write("Build falied ", foreColor: ConsoleColor.Red);
 
             o.Info.Write(printMessage, newLine: true, foreColor: ConsoleColor.Yellow);
+
+            o.Info.Write(null, true);
 
             return this.IsOK;
         }

@@ -506,13 +506,18 @@ namespace Yama
             if (file.Directory == null) return false;
             if (!file.Directory.Exists) file.Directory.Create();
 
-            if (!this.Parse(nodes)) return false;
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
 
-            if (!this.Indezieren(ref nodes, ref main)) return false;
+            if (!this.Parse(nodes)) return this.Output.Print(new BuildEnde(stopwatch, false));
 
-            if (!this.Compilen(nodes, main, ref compileRoots)) return false;
+            if (!this.Indezieren(ref nodes, ref main)) return this.Output.Print(new BuildEnde(stopwatch, false));
 
-            if (!this.Assemblen(compileRoots)) return false;
+            if (!this.Compilen(nodes, main, ref compileRoots)) return this.Output.Print(new BuildEnde(stopwatch, false));
+
+            if (!this.Assemblen(compileRoots)) return this.Output.Print(new BuildEnde(stopwatch, false));
+
+            this.Output.Print(new BuildEnde(stopwatch, true));
 
             //Console.WriteLine("Those blasted swamps... eating bugs... wading through filth... complete compilation");
 
