@@ -40,7 +40,7 @@ namespace Yama.InformationOutput.Nodes
             o.Info.Write(null, true);
 
             if (this.IsOK) o.Info.Write("Build succeeeded ", foreColor: ConsoleColor.Green);
-            else o.Info.Write("Build falied ", foreColor: ConsoleColor.Red);
+            else o.Info.Write("Build failed ", foreColor: ConsoleColor.Red);
 
             o.Info.Write(printMessage, newLine: true, foreColor: ConsoleColor.Yellow);
 
