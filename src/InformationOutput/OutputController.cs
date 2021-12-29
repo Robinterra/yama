@@ -46,6 +46,8 @@ namespace Yama.InformationOutput
                 node.Print(this.Request);
             }
 
+            this.Info.Write(null, true);
+
             return true;
         }
 

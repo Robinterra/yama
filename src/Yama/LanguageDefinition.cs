@@ -441,25 +441,28 @@ namespace Yama
 
             bool isfailed = false;
 
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
             foreach (string File in files)
             {
                 System.IO.FileInfo file = new System.IO.FileInfo ( File );
 
                 Parser.Parser p = new Parser.Parser ( file, layers, lexer );
 
-                this.Output.Print(new ParseFileStart(file));
-                System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-                stopwatch.Start();
+                //this.Output.Print(new ParseFileStart(file));
+
+                stopwatch.Restart();
 
                 if (!p.Parse(startlayer))
                 {
-                    this.PrintingErrors(p, stopwatch);
+                    stopwatch.Stop();
+                    this.PrintingErrors(p, file, stopwatch);
                     isfailed = true;
                     continue;
                 }
 
                 stopwatch.Stop();
-                this.Output.Print(new ParseFileEnde(stopwatch));
+                //this.Output.Print(new OutputEnde(stopwatch, true));
 
                 IParseTreeNode? node = p.ParentContainer;
                 if (node is null) return false;
@@ -511,7 +514,7 @@ namespace Yama
 
             if (!this.Assemblen(compileRoots)) return false;
 
-            Console.WriteLine("Those blasted swamps... eating bugs... wading through filth... complete compilation");
+            //Console.WriteLine("Those blasted swamps... eating bugs... wading through filth... complete compilation");
 
             return true;
         }
@@ -798,13 +801,21 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool PrintingErrors(Parser.Parser p, System.Diagnostics.Stopwatch stopWatch)
+        private bool PrintingErrors(Parser.Parser p, FileInfo file, System.Diagnostics.Stopwatch stopWatch)
         {
-            this.Output.Print(new ParseFileEnde(stopWatch, true));
+            this.Output.Print(new ParseFileStart(file));
+            this.Output.Print(new OutputEnde(stopWatch, false));
+
+            List<ParserError> removes = new();
+            IdentifierToken? previous = null;
 
             foreach ( ParserError error in p.ParserErrors )
             {
                 IdentifierToken token = error.Token;
+
+                if (previous == token) removes.Add(error);
+
+                previous = token;
 
                 if (token.Kind == IdentifierKind.Unknown)
                 {
@@ -814,7 +825,7 @@ namespace Yama
                 //p.PrintSyntaxError ( token, token.Text );
             }
 
-            this.Output.Print(p.ParserErrors.Select(t=>t.OutputNode));
+            this.Output.Print(p.ParserErrors.Where(q=>!removes.Contains(q)).Select(t=>t.OutputNode));
 
             return false;
         }

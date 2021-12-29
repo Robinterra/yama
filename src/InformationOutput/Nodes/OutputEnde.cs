@@ -4,7 +4,7 @@ using Yama.Lexer;
 namespace Yama.InformationOutput.Nodes
 {
 
-    public class ParseFileEnde : IOutputNode
+    public class OutputEnde : IOutputNode
     {
 
         #region get/set
@@ -14,7 +14,7 @@ namespace Yama.InformationOutput.Nodes
             get;
         }
 
-        public bool IsFailed
+        public bool IsOK
         {
             get;
         }
@@ -23,10 +23,10 @@ namespace Yama.InformationOutput.Nodes
 
         #region ctor
 
-        public ParseFileEnde(Stopwatch stopwatch, bool isfailed = false)
+        public OutputEnde(Stopwatch stopwatch, bool isok)
         {
             this.Stopwatch = stopwatch;
-            this.IsFailed = isfailed;
+            this.IsOK = isok;
         }
 
         #endregion ctor
@@ -38,7 +38,7 @@ namespace Yama.InformationOutput.Nodes
 
             string printMessage = $"{this.Stopwatch.ElapsedMilliseconds} ms";
 
-            if (!IsFailed) o.Info.Write("DONE ", foreColor: ConsoleColor.Green);
+            if (this.IsOK) o.Info.Write("DONE ", foreColor: ConsoleColor.Green);
             else o.Info.Write("FAILED ", foreColor: ConsoleColor.Red);
 
             o.Info.Write(printMessage, newLine: true, foreColor: ConsoleColor.Yellow);
