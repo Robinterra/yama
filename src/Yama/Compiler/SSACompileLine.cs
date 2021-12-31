@@ -7,6 +7,13 @@ namespace Yama.Compiler
     public class SSACompileLine
     {
 
+        #region vars
+
+        private int greateOrder = -1;
+        private int greateOrderCallsLength = -1;
+
+        #endregion vars
+
         #region get/set
 
         public SSACompileLine? ReplaceLine
@@ -27,6 +34,25 @@ namespace Yama.Compiler
         {
             get;
             set;
+        }
+
+        public int GreateOrder
+        {
+            get
+            {
+                if (this.greateOrderCallsLength == this.Calls.Count) return this.greateOrder;
+
+                int greatOrder = -1;
+
+                for (int i = 0; i < this.Calls.Count; i++)
+                {
+                    if (greatOrder < this.Calls[i].Order) greatOrder = this.Calls[i].Order;
+                }
+
+                this.greateOrderCallsLength = this.Calls.Count;
+
+                return this.greateOrder = greatOrder;
+            }
         }
 
         public ICompileRoot Owner

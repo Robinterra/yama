@@ -172,12 +172,12 @@ namespace Yama.Compiler.Definition
         {
             if (map.Line is null) return false;
 
-            int greatOrder = -1;
+            int greatOrder = map.Line.GreateOrder;
 
-            for (int i = 0; i < map.Line.Calls.Count; i++)
+            /*for (int i = 0; i < map.Line.Calls.Count; i++)
             {
                 if (greatOrder < map.Line.Calls[i].Order) greatOrder = map.Line.Calls[i].Order;
-            }
+            }*/
 
             if (greatOrder > line.Order) return true;
 
@@ -233,9 +233,9 @@ namespace Yama.Compiler.Definition
                 return true;
             }
 
-            int greatOrder = -1;
+            int greatOrder = checkCalls.GreateOrder;
 
-            for (int i = 0; i < checkCalls.Calls.Count; i++)
+            /*for (int i = 0; i < checkCalls.Calls.Count; i++)
             {
                 if (greatOrder < checkCalls.Calls[i].Order) greatOrder = checkCalls.Calls[i].Order;
                 //if (!from.Equals(checkCalls.Calls[i])) continue;
@@ -244,7 +244,7 @@ namespace Yama.Compiler.Definition
 
                 //map.Line.PhiMap.Remove(line);
                 //if (map.Line.PhiMap.Count == 0) map.Mode = RegisterUseMode.Free;
-            }
+            }*/
 
             if (greatOrder > from.Order) return true;
 
