@@ -55,6 +55,12 @@ namespace Yama.Compiler
             }
         }
 
+        public RegisterMap? RegisterMap
+        {
+            get;
+            set;
+        }
+
         public ICompileRoot Owner
         {
             get;
@@ -174,6 +180,7 @@ namespace Yama.Compiler
 
             newMap.Mode = RegisterUseMode.Used;
             newMap.Line = this;
+            this.RegisterMap = newMap;
             //newMap.Line.MakeAllRefs();
 
             this.Owner.PrimaryKeys.Add("[SSAPUSH]", newMap.Name);

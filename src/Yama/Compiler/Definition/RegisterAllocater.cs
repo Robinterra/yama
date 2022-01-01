@@ -92,6 +92,13 @@ namespace Yama.Compiler.Definition
             line = this.GetOriginal(line);
             if (line is null) return null;
 
+            if (line.RegisterMap is not null && line.RegisterMap.Line is not null)
+            {
+                if (line.Equals(line.RegisterMap.Line)) return line.RegisterMap;
+            }
+            SSACompileLine? phimap = line.PhiMap.Find(t=>t.RegisterMap != null);
+            if (phimap != null && phimap.RegisterMap!.Line!.FindEquals(line)) return phimap.RegisterMap;
+
             foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
@@ -196,12 +203,16 @@ namespace Yama.Compiler.Definition
 
         public bool ExistAllocation(SSACompileLine line)
         {
-            foreach (RegisterMap map in this.RegisterMaps)
+            SSACompileLine? phimap = line.PhiMap.Find(t=>t.RegisterMap != null);
+            if (phimap != null && phimap.RegisterMap!.Line!.FindEquals(line)) return true;
+
+            /*foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
                 if (map.Line is null) continue;
 
-                if (map.Line.FindEquals(line)) return true;
+                if (map.Line.FindEquals(line))
+                    return true;
             }
 
             foreach (RegisterMap map in this.VirtuellRegister)
@@ -210,7 +221,7 @@ namespace Yama.Compiler.Definition
                 if (map.Line is null) continue;
 
                 if (map.Line.FindEquals(line)) return true;
-            }
+            }*/
 
             return false;
         }
