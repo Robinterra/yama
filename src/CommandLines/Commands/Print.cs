@@ -1,6 +1,6 @@
 namespace LearnCsStuf.CommandLines.Commands
 {
-    public class Print : ICommandLine
+    public class PrintExpression : ICommandLine
     {
 
         // -----------------------------------------------
@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, "<subcommand>", "Gibt <subcommand> (tree) in der Console aus" );
+                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, "<subcommand>", "Zum Einstellen des Consolen Output: Um den ParserTree auszugeben 'tree', um die Parsetime für einzelne Dateien auszugeben 'parsetime'" );
             }
         }
 
@@ -59,7 +59,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             if (string.Format ( "{0}", this.Key ) != command) return null;
 
-            return new Print();
+            return new PrintExpression();
         }
 
         // -----------------------------------------------

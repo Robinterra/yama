@@ -202,7 +202,7 @@ namespace Yama
             if (Program.yama == null) Program.yama = new LanguageDefinition();
 
             FileInfo projectConfig = new FileInfo("config.yproj");
-            if (projectConfig.Exists) return Program.BuildWithProjectConfig(projectConfig, defs);
+            if (projectConfig.Exists) if (!Program.BuildWithProjectConfig(projectConfig, defs)) return false;
 
             foreach ( ICommandLine command in commands )
             {
@@ -213,7 +213,7 @@ namespace Yama
                 if (command is OptimizingExpression) yama.OptimizeLevel = Program.GetOptimizeLevel ( command.Value! );
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
                 if (command is DefinesExpression) yama.Defines.Add(command.Value!);
-                if (command is Print t) Program.CheckPrint ( yama, t );
+                if (command is PrintExpression t) Program.CheckPrint ( yama, t );
                 if (command is SkipExpression) yama.StartPosition = Program.ParseSkipExpressionHex(command.Value!);
                 if (command is StartNamespace) yama.StartNamespace = command.Value!;
                 if (command is IROutputExpression) yama.IROutputFile = new FileInfo(command.Value!);
@@ -234,10 +234,10 @@ namespace Yama
 
             if (!projectConfig.Build(yama, projectConfigFile)) return false;
 
-            DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
-            if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary );
+            //DirectoryInfo systemLibrary = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System"));
+            //if (systemLibrary.Exists) yama.Includes.Add ( systemLibrary );
 
-            return yama.Compile();
+            return true;
         }
 
         // -----------------------------------------------
@@ -266,9 +266,10 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static bool CheckPrint(LanguageDefinition yama, Print t)
+        private static bool CheckPrint(LanguageDefinition yama, PrintExpression t)
         {
             if (t.Value == "tree") yama.PrintParserTree = true;
+            if (t.Value == "parsetime") yama.ParseTime = true;
 
             return true;
         }
@@ -316,7 +317,7 @@ namespace Yama
             compileArgs.Add( new OptimizingExpression () );
             compileArgs.Add( new DefinitionExpression () );
             compileArgs.Add( new DefinesExpression () );
-            compileArgs.Add( new Print () );
+            compileArgs.Add( new PrintExpression () );
             compileArgs.Add( new SkipExpression () );
             compileArgs.Add( new StartNamespace () );
             compileArgs.Add( new IROutputExpression  () );
@@ -354,7 +355,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
             Program.EnabledCommandLines.Add ( new SkipExpression (  ) );
             Program.EnabledCommandLines.Add ( new SizeExpression (  ) );
-            Program.EnabledCommandLines.Add ( new Print (  ) );
+            Program.EnabledCommandLines.Add ( new PrintExpression (  ) );
             Program.EnabledCommandLines.Add ( new FileExpression (  ) );
             Program.EnabledCommandLines.Add ( new LearnCsStuf.CommandLines.Commands.Help (  ) );
 

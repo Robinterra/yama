@@ -72,7 +72,7 @@ namespace Yama.Lexer
         public char CurrentChar
         {
             get;
-            set;
+            private set;
         }
 
         // -----------------------------------------------
@@ -80,7 +80,7 @@ namespace Yama.Lexer
         public object? Current
         {
             get;
-            set;
+            private set;
         }
 
         // -----------------------------------------------

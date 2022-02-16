@@ -29,6 +29,14 @@ namespace Yama
 
         // -----------------------------------------------
 
+        public bool ParseTime
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public List<string> Files
         {
             get;
@@ -108,17 +116,22 @@ namespace Yama
         } = Optimize.SSA;
 
         // -----------------------------------------------
+
         public List<ICommand>? Sequence
         {
             get;
             set;
         }
 
+        // -----------------------------------------------
+
         public FileInfo? IROutputFile
         {
             get;
             set;
         }
+
+        // -----------------------------------------------
 
         public List<DirectoryInfo> Extensions
         {
@@ -188,7 +201,6 @@ namespace Yama
 
         // -----------------------------------------------
 
-        
         private ParserLayer InVektorLayer(ParserLayer execlayer)
         {
             ParserLayer layer = new ParserLayer("invektor");
@@ -449,7 +461,7 @@ namespace Yama
 
                 Parser.Parser p = new Parser.Parser ( file, layers, lexer );
 
-                //this.Output.Print(new ParseFileStart(file));
+                if (this.ParseTime) this.Output.Print(new ParseFileStart(file));
 
                 stopwatch.Restart();
 
@@ -462,7 +474,7 @@ namespace Yama
                 }
 
                 stopwatch.Stop();
-                //this.Output.Print(new OutputEnde(stopwatch, true));
+                if (this.ParseTime) this.Output.Print(new OutputEnde(stopwatch, true));
 
                 IParseTreeNode? node = p.ParentContainer;
                 if (node is null) return false;
