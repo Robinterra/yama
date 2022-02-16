@@ -208,7 +208,7 @@ namespace Yama
             {
                 if (command is FileExpression) yama.Files.Add ( command.Value! );
                 if (command is IncludeExpression) yama.Includes.Add ( new DirectoryInfo( command.Value! ));
-                if ( command is AssemblerOutputFileExpression ) yama.OutputAssemblerFile = new FileInfo ( command.Value! );
+                if (command is AssemblerOutputFileExpression) yama.OutputAssemblerFile = new FileInfo ( command.Value! );
                 if (command is OutputFileExpression) yama.OutputFile = new FileInfo(command.Value!);
                 if (command is OptimizingExpression) yama.OptimizeLevel = Program.GetOptimizeLevel ( command.Value! );
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
@@ -230,7 +230,7 @@ namespace Yama
 
         private static bool BuildWithProjectConfig(FileInfo projectConfigFile, DefinitionManager defs )
         {
-            ConfigDefinition projectConfig = new ConfigDefinition(defs);
+            ConfigDefinition projectConfig = new ConfigDefinition(defs, new());
 
             if (!projectConfig.Build(yama, projectConfigFile)) return false;
 

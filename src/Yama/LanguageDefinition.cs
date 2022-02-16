@@ -152,6 +152,28 @@ namespace Yama
 
         // -----------------------------------------------
 
+        #region ctor
+
+        // -----------------------------------------------
+
+        public LanguageDefinition()
+        {
+
+        }
+
+        // -----------------------------------------------
+
+        public LanguageDefinition(OutputController outputController)
+        {
+            this.Output = outputController;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
         #region methods
 
         // -----------------------------------------------
@@ -827,12 +849,7 @@ namespace Yama
 
                 previous = token;
 
-                if (token.Kind == IdentifierKind.Unknown)
-                {
-                    if (error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
-                }
-
-                //p.PrintSyntaxError ( token, token.Text );
+                if (token.Kind == IdentifierKind.Unknown && error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
             }
 
             this.Output.Print(p.ParserErrors.Where(q=>!removes.Contains(q)).Select(t=>t.OutputNode));
