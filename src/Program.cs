@@ -11,6 +11,8 @@ using LearnCsStuf.CommandLines.Commands;
 using Yama.Assembler;
 using Yama.Debug;
 using Yama.ProjectConfig;
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 
 namespace Yama
 {
@@ -66,20 +68,21 @@ namespace Yama
         {
             if (commands.Count == 0) return Program.HelpPrinten() == 1;
             DefinitionManager defs = new DefinitionManager();
+            OutputController outputController = new();
 
             ICommandLine firstCommand = commands[0];
 
             if (firstCommand is FileExpression) return Program.RunSofort ( firstCommand.Value!, commands );
             //System.Console.WriteLine("Remember Yama, old friend?");
-            if (firstCommand is CompileExpression) return Program.Build ( commands, defs );
-            if (firstCommand is DebugExpression) return Program.Debug ( commands, defs );
-            if (firstCommand is AssembleExpression) return Program.Assemble ( commands );
-            if (firstCommand is RunExpression) return Program.Run ( commands );
+            if (firstCommand is BuildExpression) return Program.Build ( commands, defs, outputController );
+            if (firstCommand is DebugExpression) return Program.Debug ( commands, defs, outputController );
+            if (firstCommand is AssembleExpression) return Program.Assemble ( commands, outputController );
+            if (firstCommand is RunExpression) return Program.Run ( commands, outputController );
             if (firstCommand is LearnCsStuf.CommandLines.Commands.Help) return Program.HelpPrinten (  ) == 1;
             if (firstCommand is AutoExpression) return Program.RunAuto ( firstCommand );
             if (firstCommand is PrintDefinitionsExpression) return defs.PrintAllDefinitions (  );
 
-            Console.Error.WriteLine ( "please enter a allowd argument first" );
+            outputController.Print(new SimpleErrorOut("please enter a allowd argument first"));
 
             return false;
         }
@@ -110,11 +113,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static bool Debug(List<ICommandLine> commands, DefinitionManager defs)
+        private static bool Debug(List<ICommandLine> commands, DefinitionManager defs, OutputController outputController)
         {
             Program.yama = new LanguageDefinition();
 
-            if (!Program.Assemble(commands)) return false;
+            if (!Program.Assemble(commands, outputController)) return false;
 
             Runtime runtime = new Runtime();
             runtime.Sequence = Program.yama.Sequence;
@@ -131,7 +134,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static bool Run(List<ICommandLine> commands)
+        private static bool Run(List<ICommandLine> commands, OutputController outputController)
         {
             Runtime runtime = new Runtime();
 
@@ -139,7 +142,7 @@ namespace Yama
             foreach ( ICommandLine command in commands )
             {
                 if (command is FileExpression) runtime.Input = new FileInfo ( command.Value! );
-                if (command is SizeExpression) runtime.MemorySize = Program.ParseSkipExpressionHex(command.Value!);
+                if (command is SizeExpression) runtime.MemorySize = Program.ParseSkipExpressionHex(command.Value!, outputController);
                 if (command is FileExpression && !isfirst) runtime.Arguments.Add(command.Value!);
                 if (command is FileExpression && isfirst) isfirst = false;
             }
@@ -151,7 +154,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static bool Assemble ( List<ICommandLine> commands )
+        private static bool Assemble ( List<ICommandLine> commands, OutputController outputController )
         {
             Definitionen def = new Definitionen();
             Assembler.Assembler? assembler = new Assembler.Assembler();
@@ -162,7 +165,7 @@ namespace Yama
             {
                 if (command is DefinitionExpression) assembler = def.GenerateAssembler ( assembler, command.Value! );
                 if (command is FileExpression) request.InputFile = new FileInfo ( command.Value! );
-                if (command is SkipExpression && assembler is not null) assembler.Position = Program.ParseSkipExpressionHex(command.Value!);
+                if (command is SkipExpression && assembler is not null) assembler.Position = Program.ParseSkipExpressionHex(command.Value!, outputController);
                 if (command is OutputFileExpression)
                 {
                     FileInfo file = new FileInfo ( command.Value! );
@@ -182,7 +185,7 @@ namespace Yama
             if (assembler?.Definition == null) assembler = def.GenerateAssembler ( assembler, "runtime" );
             if (assembler is null)
             {
-                Console.Error.WriteLine("No definition found!");
+                outputController.Print(new SimpleErrorOut("No definition found!"));
                 return false;
             }
 
@@ -197,7 +200,7 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static bool Build ( List<ICommandLine> commands, DefinitionManager defs )
+        private static bool Build ( List<ICommandLine> commands, DefinitionManager defs, OutputController outputController )
         {
             if (Program.yama == null) Program.yama = new LanguageDefinition();
 
@@ -214,7 +217,7 @@ namespace Yama
                 if (command is DefinitionExpression) yama.Definition = defs.GetDefinition ( command.Value );
                 if (command is DefinesExpression) yama.Defines.Add(command.Value!);
                 if (command is PrintExpression t) Program.CheckPrint ( yama, t );
-                if (command is SkipExpression) yama.StartPosition = Program.ParseSkipExpressionHex(command.Value!);
+                if (command is SkipExpression) yama.StartPosition = Program.ParseSkipExpressionHex(command.Value!, outputController);
                 if (command is StartNamespace) yama.StartNamespace = command.Value!;
                 if (command is IROutputExpression) yama.IROutputFile = new FileInfo(command.Value!);
                 if (command is ExtensionDirectoryExpression) yama.Extensions.Add(new DirectoryInfo(command.Value!));
@@ -242,11 +245,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static uint ParseSkipExpressionHex(string value)
+        private static uint ParseSkipExpressionHex(string value, OutputController outputController)
         {
             if (!uint.TryParse(value.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber, null, out uint result))
             {
-                Console.Error.WriteLine("can not parse hex number from arguments");
+                outputController.Print(new SimpleErrorOut("can not parse hex number from arguments"));
 
                 Environment.Exit(1);
             }
@@ -338,7 +341,7 @@ namespace Yama
             assembleArgs.Add( new OutputFileExpression () );
             assembleArgs.Add( new SkipExpression () );
 
-            Program.EnabledCommandLines.Add ( new CompileExpression ( compileArgs ) );
+            Program.EnabledCommandLines.Add ( new BuildExpression ( compileArgs ) );
             Program.EnabledCommandLines.Add ( new AssembleExpression ( assembleArgs ) );
             Program.EnabledCommandLines.Add ( new RunExpression ( runArgs ) );
             Program.EnabledCommandLines.Add ( new DebugExpression ( debugArgs ) );
