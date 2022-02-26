@@ -780,37 +780,6 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public bool PrintPretty ( IParseTreeNode node, string lebchilds = "" )
-        {
-            Console.Write ( node.Token.Value );
-            Console.WriteLine (  );
-
-            List<IParseTreeNode> childs = node.GetAllChilds;
-
-            string neuchild = lebchilds + "│   ";
-            int counter = 0;
-            string normalChildPrint = "├── ";
-            foreach (IParseTreeNode child in childs)
-            {
-                if (counter >= childs.Count - 1)
-                {
-                    normalChildPrint = "└── ";
-                    neuchild = lebchilds + "    ";
-                }
-
-                Console.Write ( lebchilds );
-                Console.Write ( normalChildPrint );
-
-                this.PrintPretty ( child, neuchild );
-
-                counter++;
-            }
-
-            return true;
-        }
-
-        // -----------------------------------------------
-
         public IdentifierToken? FindAToken ( IdentifierToken von, IdentifierKind zufinden )
         {
             IdentifierToken? kind = von;

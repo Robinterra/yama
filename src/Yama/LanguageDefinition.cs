@@ -510,7 +510,7 @@ namespace Yama
             IParseTreeNode? node = p.ParentContainer;
             if (node is null) return false;
 
-            if (this.PrintParserTree) p.PrintPretty ( node );
+            if (this.PrintParserTree) this.Output.Print(new ParserTreeOut(node));
 
             nodes.AddRange(node.GetAllChilds);
 
