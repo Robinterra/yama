@@ -46,9 +46,7 @@ namespace Yama.Lexer
                 if (value == null) return;
 
                 this.CurrentByte = (byte) value.ReadByte();
-                this.position = 0;
-                this.column = 0;
-                this.line = 1;
+                this.Reset();
             }
         }
 

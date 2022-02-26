@@ -60,7 +60,7 @@ namespace Yama.Index
             set;
         }
 
-        public List<FileInfo> AllUseFiles
+        public List<string> AllUseFiles
         {
             get;
             set;
@@ -98,7 +98,7 @@ namespace Yama.Index
             this.ZuCompilenNodes = new List<IParseTreeNode>();
             this.RegisterEnums = new List<IndexEnumDeklaration>();
             this.IndexTypeSafeties = new List<IIndexTypeSafety>();
-            this.AllUseFiles = new List<FileInfo>();
+            this.AllUseFiles = new List<string>();
         }
 
         #endregion ctor
@@ -165,7 +165,7 @@ namespace Yama.Index
 
             foreach (KeyValuePair<string, IndexNamespaceDeklaration> nameSpace in aviableNamespaces)
             {
-                this.AllUseFiles.AddRange(nameSpace.Value.Files);
+                this.AllUseFiles.AddRange(nameSpace.Value.OriginKeys);
 
                 this.RegisterEnums.AddRange(nameSpace.Value.EnumDeklarationen);
 

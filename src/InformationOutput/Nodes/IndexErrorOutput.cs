@@ -37,7 +37,7 @@ namespace Yama.InformationOutput.Nodes
         {
             IdentifierToken token = this.ParserNode.Token;
 
-            string filename = token.FileInfo is null ? "unknown" : token.FileInfo.FullName;
+            string filename = token.Info is null ? "unknown" : token.Info.Origin;
 
             string printMessage = $"{filename}({token.Line},{token.Column}): Index Error - {Message} '{token.Text}'";
 

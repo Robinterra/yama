@@ -42,7 +42,7 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public FileInfo? FileInfo
+        public ITokenInfo? Info
         {
             get;
             set;

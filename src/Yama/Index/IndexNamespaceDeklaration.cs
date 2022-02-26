@@ -58,7 +58,7 @@ namespace Yama.Index
             }
         }
 
-        public List<FileInfo> Files
+        public List<string> OriginKeys
         {
             get;
             set;
@@ -88,7 +88,7 @@ namespace Yama.Index
             this.References = new List<IndexNamespaceReference>();
             this.KlassenDeklarationen = new List<IndexKlassenDeklaration>();
             this.Usings = new List<IndexNamespaceReference>();
-            this.Files = new List<FileInfo>();
+            this.OriginKeys = new List<string>();
             this.EnumDeklarationen = new List<IndexEnumDeklaration>();
         }
 

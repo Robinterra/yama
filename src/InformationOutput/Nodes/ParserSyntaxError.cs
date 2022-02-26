@@ -34,7 +34,7 @@ namespace Yama.InformationOutput.Nodes
 
         public bool Print(RequestOutput o)
         {
-            string filename = this.Token.FileInfo is null ? "unknown" : this.Token.FileInfo.FullName;
+            string filename = this.Token.Info is null ? "unknown" : this.Token.Info.Origin;
 
             string printMessage = $"{filename}({Token.Line},{Token.Column}): Syntax Error - {Message} '{Token.Text}'";
 

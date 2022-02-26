@@ -343,7 +343,12 @@ namespace Yama.ProjectConfig
 
         private bool Parse(List<IDeserialize> nodes, FileInfo file)
         {
-            Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
+            if (!file.Exists) return false;
+
+            Stream stream;
+            try {stream = file.OpenRead();} catch {return false;}
+
+            Parser.Parser p = new Parser.Parser (this.GetParserRules(), this.GetBasicLexer(), new ParserInputData(file.FullName, stream));
             ParserLayer? startlayer = p.ParserLayers.Find(t=>t.Name == "root");
 
             if (startlayer == null) return false;

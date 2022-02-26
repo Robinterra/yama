@@ -97,13 +97,13 @@ namespace Yama.Parser
 
             string? name = this.Token.Value.ToString ();
             if ( name is null ) return false;
-            
+
             IndexNamespaceDeklaration dek = new IndexNamespaceDeklaration(this, name);
 
             dek = request.Index.NamespaceAdd(dek);
             this.Deklaration = dek;
 
-            if (this.Token.FileInfo is not null) dek.Files.Add(this.Token.FileInfo);
+            if (this.Token.Info is not null) dek.OriginKeys.Add(this.Token.Info.Origin);
 
             if ( this.Statement is null ) return false;
             this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, dek));

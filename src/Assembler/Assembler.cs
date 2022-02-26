@@ -120,12 +120,18 @@ namespace Yama.Assembler
 
             Definitionen definition = new Definitionen();
 
-            this.Parser = definition.GetParser(request.InputFile);
+            ParserInputData inputData = new ParserInputData("stream", new MemoryStream());
+            if (request.InputFile is not null)
+            {
+                if (request.InputFile.Exists) inputData = new ParserInputData(request.InputFile.FullName, request.InputFile.OpenRead());
+            }
+
+            this.Parser = definition.GetParser(inputData);
 
             ParserLayer? startlayer = this.Parser.ParserLayers.Find(t=>t.Name == "main");
             if (startlayer is null) return false;
 
-            if (!this.Parse(startlayer, request)) return this.PrintParserErrors();
+            if (!this.Parse(startlayer, request, definition)) return this.PrintParserErrors();
 
             if (request.IsSkipper) this.Skipper();
 
@@ -134,7 +140,7 @@ namespace Yama.Assembler
             return true;
         }
 
-        private bool Parse(ParserLayer startlayer, RequestAssemble request)
+        private bool Parse(ParserLayer startlayer, RequestAssemble request, Definitionen definition)
         {
             if (this.Parser is null) return false;
             if (request.InputFile != null) return this.Parser.Parse(startlayer);
@@ -142,7 +148,7 @@ namespace Yama.Assembler
 
             foreach (ICompileRoot root in request.Roots)
             {
-                if (this.ParseRoot(startlayer, root)) continue;
+                if (this.ParseRoot(startlayer, root, definition)) continue;
             }
 
             return this.Errors.Count == 0;
@@ -156,7 +162,7 @@ namespace Yama.Assembler
             return false;
         }
 
-        private bool ParseRoot(ParserLayer startlayer, ICompileRoot root)
+        private bool ParseRoot(ParserLayer startlayer, ICompileRoot root, Definitionen definition)
         {
             StringBuilder builder = new StringBuilder();
             foreach(string entity in root.AssemblyCommands)
@@ -167,10 +173,9 @@ namespace Yama.Assembler
 
             MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString()));
 
-            if (this.Parser is null) return false;
-            this.Parser.NewParse();
+            this.Parser = definition.GetParser(new ParserInputData("assemblerStream", stream));
 
-            if (!this.Parser.Parse(startlayer, stream))
+            if (!this.Parser.Parse(startlayer))
             {
                 this.Errors.AddRange(this.Parser.ParserErrors);
 

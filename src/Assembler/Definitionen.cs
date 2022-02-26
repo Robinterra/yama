@@ -68,9 +68,9 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public Parser.Parser GetParser(FileInfo? file)
+        public Parser.Parser GetParser(ParserInputData inputData)
         {
-            Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
+            Parser.Parser p = new Parser.Parser (this.GetParserRules(), this.GetBasicLexer(), inputData);
             p.ErrorNode = new ParserError();
 
             return p;
