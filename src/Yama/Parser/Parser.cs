@@ -46,18 +46,10 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public FileInfo? Fileinfo
+        public IParserInputData InputData
         {
             get;
-            set;
-        }
-
-        // -----------------------------------------------
-
-        public Stream? InputStream
-        {
-            get;
-            set;
+            private set;
         }
 
         // -----------------------------------------------
@@ -71,14 +63,6 @@ namespace Yama.Parser
         // -----------------------------------------------
 
         private List<IdentifierToken>? CleanTokens
-        {
-            get;
-            set;
-        }
-
-        // -----------------------------------------------
-
-        public List<IdentifierToken> SyntaxErrors
         {
             get;
             set;
@@ -102,7 +86,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public IParseTreeNode ErrorNode
+        public ParserError ErrorNode
         {
             get;
             set;
@@ -193,21 +177,14 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private Parser ( List<ParserLayer> layers, Lexer.Lexer lexer )
+        public Parser ( List<ParserLayer> layers, Lexer.Lexer lexer, IParserInputData inputData )
         {
-            this.SyntaxErrors = new List<IdentifierToken> (  );
             this.MethodTag = new List<IParseTreeNode> (  );
             this.ParserLayers = layers;
             this.Tokenizer = lexer;
             lexer.Reset();
-        }
 
-        // -----------------------------------------------
-
-        public Parser ( FileInfo? file, List<ParserLayer> layers, Lexer.Lexer lexer )
-            : this ( layers, lexer )
-        {
-            this.Fileinfo = file;
+            this.InputData = inputData;
         }
 
         // -----------------------------------------------
@@ -220,10 +197,13 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public bool NewParse()
+        public bool NewParse(IParserInputData inputData)
         {
-            this.SyntaxErrors.Clear();
-            if (this.Tokenizer is not null) this.Tokenizer.Reset();
+            this.InputData = inputData;
+
+            this.ParserErrors.Clear();
+            this.MethodTag.Clear();
+
             if (this.CleanTokens != null) this.CleanTokens.Clear();
 
             return true;
@@ -260,19 +240,9 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public bool PrintSyntaxError(IdentifierToken token, string? msg, string nexterrormsg = "Syntax error")
+        private bool PrintSyntaxError(IdentifierToken token, string msg)
         {
-            this.SyntaxErrors.Add ( token );
-
-            ConsoleColor colr = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            string filename = "Stream";
-            if (this.Fileinfo != null) filename = this.Fileinfo.FullName;
-
-            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, filename, nexterrormsg );
-
-            Console.ForegroundColor = colr;
+            this.ParserErrors.Add(new ParserError(token, msg));
 
             return true;
         }
@@ -292,8 +262,10 @@ namespace Yama.Parser
         {
             if (this.Tokenizer is null) return false;
 
-            this.Tokenizer.Daten = this.InputStream;
+            this.Tokenizer.Daten = this.InputData.InputStream;
             this.CleanTokens = new List<IdentifierToken>();
+
+            ITokenInfo info = new TokenInfo(this.InputData.Name);
 
             foreach (IdentifierToken token in this.Tokenizer)
             {
@@ -301,12 +273,12 @@ namespace Yama.Parser
                 if (token.Kind == IdentifierKind.Comment) continue;
                 if (token.Kind == IdentifierKind.Unknown && this.PrintSyntaxError ( token, "unkown char" )) continue;
 
-                token.FileInfo = this.Fileinfo;
+                token.Info = info;
 
                 this.CleanTokens.Add ( token );
             }
 
-            return this.SyntaxErrors.Count == 0;
+            return this.ParserErrors.Count == 0;
         }
 
         // -----------------------------------------------
@@ -662,40 +634,21 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private IParseTreeNode? ParseOneMember ( IParseTreeNode member, IdentifierToken token )
-        {
-            int pos = this.Position;
-
-            IParseTreeNode? result = member.Parse ( new Request.RequestParserTreeParser ( this, token ) );
-
-            if ( result != null ) return result;
-
-            this.Position = pos;
-
-            return null;
-        }
-
-        // -----------------------------------------------
-
         public bool Parse ( ParserLayer start )
         {
-            if (this.Fileinfo is null) return this.FileNotFoundError();
-            if (!this.Fileinfo.Exists) return this.FileNotFoundError();
-
             this.ActivateLayer(start);
-
-            this.InputStream = File.OpenRead ( this.Fileinfo.FullName );
 
             if (!this.CheckTokens (  )) return false;
             if (this.CleanTokens is null) return false;
+            if (this.CleanTokens.Count == 0) return true;
 
             this.Max = this.CleanTokens.Count;
             List<IParseTreeNode>? parentNodes = this.ParseCleanTokens ( 0, this.CleanTokens.Count );
-            if ( parentNodes is null ) return this.EmptyFileError();
+            if ( parentNodes is null ) parentNodes = this.EmptyFileError();
 
             this.ParentContainer = new Container (  );
             this.ParentContainer.Statements.AddRange(parentNodes);
-            this.ParentContainer.Token = new IdentifierToken ( IdentifierKind.BeginContainer, 0, 0, 0, "File", this.Fileinfo.FullName );
+            this.ParentContainer.Token = new IdentifierToken ( IdentifierKind.BeginContainer, 0, 0, 0, "ParseElement", this.InputData.Name );
 
             foreach ( IParseTreeNode node in parentNodes )
             {
@@ -707,57 +660,16 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public bool Parse ( ParserLayer start, MemoryStream stream )
+        private List<IParseTreeNode> EmptyFileError()
         {
-            this.ActivateLayer(start);
-
-            this.InputStream = stream;
-
-            if (!this.CheckTokens (  )) return false;
-            if (this.CleanTokens is null) return false;
-
-            this.Max = this.CleanTokens.Count;
-            List<IParseTreeNode>? parentNodes = this.ParseCleanTokens ( 0, this.CleanTokens.Count );
-            if ( parentNodes is null ) parentNodes = new List<IParseTreeNode>();
-
-            this.ParentContainer = new Container (  );
-            this.ParentContainer.Statements.AddRange(parentNodes);
-            this.ParentContainer.Token = new IdentifierToken ( IdentifierKind.BeginContainer, 0, 0, 0, "Stream", "stream" );
-
-            foreach ( IParseTreeNode node in parentNodes )
-            {
-                node.Token.ParentNode = this.ParentContainer;
-            }
-
-            return this.ParserErrors.Count == 0;
-        }
-
-        // -----------------------------------------------
-
-        private bool EmptyFileError()
-        {
-            string filename = "uknownFile";
-            if (this.Fileinfo is not null) filename = this.Fileinfo.FullName;
+            string filename = this.InputData.Name;
 
             IdentifierToken token = new IdentifierToken ( IdentifierKind.Unknown, -1, -1, -1, filename, "Empty File" );
 
-            this.PrintSyntaxError(token, "Empty File");
+            ParserError errorNode = new ParserError(token);
+            this.ParserErrors.Add(errorNode);
 
-            return false;
-        }
-
-        // -----------------------------------------------
-
-        private bool FileNotFoundError()
-        {
-            string filename = "uknownFile";
-            if (this.Fileinfo is not null) filename = this.Fileinfo.FullName;
-
-            IdentifierToken token = new IdentifierToken ( IdentifierKind.Unknown, -1, -1, -1, filename, "File not Found" );
-
-            this.PrintSyntaxError(token, "File not Found");
-
-            return false;
+            return new List<IParseTreeNode>() { errorNode };
         }
 
         // -----------------------------------------------
@@ -828,37 +740,6 @@ namespace Yama.Parser
             if (this.CleanTokens is null) return false;
 
             this.CleanTokens[pos] = token;
-
-            return true;
-        }
-
-        // -----------------------------------------------
-
-        public bool PrintPretty ( IParseTreeNode node, string lebchilds = "" )
-        {
-            Console.Write ( node.Token.Value );
-            Console.WriteLine (  );
-
-            List<IParseTreeNode> childs = node.GetAllChilds;
-
-            string neuchild = lebchilds + "│   ";
-            int counter = 0;
-            string normalChildPrint = "├── ";
-            foreach (IParseTreeNode child in childs)
-            {
-                if (counter >= childs.Count - 1)
-                {
-                    normalChildPrint = "└── ";
-                    neuchild = lebchilds + "    ";
-                }
-
-                Console.Write ( lebchilds );
-                Console.Write ( normalChildPrint );
-
-                this.PrintPretty ( child, neuchild );
-
-                counter++;
-            }
 
             return true;
         }

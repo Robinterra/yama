@@ -103,12 +103,14 @@ namespace Yama.ProjectConfig.Nodes
 
             IdentifierToken? token = request.Parser.Peek(result.Token, 1);
             if (token is null) return null;
-            if (token.Kind != IdentifierKind.DoublePoint) return null;
+            if (token.Kind != IdentifierKind.DoublePoint) return new ParserError(token, $"Expectet a ':' and not a {token.Kind}", result.AllTokens.ToArray());
+
             result.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
             if (token == null) return null;
-            if (token.Kind != IdentifierKind.Text) return null;
+            if (token.Kind != IdentifierKind.Text) return new ParserError(token, $"Expectet a \"Text\" and not a {token.Kind}", result.AllTokens.ToArray());
+
             result.AllTokens.Add(token);
             result.ValueToken = token;
 

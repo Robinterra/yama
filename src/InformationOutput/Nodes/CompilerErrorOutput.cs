@@ -1,14 +1,15 @@
 using Yama.Lexer;
+using Yama.Parser;
 
 namespace Yama.InformationOutput.Nodes
 {
 
-    public class ParserSyntaxError : IOutputNode
+    public class CompilerErrorOutput : IOutputNode
     {
 
         #region get/set
 
-        public IdentifierToken Token
+        public IParseTreeNode ParserNode
         {
             get;
         }
@@ -22,10 +23,10 @@ namespace Yama.InformationOutput.Nodes
 
         #region ctor
 
-        public ParserSyntaxError(string msg, IdentifierToken token)
+        public CompilerErrorOutput(string msg, IParseTreeNode parserNode)
         {
             this.Message = msg;
-            this.Token = token;
+            this.ParserNode = parserNode;
         }
 
         #endregion ctor
@@ -34,9 +35,11 @@ namespace Yama.InformationOutput.Nodes
 
         public bool Print(RequestOutput o)
         {
-            string filename = this.Token.Info is null ? "unknown" : this.Token.Info.Origin;
+            IdentifierToken token = this.ParserNode.Token;
 
-            string printMessage = $"{filename}({Token.Line},{Token.Column}): Syntax Error - {Message} '{Token.Text}'";
+            string filename = token.Info is null ? "unknown" : token.Info.Origin;
+
+            string printMessage = $"{filename}({token.Line},{token.Column}): Compiler Error - {Message} '{token.Text}'";
 
             o.Error.Write(printMessage, newLine: true, foreColor: ConsoleColor.Red);
 

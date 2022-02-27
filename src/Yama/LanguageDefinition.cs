@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Diagnostics;
 using Yama.Assembler;
 using Yama.Compiler;
-using Yama.Index;
 using Yama.InformationOutput;
 using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
@@ -22,6 +18,14 @@ namespace Yama
         // -----------------------------------------------
 
         public uint StartPosition
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public bool ParseTime
         {
             get;
             set;
@@ -69,11 +73,11 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public List<FileInfo> AllFilesInUse
+        public List<string> AllFilesInUse
         {
             get;
             set;
-        } = new List<FileInfo>();
+        } = new List<string>();
 
         // -----------------------------------------------
 
@@ -108,17 +112,22 @@ namespace Yama
         } = Optimize.SSA;
 
         // -----------------------------------------------
+
         public List<ICommand>? Sequence
         {
             get;
             set;
         }
 
+        // -----------------------------------------------
+
         public FileInfo? IROutputFile
         {
             get;
             set;
         }
+
+        // -----------------------------------------------
 
         public List<DirectoryInfo> Extensions
         {
@@ -136,6 +145,28 @@ namespace Yama
         // -----------------------------------------------
 
         #endregion get/set
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public LanguageDefinition()
+        {
+
+        }
+
+        // -----------------------------------------------
+
+        public LanguageDefinition(OutputController outputController)
+        {
+            this.Output = outputController;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
 
         // -----------------------------------------------
 
@@ -188,7 +219,6 @@ namespace Yama
 
         // -----------------------------------------------
 
-        
         private ParserLayer InVektorLayer(ParserLayer execlayer)
         {
             ParserLayer layer = new ParserLayer("invektor");
@@ -435,44 +465,56 @@ namespace Yama
 
             List<ParserLayer> layers = this.GetParserRules();
             Lexer.Lexer lexer = this.GetBasicLexer();
-            ParserLayer? startlayer = layers.Find(t=>t.Name == "namespace");
 
+            ParserLayer? startlayer = layers.Find(t=>t.Name == "namespace");
             if (startlayer == null) return false;
 
             bool isfailed = false;
 
-            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-
-            foreach (string File in files)
+            foreach (string file in files)
             {
-                System.IO.FileInfo file = new System.IO.FileInfo ( File );
-
-                Parser.Parser p = new Parser.Parser ( file, layers, lexer );
-
-                //this.Output.Print(new ParseFileStart(file));
-
-                stopwatch.Restart();
-
-                if (!p.Parse(startlayer))
-                {
-                    stopwatch.Stop();
-                    this.PrintingErrors(p, file, stopwatch);
-                    isfailed = true;
-                    continue;
-                }
-
-                stopwatch.Stop();
-                //this.Output.Print(new OutputEnde(stopwatch, true));
-
-                IParseTreeNode? node = p.ParentContainer;
-                if (node is null) return false;
-
-                if (this.PrintParserTree) p.PrintPretty ( node );
-
-                nodes.AddRange(node.GetAllChilds);
+                if (!this.ParseIteration(file, startlayer, layers, lexer, nodes)) isfailed = true;
             }
 
             return !isfailed;
+        }
+
+        // -----------------------------------------------
+
+        public bool ParseIteration(string fullFileName, ParserLayer startlayer, List<ParserLayer> layers, Lexer.Lexer lexer, List<IParseTreeNode> nodes)
+        {
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
+            System.IO.FileInfo file = new System.IO.FileInfo ( fullFileName );
+            if (!file.Exists) return false;
+
+            Stream stream;
+            try {stream = file.OpenRead();} catch {return false;}
+
+            Parser.Parser p = new Parser.Parser (layers, lexer, new ParserInputData(file.FullName, stream));
+
+            if (this.ParseTime) this.Output.Print(new ParseFileStart(file));
+
+            stopwatch.Start();
+
+            if (!p.Parse(startlayer))
+            {
+                stopwatch.Stop();
+
+                return this.PrintingErrors(p, file, stopwatch);
+            }
+
+            stopwatch.Stop();
+            if (this.ParseTime) this.Output.Print(new OutputEnde(stopwatch, true));
+
+            IParseTreeNode? node = p.ParentContainer;
+            if (node is null) return false;
+
+            if (this.PrintParserTree) this.Output.Print(new ParserTreeOut(node));
+
+            nodes.AddRange(node.GetAllChilds);
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -539,7 +581,7 @@ namespace Yama
             if (def == "avr") return true;
             if (def is null) return false;
 
-            Assembler.Assembler assembler = new Assembler.Assembler();
+            Assembler.Assembler assembler = new Assembler.Assembler(this.Output);
             Assembler.Definitionen definitionen = new Assembler.Definitionen();
             definitionen.GenerateAssembler(assembler, def);
             assembler.Position = this.StartPosition;
@@ -591,10 +633,9 @@ namespace Yama
 
         private bool LoadAllExtensionFiles(List<FileInfo> extensionsFiles)
         {
-            foreach (FileInfo yamaFile in this.AllFilesInUse)
+            foreach (string yamaFile in this.AllFilesInUse)
             {
-                FileInfo extFile = new FileInfo(Path.ChangeExtension(yamaFile.FullName, ".json"));
-
+                FileInfo extFile = new FileInfo(Path.ChangeExtension(yamaFile, ".json"));
                 if (!extFile.Exists) continue;
 
                 extensionsFiles.Add(extFile);
@@ -644,25 +685,6 @@ namespace Yama
             compiler.IRCodeStream.AutoFlush = true;
 
             return true;
-        }
-
-        // -----------------------------------------------
-
-        private bool PrintCompilerErrors(List<CompilerError> errors)
-        {
-            foreach (CompilerError error in errors)
-            {
-                if (error.Use != null)
-                {
-                    this.PrintCompilerError(error);
-
-                    continue;
-                }
-
-                this.PrintSimpleError(error.Msg);
-            }
-
-            return false;
         }
 
         // -----------------------------------------------
@@ -741,11 +763,9 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool PrintCompilerError(CompilerError error)
+        private bool PrintCompilerErrors(List<CompilerError> errors)
         {
-            if (error.Use == null) return this.PrintSimpleError(error.Msg);
-
-            this.PrintSyntaxError(error.Use.Token, error.Msg, "Compiler error");
+            this.Output.Print(errors.Select(t=>t.Output));
 
             return false;
         }
@@ -768,40 +788,9 @@ namespace Yama
 
         private bool PrintingIndexErrors(Yama.Index.Index index)
         {
-            foreach ( IndexError error in index.Errors )
-            {
-                if (error.Use == null) return this.PrintSyntaxError ( null, error.Msg, "Index error" );
-
-                IdentifierToken token = error.Use.Token;
-
-                this.PrintSyntaxError ( token, error.Msg, "Index error" );
-            }
+            this.Output.Print(index.Errors.Select(t=>t.Output));
 
             return false;
-        }
-
-        // -----------------------------------------------
-
-        public bool PrintSyntaxError(IdentifierToken? token, string? msg, string nexterrormsg = "Syntax error")
-        {
-            //if (token.Kind != SyntaxKind.Unknown) return false;
-            if (token == null)
-            {
-                Console.Error.WriteLine ( "Unkown Error {0}, {1}", msg, nexterrormsg );
-                return false;
-            }
-
-            ConsoleColor colr = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            string filename = "unknown";
-            if (token.FileInfo != null) filename = token.FileInfo.FullName;
-
-            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, filename, nexterrormsg );
-
-            Console.ForegroundColor = colr;
-
-            return true;
         }
 
         // -----------------------------------------------
@@ -822,12 +811,7 @@ namespace Yama
 
                 previous = token;
 
-                if (token.Kind == IdentifierKind.Unknown)
-                {
-                    if (error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
-                }
-
-                //p.PrintSyntaxError ( token, token.Text );
+                if (token.Kind == IdentifierKind.Unknown && error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
             }
 
             this.Output.Print(p.ParserErrors.Where(q=>!removes.Contains(q)).Select(t=>t.OutputNode));

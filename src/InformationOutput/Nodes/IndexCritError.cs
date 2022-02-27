@@ -1,17 +1,13 @@
 using Yama.Lexer;
+using Yama.Parser;
 
 namespace Yama.InformationOutput.Nodes
 {
 
-    public class ParserSyntaxError : IOutputNode
+    public class IndexCritError : IOutputNode
     {
 
         #region get/set
-
-        public IdentifierToken Token
-        {
-            get;
-        }
 
         public string Message
         {
@@ -22,10 +18,9 @@ namespace Yama.InformationOutput.Nodes
 
         #region ctor
 
-        public ParserSyntaxError(string msg, IdentifierToken token)
+        public IndexCritError(string msg)
         {
             this.Message = msg;
-            this.Token = token;
         }
 
         #endregion ctor
@@ -34,9 +29,7 @@ namespace Yama.InformationOutput.Nodes
 
         public bool Print(RequestOutput o)
         {
-            string filename = this.Token.Info is null ? "unknown" : this.Token.Info.Origin;
-
-            string printMessage = $"{filename}({Token.Line},{Token.Column}): Syntax Error - {Message} '{Token.Text}'";
+            string printMessage = $"Index Error: {Message}";
 
             o.Error.Write(printMessage, newLine: true, foreColor: ConsoleColor.Red);
 

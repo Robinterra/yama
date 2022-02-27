@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace LearnCsStuf.CommandLines.Commands
 {
-    public class CompileExpression : ICommandLine, ICommandParent
+    public class BuildExpression : ICommandLine, ICommandParent
     {
 
         // -----------------------------------------------
@@ -65,7 +65,7 @@ namespace LearnCsStuf.CommandLines.Commands
 
         // -----------------------------------------------
 
-        public CompileExpression ( List<ICommandLine> commands )
+        public BuildExpression ( List<ICommandLine> commands )
         {
             this.Childs = commands;
         }
@@ -84,7 +84,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             if (this.Key != command) return null;
 
-            return new CompileExpression ( this.Childs );
+            return new BuildExpression ( this.Childs );
         }
 
         // -----------------------------------------------

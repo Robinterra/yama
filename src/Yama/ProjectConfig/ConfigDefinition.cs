@@ -38,7 +38,7 @@ namespace Yama.ProjectConfig
         public OutputController Output
         {
             get;
-        } = new OutputController();
+        }
 
         // -----------------------------------------------
 
@@ -50,10 +50,11 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        public ConfigDefinition (DefinitionManager defs)
+        public ConfigDefinition (DefinitionManager defs, OutputController outputController)
         {
             this.TargetManager = defs;
             this.BinPackages = new Dictionary<string, Package> ();
+            this.Output = outputController;
         }
         
         // -----------------------------------------------
@@ -87,7 +88,7 @@ namespace Yama.ProjectConfig
 
             if (!this.TranslateToDefinition(project, file, definition)) return false;
 
-            if ( !ismain ) return true;
+            if (!ismain) return true;
 
             return this.TranslateToDefinitionMain ( project, file, definition );
         }
@@ -97,11 +98,11 @@ namespace Yama.ProjectConfig
         private bool TranslateToDefinitionMain(Project project, FileInfo file, LanguageDefinition definition)
         {
             if (this.TargetManager == null) return false;
+            if (!this.ValidetProjectConfig(project, file)) return false;
 
             definition.Definition = this.TargetManager.GetDefinition(project.TargetPlattform);
             if (definition.Definition == null) return false;
 
-            if (project.Skip < 0) return this.PrintingError("skip is lower 0, that is not allowed", file);
             definition.StartPosition = (uint)project.Skip;
 
             if ( !string.IsNullOrEmpty ( project.StartNamespace ) ) definition.StartNamespace = project.StartNamespace;
@@ -111,6 +112,13 @@ namespace Yama.ProjectConfig
             if ( project.OutputFile != null ) definition.OutputFile = project.OutputFile;
             if ( project.IROutputFile != null ) definition.IROutputFile = project.IROutputFile;
             if ( project.AssemblerOutputFile != null ) definition.OutputAssemblerFile = project.AssemblerOutputFile;
+
+            return true;
+        }
+
+        private bool ValidetProjectConfig(Project project, FileInfo file)
+        {
+            if (project.Skip < 0) return this.PrintingError("skip is lower 0, that is not allowed", file);
 
             return true;
         }
@@ -335,13 +343,21 @@ namespace Yama.ProjectConfig
 
         private bool Parse(List<IDeserialize> nodes, FileInfo file)
         {
-            Parser.Parser p = new Parser.Parser ( file, this.GetParserRules(), this.GetBasicLexer() );
+            if (!file.Exists) return false;
+
+            Stream stream;
+            try {stream = file.OpenRead();} catch {return false;}
+
+            Parser.Parser p = new Parser.Parser (this.GetParserRules(), this.GetBasicLexer(), new ParserInputData(file.FullName, stream));
             ParserLayer? startlayer = p.ParserLayers.Find(t=>t.Name == "root");
 
             if (startlayer == null) return false;
             p.ErrorNode = new ParserError (  );
 
-            if (!p.Parse(startlayer)) return this.PrintingErrors(p);
+            System.Diagnostics.Stopwatch stopWatch = new();
+            stopWatch.Start();
+
+            if (!p.Parse(startlayer)) return this.PrintingErrors(p, file, stopWatch);
 
             IParseTreeNode? node = p.ParentContainer;
             if (node is null) return false;
@@ -384,19 +400,26 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        private bool PrintingErrors(Parser.Parser p)
+        private bool PrintingErrors(Parser.Parser p, FileInfo file, System.Diagnostics.Stopwatch stopWatch)
         {
-            foreach ( IParseTreeNode error in p.ParserErrors )
+            this.Output.Print(new ParseFileStart(file));
+            this.Output.Print(new OutputEnde(stopWatch, false));
+
+            List<ParserError> removes = new();
+            IdentifierToken? previous = null;
+
+            foreach ( ParserError error in p.ParserErrors )
             {
                 IdentifierToken token = error.Token;
 
-                if (token.Kind == IdentifierKind.Unknown)
-                {
-                    if (token.ParentNode != null) token = token.ParentNode.Token;
-                }
+                if (previous == token) removes.Add(error);
 
-                p.PrintSyntaxError ( token, token.Text );
+                previous = token;
+
+                if (token.Kind == IdentifierKind.Unknown && error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
             }
+
+            this.Output.Print(p.ParserErrors.Where(q=>!removes.Contains(q)).Select(t=>t.OutputNode));
 
             return false;
         }
@@ -405,14 +428,9 @@ namespace Yama.ProjectConfig
 
         private bool PrintingError(string msg, FileInfo? file)
         {
-            ConsoleColor colr = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-
             string filename = file == null ? "config.yproj" : file.FullName;
 
-            Console.Error.WriteLine ( "{0}: {1}", filename, msg );
-
-            Console.ForegroundColor = colr;
+            this.Output.Print(new SimpleErrorOut($"{filename}: {msg}"));
 
             return false;
         }

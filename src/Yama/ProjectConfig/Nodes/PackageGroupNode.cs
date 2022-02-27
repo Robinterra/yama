@@ -123,17 +123,17 @@ namespace Yama.ProjectConfig.Nodes
 
             IdentifierToken? token = request.Parser.Peek(result.Token, 1);
             if (token is null) return null;
-            if (token.Kind != IdentifierKind.DoublePoint) return null;
+            if (token.Kind != IdentifierKind.DoublePoint) return new ParserError(token, $"Expectet a ':' and not a {token.Kind}", result.AllTokens.ToArray());
             result.AllTokens.Add(token);
 
             token = request.Parser.Peek(token, 1);
             if (token is null) return null;
-            if (token.Kind != IdentifierKind.BeginContainer) return null;
+            if (token.Kind != IdentifierKind.BeginContainer) return new ParserError(token, $"Expectet a '{{' and not a {token.Kind}", result.AllTokens.ToArray());
             result.AllTokens.Add(token);
             IdentifierToken begin = token;
 
             token = request.Parser.FindEndToken ( token, IdentifierKind.CloseContainer, IdentifierKind.BeginContainer );
-            if (token == null) return null;
+            if (token == null) return new ParserError(begin, $"Can not find '}}' from", result.AllTokens.ToArray());
 
             result.AllTokens.Add ( token );
             result.Ende = token;

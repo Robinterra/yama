@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Yama.Index;
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 using Yama.Parser;
 using Yama.Parser.Request;
 
@@ -411,8 +414,15 @@ namespace Yama.Compiler
 
         public bool AddError(string msg, IParseTreeNode? node = null)
         {
-            CompilerError error = new CompilerError(msg, node);
+            CompilerError error = node is null ? new(new SimpleErrorOut(msg)) : new(node, msg);
 
+            this.Errors.Add(error);
+
+            return false;
+        }
+
+        public bool AddError(CompilerError error)
+        {
             this.Errors.Add(error);
 
             return false;

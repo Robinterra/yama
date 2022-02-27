@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -58,7 +60,7 @@ namespace Yama.Index
             set;
         }
 
-        public List<FileInfo> AllUseFiles
+        public List<string> AllUseFiles
         {
             get;
             set;
@@ -96,7 +98,7 @@ namespace Yama.Index
             this.ZuCompilenNodes = new List<IParseTreeNode>();
             this.RegisterEnums = new List<IndexEnumDeklaration>();
             this.IndexTypeSafeties = new List<IIndexTypeSafety>();
-            this.AllUseFiles = new List<FileInfo>();
+            this.AllUseFiles = new List<string>();
         }
 
         #endregion ctor
@@ -157,13 +159,13 @@ namespace Yama.Index
         {
             Dictionary<string, IndexNamespaceDeklaration> aviableNamespaces = new Dictionary<string, IndexNamespaceDeklaration>();
 
-            if (!this.Namespaces.ContainsKey(this.StartNamespace)) return this.CreateError(null, string.Format("no start '{0}' namespace found", this.StartNamespace));
+            if (!this.Namespaces.ContainsKey(this.StartNamespace)) return this.AddError(new (new IndexCritError($"no start '{this.StartNamespace}' namespace found")));
 
             this.MakeRegisterFromValidsNamespaces(this.Namespaces[this.StartNamespace], aviableNamespaces);
 
             foreach (KeyValuePair<string, IndexNamespaceDeklaration> nameSpace in aviableNamespaces)
             {
-                this.AllUseFiles.AddRange(nameSpace.Value.Files);
+                this.AllUseFiles.AddRange(nameSpace.Value.OriginKeys);
 
                 this.RegisterEnums.AddRange(nameSpace.Value.EnumDeklarationen);
 
@@ -271,7 +273,14 @@ namespace Yama.Index
             return this.Errors.Count == 0;
         }
 
-        public bool CreateError(IParseTreeNode? node, string msg = "The call is not allowed here")
+        public bool AddError(IndexError error)
+        {
+            this.Errors.Add(error);
+
+            return true;
+        }
+
+        public bool CreateError(IParseTreeNode node, string msg = "The call is not allowed here")
         {
             this.Errors.Add(new (node, msg));
 

@@ -54,11 +54,19 @@ namespace Yama.Parser
             this.AllTokens = new() { token };
         }
 
+        public ParserError(IdentifierToken token, string errorMessage, params IdentifierToken[] tokens)
+        {
+            this.Token = token;
+            this.OutputNode = new ParserSyntaxError(errorMessage, token);
+            this.AllTokens = new() { token };
+            this.AllTokens.AddRange(tokens);
+        }
+
         #endregion ctor
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public virtual IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
             return new ParserError(request.Token);
         }

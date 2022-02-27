@@ -136,7 +136,7 @@ namespace Yama.Parser
             GenericCall? genericRule = request.Parser.GetRule<GenericCall>();
             if (genericRule is null) return token;
 
-            IParseTreeNode? node = genericRule.Parse(new RequestParserTreeParser(request.Parser, token));
+            IParseTreeNode? node = request.Parser.TryToParse(genericRule, token);
             if (node is not GenericCall genericCall) return token;
 
             deklaration.GenericDefintion = genericCall;

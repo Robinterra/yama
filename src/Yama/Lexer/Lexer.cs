@@ -45,10 +45,7 @@ namespace Yama.Lexer
                 this.daten = value;
                 if (value == null) return;
 
-                this.CurrentByte = (byte) value.ReadByte();
-                this.position = 0;
-                this.column = 0;
-                this.line = 1;
+                this.Reset();
             }
         }
 
@@ -72,7 +69,7 @@ namespace Yama.Lexer
         public char CurrentChar
         {
             get;
-            set;
+            private set;
         }
 
         // -----------------------------------------------
@@ -80,7 +77,7 @@ namespace Yama.Lexer
         public object? Current
         {
             get;
-            set;
+            private set;
         }
 
         // -----------------------------------------------
@@ -334,11 +331,26 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public void Reset()
+        private bool ResetLocalVariables()
         {
             this.position = 0;
             this.column = 1;
             this.line = 1;
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public void Reset()
+        {
+            if (this.daten is null) return;
+            if (!this.daten.CanSeek) return;
+
+            this.daten.Seek(0, SeekOrigin.Begin);
+            this.CurrentByte = (byte)this.daten.ReadByte();
+
+            this.ResetLocalVariables();
         }
 
         // -----------------------------------------------
