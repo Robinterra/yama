@@ -591,7 +591,12 @@ namespace Yama
             request.Roots = compileRoots;
             request.WithMapper = true;
 
-            assembler.Assemble(request);
+            if (!assembler.Assemble(request))
+            {
+                request.Stream.Close();
+
+                return false;
+            }
 
             request.Stream.Close();
 
