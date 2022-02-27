@@ -634,21 +634,6 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private IParseTreeNode? ParseOneMember ( IParseTreeNode member, IdentifierToken token )
-        {
-            int pos = this.Position;
-
-            IParseTreeNode? result = member.Parse ( new Request.RequestParserTreeParser ( this, token ) );
-
-            if ( result != null ) return result;
-
-            this.Position = pos;
-
-            return null;
-        }
-
-        // -----------------------------------------------
-
         public bool Parse ( ParserLayer start )
         {
             this.ActivateLayer(start);

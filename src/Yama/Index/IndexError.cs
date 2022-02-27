@@ -29,5 +29,6 @@ namespace Yama.Index
         }
 
         #endregion ctor
+
     }
 }

@@ -36,8 +36,7 @@ namespace Yama.InformationOutput.Nodes
 
         private bool PrintPretty (IParseTreeNode node, RequestOutput o, string lebchilds = "")
         {
-            o.Info.Write(node.Token.Value is null ? string.Empty : node.Token.Value.ToString());
-            o.Info.Write("\n");
+            o.Info.Write(node.Token.Value is null ? string.Empty : node.Token.Value.ToString(), newLine: true, foreColor: ConsoleColor.Green);
 
             List<IParseTreeNode> childs = node.GetAllChilds;
 
@@ -53,7 +52,7 @@ namespace Yama.InformationOutput.Nodes
                 }
 
                 o.Info.Write(lebchilds);
-                o.Info.Write(normalChildPrint);
+                o.Info.Write(normalChildPrint, foreColor: ConsoleColor.Yellow);
 
                 this.PrintPretty ( child, o, neuchild );
 

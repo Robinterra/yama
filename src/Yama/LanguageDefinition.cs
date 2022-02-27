@@ -689,25 +689,6 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool PrintCompilerErrors(List<CompilerError> errors)
-        {
-            foreach (CompilerError error in errors)
-            {
-                if (error.Use != null)
-                {
-                    this.PrintCompilerError(error);
-
-                    continue;
-                }
-
-                this.PrintSimpleError(error.Msg);
-            }
-
-            return false;
-        }
-
-        // -----------------------------------------------
-
         private List<string> GetFiles()
         {
             List<string> result = new List<string>();
@@ -782,11 +763,9 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool PrintCompilerError(CompilerError error)
+        private bool PrintCompilerErrors(List<CompilerError> errors)
         {
-            if (error.Use == null) return this.PrintSimpleError(error.Msg);
-
-            this.PrintSyntaxError(error.Use.Token, error.Msg, "Compiler error");
+            this.Output.Print(errors.Select(t=>t.Output));
 
             return false;
         }
@@ -812,30 +791,6 @@ namespace Yama
             this.Output.Print(index.Errors.Select(t=>t.Output));
 
             return false;
-        }
-
-        // -----------------------------------------------
-
-        public bool PrintSyntaxError(IdentifierToken? token, string? msg, string nexterrormsg = "Syntax error")
-        {
-            //if (token.Kind != SyntaxKind.Unknown) return false;
-            if (token == null)
-            {
-                Console.Error.WriteLine ( "Unkown Error {0}, {1}", msg, nexterrormsg );
-                return false;
-            }
-
-            ConsoleColor colr = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            string filename = "unknown";
-            if (token.Info != null) filename = token.Info.Origin;
-
-            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, filename, nexterrormsg );
-
-            Console.ForegroundColor = colr;
-
-            return true;
         }
 
         // -----------------------------------------------

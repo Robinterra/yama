@@ -159,7 +159,7 @@ namespace Yama.Index
         {
             Dictionary<string, IndexNamespaceDeklaration> aviableNamespaces = new Dictionary<string, IndexNamespaceDeklaration>();
 
-            if (!this.Namespaces.ContainsKey(this.StartNamespace)) return this.AddError(new IndexCritError($"no start '{this.StartNamespace}' namespace found"));
+            if (!this.Namespaces.ContainsKey(this.StartNamespace)) return this.AddError(new (new IndexCritError($"no start '{this.StartNamespace}' namespace found")));
 
             this.MakeRegisterFromValidsNamespaces(this.Namespaces[this.StartNamespace], aviableNamespaces);
 
@@ -273,9 +273,9 @@ namespace Yama.Index
             return this.Errors.Count == 0;
         }
 
-        public bool AddError(IOutputNode output)
+        public bool AddError(IndexError error)
         {
-            this.Errors.Add(new(output));
+            this.Errors.Add(error);
 
             return true;
         }

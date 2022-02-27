@@ -1,3 +1,5 @@
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 using Yama.Parser;
 
 namespace Yama.Compiler
@@ -7,28 +9,26 @@ namespace Yama.Compiler
 
         #region get/set
 
-        public IParseTreeNode? Use
+        public IOutputNode Output
         {
             get;
-            set;
-        }
-
-        public string Msg
-        {
-            get;
-            set;
         }
 
         #endregion get/set
 
         #region ctor
 
-        public CompilerError(string msg, IParseTreeNode? use)
+        public CompilerError(IParseTreeNode use, string msg)
         {
-            this.Use = use;
-            this.Msg = msg;
+            this.Output = new CompilerErrorOutput(msg, use);
+        }
+
+        public CompilerError(IOutputNode outputNode)
+        {
+            this.Output = outputNode;
         }
 
         #endregion ctor
+
     }
 }
