@@ -70,14 +70,6 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public List<IdentifierToken> SyntaxErrors
-        {
-            get;
-            set;
-        }
-
-        // -----------------------------------------------
-
         public Container? ParentContainer
         {
             get;
@@ -187,7 +179,6 @@ namespace Yama.Parser
 
         public Parser ( List<ParserLayer> layers, Lexer.Lexer lexer, IParserInputData inputData )
         {
-            this.SyntaxErrors = new List<IdentifierToken> (  );
             this.MethodTag = new List<IParseTreeNode> (  );
             this.ParserLayers = layers;
             this.Tokenizer = lexer;
@@ -210,7 +201,6 @@ namespace Yama.Parser
         {
             this.InputData = inputData;
 
-            this.SyntaxErrors.Clear();
             this.ParserErrors.Clear();
             this.MethodTag.Clear();
 
@@ -250,18 +240,9 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public bool PrintSyntaxError(IdentifierToken token, string? msg, string nexterrormsg = "Syntax error")
+        private bool PrintSyntaxError(IdentifierToken token, string msg)
         {
-            this.SyntaxErrors.Add ( token );
-
-            ConsoleColor colr = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            string filename = this.InputData.Name;
-
-            Console.Error.WriteLine ( "{4}({0},{1}): {5} - {3} \"{2}\"", token.Line, token.Column, token.Text, msg, filename, nexterrormsg );
-
-            Console.ForegroundColor = colr;
+            this.ParserErrors.Add(new ParserError(token, msg));
 
             return true;
         }
@@ -297,7 +278,7 @@ namespace Yama.Parser
                 this.CleanTokens.Add ( token );
             }
 
-            return this.SyntaxErrors.Count == 0;
+            return this.ParserErrors.Count == 0;
         }
 
         // -----------------------------------------------
@@ -700,7 +681,7 @@ namespace Yama.Parser
 
             IdentifierToken token = new IdentifierToken ( IdentifierKind.Unknown, -1, -1, -1, filename, "Empty File" );
 
-            ParserError errorNode = (ParserError)this.ErrorNode.Parse(new RequestParserTreeParser(this, token));
+            ParserError errorNode = new ParserError(token);
             this.ParserErrors.Add(errorNode);
 
             return new List<IParseTreeNode>() { errorNode };

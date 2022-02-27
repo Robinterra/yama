@@ -581,7 +581,7 @@ namespace Yama
             if (def == "avr") return true;
             if (def is null) return false;
 
-            Assembler.Assembler assembler = new Assembler.Assembler();
+            Assembler.Assembler assembler = new Assembler.Assembler(this.Output);
             Assembler.Definitionen definitionen = new Assembler.Definitionen();
             definitionen.GenerateAssembler(assembler, def);
             assembler.Position = this.StartPosition;

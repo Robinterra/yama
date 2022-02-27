@@ -66,7 +66,7 @@ namespace Yama.Parser
 
         #region methods
 
-        public IParseTreeNode Parse ( Request.RequestParserTreeParser request )
+        public virtual IParseTreeNode Parse ( Request.RequestParserTreeParser request )
         {
             return new ParserError(request.Token);
         }

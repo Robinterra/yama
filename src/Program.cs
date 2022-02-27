@@ -157,7 +157,7 @@ namespace Yama
         private static bool Assemble ( List<ICommandLine> commands, OutputController outputController )
         {
             Definitionen def = new Definitionen();
-            Assembler.Assembler? assembler = new Assembler.Assembler();
+            Assembler.Assembler? assembler = new Assembler.Assembler(outputController);
             RequestAssemble request = new RequestAssemble();
             if (Program.yama == null) Program.yama = new LanguageDefinition();
 

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using Yama.Assembler.ARMT32;
 using Yama.Compiler;
+using Yama.InformationOutput;
+using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
 using Yama.Parser;
 
@@ -99,7 +101,29 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
+        public OutputController Output
+        {
+            get;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public Assembler(OutputController outputController)
+        {
+            this.Output = outputController;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
 
         // -----------------------------------------------
 
@@ -131,7 +155,7 @@ namespace Yama.Assembler
             ParserLayer? startlayer = this.Parser.ParserLayers.Find(t=>t.Name == "main");
             if (startlayer is null) return false;
 
-            if (!this.Parse(startlayer, request, definition)) return this.PrintParserErrors();
+            if (!this.Parse(startlayer, request, definition)) return this.PrintingErrors(this.Parser);
 
             if (request.IsSkipper) this.Skipper();
 
@@ -154,10 +178,9 @@ namespace Yama.Assembler
             return this.Errors.Count == 0;
         }
 
-        public bool AddError(IParseTreeNode t, string v)
+        public bool AddError(IParseTreeNode t, string msg)
         {
-            if (this.Parser is null) return false;
-            this.Parser.PrintSyntaxError(t.Token, v, "Assembler error");
+            this.Output.Print(new ParserSyntaxError(msg, t.Token));
 
             return false;
         }
@@ -236,26 +259,34 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        private bool PrintErrors()
+        private bool PrintingErrors(Parser.Parser p)
         {
-            foreach (IParseTreeNode node in this.Errors)
+            List<ParserError> removes = new();
+            IdentifierToken? previous = null;
+
+            foreach ( ParserError error in p.ParserErrors )
             {
-                this.Parser?.PrintSyntaxError(node.Token, "Assembler error", "Assembler error");
+                IdentifierToken token = error.Token;
+
+                if (previous == token) removes.Add(error);
+
+                previous = token;
+
+                if (token.Kind == IdentifierKind.Unknown && error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
             }
+
+            this.Output.Print(p.ParserErrors.Where(q=>!removes.Contains(q)).Select(t=>t.OutputNode));
 
             return false;
         }
 
         // -----------------------------------------------
 
-        
-        private bool PrintParserErrors()
+        private bool PrintErrors()
         {
-            if (this.Parser is null) return false;
-
-            foreach (IParseTreeNode node in this.Parser.ParserErrors)
+            foreach (IParseTreeNode node in this.Errors)
             {
-                this.Parser.PrintSyntaxError(node.Token, "Parser error", "Assembler error");
+                this.AddError(node, "Assembler error");
             }
 
             return false;
