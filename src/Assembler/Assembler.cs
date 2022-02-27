@@ -191,6 +191,9 @@ namespace Yama.Assembler
 
         private bool ParseRoot(ParserLayer startlayer, ICompileRoot root, Definitionen definition)
         {
+            if (this.Parser is null) return false;
+            if (root.AssemblyCommands.Count == 0) return true;
+
             StringBuilder builder = new StringBuilder();
             foreach(string entity in root.AssemblyCommands)
             {
@@ -200,7 +203,7 @@ namespace Yama.Assembler
 
             MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString()));
 
-            this.Parser = definition.GetParser(new ParserInputData("assemblerStream", stream));
+            this.Parser.NewParse(new ParserInputData("assemblerStream", stream));
 
             if (!this.Parser.Parse(startlayer))
             {
@@ -208,8 +211,7 @@ namespace Yama.Assembler
 
                 return false;
             }
-
-            if (this.Parser.ParentContainer is null) return false;
+            if (this.Parser.ParentContainer is null) return true;
 
             AssemblerCompilerMap map = new AssemblerCompilerMap(root, this.Parser.ParentContainer.Statements);
 

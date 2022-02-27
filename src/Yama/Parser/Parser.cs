@@ -200,6 +200,7 @@ namespace Yama.Parser
         public bool NewParse(IParserInputData inputData)
         {
             this.InputData = inputData;
+            this.ParentContainer = null;
 
             this.ParserErrors.Clear();
             this.MethodTag.Clear();

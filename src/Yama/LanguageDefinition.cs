@@ -591,7 +591,12 @@ namespace Yama
             request.Roots = compileRoots;
             request.WithMapper = true;
 
-            assembler.Assemble(request);
+            if (!assembler.Assemble(request))
+            {
+                request.Stream.Close();
+
+                return false;
+            }
 
             request.Stream.Close();
 
@@ -643,7 +648,7 @@ namespace Yama
 
             foreach (DirectoryInfo extensionPath in this.Extensions)
             {
-                if (!extensionPath.Exists) return this.PrintSimpleError(string.Format("'{}' extension path can not be found", extensionPath.FullName));
+                if (!extensionPath.Exists) return this.PrintSimpleError($"'{extensionPath.FullName}' extension path can not be found");
 
                 if (!this.LoadExtensionFromDirectory(extensionPath, extensionsFiles)) return false;
             }
@@ -655,7 +660,7 @@ namespace Yama
 
         private bool LoadExtensionFromDirectory(DirectoryInfo directory, List<FileInfo> extensionsFiles)
         {
-            if (!directory.Exists) return this.PrintSimpleError(string.Format("can not find '{0}' extension path", directory.FullName));
+            if (!directory.Exists) return this.PrintSimpleError($"can not find '{directory.FullName}' extension path");
 
             foreach (DirectoryInfo childDirectory in directory.GetDirectories())
             {
@@ -697,14 +702,14 @@ namespace Yama
 
             foreach(string file in this.Files)
             {
-                if (!File.Exists(file)) this.PrintSimpleError(string.Format("Cannot add {0} File, it is not exist", file));
+                if (!File.Exists(file)) this.PrintSimpleError($"Cannot add {file} File, it is not exist");
             }
 
             List<DirectoryInfo> infos = new List<DirectoryInfo>();
 
             foreach (DirectoryInfo inc in this.Includes)
             {
-                if (!inc.Exists) this.PrintSimpleError(string.Format("Cannot inlcude {0} Directory, it is not exist", inc));
+                if (!inc.Exists) this.PrintSimpleError($"Cannot inlcude {inc} Directory, it is not exist");
 
                 infos.Add ( inc );
             }
@@ -738,9 +743,11 @@ namespace Yama
             return result;
         }
 
+        // -----------------------------------------------
+
         private bool GetAllFilesFromADirectory(List<string> result, List<DirectoryInfo> next, DirectoryInfo check)
         {
-            if (!check.Exists) return this.PrintSimpleError(string.Format("Inlcude path {0} can not be found", check.FullName));
+            if (!check.Exists) return this.PrintSimpleError($"Inlcude path {check.FullName} can not be found");
 
             foreach ( FileInfo file in check.GetFiles (  ) )
             {
@@ -772,14 +779,9 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public bool PrintSimpleError(string text)
+        public bool PrintSimpleError(string msg)
         {
-            ConsoleColor colr = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            Console.Error.WriteLine ( text );
-
-            Console.ForegroundColor = colr;
+            this.Output.Print(new SimpleErrorOut(msg));
 
             return false;
         }
