@@ -97,8 +97,8 @@ namespace Yama.Parser
             if ( request.Token.Kind != IdentifierKind.If ) return null;
 
             IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
-            if (token is null) return null;
-            if ( token.Kind != IdentifierKind.OpenBracket ) return null;
+            if (token is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'if' Keyword {request.Token.Kind}");
+            if ( token.Kind != IdentifierKind.OpenBracket ) return new ParserError(token, $"Expectet a open Bracket '(' after Keyword 'if' and not a {token.Kind}", request.Token);
 
             IfKey key = new IfKey (  );
             key.Token = request.Token;
