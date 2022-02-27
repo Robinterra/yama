@@ -170,12 +170,16 @@ namespace Yama.Assembler
             if (request.InputFile != null) return this.Parser.Parse(startlayer);
             if (request.Roots == null) return false;
 
+            bool isfailed = false;
+
             foreach (ICompileRoot root in request.Roots)
             {
                 if (this.ParseRoot(startlayer, root, definition)) continue;
+
+                isfailed = true;
             }
 
-            return this.Errors.Count == 0;
+            return !isfailed;
         }
 
         public bool AddError(IParseTreeNode t, string msg)
@@ -200,7 +204,7 @@ namespace Yama.Assembler
 
             if (!this.Parser.Parse(startlayer))
             {
-                this.Errors.AddRange(this.Parser.ParserErrors);
+                this.PrintingErrors(this.Parser);
 
                 return false;
             }
