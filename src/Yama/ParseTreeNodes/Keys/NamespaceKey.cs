@@ -70,7 +70,6 @@ namespace Yama.Parser
 
             IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
             if ( token is null ) return null;
-            if ( token.Kind != IdentifierKind.Text ) return null;
 
             NamespaceKey key = new NamespaceKey ( this.NextLayer );
             key.AllTokens.Add ( request.Token );
@@ -87,6 +86,7 @@ namespace Yama.Parser
             key.Statement = request.Parser.ParseCleanToken(statementchild, this.NextLayer);
 
             if (key.Statement == null) return null;
+            if ( token.Kind != IdentifierKind.Text ) return new ParserError(request.Token, $"Wrong Syntax for a namespace. Expected: 'namespace \"YourNameSpaceName\"' and not 'namespace {token.Text}'", token);
 
             return key;
         }

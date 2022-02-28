@@ -104,24 +104,23 @@ namespace Yama.Parser
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
 
-            IdentifierToken? conditionkind = request.Parser.Peek ( request.Token, 1 );
-            if (conditionkind is null) return null;
+            IdentifierToken? conditionToken = request.Parser.Peek ( request.Token, 1 );
+            if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", token);
 
             IParseTreeNode? rule = request.Parser.GetRule<ContainerExpression>();
             if (rule is null) return null;
 
-            IParseTreeNode? node = request.Parser.TryToParse ( rule, conditionkind );
-            if (node is null) return null;
+            IParseTreeNode? node = request.Parser.TryToParse ( rule, conditionToken );
+            if (node is null) return new ParserError(conditionToken, $"Can not parse Condition of a if", token, request.Token);
 
             key.Condition = node;
 
             IdentifierToken? ifStatementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
-
-            if (ifStatementchild is null) return null;
-            if (!this.IsAllowedStatmentToken (ifStatementchild)) return null;
+            if (ifStatementchild is null) return new ParserError(request.Token, $"Can not find a Statement of a if", token, conditionToken);
+            if (!this.IsAllowedStatmentToken (ifStatementchild)) return new ParserError(ifStatementchild, $"A if Statement can not begin with a '{ifStatementchild.Kind}'. Possilbe begins of a if Statement is: return, break, continue, '{{', if, while, for.", token, conditionToken, request.Token);
 
             node = request.Parser.ParseCleanToken(ifStatementchild);
-            if (node is null) return null;
+            if (node is null) return new ParserError(ifStatementchild, $"if statement can not be parse", token, conditionToken, request.Token);
 
             key.IfStatement = node;
 
@@ -133,7 +132,7 @@ namespace Yama.Parser
             if ( elseStatementChild.Kind != IdentifierKind.Else ) return key;
 
             node = request.Parser.ParseCleanToken ( elseStatementChild );
-            if (node is null) return null;
+            if (node is null) return new ParserError(elseStatementChild, $"else statement can not be parse", token, conditionToken, request.Token);
 
             key.ElseStatement = node;
 

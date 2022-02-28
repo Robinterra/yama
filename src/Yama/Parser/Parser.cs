@@ -464,9 +464,10 @@ namespace Yama.Parser
 
         private IParseTreeNode? GetNodeFromToken ( IdentifierToken token )
         {
-            if ( token.ParentNode != null ) return this.GetNodeFromToken ( token.ParentNode.Token );
+            if (token.ParentNode == null) return token.Node;
+            //if (token.ParentNode.Token == token) return token.Node;
 
-            return token.Node;
+            return this.GetNodeFromToken ( token.ParentNode.Token );
         }
 
         // -----------------------------------------------
@@ -695,22 +696,22 @@ namespace Yama.Parser
 
         public IdentifierToken? FindEndToken ( IdentifierToken begin, IdentifierKind endKind, IdentifierKind escapeKind )
         {
-            IdentifierToken? kind = begin;
+            IdentifierToken? resultToken = begin;
 
-            for ( int i = 1; kind.Kind != endKind; i++ )
+            for ( int i = 1; resultToken.Kind != endKind; i++ )
             {
-                kind = this.Peek ( begin, i );
-                if ( kind is null ) return null;
-                if ( kind.Kind != escapeKind ) continue;
+                resultToken = this.Peek ( begin, i );
+                if ( resultToken is null ) return null;
+                if ( resultToken.Kind != escapeKind ) continue;
 
-                IParseTreeNode? nodeCon = this.ParseCleanToken ( kind );
+                IParseTreeNode? nodeCon = this.ParseCleanToken ( resultToken );
                 if ( nodeCon is null ) return null;
                 if ( nodeCon is not IContainer c ) return null;
 
                 i = c.Ende.Position - begin.Position;
             }
 
-            return kind;
+            return resultToken;
         }
 
         // -----------------------------------------------
