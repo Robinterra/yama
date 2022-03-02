@@ -71,10 +71,10 @@ namespace Yama.Parser
             key.AllTokens.Add(request.Token);
 
             IdentifierToken? statementchild = request.Parser.Peek ( request.Token, 1);
-            if (statementchild is null) return null;
+            if (statementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a else");
 
             key.Statement = request.Parser.ParseCleanToken(statementchild);
-            if (key.Statement == null) return null;
+            if (key.Statement == null) return new ParserError(statementchild, $"else statement can not be parse", request.Token);
 
             return key;
         }

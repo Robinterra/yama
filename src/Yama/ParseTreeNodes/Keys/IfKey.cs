@@ -116,7 +116,7 @@ namespace Yama.Parser
             key.Condition = node;
 
             IdentifierToken? ifStatementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
-            if (ifStatementchild is null) return new ParserError(request.Token, $"Can not find a Statement of a if", token, conditionToken);
+            if (ifStatementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a if", token, conditionToken);
             if (!this.IsAllowedStatmentToken (ifStatementchild)) return new ParserError(ifStatementchild, $"A if Statement can not begin with a '{ifStatementchild.Kind}'. Possilbe begins of a if Statement is: return, break, continue, '{{', if, while, for.", token, conditionToken, request.Token);
 
             node = request.Parser.ParseCleanToken(ifStatementchild);
