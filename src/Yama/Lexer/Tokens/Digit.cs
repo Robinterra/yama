@@ -20,9 +20,30 @@ namespace Yama.Lexer
             }
         }
 
+        public bool EnablePunctuation
+        {
+            get;
+            set;
+        }
+
         // -----------------------------------------------
 
         #endregion get/set
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public Digit(bool enablePunctuation = true)
+        {
+            this.EnablePunctuation = enablePunctuation;
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
 
         // -----------------------------------------------
 
@@ -46,7 +67,7 @@ namespace Yama.Lexer
 
                 if (!hasPoint)
                 {
-                    if (lexer.CurrentChar == '.')
+                    if (lexer.CurrentChar == '.' && this.EnablePunctuation)
                     {
                         isFirst0 = false;
                         hasPoint = true;

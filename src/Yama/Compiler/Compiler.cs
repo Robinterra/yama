@@ -205,6 +205,9 @@ namespace Yama.Compiler
         public bool EndCurrentMethod()
         {
             this.PopContainer();
+            this.PopContainer();
+
+            this.ContainerMgmt.CurrentMethod = null;
 
             return true;
         }
@@ -486,6 +489,7 @@ namespace Yama.Compiler
             if (containerMaps == null) return true;
 
             Dictionary<string, SSAVariableMap> parentVarMap = this.ContainerMgmt.CurrentMethod.VarMapper;
+            if (parentVarMap.Equals(containerMaps)) return true;
 
             foreach (KeyValuePair<string, SSAVariableMap> conMap in containerMaps)
             {
@@ -542,11 +546,11 @@ namespace Yama.Compiler
             foreach (SSACompileLine line in conMap.Value.AllSets)
             {
                 orig.Reference.PhiMap.AddRange(line.PhiMap);
-                line.PhiMap.AddRange(orig.Reference.PhiMap);
+                line.PhiMap.AddRange(orig.Reference.PhiMap.Where(t=>!line.PhiMap.Contains(t)));
                 foreach (SSACompileLine phi in line.PhiMap)
                 {
                     orig.Reference.Calls.AddRange(phi.Calls);
-                    phi.Calls.AddRange(orig.Reference.Calls);
+                    phi.Calls.AddRange(orig.Reference.Calls.Where(t=>!phi.Calls.Contains(t)));
                 }
             }
 

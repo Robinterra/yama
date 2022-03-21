@@ -437,7 +437,7 @@ namespace Yama
             rules.Add ( new KeyWord ( "sizeof", IdentifierKind.Sizeof ) );
             rules.Add ( new KeyWord ( "using", IdentifierKind.Using ) );
             rules.Add ( new KeyWord ( "namespace", IdentifierKind.Namespace ) );
-            rules.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ) } ) );
+            rules.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit ( false ), new Underscore (  ) } ) );
 
             return rules;
         }

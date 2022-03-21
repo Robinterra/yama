@@ -101,22 +101,22 @@ namespace Yama.Parser
             if ( request.Token.Kind != IdentifierKind.For ) return null;
 
             IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
-            if (token is null) return null;
-            if ( token.Kind != IdentifierKind.OpenBracket ) return null;
+            if (token is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'for' Keyword {request.Token.Kind}");
+            if ( token.Kind != IdentifierKind.OpenBracket ) return new ParserError(token, $"Expectet a open Bracket '(' after Keyword 'for' and not a {token.Kind}", request.Token);
 
             ForKey key = new ForKey (  );
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
 
-            IdentifierToken? conditionkind = request.Parser.Peek ( request.Token, 1 );
-            if (conditionkind is null) return null;
+            IdentifierToken? conditionToken = request.Parser.Peek ( request.Token, 1 );
+            if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", token);
 
             IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
 
-            IParseTreeNode? klammer = request.Parser.TryToParse ( rule, conditionkind );
+            IParseTreeNode? klammer = request.Parser.TryToParse ( rule, conditionToken );
 
-            if (klammer is not Container t) return null;
-            if (t.Statements.Count != 3) return null;
+            if (klammer is not Container t) return new ParserError(conditionToken, $"Can not parse Condition of a for", token, request.Token);
+            if (t.Statements.Count != 3) return new ParserError(conditionToken, $"Can not parse Condition of a for, expected 3 statments and not {t.Statements.Count}", token, request.Token);
 
             t.Token.ParentNode = key;
 
@@ -125,10 +125,10 @@ namespace Yama.Parser
             key.Inkrementation = t.Statements[2];
 
             IdentifierToken? statementchild = request.Parser.Peek ( t.Ende, 1);
-            if (statementchild is null) return null;
+            if (statementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a for", token, conditionToken);
 
             IParseTreeNode? statement = request.Parser.ParseCleanToken(statementchild);
-            if (statement is null) return null;
+            if (statement is null) return new ParserError(statementchild, $"for statement can not be parse", token, conditionToken, request.Token);
 
             key.Statement = statement;
 

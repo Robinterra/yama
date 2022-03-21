@@ -134,27 +134,27 @@ namespace Yama.Parser
 
             newKey.Definition = token;
             newKey.AllTokens.Add ( token );
-            if ( !this.CheckHashValidOperator( token )) return null;
+            if ( !this.CheckHashValidOperator( token )) return new ParserError(request.Token, $"Wrong Syntax for a new Keyword. Expected: 'new YourClassName' and not 'new {token.Text}'", token);
 
-            IdentifierToken? beginkind = request.Parser.Peek ( newKey.Definition, 1 );
-            if ( beginkind is null ) return null;
+            IdentifierToken? beginToken = request.Parser.Peek ( newKey.Definition, 1 );
+            if ( beginToken is null ) return null;
 
-            beginkind = this.TryParseGeneric(request, newKey, beginkind);
-            if ( beginkind is null ) return null;
+            beginToken = this.TryParseGeneric(request, newKey, beginToken);
+            if ( beginToken is null ) return null;
 
-            if (beginkind.Kind != IdentifierKind.OpenBracket) return null;
+            if (beginToken.Kind != IdentifierKind.OpenBracket) return new ParserError(request.Token, $"Wrong Syntax for a new Keyword. Expected: 'new {token.Text} (' and not 'new {token.Text} {beginToken.Text}'", token, beginToken);
 
-            IdentifierToken? endToken = request.Parser.FindEndToken ( beginkind, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
-            if ( endToken is null ) return null;
+            IdentifierToken? endToken = request.Parser.FindEndToken ( beginToken, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
+            if ( endToken is null ) return new ParserError(beginToken, $"Wrong Syntax for a new Keyword. Can not find close Bracket", token, request.Token);
 
-            List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( beginkind.Position + 1, endToken.Position, true );
+            List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( beginToken.Position + 1, endToken.Position, true );
             if (nodes is null) return null;
 
             newKey.Parameters = nodes;
 
             newKey.ende = endToken;
             newKey.AllTokens.Add(endToken);
-            newKey.AllTokens.Add(beginkind);
+            newKey.AllTokens.Add(beginToken);
 
             return newKey;
         }
