@@ -201,6 +201,8 @@ namespace Yama.Compiler
 
             if (map.Type == RegisterType.Stack) this.HandleVirtuellSetRegister(container, genericDefinition, compiler, map);
 
+            this.RegisterMap = map;
+
             return true;
         }
 
