@@ -84,6 +84,7 @@ namespace Yama.Compiler
 
         public SSAVariableMap(SSAVariableMap value)
         {
+            //this.AllSets.AddRange(value.AllSets);
             this.Key = value.Key;
             this.Reference = value.Reference;
             this.Deklaration = value.Deklaration;
