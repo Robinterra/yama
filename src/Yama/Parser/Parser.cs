@@ -273,6 +273,8 @@ namespace Yama.Parser
                 if (token.Kind == IdentifierKind.Whitespaces) continue;
                 if (token.Kind == IdentifierKind.Comment) continue;
                 if (token.Kind == IdentifierKind.Unknown && this.PrintSyntaxError ( token, "unkown char" )) continue;
+                if (token.Text == "adc1.Init")
+                    Console.WriteLine("jes");
 
                 token.Info = info;
 
