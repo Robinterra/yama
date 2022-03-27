@@ -73,10 +73,10 @@ namespace Yama.Parser
             key.AllTokens.Add(request.Token);
 
             IdentifierToken? conditionkind = request.Parser.Peek ( request.Token, 1 );
-            if (conditionkind is null) return null;
+            if (conditionkind is null) return new ParserError(request.Token, "Expectet a open Bracket '{' after Keyword 'set'");
 
             IParseTreeNode? node = request.Parser.ParseCleanToken(conditionkind, this.layer);
-            if (node is not Container c) return null;
+            if (node is not Container c) return new ParserError(request.Token, "failed to parse 'set' statement");
 
             key.Statement = c;
 

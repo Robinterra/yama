@@ -193,18 +193,26 @@ namespace Yama.Parser
 
             if ( token == null ) return null;
 
+            request.Parser.ActivateLayer(this.layer);
+
             IParseTreeNode? container = request.Parser.ParseCleanToken(token, this.layer);
+
+            request.Parser.VorherigesLayer();
+
             if (container is null) return null;
             if (!(container is Container ab)) return null;
-            if (container.GetAllChilds.Count != 2) return null;
+            //if (container.GetAllChilds.Count != 2) return null;
 
             deklaration.AllTokens.Add(container.Token);
 
-            if (container.GetAllChilds[0] is GetKey gk) deklaration.GetStatement = gk;
-            if (container.GetAllChilds[1] is SetKey sk) deklaration.SetStatement = sk;
+            foreach (IParseTreeNode node in ab.GetAllChilds)
+            {
+                if (node is GetKey gk) deklaration.GetStatement = gk;
+                if (node is SetKey sk) deklaration.SetStatement = sk;
+            }
 
-            if (deklaration.GetStatement == null) return null;
-            if (deklaration.SetStatement == null) return null;
+            if (deklaration.GetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a get statement", deklaration.AllTokens.ToArray());
+            if (deklaration.SetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a set statement", deklaration.AllTokens.ToArray());
 
             return deklaration;
         }
