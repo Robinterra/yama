@@ -63,21 +63,22 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.Return ) return null;
 
+            ReturnKey result = new ReturnKey();
+            result.Token = request.Token;
+            result.AllTokens.Add ( request.Token );
+
             IdentifierToken? ende = request.Parser.FindAToken(request.Token, IdentifierKind.EndOfCommand);
-            if (ende is null) return null;
+            if (ende is null) return new ParserError(request.Token, "Expectet a ';' after the return statement");
 
             List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens(request.Token.Position + 1, ende.Position);
             IParseTreeNode? node = null;
 
-            if ( nodes is null ) return null;
-            if ( nodes.Count != 1 ) return null;
+            if ( nodes is null ) return result;
+            if ( nodes.Count > 1 ) return new ParserError(request.Token, "There are to many statements after the return key, maybe you forgett a ';' after the return statement");
+            if (nodes.Count == 0) return result;
+
             node = nodes[0];
-
-            ReturnKey result = new ReturnKey();
-
             result.Statement = node;
-            result.Token = request.Token;
-            result.AllTokens.Add ( request.Token );
 
             return result;
         }
