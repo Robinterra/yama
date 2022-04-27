@@ -122,17 +122,17 @@ namespace Yama.Parser
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
-            if (token is null) return null;
-            if ( !this.CheckHashValidName ( token ) ) return null;
+            if (token is null) return new ParserError(request.Token, $"Can not find a Name after a enum deklaration", request.Token);
+            if ( !this.CheckHashValidName ( token ) ) return new ParserError(token, $"Expectet a name for the enum and not a '{token.Text}'", token, request.Token);
 
             deklaration.Token = token;
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
-            if (token is null) return null;
+            if (token is null) return new ParserError(request.Token, $"Can not find a '{{' after the enum name", deklaration.Token);
 
             deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer);
-            if (deklaration.Statement is null) return null;
+            if (deklaration.Statement is null) return new ParserError(request.Token, $"Can not find a enum Statement after the enum name", deklaration.Token);
 
             return deklaration;
         }

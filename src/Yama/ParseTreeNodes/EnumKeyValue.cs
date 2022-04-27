@@ -60,9 +60,16 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
-            if ( token is null ) return null;
-            if ( token.Kind != IdentifierKind.NumberToken ) return null;
+            IdentifierToken? equalToken = request.Parser.Peek ( request.Token, 1 );
+            if ( equalToken is null ) return new ParserError(request.Token, $"Expectet a = after the '{request.Token.Text}'");
+            if ( equalToken.Kind != IdentifierKind.Operator ) return new ParserError(equalToken, $"Expectet a = after the '{request.Token.Text}' and not a {equalToken.Kind.ToString()}", request.Token);
+            if (equalToken.Text != "=") return new ParserError(equalToken, $"Expectet a = after the '{request.Token.Text}' and not a {equalToken.Kind.ToString()}", request.Token);
+
+            node.AllTokens.Add(equalToken);
+
+            IdentifierToken? token = request.Parser.Peek ( equalToken, 1 );
+            if ( token is null ) return new ParserError(equalToken, $"Expectet a number after the '{request.Token.Text} ='", request.Token);
+            if ( token.Kind != IdentifierKind.NumberToken ) return new ParserError(token, $"Expectet a number after the '{request.Token.Text} =' and not a {token.Kind.ToString()}", request.Token, equalToken);
 
             node.Value = token;
             node.AllTokens.Add(token);

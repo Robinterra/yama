@@ -49,17 +49,14 @@ namespace Yama.Parser
             if ( request.Token.Kind != IdentifierKind.Using ) return null;
 
             IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
-            if (token is null) return null;
-            if (token.Kind != IdentifierKind.Text) return null;
+            if (token is null) return new ParserError(request.Token, "Wrong Syntax for a using. Expected a Text after the using");
+            if (token.Kind != IdentifierKind.Text) return new ParserError(request.Token, $"Wrong Syntax for a using. Expected: 'using \"YourUsingNameSpaceName\"' and not 'using {token.Text}'", token);
 
             UsingKey key = new UsingKey (  );
             key.AllTokens.Add ( request.Token );
 
-            IdentifierToken? keyNamenToken = request.Parser.Peek ( request.Token, 1 );
-            if (keyNamenToken is null) return null;
-
-            key.Token = keyNamenToken;
-            key.AllTokens.Add ( keyNamenToken );
+            key.Token = token;
+            key.AllTokens.Add ( token );
 
             return key;
         }
