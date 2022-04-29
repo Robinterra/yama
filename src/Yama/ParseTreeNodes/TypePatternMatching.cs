@@ -116,15 +116,15 @@ namespace Yama.Parser
             node.AllTokens.Add(request.Token);
 
             IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
-            if ( token is null ) return null;
+            if ( token is null ) return new ParserError(request.Token, $"Expectet a token before the 'is' Keyword, like 'isOk is int'");
 
             node.LeftNode = request.Parser.ParseCleanToken ( token );
 
             node.RightToken = request.Parser.Peek ( request.Token, 1 );
-            if ( node.RightToken == null ) return null;
+            if ( node.RightToken == null ) return new ParserError(request.Token, $"Expectet a word after the is keyword", token);
 
             node.AllTokens.Add(node.RightToken);
-            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return null;
+            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the is keyword and not a '{node.RightToken.Text}'", token, node.RightToken);
             if ( node.RightToken.Kind == IdentifierKind.Null ) return this.ParseNullChecking (node);
 
             node.ReferenceDeklaration = request.Parser.Peek ( node.RightToken, 1 );

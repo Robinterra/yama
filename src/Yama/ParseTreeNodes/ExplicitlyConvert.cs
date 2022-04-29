@@ -82,13 +82,13 @@ namespace Yama.Parser
             node.AllTokens.Add(request.Token);
 
             IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
-            if (token is null) return null;
+            if (token is null) return new ParserError(request.Token, $"Expectet a token before the 'as' Keyword, like 'isOk as int'");
 
             node.LeftNode = request.Parser.ParseCleanToken ( token );
 
             node.RightToken = request.Parser.Peek ( request.Token, 1 );
-            if (node.RightToken is null) return null;
-            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return null;
+            if (node.RightToken is null) return new ParserError(request.Token, $"Expectet a word after the as keyword", token);
+            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the as keyword and not a '{node.RightToken.Text}'", token, node.RightToken);
 
             node.AllTokens.Add(node.RightToken);
 
