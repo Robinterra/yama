@@ -225,23 +225,23 @@ namespace Yama.Parser
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
-            if (token is null) return null;
-            if ( !this.CheckHashValidName ( token ) ) return null;
+            if (token is null) return new ParserError(deklaration.ClassDefinition, $"Can not find a Name after a class deklaration", request.Token);
+            if ( !this.CheckHashValidName ( token ) ) return new ParserError(token, $"Expectet a name for the class and not a '{token.Text}'", token, request.Token);
 
             deklaration.Token = token;
             deklaration.AllTokens.Add(token);
 
             token = request.Parser.Peek ( token, 1 );
-            if (token is null) return null;
+            if (token is null) return new ParserError(deklaration.Token, $"Can not find a '{{' after the class name", request.Token, deklaration.ClassDefinition);
 
             token = this.TryParseGeneric ( request, deklaration, token );
 
             token = this.MakeInheritanceBase ( request.Parser, token, deklaration );
-            if (token is null) return null;
+            if (token is null) return new ParserError(deklaration.Token, $"Can not find a '{{' after the class name", request.Token, deklaration.ClassDefinition);
 
             deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer);
 
-            if (deklaration.Statement is null) return null;
+            if (deklaration.Statement is null) return new ParserError(deklaration.Token, $"Can not find a '{{' after the class name", request.Token, deklaration.ClassDefinition);
 
             return deklaration;
         }
