@@ -7,7 +7,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class ConditionalCompilationNode : IParseTreeNode
+    public class ConditionalCompilationNode : IParseTreeNode, IIndexNode, ICompileNode
     {
 
         #region get/set
@@ -81,13 +81,13 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Token.Text.Contains("#defalgo"))
             {

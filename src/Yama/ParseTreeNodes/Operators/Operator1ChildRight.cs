@@ -6,7 +6,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class Operator1ChildRight : IParseTreeNode, IPriority
+    public class Operator1ChildRight : IParseTreeNode, IIndexNode, ICompileNode, IPriority
     {
 
         #region get/set
@@ -171,15 +171,15 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.ChildNode is null) return request.Index.CreateError(this);
+            if (this.ChildNode is not IIndexNode childnode) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             reference.IsOperator = true;
 
-            this.ChildNode.Indezieren(request);
+            childnode.Indezieren(request);
 
             IndexVariabelnReference? varref = container.VariabelnReferences.LastOrDefault();
             if (varref is null) return request.Index.CreateError(this);
@@ -194,10 +194,10 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Reference is null) return false;
-            if (this.ChildNode is null) return false;
+            if (this.ChildNode is not ICompileNode compileNode) return false;
             if (this.Reference.Deklaration is null) return false;
 
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
@@ -207,7 +207,7 @@ namespace Yama.Parser
                 if (isok) return true;
             }
 
-            this.ChildNode.Compile(request);
+            compileNode.Compile(request);
 
             CompilePushResult compilePushResult = new CompilePushResult();
             compilePushResult.Compile(request.Compiler, null, "default");
@@ -223,12 +223,12 @@ namespace Yama.Parser
         {
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
-            if (this.ChildNode is null) return false;
-            if (t.Statement is null) return false;
+            if (this.ChildNode is not ICompileNode childNode) return false;
+            if (t.Statement is not ICompileNode statement) return false;
 
-            this.ChildNode.Compile(new Request.RequestParserTreeCompile(compiler, mode));
+            childNode.Compile(new RequestParserTreeCompile(compiler, mode));
 
-            t.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+            statement.Compile(new RequestParserTreeCompile(compiler, "default"));
 
             return true;
         }

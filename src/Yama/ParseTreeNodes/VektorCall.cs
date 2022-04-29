@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Yama.Parser
 {
-    public class VektorCall : IParseTreeNode, IEndExpression, IContainer
+    public class VektorCall : IParseTreeNode, IIndexNode, ICompileNode, IEndExpression, IContainer
     {
 
         #region vars
@@ -146,24 +146,26 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.LeftNode is null) return request.Index.CreateError(this);
+            if (this.LeftNode is not IIndexNode leftNode) return request.Index.CreateError(this);
 
             foreach (IParseTreeNode node in this.ParametersNodes)
             {
-                node.Indezieren(request);
+                if (node is not IIndexNode indexNode) continue;
+
+                indexNode.Indezieren(request);
             }
 
-            this.LeftNode.Indezieren(request);
+            leftNode.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.LeftNode is null) return false;
+            if (this.LeftNode is not ICompileNode leftNode) return false;
 
             List<IParseTreeNode> copylist = this.ParametersNodes;//.ToArray().ToList();
             copylist.Reverse();
@@ -183,9 +185,9 @@ namespace Yama.Parser
             {
                 dek = par;
                 if (par is EnumartionExpression b) dek = b.ExpressionParent;
-                if (dek is null) continue;
+                if (dek is not ICompileNode compileNode) continue;
 
-                dek.Compile(new Request.RequestParserTreeCompile (request.Compiler, "default"));
+                compileNode.Compile(new RequestParserTreeCompile (request.Compiler, "default"));
 
                 CompilePushResult compilePushResult = new CompilePushResult();
                 compilePushResult.Compile(request.Compiler, null, "default");
@@ -196,7 +198,7 @@ namespace Yama.Parser
             string modeCall = "vektorcall";
             if (request.Mode == "set") modeCall = "setvektorcall";
 
-            this.LeftNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, modeCall));
+            leftNode.Compile(new RequestParserTreeCompile(request.Compiler, modeCall));
             if (this.LeftNode is not OperatorPoint op) return false;
 
             if (op.IsANonStatic) parasCount++;

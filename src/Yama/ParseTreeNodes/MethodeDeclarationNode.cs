@@ -8,7 +8,7 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class MethodeDeclarationNode : IParseTreeNode//, IPriority
+    public class MethodeDeclarationNode : IParseTreeNode, IIndexNode, ICompileNode//, IPriority
     {
         private ParserLayer layer;
 
@@ -311,11 +311,11 @@ namespace Yama.Parser
             return null;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexKlassenDeklaration klasse) return request.Index.CreateError(this);
             if (this.TypeDefinition is null) return request.Index.CreateError(this);
-            if (this.Statement is null) return request.Index.CreateError(this);
+            if (this.Statement is not IIndexNode statementNode) return request.Index.CreateError(this);
 
             IndexVariabelnReference returnValue = this.GetReturnValueIndex(klasse, this.TypeDefinition);
 
@@ -349,7 +349,7 @@ namespace Yama.Parser
 
                 if (dek == null) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
 
-                if (!dek.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, container))) continue;
+                if (!dek.Indezieren(new RequestParserTreeIndezieren(request.Index, container))) continue;
                 if (dek.Deklaration is null) return request.Index.CreateError(this);
 
                 deklaration.Parameters.Add(dek.Deklaration);
@@ -363,7 +363,7 @@ namespace Yama.Parser
 
             this.AddMethode(klasse, deklaration);
 
-            this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, container));
+            statementNode.Indezieren(new RequestParserTreeIndezieren(request.Index, container));
 
             return true;
         }
@@ -419,7 +419,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool CompileCopy(RequestParserTreeCompile request)
+        /*public bool CompileCopy(RequestParserTreeCompile request)
         {
             if (this.Deklaration is null) return false;
             if (this.Statement is null) return false;
@@ -440,14 +440,14 @@ namespace Yama.Parser
                 rc.CompileDek(compiler, node, "set");
             }
 
-            this.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+            this.Statement.Compile(new RequestParserTreeCompile(compiler, "default"));
 
             container.Ende.Compile(compiler, this, "default");
 
             return compiler.PopContainer();
-        }
+        }*/
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (!this.CanCompile(request.Compiler)) return true;
             if (this.Statement is not Container c) return false;
@@ -632,13 +632,13 @@ namespace Yama.Parser
 
         private bool CompileNormalFunktion(Compiler.Compiler compiler, string mode, int count)
         {
-            if (this.Statement is null) return false;
+            if (this.Statement is not ICompileNode statementNode) return false;
             if (this.CompileContainer.Begin is null) return false;
             if (this.CompileContainer.Ende is null) return false;
 
             this.CompileContainer.Begin.Compile(compiler, this, "default");
 
-            this.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+            statementNode.Compile(new RequestParserTreeCompile(compiler, "default"));
 
             this.CompileContainer.Ende.Compile(compiler, this, "default");
 

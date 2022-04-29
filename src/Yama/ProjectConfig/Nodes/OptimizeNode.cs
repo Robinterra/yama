@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
 using Yama.Lexer;
 using Yama.Parser;
 using Yama.Parser.Request;
@@ -64,13 +62,6 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public bool Compile(RequestParserTreeCompile request)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        // -----------------------------------------------
-
         public bool Deserialize(RequestDeserialize request)
         {
             if (this.ValueToken.Value is not int i) return false;
@@ -80,13 +71,6 @@ namespace Yama.ProjectConfig.Nodes
             request.Project.Optimize = (Optimize)level;
 
             return true;
-        }
-
-        // -----------------------------------------------
-
-        public bool Indezieren(RequestParserTreeIndezieren request)
-        {
-            throw new System.NotImplementedException();
         }
 
         // -----------------------------------------------

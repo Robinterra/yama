@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class ElseKey : IParseTreeNode, IContainer
+    public class ElseKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 
         #region get/set
@@ -79,21 +80,22 @@ namespace Yama.Parser
             return key;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
             if (this.Statement is null) return request.Index.CreateError(this);
+            if (this.Statement is not IIndexNode indexNode) return true;
 
-            this.Statement.Indezieren(request);
+            indexNode.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.Statement is null) return false;
+            if (this.Statement is not ICompileNode compileNode) return true;
 
-            this.Statement.Compile(request);
+            compileNode.Compile(request);
 
             return true;
         }

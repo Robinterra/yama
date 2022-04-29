@@ -5,7 +5,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class ContinueKey : IParseTreeNode
+    public class ContinueKey : IParseTreeNode, IIndexNode, ICompileNode
     {
 
         #region get/set
@@ -62,12 +62,12 @@ namespace Yama.Parser
             return key;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 

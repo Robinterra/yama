@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
@@ -44,14 +45,6 @@ namespace Yama.Parser
         // -----------------------------------------------
 
         IParseTreeNode? Parse ( Request.RequestParserTreeParser request );
-
-        // -----------------------------------------------
-
-        bool Indezieren ( Request.RequestParserTreeIndezieren request );
-
-        // -----------------------------------------------
-
-        bool Compile ( Request.RequestParserTreeCompile request );
 
         // -----------------------------------------------
 

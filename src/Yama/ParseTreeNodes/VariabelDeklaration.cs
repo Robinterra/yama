@@ -7,7 +7,7 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class VariabelDeklaration : IParseTreeNode, IPriority
+    public class VariabelDeklaration : IParseTreeNode, IIndexNode, ICompileNode, IPriority
     {
 
         #region get/set
@@ -144,7 +144,7 @@ namespace Yama.Parser
             return request.Parser.Peek(genericCall.Ende, 1);
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
@@ -152,9 +152,9 @@ namespace Yama.Parser
 
             if (reference is null)
             {
-                if (this.TypeDefinition is null) return request.Index.CreateError(this);
+                if (this.TypeDefinition is not IIndexNode typeNode) return request.Index.CreateError(this);
 
-                this.TypeDefinition.Indezieren(request);
+                typeNode.Indezieren(request);
 
                 IndexVariabelnReference? type = container.VariabelnReferences.LastOrDefault();
                 if (type is null) return request.Index.CreateError(this);
@@ -175,7 +175,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (request.Mode != "set") return true;
             if (this.Deklaration is null) return false;

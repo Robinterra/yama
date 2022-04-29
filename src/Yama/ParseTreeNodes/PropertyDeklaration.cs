@@ -7,7 +7,7 @@ using Yama.Compiler;
 
 namespace Yama.Parser
 {
-    public class PropertyDeklaration : IParseTreeNode//, IPriority
+    public class PropertyDeklaration : IParseTreeNode, IIndexNode, ICompileNode//, IPriority
     {
         private ParserLayer layer;
 
@@ -196,7 +196,7 @@ namespace Yama.Parser
             return type;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexKlassenDeklaration klasse) return request.Index.CreateError(this);
             if (this.TypeDefinition is null) return request.Index.CreateError(this);
@@ -240,7 +240,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Deklaration is null) return false;
             if (this.Deklaration.Zusatz != MethodeType.Static) return true;

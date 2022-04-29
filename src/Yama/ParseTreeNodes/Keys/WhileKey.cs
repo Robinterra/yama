@@ -5,7 +5,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class WhileKey : IParseTreeNode, IContainer
+    public class WhileKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 
         #region get/set
@@ -126,27 +126,27 @@ namespace Yama.Parser
             return key;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.Statement is null) return request.Index.CreateError(this);
-            if (this.Condition is null) return request.Index.CreateError(this);
+            if (this.Statement is not IIndexNode statementNode) return request.Index.CreateError(this);
+            if (this.Condition is not IIndexNode conditionNode) return request.Index.CreateError(this);
 
             this.IndexContainer =  container;
 
-            this.Statement.Indezieren(request);
+            statementNode.Indezieren(request);
             if (this.Statement is Container ec) this.IndexContainer = ec.IndexContainer;
 
-            this.Condition.Indezieren(request);
+            conditionNode.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.IndexContainer is null) return false;
-            if (this.Condition is null) return false;
-            if (this.Statement is null) return false;
+            if (this.Condition is not ICompileNode conditionNode) return false;
+            if (this.Statement is not ICompileNode statementNode) return false;
 
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
@@ -161,14 +161,14 @@ namespace Yama.Parser
 
             //compiler.IsLoopHeaderBegin = true;
 
-            this.Condition.Compile(request);
+            conditionNode.Compile(request);
 
             //compiler.IsLoopHeaderBegin = false;
 
             this.CompileContainer.Ende.Node = this;
             jumpende.Compile(request.Compiler, this.CompileContainer.Ende, "isZero");
 
-            this.Statement.Compile(request);
+            statementNode.Compile(request);
 
             jumpbegin.Compile(request.Compiler, this.CompileContainer.Begin, request.Mode);
 

@@ -6,7 +6,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class IfKey : IParseTreeNode, IContainer
+    public class IfKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 
         #region get/set
@@ -152,35 +152,35 @@ namespace Yama.Parser
             return false;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (!(request.Parent is IndexContainer container)) return request.Index.CreateError(this);
 
             this.IfContainer = container;
             this.ElseContainer = container;
 
-            if (this.ElseStatement is not null)
+            if (this.ElseStatement is IIndexNode elseNode)
             {
-                this.ElseStatement.Indezieren(request);
+                elseNode.Indezieren(request);
                 if (this.ElseStatement is Container ec) this.ElseContainer = ec.IndexContainer;
             }
 
-            if (this.IfStatement is null) return request.Index.CreateError(this);
+            if (this.IfStatement is not IIndexNode statementNode) return request.Index.CreateError(this);
 
-            this.IfStatement.Indezieren(request);
+            statementNode.Indezieren(request);
             if (this.IfStatement is Container c) this.IfContainer = c.IndexContainer;
 
-            if (this.Condition is null) return request.Index.CreateError(this);
-            this.Condition.Indezieren(request);
+            if (this.Condition is not IIndexNode conditionNode) return request.Index.CreateError(this);
+            conditionNode.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.Condition is null) return false;
+            if (this.Condition is not ICompileNode conditionNode) return false;
             if (this.IfContainer is null) return false;
-            if (this.IfStatement is  null) return false;
+            if (this.IfStatement is not ICompileNode statementNode) return false;
             if (request.Compiler.ContainerMgmt.CurrentContainer is null) return false;
 
             CompileContainer ifcontainer = new CompileContainer();
@@ -195,13 +195,13 @@ namespace Yama.Parser
 
             CompileJumpWithCondition jumpWithCondition = new CompileJumpWithCondition();
 
-            this.Condition.Compile(request);
+            conditionNode.Compile(request);
 
             jumpWithCondition.Compile(request.Compiler, ifcontainer.Ende, "isZero");
 
             request.Compiler.PushContainer(ifcontainer, this.IfContainer.ThisUses);
 
-            this.IfStatement.Compile(request);
+            statementNode.Compile(request);
 
             request.Compiler.PopContainer();
 
@@ -209,12 +209,12 @@ namespace Yama.Parser
 
             ifcontainer.Ende.Compile(request.Compiler, this, request.Mode);
 
-            if (this.ElseStatement is null) return true;
+            if (this.ElseStatement is not ICompileNode elseStatementNode) return true;
             if (this.ElseContainer is null) return true;
 
             request.Compiler.PushContainer(elsecontainer, this.ElseContainer.ThisUses);
 
-            this.ElseStatement.Compile(request);
+            elseStatementNode.Compile(request);
 
             request.Compiler.PopContainer();
 

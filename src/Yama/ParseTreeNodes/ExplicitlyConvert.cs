@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Yama.Parser
 {
-    public class ExplicitlyConvert : IParseTreeNode
+    public class ExplicitlyConvert : IParseTreeNode, IIndexNode, ICompileNode
     {
 
         #region get/set
@@ -95,13 +95,13 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.LeftNode is null) return request.Index.CreateError(this);
+            if (this.LeftNode is not IIndexNode leftNode) return request.Index.CreateError(this);
             if (this.RightToken is null) return request.Index.CreateError(this);
 
-            this.LeftNode.Indezieren(request);
+            leftNode.Indezieren(request);
 
             IndexVariabelnReference type = new IndexVariabelnReference (this, this.RightToken.Text);
             container.VariabelnReferences.Add(type);
@@ -109,11 +109,11 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.LeftNode is null) return false;
+            if (this.LeftNode is not ICompileNode leftNode) return false;
 
-            return this.LeftNode.Compile(request);
+            return leftNode.Compile(request);
         }
 
         #endregion methods

@@ -8,7 +8,7 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class Operator2Childs : IParseTreeNode, IPriority
+    public class Operator2Childs : IParseTreeNode, IIndexNode, ICompileNode, IPriority
     {
 
         #region get/set
@@ -154,21 +154,21 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.LeftNode is null) return request.Index.CreateError(this);
-            if (this.RightNode is null) return request.Index.CreateError(this);
+            if (this.LeftNode is not IIndexNode leftNode) return request.Index.CreateError(this);
+            if (this.RightNode is not IIndexNode rightNode) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             reference.IsOperator = true;
             int anzahl = container.VariabelnReferences.Count;
 
-            this.LeftNode.Indezieren(request);
+            leftNode.Indezieren(request);
             IndexVariabelnReference? varref = container.VariabelnReferences.LastOrDefault();
             if (anzahl == container.VariabelnReferences.Count) varref = null;
 
-            this.RightNode.Indezieren(request);
+            rightNode.Indezieren(request);
             this.VariabelReference = reference;
             //container.VariabelnReferences.Add(reference);
 
@@ -194,16 +194,16 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.RightNode is null) return false;
-            if (this.LeftNode is null) return false;
+            if (this.RightNode is not ICompileNode rightNode) return false;
+            if (this.LeftNode is not ICompileNode leftNode) return false;
 
-            this.RightNode.Compile(request);
+            rightNode.Compile(request);
 
             if (this.Token.Text == "=")
             {
-                this.LeftNode.Compile(new Request.RequestParserTreeCompile ( request.Compiler, "set" ));
+                leftNode.Compile(new RequestParserTreeCompile ( request.Compiler, "set" ));
 
                 return true;
             }
@@ -212,39 +212,37 @@ namespace Yama.Parser
             if (this.Reference.Deklaration is null) return false;
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {
-                bool isok = this.CompileCopy(request.Compiler, request.Mode, t);
+                bool isok = this.CompileCopy(request.Compiler, leftNode, request.Mode, t);
 
                 if (isok) return true;
             }
 
-            this.FunctionsCall(request.Compiler, request.Mode);
+            this.FunctionsCall(request.Compiler, leftNode, request.Mode);
 
             return true;
         }
 
-        private bool CompileCopy(Compiler.Compiler compiler, string mode, MethodeDeclarationNode t)
+        private bool CompileCopy(Compiler.Compiler compiler, ICompileNode leftNode, string mode, MethodeDeclarationNode t)
         {
-            if (this.LeftNode is null) return false;
             if (t.AccessDefinition == null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
-            if (t.Statement is null) return false;
+            if (t.Statement is not ICompileNode statement) return false;
 
-            this.LeftNode.Compile(new Request.RequestParserTreeCompile (compiler, mode));
+            leftNode.Compile(new RequestParserTreeCompile (compiler, mode));
 
-            t.Statement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+            statement.Compile(new RequestParserTreeCompile(compiler, "default"));
 
             return true;
         }
 
-        private bool FunctionsCall(Compiler.Compiler compiler, string mode)
+        private bool FunctionsCall(Compiler.Compiler compiler, ICompileNode leftNode, string mode)
         {
-            if (this.LeftNode is null) return false;
             if (this.Reference is null) return false;
 
             CompilePushResult compilePushResult = new CompilePushResult();
             compilePushResult.Compile(compiler, null, "default");
 
-            this.LeftNode.Compile(new Request.RequestParserTreeCompile(compiler, mode));
+            leftNode.Compile(new RequestParserTreeCompile(compiler, mode));
 
             compilePushResult = new CompilePushResult();
             compilePushResult.Compile(compiler, null, "default");

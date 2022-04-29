@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class UsingKey : IParseTreeNode
+    public class UsingKey : IParseTreeNode, IIndexNode, ICompileNode
     {
 
         #region get/set
@@ -61,7 +62,7 @@ namespace Yama.Parser
             return key;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieses Usings");
 
@@ -75,7 +76,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             return true;
         }

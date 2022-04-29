@@ -7,7 +7,7 @@ using Yama.Compiler;
 
 namespace Yama.Parser
 {
-    public class PropertyGetSetDeklaration : IParseTreeNode
+    public class PropertyGetSetDeklaration : IParseTreeNode, IIndexNode, ICompileNode
     {
         private ParserLayer layer;
 
@@ -242,7 +242,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexKlassenDeklaration klasse) return request.Index.CreateError(this);
             if (this.TypeDefinition is null) return request.Index.CreateError(this);
@@ -259,8 +259,8 @@ namespace Yama.Parser
 
             deklaration.Type = this.GetMethodeType();
 
-            this.GetStatement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
-            this.SetStatement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
+            this.GetStatement.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
+            this.SetStatement.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
 
             this.IndezierenNonStaticDek(deklaration, klasse);
 
@@ -280,7 +280,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool CompileSetMethode(Request.RequestParserTreeCompile request)
+        public bool CompileSetMethode(RequestParserTreeCompile request)
         {
             if (this.SetStatement is null) return false;
 
@@ -348,7 +348,7 @@ namespace Yama.Parser
             return t.CanCompile();
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (!this.CanCompile(request.Compiler)) return true;
 
@@ -385,7 +385,7 @@ namespace Yama.Parser
 
             compileContainer.Begin.Compile(compiler, this, "default");
 
-            this.SetStatement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+            this.SetStatement.Compile(new RequestParserTreeCompile(compiler, "default"));
 
             if (compileContainer.Ende is null) return false;
 
@@ -425,7 +425,7 @@ namespace Yama.Parser
 
             compileContainer.Begin.Compile(compiler, this, "default");
 
-            this.GetStatement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+            this.GetStatement.Compile(new RequestParserTreeCompile(compiler, "default"));
 
             if (compileContainer.Ende is null) return false;
 

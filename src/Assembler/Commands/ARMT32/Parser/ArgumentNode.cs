@@ -58,16 +58,6 @@ namespace Yama.Assembler.ARMT32
 
         #endregion
 
-        public bool Compile(RequestParserTreeCompile request)
-        {
-            return true;
-        }
-
-        public bool Indezieren(RequestParserTreeIndezieren request)
-        {
-            return true;
-        }
-
         public IParseTreeNode? Parse(RequestParserTreeParser request)
         {
             ArgumentNode deklaration = new ArgumentNode();

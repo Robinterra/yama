@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Yama.Assembler;
 using Yama.Compiler;
+using Yama.Index;
 using Yama.InformationOutput;
 using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
@@ -305,8 +306,8 @@ namespace Yama
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 10 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=" }, 1 ) );
-            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, IdentifierKind.DoublePoint, 2 ) );
-            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, IdentifierKind.DoublePoint, 2 ) );
+            //layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, IdentifierKind.DoublePoint, 2 ) );
+            //layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, IdentifierKind.DoublePoint, 2 ) );
 
             return layer;
         }
@@ -521,10 +522,8 @@ namespace Yama
 
         private bool Indezieren(ref List<IParseTreeNode> nodes, ref MethodeDeclarationNode? main)
         {
-            Yama.Index.Index index = new Yama.Index.Index();
-            index.Roots = nodes;
-            index.StartNamespace = this.StartNamespace;
-            index.AllUseFiles = this.AllFilesInUse;
+            Yama.Index.Index index = new Yama.Index.Index(nodes.Cast<IIndexNode>(), this.StartNamespace, this.AllFilesInUse);
+
 
             if (!index.CreateIndex()) return this.PrintingIndexErrors(index);
 
@@ -624,7 +623,7 @@ namespace Yama
 
             if (!compiler.Definition.LoadExtensions(extensionsFiles)) return this.PrintCompilerErrors(compiler.Errors);
 
-            if (compiler.Compilen(nodes))
+            if (compiler.Compilen(nodes.Cast<ICompileNode>()))
             {
                 roots = compiler.AssemblerSequence;
 

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Yama.Parser
 {
-    public class MethodeCallNode : IParseTreeNode, IEndExpression, IContainer
+    public class MethodeCallNode : IParseTreeNode, IIndexNode, ICompileNode, IEndExpression, IContainer
     {
 
         #region vars
@@ -145,16 +145,18 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.LeftNode is null) return request.Index.CreateError(this);
+            if (this.LeftNode is not IIndexNode leftNode) return request.Index.CreateError(this);
 
             IndexMethodReference methodReference = new IndexMethodReference(this, this.Token.Text);
 
             foreach (IParseTreeNode node in this.ParametersNodes)
             {
-                node.Indezieren(request);
+                if (node is not IIndexNode indexNode) continue;
+
+                indexNode.Indezieren(request);
 
                 IndexVariabelnReference? reference = container.VariabelnReferences.LastOrDefault();
                 if (reference is null) return request.Index.CreateError(this);
@@ -162,7 +164,7 @@ namespace Yama.Parser
                 methodReference.Parameters.Add(reference);
             }
 
-            this.LeftNode.Indezieren(request);
+            leftNode.Indezieren(request);
 
             IndexVariabelnReference? callRef = container.VariabelnReferences.LastOrDefault();
             if (callRef is null) return request.Index.CreateError(this);
@@ -175,9 +177,9 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.LeftNode is null) return false;
+            if (this.LeftNode is not ICompileNode leftNode) return false;
 
             List<IParseTreeNode> copylist = this.ParametersNodes.ToArray().ToList();
             copylist.Reverse();
@@ -192,9 +194,9 @@ namespace Yama.Parser
             {
                 dek = par;
                 if (par is EnumartionExpression b) dek = b.ExpressionParent;
-                if (dek == null) continue;
+                if (dek is not ICompileNode compileNode) continue;
 
-                dek.Compile(request);
+                compileNode.Compile(request);
 
                 CompilePushResult compilePushResult = new CompilePushResult();
                 compilePushResult.Compile(request.Compiler, null, "default");
@@ -202,7 +204,7 @@ namespace Yama.Parser
                 parasCount++;
             }
 
-            this.LeftNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, "methode"));
+            leftNode.Compile(new RequestParserTreeCompile(request.Compiler, "methode"));
             if (this.LeftNode is not OperatorPoint op) return false;
 
             if (op.IsANonStatic) parasCount++;
@@ -219,10 +221,9 @@ namespace Yama.Parser
             return true;
         }
 
-        private bool CompileCopy(List<IParseTreeNode> copylist, Request.RequestParserTreeCompile request)
+        /*private bool CompileCopy(List<IParseTreeNode> copylist, RequestParserTreeCompile request)
         {
             if (this.Reference is null) return false;
-            if (this.LeftNode is null) return false;
             if (this.Reference.Deklaration is null) return false;
             if (this.Reference.Deklaration.Use is not MethodeDeclarationNode t) return false;
             if (t.Deklaration is null) return false;
@@ -243,12 +244,12 @@ namespace Yama.Parser
                 parameter.Compile(request);
             }
 
-            this.LeftNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, "copy"));
+            this.LeftNode.Compile(new RequestParserTreeCompile(request.Compiler, "copy"));
 
-            t.CompileCopy(new Request.RequestParserTreeCompile(request.Compiler, "default"));
+            t.CompileCopy(new RequestParserTreeCompile(request.Compiler, "default"));
 
             return true;
-        }
+        }*/
 
         #endregion methods
 

@@ -5,7 +5,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class ForKey : IParseTreeNode, IContainer
+    public class ForKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 
         #region get/set
@@ -135,31 +135,26 @@ namespace Yama.Parser
             return key;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
             if (this.Statement is null) return request.Index.CreateError(this);
-            if (this.Inkrementation is null) return request.Index.CreateError(this);
-            if (this.Condition is null) return request.Index.CreateError(this);
-            if (this.Deklaration is null) return request.Index.CreateError(this);
 
             this.IndexContainer = container;
 
-            this.Statement.Indezieren(request);
+            if (this.Statement is IIndexNode statementIndexNode) statementIndexNode.Indezieren(request);
             if (this.Statement is Container ec) this.IndexContainer = ec.IndexContainer;
-            this.Inkrementation.Indezieren(request);
-            this.Condition.Indezieren(request);
-            this.Deklaration.Indezieren(request);
+
+            if (this.Inkrementation is IIndexNode inkrementationIndexNode) inkrementationIndexNode.Indezieren(request);
+            if (this.Condition is IIndexNode conditionIndexNode) conditionIndexNode.Indezieren(request);
+            if (this.Deklaration is IIndexNode deklarationIndexNode) deklarationIndexNode.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Statement is null) return false;
-            if (this.Inkrementation is null) return false;
-            if (this.Condition is null) return false;
-            if (this.Deklaration is null) return false;
             if (this.IndexContainer is null) return false;
 
             this.CompileContainer.Begin = new CompileSprungPunkt();
@@ -168,7 +163,7 @@ namespace Yama.Parser
 
             CompileSprungPunkt sprungPunktSkipInc = new CompileSprungPunkt();
 
-            this.Deklaration.Compile(request);
+            if (this.Deklaration is ICompileNode deklarationNode) deklarationNode.Compile(request);
 
             request.Compiler.PushContainer(this.CompileContainer, this.IndexContainer.ThisUses, true);
 
@@ -182,16 +177,16 @@ namespace Yama.Parser
 
             this.CompileContainer.Begin.Compile(request.Compiler, this, request.Mode);
 
-            this.Inkrementation.Compile(request);
+            if (this.Inkrementation is ICompileNode inkrementationNode) inkrementationNode.Compile(request);
 
             sprungPunktSkipInc.Compile(request.Compiler, this, request.Mode);
 
-            this.Condition.Compile(request);
+            if (this.Condition is ICompileNode conditionNode) conditionNode.Compile(request);
 
             this.CompileContainer.Ende.Node = this;
             jumpende.Compile(request.Compiler, this.CompileContainer.Ende, "isZero");
 
-            this.Statement.Compile(request);
+            if (this.Statement is ICompileNode statementNode) statementNode.Compile(request);
 
             jumpbegin.Compile(request.Compiler, this.CompileContainer.Begin, request.Mode);
 

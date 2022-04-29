@@ -6,7 +6,7 @@ using Yama.Compiler;
 
 namespace Yama.Parser
 {
-    public class Operator1ChildLeft : IParseTreeNode, IPriority
+    public class Operator1ChildLeft : IParseTreeNode, IIndexNode, ICompileNode, IPriority
     {
 
         #region get/set
@@ -151,14 +151,14 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.ChildNode is null) return request.Index.CreateError(this);
+            if (this.ChildNode is not IIndexNode childNode) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
 
-            this.ChildNode.Indezieren(request);
+            childNode.Indezieren(request);
             IndexVariabelnReference varref = container.VariabelnReferences.Last();
 
             this.VariabelReference = reference;
@@ -171,12 +171,12 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.ChildNode is null) return false;
+            if (this.ChildNode is not ICompileNode childNode) return false;
             if (this.Reference is null) return false;
 
-            this.ChildNode.Compile(request);
+            childNode.Compile(request);
 
             CompilePushResult compilePushResult = new CompilePushResult();
             compilePushResult.Compile(request.Compiler, null, "default");
@@ -185,7 +185,7 @@ namespace Yama.Parser
 
             this.FunctionExecute.Compile(request.Compiler, null, request.Mode);
 
-            this.ChildNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, "set"));
+            childNode.Compile(new RequestParserTreeCompile(request.Compiler, "set"));
 
             return true;
         }

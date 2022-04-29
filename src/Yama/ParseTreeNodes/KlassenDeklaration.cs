@@ -7,7 +7,7 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class KlassenDeklaration : IParseTreeNode//, IPriority
+    public class KlassenDeklaration : IParseTreeNode, IIndexNode, ICompileNode//, IPriority
     {
 
         #region get/set
@@ -259,7 +259,7 @@ namespace Yama.Parser
             return request.Parser.Peek(genericCall.Ende, 1);
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
             if (this.Statement is null) return request.Index.CreateError(this);
@@ -285,13 +285,15 @@ namespace Yama.Parser
             dek.KlassenDeklarationen.Add(deklaration);
             foreach (IParseTreeNode node in this.Statement.GetAllChilds)
             {
-                node.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
+                if (node is not IIndexNode indexNode) continue;
+
+                indexNode.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
             }
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Deklaration is null) return false;
 
@@ -300,7 +302,8 @@ namespace Yama.Parser
                 if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(request);
+                if (m.Use is not ICompileNode compileNode) continue;
+                compileNode.Compile(request);
             }
 
             foreach (IndexMethodDeklaration m in this.Deklaration.Operators)
@@ -308,7 +311,8 @@ namespace Yama.Parser
                 if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(request);
+                if (m.Use is not ICompileNode compileNode) continue;
+                compileNode.Compile(request);
             }
 
             foreach (IMethode m in this.Deklaration.Methods)
@@ -317,7 +321,8 @@ namespace Yama.Parser
                 if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(request);
+                if (m.Use is not ICompileNode compileNode) continue;
+                compileNode.Compile(request);
             }
 
             foreach (IndexPropertyDeklaration m in this.Deklaration.IndexProperties)
@@ -325,7 +330,8 @@ namespace Yama.Parser
                 if (m.Klasse is null) continue;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(request);
+                if (m.Use is not ICompileNode compileNode) continue;
+                compileNode.Compile(request);
             }
 
             foreach (IndexPropertyDeklaration m in this.Deklaration.IndexStaticProperties)
@@ -333,7 +339,8 @@ namespace Yama.Parser
                 if (m.Klasse is null) continue;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(request);
+                if (m.Use is not ICompileNode compileNode) continue;
+                compileNode.Compile(request);
             }
 
             foreach (IndexMethodDeklaration m in this.Deklaration.Ctors)
@@ -341,7 +348,8 @@ namespace Yama.Parser
                 if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(request);
+                if (m.Use is not ICompileNode compileNode) continue;
+                compileNode.Compile(request);
             }
 
             foreach (IndexMethodDeklaration m in this.Deklaration.DeCtors)
@@ -349,7 +357,8 @@ namespace Yama.Parser
                 if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
-                m.Use.Compile(request);
+                if (m.Use is not ICompileNode compileNode) continue;
+                compileNode.Compile(request);
             }
 
             return true;

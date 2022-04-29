@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.InformationOutput;
 using Yama.InformationOutput.Nodes;
@@ -6,7 +7,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class ParserError : IParseTreeNode
+    public class ParserError : IParseTreeNode, IIndexNode, ICompileNode
     {
 
         #region get/set
@@ -71,12 +72,12 @@ namespace Yama.Parser
             return new ParserError(request.Token);
         }
 
-        public bool Indezieren ( Request.RequestParserTreeIndezieren request )
+        public bool Indezieren ( RequestParserTreeIndezieren request )
         {
             return request.Index.CreateError(this);
         }
 
-        public bool Compile ( Request.RequestParserTreeCompile request)
+        public bool Compile ( RequestParserTreeCompile request)
         {
             return false;
         }

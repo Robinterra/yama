@@ -1,8 +1,10 @@
+using Yama.Compiler;
+using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class NormalExpression : IParseTreeNode, IEndExpression
+    public class NormalExpression : IParseTreeNode, IIndexNode, ICompileNode, IEndExpression
     {
 
         #region get/set
@@ -71,20 +73,20 @@ namespace Yama.Parser
             return expression;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             //if (!(parent is IndexContainer container)) return index.CreateError(this);
 
-            if (this.ExpressionParent == null) return true;
+            if (this.ExpressionParent is not IIndexNode expressionNode) return true;
 
-            return this.ExpressionParent.Indezieren(request);
+            return expressionNode.Indezieren(request);
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.ExpressionParent is null) return false;
+            if (this.ExpressionParent is not ICompileNode expressionParent) return false;
 
-            this.ExpressionParent.Compile(request);
+            expressionParent.Compile(request);
 
             return true;
         }
