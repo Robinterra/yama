@@ -207,6 +207,17 @@ namespace Yama
 
         // -----------------------------------------------
 
+        private ParserLayer MethodenVektorDeklarationsHeader()
+        {
+            ParserLayer layer = new ParserLayer("methodevektorDeklarationsHeader");
+
+            layer.ParserMembers.Add(new VariabelDeklaration(0, true));
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
         private ParserLayer InPropertyLayer(ParserLayer execlayer)
         {
             ParserLayer layer = new ParserLayer("inproperty");
@@ -227,7 +238,6 @@ namespace Yama
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new GetKey(execlayer));
             layer.ParserMembers.Add(new SetKey(execlayer));
-            layer.ParserMembers.Add(new EnumartionExpression());
             layer.ParserMembers.Add(new VariabelDeklaration(11));
 
             return layer;
@@ -235,13 +245,13 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private ParserLayer InKlassenLayer(ParserLayer execlayer, ParserLayer inpropertyLayer, ParserLayer invektorlayer)
+        private ParserLayer InKlassenLayer(ParserLayer execlayer, ParserLayer inpropertyLayer, ParserLayer invektorlayer, ParserLayer methodeVektorDeklarationsHeader)
         {
             ParserLayer layer = new ParserLayer("inclass");
 
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
-            layer.ParserMembers.Add(new MethodeDeclarationNode ( execlayer ));
-            layer.ParserMembers.Add ( new VektorDeclaration ( invektorlayer ) );
+            layer.ParserMembers.Add(new MethodeDeclarationNode ( execlayer, methodeVektorDeklarationsHeader ));
+            layer.ParserMembers.Add(new VektorDeclaration(invektorlayer, methodeVektorDeklarationsHeader));
             layer.ParserMembers.Add(new PropertyDeklaration ( inpropertyLayer ));
             layer.ParserMembers.Add(new PropertyGetSetDeklaration ( invektorlayer ));
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
@@ -256,8 +266,36 @@ namespace Yama
             ParserLayer layer = new ParserLayer("inenum");
 
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
-            layer.ParserMembers.Add(new EnumartionExpression());
             layer.ParserMembers.Add(new EnumKeyValue());
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer InContainerStatement(ParserLayer normalStatementLayer)
+        {
+            ParserLayer layer = new ParserLayer("incontainerStatement");
+
+            layer.ParserMembers.Add ( new IfKey (  ) );
+            layer.ParserMembers.Add ( new ElseKey (  ) );
+            layer.ParserMembers.Add ( new WhileKey (  ) );
+            layer.ParserMembers.Add ( new ForKey (  ) );
+            layer.ParserMembers.Add ( new ContinueKey (  ) );
+            layer.ParserMembers.Add ( new BreakKey (  ) );
+            layer.ParserMembers.Add ( new ReturnKey (  ) );
+            layer.ParserMembers.Add ( new NormalStatementNode(normalStatementLayer) );
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer NormalStatementLayer(ParserLayer expression)
+        {
+            ParserLayer layer = new ParserLayer("normalStatementLayer");
+
+            
 
             return layer;
         }
@@ -329,11 +367,12 @@ namespace Yama
         {
             List<ParserLayer> parserRules = new List<ParserLayer>();
 
+            ParserLayer methodenVektorDeklarationsHeader = this.MethodenVektorDeklarationsHeader();
             ParserLayer executionlayer = this.ExecutionLayer();
             ParserLayer inenumlayer = this.InEnumLayer();
             ParserLayer inpropertyLayer = this.InPropertyLayer(executionlayer);
             ParserLayer invektorlayer = this.InVektorLayer(executionlayer);
-            ParserLayer inclassLayer = this.InKlassenLayer(executionlayer, inpropertyLayer, invektorlayer);
+            ParserLayer inclassLayer = this.InKlassenLayer(executionlayer, inpropertyLayer, invektorlayer, methodenVektorDeklarationsHeader);
             ParserLayer classLayer = this.KlassenLayer(inclassLayer, inenumlayer);
             ParserLayer namespaceLayer = this.NamespaceLayer(classLayer);
             parserRules.Add(namespaceLayer);

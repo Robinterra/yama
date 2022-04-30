@@ -9,7 +9,9 @@ namespace Yama.Parser
 {
     public class VektorDeclaration : IParseTreeNode, IIndexNode, ICompileNode
     {
-        private ParserLayer layer;
+        private ParserLayer getsetlayer;
+
+        private ParserLayer methodeVektorDeklarationsHeader;
 
         #region get/set
 
@@ -107,12 +109,13 @@ namespace Yama.Parser
 
         #region ctor
 
-        public VektorDeclaration(ParserLayer layer)
+        public VektorDeclaration(ParserLayer getsetlayer, ParserLayer methodeVektorDeklarationsHeader)
         {
             this.Parameters = new();
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
-            this.layer = layer;
+            this.getsetlayer = getsetlayer;
+            this.methodeVektorDeklarationsHeader = methodeVektorDeklarationsHeader;
         }
 
         #endregion ctor
@@ -177,7 +180,7 @@ namespace Yama.Parser
 
         public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
-            VektorDeclaration deklaration = new VektorDeclaration(this.layer);
+            VektorDeclaration deklaration = new VektorDeclaration(this.getsetlayer, this.methodeVektorDeklarationsHeader);
 
             IdentifierToken? token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
             if (token is null) return null;
@@ -204,7 +207,7 @@ namespace Yama.Parser
 
             if ( token == null ) return null;
 
-            request.Parser.ActivateLayer(this.layer);
+            request.Parser.ActivateLayer(this.methodeVektorDeklarationsHeader);
 
             IParseTreeNode? parametersVektor = request.Parser.TryToParse ( rule, token );
 
@@ -219,13 +222,8 @@ namespace Yama.Parser
             token = request.Parser.Peek ( t.Ende, 1);
             if ( token is null ) return null;
 
-            request.Parser.ActivateLayer(this.layer);
+            IParseTreeNode? container = request.Parser.ParseCleanToken(token, this.getsetlayer);
 
-            IParseTreeNode? container = request.Parser.ParseCleanToken(token, this.layer);
-
-            request.Parser.VorherigesLayer();
-
-            if (container is null) return null;
             if (container is not Container ab) return null;
 
             ab.Token.ParentNode = deklaration;
@@ -277,11 +275,6 @@ namespace Yama.Parser
             foreach (IParseTreeNode par in this.Parameters)
             {
                 if (par is VariabelDeklaration t) dek = t;
-                if (par is EnumartionExpression b)
-                {
-                    if (b.ExpressionParent == null) continue;
-                    dek = (VariabelDeklaration)b.ExpressionParent;
-                }
 
                 if (dek is null) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
                 if (!dek.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration.SetContainer))) continue;

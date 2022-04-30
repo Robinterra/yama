@@ -193,7 +193,6 @@ namespace Yama.Parser
             foreach (IParseTreeNode par in copylist )
             {
                 dek = par;
-                if (par is EnumartionExpression b) dek = b.ExpressionParent;
                 if (dek is not ICompileNode compileNode) continue;
 
                 compileNode.Compile(request);

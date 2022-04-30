@@ -7,7 +7,7 @@ string = '"' {allChars} '"'
 identiefier = letter{letter | digit | _}
 number = digit {digit}
 hexnumber = "0x" (digit | hexletter) {digit | hexletter}
-pointIdentifion = identiefier {.identiefier}
+pointIdentifion = identiefier.identiefier
 expressionIden = pointIdentifion | number | hexnumber
 
 asExpression = "as" identiefier
@@ -23,8 +23,10 @@ vektorCall = "[" expression {, expression} "]" [ asExpression ]
 newStatement = "new" identiefier "(" expression {, expression} ")" [ asExpression ]
 assigment = "=" (expression | newStatement)
 
-normalStatement = pointIdentifion ( methodeCall | assigment | vektorCall ) | identiefier identiefier [ assigment ]
-returnStatement = expression ";"
+variableDeklaration = identiefier identiefier
+
+normalStatement = pointIdentifion ( methodeCall | assigment | vektorCall ) | variableDeklaration [ assigment ] | identiefier assigment
+returnStatement = "return" expression ";"
 
 statementInLoop = statementInMehtode | continue | break
 containerLoopStatement = "{" { statementInLoop [ ; ] } "}"
@@ -46,16 +48,16 @@ getsetContain = "{" [ get containerStatement ] [ set containerStatement ] "}"
 accessdefinition = "public" | "private"
 methodeZusatz = "static" | "copy"
 
-methodeDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier "(" { identiefier identieefier [ "," ] } ")" containerStatement
+methodeDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier "(" { variableDeklaration [ "," ] } ")" containerStatement
 gobalvariableDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier ";"
 propertiesDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier getsetContain
-vektorDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier "[" identiefier identieefier [ "," ] { identiefier identieefier [ "," ] } "]" getsetContain
+vektorDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier "[" { variableDeklaration [ "," ] } "]" getsetContain
 
 inclass = { methodeDeklaration | gobalvariableDeklaration | propertiesDeklaration | vektorDeklaration }
 inenum = { identiefier "=" number | hexnumber [,] }
 
 classDeklaration = accessdefinition "class" identiefier "{" inclass "}"
-enumDeklaration = accessdefinition "enum" identiefier "{" inenum "}"
+EnumDeklaration = accessdefinition "enum" identiefier "{" inenum "}"
 usingUse = "using" string ";"
 
 innamespace = { classDeklaration | enumDeklaration | usingUse }

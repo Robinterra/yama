@@ -74,6 +74,12 @@ namespace Yama.Parser
             node.Value = token;
             node.AllTokens.Add(token);
 
+            token = request.Parser.Peek ( equalToken, 1 );
+            if ( token is null ) return node;
+            if (token.Kind != IdentifierKind.Comma) return node;
+
+            node.AllTokens.Add(token);
+
             return node;
         }
 

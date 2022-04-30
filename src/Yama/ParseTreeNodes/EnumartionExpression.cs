@@ -82,6 +82,10 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
+            if (this.ExpressionParent is not ICompileNode compilenode) return true;
+
+            compilenode.Compile(request);
+
             return true;
         }
     }

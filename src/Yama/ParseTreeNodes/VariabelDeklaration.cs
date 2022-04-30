@@ -36,6 +36,11 @@ namespace Yama.Parser
             set;
         }
 
+        public bool IsInMethodeDeklaration
+        {
+            get;
+        }
+
         public int Prio
         {
             get;
@@ -69,9 +74,10 @@ namespace Yama.Parser
 
         #region ctor
 
-        public VariabelDeklaration ( int prio )
+        public VariabelDeklaration ( int prio, bool isinmethoddeklaration = false )
         {
             this.Token = new();
+            this.IsInMethodeDeklaration = isinmethoddeklaration;
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
@@ -127,6 +133,14 @@ namespace Yama.Parser
 
             node.TypeDefinition = request.Parser.TryToParse ( callRule, request.Token );
             if ( node.TypeDefinition is null ) return null;
+
+            if (!IsInMethodeDeklaration) return node;
+
+            IdentifierToken? optionalComma = request.Parser.Peek ( lexerRight, 1 );
+            if (optionalComma is null) return node;
+            if (optionalComma.Kind != IdentifierKind.Comma) return node;
+
+            node.AllTokens.Add(optionalComma);
 
             return node;
         }

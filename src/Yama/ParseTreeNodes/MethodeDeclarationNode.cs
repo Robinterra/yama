@@ -10,7 +10,9 @@ namespace Yama.Parser
 {
     public class MethodeDeclarationNode : IParseTreeNode, IIndexNode, ICompileNode//, IPriority
     {
-        private ParserLayer layer;
+        private ParserLayer methodenStatementLayer;
+
+        private ParserLayer methodeVektorDeklarationsHeader;
 
         #region get/set
 
@@ -121,12 +123,13 @@ namespace Yama.Parser
 
         #region ctor
 
-        public MethodeDeclarationNode(ParserLayer layer)
+        public MethodeDeclarationNode(ParserLayer methodenStatementLayer, ParserLayer methodeVektorDeklarationsHeader)
         {
             this.Token = new();
             this.Tags = new();
             this.AllTokens = new List<IdentifierToken> ();
-            this.layer = layer;
+            this.methodenStatementLayer = methodenStatementLayer;
+            this.methodeVektorDeklarationsHeader = methodeVektorDeklarationsHeader;
             this.MallocFree = new IndexVariabelnReference(this, "MemoryManager")
             {
                 ParentCall = new IndexVariabelnReference(this, "Free")
@@ -233,7 +236,7 @@ namespace Yama.Parser
 
         public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
-            MethodeDeclarationNode deklaration = new MethodeDeclarationNode(this.layer);
+            MethodeDeclarationNode deklaration = new MethodeDeclarationNode(this.methodenStatementLayer, this.methodeVektorDeklarationsHeader);
 
             IdentifierToken? token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
             if (token is null) return null;
@@ -259,13 +262,12 @@ namespace Yama.Parser
 
             IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
 
-            request.Parser.ActivateLayer(this.layer);
+            request.Parser.ActivateLayer(this.methodeVektorDeklarationsHeader);
 
             IParseTreeNode? klammer = request.Parser.TryToParse ( rule, token );
 
             request.Parser.VorherigesLayer();
 
-            if (klammer is null) return null;
             if (klammer is not Container t) return null;
 
             t.Token.ParentNode = deklaration;
@@ -274,7 +276,7 @@ namespace Yama.Parser
             IdentifierToken? statementchild = request.Parser.Peek ( t.Ende, 1);
             if (statementchild is null) return null;
 
-            deklaration.Statement = request.Parser.ParseCleanToken(statementchild, this.layer);
+            deklaration.Statement = request.Parser.ParseCleanToken(statementchild, this.methodenStatementLayer);
             if (deklaration.Statement is null) return null;
 
             deklaration.Tags.AddRange(request.Parser.PopMethodTag (  ));
@@ -341,11 +343,6 @@ namespace Yama.Parser
             foreach (IParseTreeNode par in this.Parameters)
             {
                 if (par is VariabelDeklaration t) dek = t;
-                if (par is EnumartionExpression b)
-                {
-                    if (b.ExpressionParent == null) continue;
-                    dek = (VariabelDeklaration)b.ExpressionParent;
-                }
 
                 if (dek == null) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
 
