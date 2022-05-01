@@ -60,11 +60,6 @@ namespace Yama.Parser
             set;
         }
 
-        internal List<IParseTreeNode>? ParseCleanToken(IdentifierToken token, object normalStatementLayer)
-        {
-            throw new NotImplementedException();
-        }
-
         // -----------------------------------------------
 
         private List<IdentifierToken>? CleanTokens

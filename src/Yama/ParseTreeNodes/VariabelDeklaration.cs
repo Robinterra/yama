@@ -7,7 +7,7 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class VariabelDeklaration : IParseTreeNode, IIndexNode, ICompileNode, IPriority
+    public class VariabelDeklaration : IParseTreeNode, IIndexNode, ICompileNode, IPriority, IContainer
     {
 
         #region get/set
@@ -70,6 +70,12 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -80,6 +86,7 @@ namespace Yama.Parser
             this.IsInMethodeDeklaration = isinmethoddeklaration;
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
+            this.Ende = new();
         }
 
         #endregion ctor
@@ -127,6 +134,7 @@ namespace Yama.Parser
 
             node.Token = lexerRight;
             node.AllTokens.Add(lexerRight);
+            node.Ende = lexerRight;
 
             IParseTreeNode? callRule = request.Parser.GetRule<ReferenceCall>();
             if (callRule is null) return null;
@@ -141,6 +149,7 @@ namespace Yama.Parser
             if (optionalComma.Kind != IdentifierKind.Comma) return node;
 
             node.AllTokens.Add(optionalComma);
+            node.Ende = optionalComma;
 
             return node;
         }

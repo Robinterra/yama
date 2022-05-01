@@ -4,9 +4,10 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class NormalStatementNode : IParseTreeNode, IIndexNode, ICompileNode, IEndExpression
+    public class NormalStatementNode : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
-        private ParserLayer normalStatementLayer;
+        private ParserLayer identifierStatementLayer;
+        private ParserLayer statementLayer;
 
         #region get/set
 
@@ -16,7 +17,7 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode? Child
+        public IParseTreeNode? IdentifierChild
         {
             get;
             set;
@@ -26,9 +27,9 @@ namespace Yama.Parser
         {
             get
             {
-                if (this.Child is null) return new ();
+                if (this.IdentifierChild is null) return new ();
 
-                return new List<IParseTreeNode> { this.Child };
+                return new List<IParseTreeNode> { this.IdentifierChild };
             }
         }
 
@@ -37,15 +38,29 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get;
+            set;
+        }
+
+        public IParseTreeNode? StatementChild
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public NormalStatementNode (ParserLayer normalStatementLayer)
+        public NormalStatementNode (ParserLayer identifierStatementLayer, ParserLayer statementLayer)
         {
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
-            this.normalStatementLayer = normalStatementLayer;
+            this.identifierStatementLayer = identifierStatementLayer;
+            this.statementLayer = statementLayer;
+            this.Ende = new IdentifierToken();
         }
 
         #endregion ctor
@@ -54,14 +69,28 @@ namespace Yama.Parser
 
         public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
-            NormalStatementNode expression = new NormalStatementNode ( this.normalStatementLayer );
+            NormalStatementNode expression = new NormalStatementNode ( this.identifierStatementLayer, this.statementLayer );
 
             expression.Token = request.Token;
 
-            IParseTreeNode? node = request.Parser.ParseCleanToken(request.Token, this.normalStatementLayer);
+            IParseTreeNode? node = request.Parser.ParseCleanToken(request.Token, this.identifierStatementLayer);
             if (node is null) return null;
 
-            expression.Child = node;
+            expression.IdentifierChild = node;
+
+            IdentifierToken? ende = request.Token;
+            if (node is IContainer container) ende = container.Ende;
+
+            ende = request.Parser.Peek(ende, 1);
+            if (ende is null) return null;
+
+            node = request.Parser.ParseCleanToken(ende, this.statementLayer);
+            if (node is null) return null;
+
+            if (node is IContainer statementContainer) ende = statementContainer.Ende;
+            expression.Ende = ende;
+
+            expression.StatementChild = node;
 
             return expression;
         }
@@ -70,16 +99,27 @@ namespace Yama.Parser
         {
             //if (!(parent is IndexContainer container)) return index.CreateError(this);
 
-            if (this.Child is not IIndexNode expressionNode) return true;
+            if (this.IdentifierChild is not IIndexNode identiefierChild) return true;
+            if (this.StatementChild is not IIndexNode statementChild) return true;
 
-            return expressionNode.Indezieren(request);
+            identiefierChild.Indezieren(request);
+
+            return statementChild.Indezieren(request);
+
         }
 
         public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.Child is not ICompileNode expressionParent) return false;
+            if (this.IdentifierChild is not ICompileNode identifierChild) return false;
 
-            expressionParent.Compile(request);
+            if (this.StatementChild is AssigmentNode assigmentNode)
+            {
+                assigmentNode.Compile(request);
+
+                return identifierChild.Compile(new RequestParserTreeCompile ( request.Compiler, "set" ));
+            }
+
+            identifierChild.Compile(request);
 
             return true;
         }

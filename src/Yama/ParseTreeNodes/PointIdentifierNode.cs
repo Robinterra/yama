@@ -7,7 +7,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class PointIdentifier : IParseTreeNode, IIndexNode, ICompileNode//, IPriority
+    public class PointIdentifier : IParseTreeNode, IIndexNode, ICompileNode, IContainer//, IPriority
     {
 
         #region get/set
@@ -79,6 +79,12 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -87,6 +93,7 @@ namespace Yama.Parser
         {
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
+            this.Ende = new IdentifierToken();
         }
 
         #endregion ctor
@@ -117,18 +124,31 @@ namespace Yama.Parser
             if (token.Kind != IdentifierKind.Point ) return null;
 
             PointIdentifier node = new PointIdentifier();
-            node.Token = request.Token;
-            node.AllTokens.Add(request.Token);
+            node.Token = token;
+            node.AllTokens.Add(token);
 
-            IParseTreeNode? rule = request.Parser.GetRule<ReferenceCall>();
-            if (rule is null) return null;
+            IParseTreeNode? referenceRule = request.Parser.GetRule<ReferenceCall>();
+            if (referenceRule is null) return null;
 
             token = request.Parser.Peek ( token, 1 );
             if (token is null) return null;
             if ( !this.CheckHashValidOperator ( token ) ) return null;
 
-            node.LeftNode = request.Parser.TryToParse(rule, request.Token);
-            node.RightNode = request.Parser.ParseCleanToken ( token );
+            node.LeftNode = request.Parser.TryToParse(referenceRule, request.Token);
+            if (node.LeftNode is null) return null;
+
+            node.RightNode = request.Parser.TryToParse(this, token);
+            if (node.RightNode is IContainer container)
+            {
+                node.Ende = container.Ende;
+
+                return node;
+            }
+
+            node.RightNode = request.Parser.TryToParse(referenceRule, token);
+            node.Ende = token;
+
+            if (node.RightNode is null) return null;
 
             return node;
         }

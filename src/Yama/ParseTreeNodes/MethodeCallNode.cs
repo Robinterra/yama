@@ -76,6 +76,9 @@ namespace Yama.Parser
             get;
             set;
         }
+
+        private ParserLayer expressionLayer;
+
         public IdentifierToken Ende
         {
             get
@@ -95,7 +98,7 @@ namespace Yama.Parser
 
         #region ctor
 
-        public MethodeCallNode ( IdentifierKind begin, IdentifierKind end, int prio )
+        public MethodeCallNode ( IdentifierKind begin, IdentifierKind end, int prio, ParserLayer expressionLayer )
         {
             this.Token = new();
             this.ParametersNodes = new List<IParseTreeNode>();
@@ -103,6 +106,7 @@ namespace Yama.Parser
             this.Prio = prio;
             this.BeginZeichen = begin;
             this.EndeZeichen = end;
+            this.expressionLayer = expressionLayer;
         }
 
         #endregion ctor
@@ -126,13 +130,18 @@ namespace Yama.Parser
             IdentifierToken? steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
             if ( steuerToken is null ) return null;
 
-            MethodeCallNode node = new MethodeCallNode ( this.BeginZeichen, this.EndeZeichen, this.Prio );
+            MethodeCallNode node = new MethodeCallNode ( this.BeginZeichen, this.EndeZeichen, this.Prio, this.expressionLayer );
 
             node.AllTokens.Add ( steuerToken );
             node.ende = steuerToken;
             node.LeftNode = request.Parser.ParseCleanToken ( left );
 
+            request.Parser.ActivateLayer(this.expressionLayer);
+
             List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
+
+            request.Parser.VorherigesLayer();
+
             if (nodes is null) return null;
 
             node.ParametersNodes.AddRange(nodes);

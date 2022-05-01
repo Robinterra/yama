@@ -82,14 +82,17 @@ namespace Yama.Parser
             get;
         }
 
+        private ParserLayer expressionLayer;
+
         #endregion get/set
 
         #region ctor
 
-        public ForKey ()
+        public ForKey (ParserLayer expressionLayer)
         {
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
+            this.expressionLayer = expressionLayer;
         }
 
         #endregion ctor
@@ -104,7 +107,7 @@ namespace Yama.Parser
             if (token is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'for' Keyword {request.Token.Kind}");
             if ( token.Kind != IdentifierKind.OpenBracket ) return new ParserError(token, $"Expectet a open Bracket '(' after Keyword 'for' and not a {token.Kind}", request.Token);
 
-            ForKey key = new ForKey (  );
+            ForKey key = new ForKey ( this.expressionLayer );
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
 
@@ -134,6 +137,50 @@ namespace Yama.Parser
 
             return key;
         }
+
+        /*public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
+        {
+            if ( request.Token.Kind != IdentifierKind.For ) return null;
+
+            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
+            if (token is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'for' Keyword {request.Token.Kind}");
+            if ( token.Kind != IdentifierKind.OpenBracket ) return new ParserError(token, $"Expectet a open Bracket '(' after Keyword 'for' and not a {token.Kind}", request.Token);
+
+            ForKey key = new ForKey ( this.expressionLayer );
+            key.Token = request.Token;
+            key.AllTokens.Add(request.Token);
+            key.AllTokens.Add(token);
+
+            IdentifierToken? conditionToken = request.Parser.Peek ( token, 1 );
+            if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", token);
+
+            IParseTreeNode? rule = request.Parser.GetRule<NormalStatementNode>();
+            if (rule is null) return null;
+
+            key.Deklaration = request.Parser.TryToParse(rule, conditionToken);
+            if (key.Deklaration is not NormalStatementNode deklaration) return null;
+
+            token = request.Parser.Peek ( deklaration.Ende, 1 );
+            if (token is null) return null;
+            if (token.Kind != IdentifierKind.EndOfCommand) return null;
+
+            token = request.Parser.Peek ( token, 1 );
+            if (token is null) return null;
+
+            key.Condition = request.Parser.ParseCleanToken(token, this.expressionLayer);
+
+            key.Inkrementation = request.Parser.TryToParse(rule, token);
+
+            IdentifierToken? statementchild = request.Parser.Peek ( token, 1);
+            if (statementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a for", token, conditionToken);
+
+            IParseTreeNode? statement = request.Parser.ParseCleanToken(statementchild);
+            if (statement is null) return new ParserError(statementchild, $"for statement can not be parse", token, conditionToken, request.Token);
+
+            key.Statement = statement;
+
+            return key;
+        }*/
 
         public bool Indezieren(RequestParserTreeIndezieren request)
         {

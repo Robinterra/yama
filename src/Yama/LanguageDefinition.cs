@@ -273,29 +273,46 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private ParserLayer InContainerStatement(ParserLayer normalStatementLayer)
+        private ParserLayer InContainerStatement(ParserLayer statementLayer, ParserLayer identifierStatementLayer, ParserLayer expressionLayer)
         {
             ParserLayer layer = new ParserLayer("incontainerStatement");
 
+            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add ( new IfKey (  ) );
             layer.ParserMembers.Add ( new ElseKey (  ) );
             layer.ParserMembers.Add ( new WhileKey (  ) );
-            layer.ParserMembers.Add ( new ForKey (  ) );
+            layer.ParserMembers.Add ( new ForKey ( expressionLayer ) );
             layer.ParserMembers.Add ( new ContinueKey (  ) );
             layer.ParserMembers.Add ( new BreakKey (  ) );
             layer.ParserMembers.Add ( new ReturnKey (  ) );
-            layer.ParserMembers.Add ( new NormalStatementNode(normalStatementLayer) );
+            layer.ParserMembers.Add ( new NormalStatementNode(identifierStatementLayer, statementLayer));
 
             return layer;
         }
 
         // -----------------------------------------------
 
-        private ParserLayer NormalStatementLayer(ParserLayer expression)
+        private ParserLayer StatementLayer(ParserLayer expressionLayer)
         {
-            ParserLayer layer = new ParserLayer("normalStatementLayer");
+            ParserLayer layer = new ParserLayer("statementLayer");
 
-            
+            layer.ParserMembers.Add(new AssigmentNode(expressionLayer));
+            layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12, expressionLayer ) );
+            layer.ParserMembers.Add ( new VektorCall ( IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket, 12 ) );
+
+            return layer;
+
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer IdentifierStatementLayer()
+        {
+            ParserLayer layer = new ParserLayer("IdentifierStatementLayer");
+
+            layer.ParserMembers.Add(new PointIdentifier());
+            layer.ParserMembers.Add(new VariabelDeklaration(0));
+            layer.ParserMembers.Add(new ReferenceCall());
 
             return layer;
         }
@@ -311,14 +328,14 @@ namespace Yama
             layer.ParserMembers.Add ( new IfKey (  ) );
             layer.ParserMembers.Add ( new ElseKey (  ) );
             layer.ParserMembers.Add ( new WhileKey (  ) );
-            layer.ParserMembers.Add ( new ForKey (  ) );
+            layer.ParserMembers.Add ( new ForKey ( layer ) );
             layer.ParserMembers.Add ( new NewKey (  ) );
             layer.ParserMembers.Add ( new NullKey (  ) );
             layer.ParserMembers.Add ( new ContinueKey (  ) );
             layer.ParserMembers.Add ( new BreakKey (  ) );
             layer.ParserMembers.Add ( new TypePatternMatching ( 10 ) );
             layer.ParserMembers.Add ( new ExplicitlyConvert ( 10 ) );
-            layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12 ) );
+            layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12, layer ) );
             layer.ParserMembers.Add ( new VektorCall ( IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket, 12 ) );
             layer.ParserMembers.Add ( new ContainerExpression ( 11 ) );
             layer.ParserMembers.Add ( new NormalExpression (  ) );
@@ -369,6 +386,9 @@ namespace Yama
 
             ParserLayer methodenVektorDeklarationsHeader = this.MethodenVektorDeklarationsHeader();
             ParserLayer executionlayer = this.ExecutionLayer();
+            ParserLayer identifierLayer = this.IdentifierStatementLayer();
+            ParserLayer statementLayer = this.StatementLayer(executionlayer);
+            ParserLayer inContainerLayer = this.InContainerStatement(statementLayer, identifierLayer, executionlayer);
             ParserLayer inenumlayer = this.InEnumLayer();
             ParserLayer inpropertyLayer = this.InPropertyLayer(executionlayer);
             ParserLayer invektorlayer = this.InVektorLayer(executionlayer);
@@ -376,7 +396,11 @@ namespace Yama
             ParserLayer classLayer = this.KlassenLayer(inclassLayer, inenumlayer);
             ParserLayer namespaceLayer = this.NamespaceLayer(classLayer);
             parserRules.Add(namespaceLayer);
+            parserRules.Add(methodenVektorDeklarationsHeader);
             parserRules.Add(classLayer);
+            parserRules.Add(identifierLayer);
+            parserRules.Add(statementLayer);
+            parserRules.Add(inContainerLayer);
             parserRules.Add(inclassLayer);
             parserRules.Add(inpropertyLayer);
             parserRules.Add(executionlayer);
