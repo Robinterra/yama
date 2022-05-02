@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Yama.Parser
 {
-    public class ExplicitlyConvert : IParseTreeNode, IIndexNode, ICompileNode
+    public class ExplicitlyConvert : IParseTreeNode, IIndexNode, ICompileNode, IParentNode
     {
 
         #region get/set
@@ -81,14 +81,9 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
-            if (token is null) return new ParserError(request.Token, $"Expectet a token before the 'as' Keyword, like 'isOk as int'");
-
-            node.LeftNode = request.Parser.ParseCleanToken ( token );
-
             node.RightToken = request.Parser.Peek ( request.Token, 1 );
-            if (node.RightToken is null) return new ParserError(request.Token, $"Expectet a word after the as keyword", token);
-            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the as keyword and not a '{node.RightToken.Text}'", token, node.RightToken);
+            if (node.RightToken is null) return new ParserError(request.Token, $"Expectet a word after the as keyword");
+            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the as keyword and not a '{node.RightToken.Text}'", node.RightToken);
 
             node.AllTokens.Add(node.RightToken);
 

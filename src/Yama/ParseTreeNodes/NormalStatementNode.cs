@@ -17,19 +17,13 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode? IdentifierChild
-        {
-            get;
-            set;
-        }
-
         public List<IParseTreeNode> GetAllChilds
         {
             get
             {
-                if (this.IdentifierChild is null) return new ();
+                if (this.StatementChild is null) return new ();
 
-                return new List<IParseTreeNode> { this.IdentifierChild };
+                return new List<IParseTreeNode> { this.StatementChild };
             }
         }
 
@@ -76,21 +70,20 @@ namespace Yama.Parser
             IParseTreeNode? node = request.Parser.ParseCleanToken(request.Token, this.identifierStatementLayer);
             if (node is null) return null;
 
-            expression.IdentifierChild = node;
-
             IdentifierToken? ende = request.Token;
             if (node is IContainer container) ende = container.Ende;
 
             ende = request.Parser.Peek(ende, 1);
             if (ende is null) return null;
 
-            node = request.Parser.ParseCleanToken(ende, this.statementLayer);
-            if (node is null) return null;
+            IParseTreeNode? statementnode = request.Parser.ParseCleanToken(ende, this.statementLayer);
+            if (statementnode is not IParentNode parentNode) return null;
+            parentNode.LeftNode = node;
 
-            if (node is IContainer statementContainer) ende = statementContainer.Ende;
+            if (statementnode is IContainer statementContainer) ende = statementContainer.Ende;
             expression.Ende = ende;
 
-            expression.StatementChild = node;
+            expression.StatementChild = statementnode;
 
             return expression;
         }
@@ -99,10 +92,7 @@ namespace Yama.Parser
         {
             //if (!(parent is IndexContainer container)) return index.CreateError(this);
 
-            if (this.IdentifierChild is not IIndexNode identiefierChild) return true;
             if (this.StatementChild is not IIndexNode statementChild) return true;
-
-            identiefierChild.Indezieren(request);
 
             return statementChild.Indezieren(request);
 
@@ -110,18 +100,9 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.IdentifierChild is not ICompileNode identifierChild) return false;
+            if (this.StatementChild is not ICompileNode statementChild) return false;
 
-            if (this.StatementChild is AssigmentNode assigmentNode)
-            {
-                assigmentNode.Compile(request);
-
-                return identifierChild.Compile(new RequestParserTreeCompile ( request.Compiler, "set" ));
-            }
-
-            identifierChild.Compile(request);
-
-            return true;
+            return statementChild.Compile(request);
         }
 
         #endregion methods

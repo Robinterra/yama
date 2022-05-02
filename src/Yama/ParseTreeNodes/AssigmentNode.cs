@@ -8,7 +8,7 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class AssigmentNode : IParseTreeNode, IIndexNode, ICompileNode, IContainer
+    public class AssigmentNode : IParseTreeNode, IIndexNode, ICompileNode, IContainer, IParentNode
     {
 
         #region get/set
@@ -43,6 +43,12 @@ namespace Yama.Parser
         }
 
         public IdentifierToken Ende
+        {
+            get;
+            set;
+        }
+
+        public IParseTreeNode? LeftNode
         {
             get;
             set;
@@ -108,8 +114,11 @@ namespace Yama.Parser
         public bool Compile(RequestParserTreeCompile request)
         {
             if (this.ChildNode is not ICompileNode rightNode) return false;
+            if (this.LeftNode is not ICompileNode leftnode) return false;
 
-            return rightNode.Compile(request);
+            rightNode.Compile(request);
+
+            return leftnode.Compile(new RequestParserTreeCompile ( request.Compiler, "set" ));
         }
 
         #endregion methods

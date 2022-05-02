@@ -8,13 +8,13 @@ identiefier = letter{letter | digit | _}
 number = digit {digit}
 hexnumber = "0x" (digit | hexletter) {digit | hexletter}
 pointIdentifion = identiefier.identiefier
-expressionIden = pointIdentifion | number | hexnumber
+expressionIden = pointIdentifion | number | hexnumber | "true" | "false" | "null"
 
 asExpression = "as" identiefier
 isExpression = "is" (null | identiefier identiefier)
 
 operationExpression = operator expression
-expression = [ operator ] expressionIden [ asExpression | methodeCall | vektorCall ] { operationExpression }
+expression = [ "(" ] [ operator ] expressionIden [ asExpression | methodeCall | vektorCall ] [ operationExpression ] [ ")" ] [ asExpression ] [ operationExpression ]
 
 genericCall = "<" identiefier {, identiefier} ">"
 methodeCall = [ genericCall ] "(" expression {, expression} ")" [ asExpression ]

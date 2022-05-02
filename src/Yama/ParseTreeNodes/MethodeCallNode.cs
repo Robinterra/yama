@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Yama.Parser
 {
-    public class MethodeCallNode : IParseTreeNode, IIndexNode, ICompileNode, IEndExpression, IContainer
+    public class MethodeCallNode : IParseTreeNode, IIndexNode, ICompileNode, IContainer, IParentNode
     {
 
         #region vars
@@ -117,16 +117,6 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != this.BeginZeichen ) return null;
 
-            IdentifierToken? left = request.Parser.Peek ( request.Token, -1 );
-            if (left is null) return null;
-            if ( left.Kind == IdentifierKind.Operator ) return null;
-            if ( left.Kind == IdentifierKind.NumberToken ) return null;
-            if ( left.Kind == IdentifierKind.OpenBracket ) return null;
-            if ( left.Kind == IdentifierKind.BeginContainer ) return null;
-            if ( left.Kind == IdentifierKind.OpenSquareBracket ) return null;
-            if ( left.Kind == IdentifierKind.EndOfCommand ) return null;
-            if ( left.Kind == IdentifierKind.Comma ) return null;
-
             IdentifierToken? steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
             if ( steuerToken is null ) return null;
 
@@ -134,7 +124,6 @@ namespace Yama.Parser
 
             node.AllTokens.Add ( steuerToken );
             node.ende = steuerToken;
-            node.LeftNode = request.Parser.ParseCleanToken ( left );
 
             request.Parser.ActivateLayer(this.expressionLayer);
 
