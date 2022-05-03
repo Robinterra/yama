@@ -8,7 +8,7 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class Operator2Childs : IParseTreeNode, IIndexNode, ICompileNode, IPriority
+    public class Operator2Childs : IParseTreeNode, IIndexNode, ICompileNode, IPriority, IParentNode, IContainer
     {
 
         #region get/set
@@ -76,6 +76,17 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get
+            {
+                if (this.RightNode is IContainer con) return con.Ende;
+                if (this.RightNode is null) return this.Token;
+
+                return this.RightNode.Token;
+            }
+        }
+
         public IndexVariabelnReference? Reference
         {
             get;
@@ -141,12 +152,7 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
-            if (token is null) return null;
-
-            node.LeftNode = request.Parser.ParseCleanToken ( token );
-
-            token = request.Parser.Peek ( request.Token, 1 );
+            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
             if (token is null) return null;
 
             node.RightNode = request.Parser.ParseCleanToken ( token );

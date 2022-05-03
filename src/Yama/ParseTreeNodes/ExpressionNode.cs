@@ -44,26 +44,39 @@ namespace Yama.Parser
 
         public IdentifierToken Ende
         {
+            get
+            {
+                if (this.isCloseBracketEnde) return this.CloseBracket!;
+
+                if (this.ChildNode is IContainer con) return con.Ende;
+                if (this.ChildNode is null) return this.Token;
+
+                return this.ChildNode.Token;
+            }
+        }
+
+        public IdentifierToken? CloseBracket
+        {
             get;
             set;
         }
 
-        private ParserLayer expressionLayer;
+        private bool isCloseBracketEnde;
+
         private ParserLayer expressionIdenLayer;
+
         private ParserLayer expressionCallLayer;
 
         #endregion get/set
 
         #region ctor
 
-        public ExpressionNode (ParserLayer expressionLayer, ParserLayer expressionIdenLayer, ParserLayer expressionCallLayer)
+        public ExpressionNode (ParserLayer expressionIdenLayer, ParserLayer expressionCallLayer)
         {
             this.AllTokens = new List<IdentifierToken> ();
-            this.expressionLayer = expressionLayer;
             this.expressionCallLayer = expressionCallLayer;
             this.expressionIdenLayer = expressionIdenLayer;
             this.Token = new();
-            this.Ende = new();
         }
 
         #endregion ctor
@@ -72,48 +85,106 @@ namespace Yama.Parser
 
         public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
-            IdentifierToken? operatorToken = request.Token;
-            bool isKlammerung = operatorToken.Kind == IdentifierKind.OpenBracket;
-            if (isKlammerung) operatorToken = request.Parser.Peek(request.Token, 1);
-            if (operatorToken is null) return null;
+            IdentifierToken? expressionIdenToken = request.Token;
+            bool isKlammerung = expressionIdenToken.Kind == IdentifierKind.OpenBracket;
+            if (isKlammerung) expressionIdenToken = request.Parser.Peek(request.Token, 1);
+            if (expressionIdenToken is null) return null;
 
-            ExpressionNode node = new ExpressionNode(this.expressionLayer, this.expressionIdenLayer, this.expressionCallLayer);
+            ExpressionNode node = new ExpressionNode(this.expressionIdenLayer, this.expressionCallLayer);
 
-            request.Parser.ActivateLayer(this.expressionIdenLayer);
-
-            IParseTreeNode? firstNode = this.ParseFirstNode(request, operatorToken);
+            IParseTreeNode? firstNode = this.ParseFirstNode(request, expressionIdenToken);
             node.ChildNode = firstNode;
 
-            request.Parser.VorherigesLayer();
-
             if (firstNode is null) return null;
-            if (firstNode is IContainer firstNodeContainer) operatorToken = firstNodeContainer.Ende;
-            node.Token = operatorToken;
-
-            IdentifierToken? callConvertToken = request.Parser.Peek(operatorToken, 1);
-            if (callConvertToken is null) return node;
-            if (callConvertToken.Kind == IdentifierKind.EndOfCommand) return node;
-
-            IdentifierToken? operationExpressionToken = this.ParseCallConvertToken(callConvertToken, request, node);
-            if (operationExpressionToken is null) return node;
-            if (operationExpressionToken.Kind == IdentifierKind.EndOfCommand) return node;
-
-            AssigmentNode node = new AssigmentNode(this.expressionLayer);
+            if (firstNode is IContainer firstNodeContainer) expressionIdenToken = firstNodeContainer.Ende;
             node.Token = request.Token;
-            node.AllTokens.Add(request.Token);
 
-            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
-            if (token is null) return null;
+            IdentifierToken? callConvertToken = request.Parser.Peek(expressionIdenToken, 1);
+            if (callConvertToken is null) return this.GetResult(isKlammerung, node);
+            if (callConvertToken.Kind == IdentifierKind.EndOfCommand) return this.GetResult(isKlammerung, node);
 
-            node.ChildNode = request.Parser.ParseCleanToken ( token, this.expressionLayer );
+            IdentifierToken? operationExpressionToken = this.ParseCallConvertToken(callConvertToken, request, node, firstNode);
+            if (node.ChildNode is null) return null;
+            if (operationExpressionToken is null) return this.GetResult(isKlammerung, node);
+            if (operationExpressionToken.Kind == IdentifierKind.EndOfCommand) return this.GetResult(isKlammerung, node);
 
-            node.Ende = token;
-            if (node is IContainer container) node.Ende = container.Ende;
+            IdentifierToken? maybeCloseBracket = this.ParseOperationExpressionToken(operationExpressionToken, request, node, node.ChildNode);
+            if (node.ChildNode is null) return null;
+            if (maybeCloseBracket is null) return this.GetResult(isKlammerung, node);
+            if (!isKlammerung) return this.GetResult(false, node);
+            if (maybeCloseBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(maybeCloseBracket, "Expected a ')' and not a", node.AllTokens.ToArray());
+
+            node.CloseBracket = maybeCloseBracket;
+            node.AllTokens.Add(maybeCloseBracket);
+            node.isCloseBracketEnde = true;
+
+            IdentifierToken? maybeAsExpression = request.Parser.Peek(expressionIdenToken, 1);
+            if (maybeAsExpression is null) return this.GetResult(isKlammerung, node);
+
+            IdentifierToken? maybeOperationExpression = this.TryAsExpression(request, maybeAsExpression, node, node.ChildNode);
+            if (node.ChildNode is null) return null;
+            if (maybeOperationExpression is null) return node;
+
+            this.ParseOperationExpressionToken(maybeOperationExpression, request, node, node.ChildNode);
 
             return node;
         }
 
-        private IdentifierToken? ParseCallConvertToken(IdentifierToken callConvertToken, RequestParserTreeParser request, ExpressionNode node)
+        private IdentifierToken? TryAsExpression(RequestParserTreeParser request, IdentifierToken maybeAsExpression, ExpressionNode node, IParseTreeNode childNode)
+        {
+            if (maybeAsExpression.Kind != IdentifierKind.As) return maybeAsExpression;
+
+            IParseTreeNode? rule = request.Parser.GetRule<ExplicitlyConvert>();
+            if (rule is null) return null;
+
+            IParseTreeNode? callNode = request.Parser.TryToParse(rule, maybeAsExpression);
+            if (callNode is not IParentNode parentNode) return null;
+            if (callNode is not IContainer container) return null;
+
+            node.ChildNode = request.Parser.SetChild(parentNode, childNode);
+
+            return request.Parser.Peek(container.Ende, 1);
+        }
+
+        private IParseTreeNode? GetResult(bool isKlammerung, ExpressionNode node)
+        {
+            if (isKlammerung && !node.isCloseBracketEnde) return new ParserError(node.Token, "missing close ')' bracket", node.AllTokens.ToArray());
+
+            if (!isKlammerung) return node.ChildNode;
+
+            return node;
+        }
+
+        private IdentifierToken? ParseOperationExpressionToken(IdentifierToken operationExpressionToken, RequestParserTreeParser request, ExpressionNode node, IParseTreeNode childNode)
+        {
+            if (operationExpressionToken.Kind != IdentifierKind.OperatorKey) return operationExpressionToken;
+
+            node.isCloseBracketEnde = false;
+
+            IParseTreeNode? callNode = request.Parser.ParseCleanToken(operationExpressionToken, this.expressionCallLayer);
+            if (callNode is not Operator2Childs opNode) return null;
+
+            request.Parser.SetChild(opNode, childNode);
+
+            Operator2Childs newParent = CleanUpOperation2Childs(opNode, childNode, request);
+
+            return request.Parser.Peek(newParent.Ende, 1);
+        }
+
+        private Operator2Childs CleanUpOperation2Childs(Operator2Childs opNode, IParseTreeNode childNode, RequestParserTreeParser request)
+        {
+            if (opNode.RightNode is not Operator2Childs rightNode) return opNode;
+            if (rightNode.Prio >= opNode.Prio) return opNode;
+
+            opNode.RightNode = rightNode.LeftNode;
+            if (opNode.RightNode is not null) opNode.RightNode.Token.ParentNode = opNode;
+
+            request.Parser.SetChild(rightNode, opNode);
+
+            return rightNode;
+        }
+
+        private IdentifierToken? ParseCallConvertToken(IdentifierToken callConvertToken, RequestParserTreeParser request, ExpressionNode node, IParseTreeNode firstNode)
         {
             if (callConvertToken.Kind != IdentifierKind.As
             || callConvertToken.Kind != IdentifierKind.OpenBracket
@@ -123,19 +194,14 @@ namespace Yama.Parser
             if (callNode is not IParentNode parentNode) return null;
             if (callNode is not IContainer container) return null;
 
-            parentNode.LeftNode = node.ChildNode;
-            node.ChildNode = callNode;
+            node.ChildNode = request.Parser.SetChild(parentNode, firstNode);
 
             return request.Parser.Peek(container.Ende, 1);
         }
 
         private IParseTreeNode? ParseFirstNode(RequestParserTreeParser request, IdentifierToken operatorToken)
         {
-            IParseTreeNode? operator1ChildRule = request.Parser.GetRule<Operator1ChildRight>();
-            if (operator1ChildRule is null)  return null;
-            if (operatorToken.Kind == IdentifierKind.Operator) return request.Parser.TryToParse(operator1ChildRule, operatorToken);
-
-            return request.Parser.ParseCleanToken(operatorToken);
+            return request.Parser.ParseCleanToken(operatorToken, this.expressionIdenLayer);
         }
 
         public bool Indezieren(RequestParserTreeIndezieren request)

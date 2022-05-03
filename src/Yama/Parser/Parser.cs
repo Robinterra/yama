@@ -187,6 +187,15 @@ namespace Yama.Parser
             this.InputData = inputData;
         }
 
+        public IParseTreeNode SetChild(IParentNode parentNode, IParseTreeNode childNode)
+        {
+            parentNode.LeftNode = childNode;
+
+            childNode.Token.ParentNode = (IParseTreeNode)parentNode;
+
+            return childNode.Token.ParentNode;
+        }
+
         // -----------------------------------------------
 
         #endregion ctor
