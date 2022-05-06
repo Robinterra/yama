@@ -643,6 +643,8 @@ namespace Yama.Parser
 
             foreach ( IParseTreeNode child in result.GetAllChilds )
             {
+                if (child.Token == result.Token) continue;
+
                 child.Token.ParentNode = result;
             }
 

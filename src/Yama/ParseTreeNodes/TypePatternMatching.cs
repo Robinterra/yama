@@ -7,7 +7,7 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class TypePatternMatching : IParseTreeNode, IIndexNode, ICompileNode
+    public class TypePatternMatching : IParseTreeNode, IIndexNode, ICompileNode, IParentNode, IContainer
     {
 
         #region get/set
@@ -82,6 +82,17 @@ namespace Yama.Parser
             set;
         }
 
+        public IdentifierToken Ende
+        {
+            get
+            {
+                if (this.ReferenceDeklaration is not null) return this.ReferenceDeklaration;
+                if (this.RightToken is not null) return this.RightToken;
+
+                return this.Token;
+            }
+        }
+
         #endregion get/set
 
         #region ctor
@@ -115,16 +126,11 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
-            if ( token is null ) return new ParserError(request.Token, $"Expectet a token before the 'is' Keyword, like 'isOk is int'");
-
-            node.LeftNode = request.Parser.ParseCleanToken ( token );
-
             node.RightToken = request.Parser.Peek ( request.Token, 1 );
-            if ( node.RightToken == null ) return new ParserError(request.Token, $"Expectet a word after the is keyword", token);
+            if ( node.RightToken == null ) return new ParserError(request.Token, $"Expectet a word after the is keyword");
 
             node.AllTokens.Add(node.RightToken);
-            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the is keyword and not a '{node.RightToken.Text}'", token, node.RightToken);
+            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the is keyword and not a '{node.RightToken.Text}'", node.RightToken);
             if ( node.RightToken.Kind == IdentifierKind.Null ) return this.ParseNullChecking (node);
 
             node.ReferenceDeklaration = request.Parser.Peek ( node.RightToken, 1 );

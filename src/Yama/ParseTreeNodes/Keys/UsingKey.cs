@@ -59,6 +59,12 @@ namespace Yama.Parser
             key.Token = token;
             key.AllTokens.Add ( token );
 
+            IdentifierToken? semikolonToken = request.Parser.Peek ( token, 1 );
+            if (semikolonToken is null) return null;
+            if (semikolonToken.Kind != IdentifierKind.EndOfCommand) return new ParserError(semikolonToken, "expected ; and not ", request.Token, token);
+
+            key.AllTokens.Add(semikolonToken);
+
             return key;
         }
 

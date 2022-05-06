@@ -78,14 +78,20 @@ namespace Yama.Parser
             get;
         }
 
+        private ParserLayer expressionLayer;
+
+        private ParserLayer statementLayer;
+
         #endregion get/set
 
         #region ctor
 
-        public IfKey ()
+        public IfKey (ParserLayer expressionLayer, ParserLayer statementLayer)
         {
             this.Token = new();
+            this.statementLayer = statementLayer;
             this.AllTokens = new List<IdentifierToken> ();
+            this.expressionLayer = expressionLayer;
         }
 
         #endregion ctor
@@ -96,33 +102,35 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.If ) return null;
 
-            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
-            if (token is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'if' Keyword {request.Token.Kind}");
-            if ( token.Kind != IdentifierKind.OpenBracket ) return new ParserError(token, $"Expectet a open Bracket '(' after Keyword 'if' and not a {token.Kind}", request.Token);
+            IdentifierToken? openBrackettoken = request.Parser.Peek ( request.Token, 1 );
+            if (openBrackettoken is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'if' Keyword {request.Token.Kind}");
+            if ( openBrackettoken.Kind != IdentifierKind.OpenBracket ) return new ParserError(openBrackettoken, $"Expectet a open Bracket '(' after Keyword 'if' and not a {openBrackettoken.Kind}", request.Token);
 
-            IfKey key = new IfKey (  );
+            IfKey key = new IfKey ( this.expressionLayer, this.statementLayer );
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
+            key.AllTokens.Add(openBrackettoken);
 
-            IdentifierToken? conditionToken = request.Parser.Peek ( request.Token, 1 );
-            if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", token);
+            IdentifierToken? conditionToken = request.Parser.Peek ( openBrackettoken, 1 );
+            if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", openBrackettoken);
 
-            IParseTreeNode? rule = request.Parser.GetRule<ContainerExpression>();
-            if (rule is null) return null;
+            IParseTreeNode? condition = request.Parser.ParseCleanToken(conditionToken, this.expressionLayer, false);
+            if (condition is not IContainer conCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            key.Condition = condition;
 
-            IParseTreeNode? node = request.Parser.TryToParse ( rule, conditionToken );
-            if (node is null) return new ParserError(conditionToken, $"Can not parse Condition of a if", token, request.Token);
+            IdentifierToken? closeBracket = request.Parser.Peek ( conCon.Ende, 1);
+            if (closeBracket is null) return null;
+            if (closeBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(closeBracket, $"Expected ) and not", request.Token, openBrackettoken);
+            key.AllTokens.Add(closeBracket);
 
-            key.Condition = node;
+            IdentifierToken? ifStatementchild = request.Parser.Peek (closeBracket, 1);
+            if (ifStatementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a if", openBrackettoken, conditionToken);
+            //if (!this.IsAllowedStatmentToken (ifStatementchild)) return new ParserError(ifStatementchild, $"A if Statement can not begin with a '{ifStatementchild.Kind}'. Possilbe begins of a if Statement is: return, break, continue, '{{', if, while, for.", openBrackettoken, conditionToken, request.Token);
 
-            IdentifierToken? ifStatementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
-            if (ifStatementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a if", token, conditionToken);
-            if (!this.IsAllowedStatmentToken (ifStatementchild)) return new ParserError(ifStatementchild, $"A if Statement can not begin with a '{ifStatementchild.Kind}'. Possilbe begins of a if Statement is: return, break, continue, '{{', if, while, for.", token, conditionToken, request.Token);
+            IParseTreeNode? statementNode = request.Parser.ParseCleanToken(ifStatementchild, this.statementLayer, false);
+            if (statementNode is null) return new ParserError(ifStatementchild, $"A if Statement can not begin with a '{ifStatementchild.Kind}'. Possilbe begins of a if Statement is: return, break, continue, '{{', if, while, for.", openBrackettoken, conditionToken, request.Token);
 
-            node = request.Parser.ParseCleanToken(ifStatementchild);
-            if (node is null) return new ParserError(ifStatementchild, $"if statement can not be parse", token, conditionToken, request.Token);
-
-            key.IfStatement = node;
+            key.IfStatement = statementNode;
 
             IdentifierToken elsePeekToken = (key.IfStatement is IContainer t) ? t.Ende : key.IfStatement.Token;
 
@@ -131,10 +139,13 @@ namespace Yama.Parser
             if ( elseStatementChild.Node is not null ) return key;
             if ( elseStatementChild.Kind != IdentifierKind.Else ) return key;
 
-            node = request.Parser.ParseCleanToken ( elseStatementChild );
-            if (node is null) return new ParserError(elseStatementChild, $"else statement can not be parse", token, conditionToken, request.Token);
+            IParseTreeNode? elseRule = request.Parser.GetRule<ElseKey>();
+            if (elseRule is null) return null;
 
-            key.ElseStatement = node;
+            IParseTreeNode? elseNode = request.Parser.TryToParse(elseRule, elseStatementChild);
+            if (elseNode is null) return new ParserError(elseStatementChild, $"else statement can not be parse", openBrackettoken, conditionToken, request.Token);
+
+            key.ElseStatement = elseNode;
 
             return key;
         }

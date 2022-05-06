@@ -14,6 +14,8 @@ namespace Yama.Parser
 
         private IdentifierToken? ende;
 
+        private ParserLayer expressionLayer;
+
         #endregion vars
 
         #region get/set
@@ -90,16 +92,17 @@ namespace Yama.Parser
 
         #region ctor
 
-        public VektorCall ( int prio )
+        public VektorCall ( int prio, ParserLayer expressionLayer )
         {
+            this.expressionLayer = expressionLayer;
             this.ParametersNodes = new();
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
 
-        public VektorCall ( IdentifierKind begin, IdentifierKind end, int prio )
-            : this ( prio )
+        public VektorCall ( IdentifierKind begin, IdentifierKind end, int prio, ParserLayer expressionLayer )
+            : this ( prio, expressionLayer )
         {
             this.BeginZeichen = begin;
             this.EndeZeichen = end;
@@ -116,16 +119,19 @@ namespace Yama.Parser
             IdentifierToken? steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
             if ( steuerToken is null ) return null;
 
-            VektorCall node = new VektorCall ( this.Prio );
+            VektorCall node = new VektorCall ( this.Prio, this.expressionLayer );
+
+            request.Parser.ActivateLayer(this.expressionLayer);
 
             List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
+
+            request.Parser.VorherigesLayer();
+
             if (nodes is null) return null;
             node.ParametersNodes.AddRange(nodes);
 
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
-
-            if (node.LeftNode == null) return null;
 
             node.ende = steuerToken;
             node.AllTokens.Add(steuerToken);

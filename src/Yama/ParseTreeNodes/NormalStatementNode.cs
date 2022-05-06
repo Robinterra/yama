@@ -81,6 +81,20 @@ namespace Yama.Parser
             request.Parser.SetChild(parentNode, node);
 
             if (statementnode is IContainer statementContainer) ende = statementContainer.Ende;
+
+            if (statementnode is VektorCall)
+            {
+                IdentifierToken? assigmentToken = request.Parser.Peek(ende, 1);
+                if (assigmentToken is null) return null;
+                IParseTreeNode? assigmentRule = request.Parser.GetRule<AssigmentNode>();
+                if (assigmentRule is null) return null;
+                IParseTreeNode? assigmentNode = request.Parser.TryToParse(assigmentRule, assigmentToken);
+                if (assigmentNode is not IParentNode parentAssigment) return null;
+                request.Parser.SetChild(parentAssigment, statementnode);
+                statementnode = assigmentNode;
+                if (statementnode is IContainer assigmentContainer) ende = assigmentContainer.Ende;
+            }
+
             expression.Ende = ende;
 
             expression.StatementChild = statementnode;

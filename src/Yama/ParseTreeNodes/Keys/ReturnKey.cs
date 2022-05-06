@@ -5,8 +5,9 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class ReturnKey : IParseTreeNode, IIndexNode, ICompileNode
+    public class ReturnKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
+        private ParserLayer expressionLayer;
 
         #region get/set
 
@@ -45,14 +46,22 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get;
+            private set;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public ReturnKey ()
+        public ReturnKey (ParserLayer expressionLayer)
         {
+            this.expressionLayer = expressionLayer;
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
+            this.Ende = this.Token;
         }
 
         #endregion ctor
@@ -63,22 +72,25 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.Return ) return null;
 
-            ReturnKey result = new ReturnKey();
+            ReturnKey result = new ReturnKey(this.expressionLayer);
             result.Token = request.Token;
             result.AllTokens.Add ( request.Token );
 
-            IdentifierToken? ende = request.Parser.FindAToken(request.Token, IdentifierKind.EndOfCommand);
-            if (ende is null) return new ParserError(request.Token, "Expectet a ';' after the return statement");
+            //IdentifierToken? ende = request.Parser.FindAToken(request.Token, IdentifierKind.EndOfCommand);
+            //if (ende is null) return new ParserError(request.Token, "Expectet a ';' after the return statement");
 
-            List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens(request.Token.Position + 1, ende.Position);
-            IParseTreeNode? node = null;
+            IdentifierToken? token = request.Parser.Peek(request.Token, 1);
+            if (token is null) return null;
 
-            if ( nodes is null ) return result;
-            if ( nodes.Count > 1 ) return new ParserError(request.Token, "There are to many statements after the return key, maybe you forgett a ';' after the return statement");
-            if (nodes.Count == 0) return result;
-
-            node = nodes[0];
+            IParseTreeNode? node = request.Parser.ParseCleanToken(token, this.expressionLayer, true);
             result.Statement = node;
+            if (node is not IContainer con) return null;
+
+            IdentifierToken? semikolon = request.Parser.Peek(con.Ende, 1);
+            if (semikolon is null) return null;
+            if (semikolon.Kind != IdentifierKind.EndOfCommand) return null;
+            result.AllTokens.Add(semikolon);
+            result.Ende = semikolon;
 
             return result;
         }
