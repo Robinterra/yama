@@ -12,6 +12,8 @@ namespace Yama.Parser
 
         private IdentifierToken? ende;
 
+        private ParserLayer expressionLayer;
+
         #endregion vars
 
         #region get/set
@@ -95,8 +97,9 @@ namespace Yama.Parser
 
         #region ctor
 
-        public NewKey ()
+        public NewKey (ParserLayer expressionLayer)
         {
+            this.expressionLayer = expressionLayer;
             this.Parameters = new List<IParseTreeNode>();
             this.AllTokens = new List<IdentifierToken> ();
             this.Token = new IdentifierToken();
@@ -125,7 +128,7 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.New ) return null;
 
-            NewKey newKey = new NewKey();
+            NewKey newKey = new NewKey(this.expressionLayer);
             newKey.Token = request.Token;
             newKey.AllTokens.Add ( request.Token );
 
@@ -147,7 +150,12 @@ namespace Yama.Parser
             IdentifierToken? endToken = request.Parser.FindEndToken ( beginToken, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
             if ( endToken is null ) return new ParserError(beginToken, $"Wrong Syntax for a new Keyword. Can not find close Bracket", token, request.Token);
 
+            request.Parser.ActivateLayer(this.expressionLayer);
+
             List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( beginToken.Position + 1, endToken.Position, true );
+
+            request.Parser.VorherigesLayer();
+
             if (nodes is null) return null;
 
             newKey.Parameters = nodes;

@@ -103,35 +103,53 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.For ) return null;
 
-            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
-            if (token is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'for' Keyword {request.Token.Kind}");
-            if ( token.Kind != IdentifierKind.OpenBracket ) return new ParserError(token, $"Expectet a open Bracket '(' after Keyword 'for' and not a {token.Kind}", request.Token);
+            IdentifierToken? openBrackettoken = request.Parser.Peek ( request.Token, 1 );
+            if (openBrackettoken is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'for' Keyword {request.Token.Kind}");
+            if ( openBrackettoken.Kind != IdentifierKind.OpenBracket ) return new ParserError(openBrackettoken, $"Expectet a open Bracket '(' after Keyword 'for' and not a {openBrackettoken.Kind}", request.Token);
 
             ForKey key = new ForKey ( this.expressionLayer );
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
+            key.AllTokens.Add(openBrackettoken);
 
-            IdentifierToken? conditionToken = request.Parser.Peek ( request.Token, 1 );
-            if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", token);
+            IdentifierToken? deklarationToken = request.Parser.Peek ( openBrackettoken, 1 );
+            if (deklarationToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", openBrackettoken);
 
-            IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
+            IParseTreeNode? rule = request.Parser.GetRule<NormalStatementNode>();
+            if (rule is null) return null;
 
-            IParseTreeNode? klammer = request.Parser.TryToParse ( rule, conditionToken );
+            IParseTreeNode? deklaration = request.Parser.TryToParse(rule, deklarationToken);
+            if (deklaration is not IContainer dekCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            key.Deklaration = deklaration;
 
-            if (klammer is not Container t) return new ParserError(conditionToken, $"Can not parse Condition of a for", token, request.Token);
-            if (t.Statements.Count != 3) return new ParserError(conditionToken, $"Can not parse Condition of a for, expected 3 statments and not {t.Statements.Count}", token, request.Token);
+            IdentifierToken? conditionToken = request.Parser.Peek ( dekCon.Ende, 1 );
+            if (conditionToken is null) return null;
 
-            t.Token.ParentNode = key;
+            IParseTreeNode? condition = request.Parser.ParseCleanToken(conditionToken, this.expressionLayer, false);
+            if (condition is not IContainer conCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            key.Condition = condition;
 
-            key.Deklaration = t.Statements[0];
-            key.Condition = t.Statements[1];
-            key.Inkrementation = t.Statements[2];
+            IdentifierToken? semikolonToken = request.Parser.Peek ( conCon.Ende, 1 );
+            if (semikolonToken is null) return new ParserError(request.Token, $"Can not parse Condition of a for, missing ';'", openBrackettoken);
+            key.AllTokens.Add(semikolonToken);
 
-            IdentifierToken? statementchild = request.Parser.Peek ( t.Ende, 1);
-            if (statementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a for", token, conditionToken);
+            IdentifierToken? inkrementToken = request.Parser.Peek ( semikolonToken, 1 );
+            if (inkrementToken is null) return null;
+
+            IParseTreeNode? inkrement = request.Parser.TryToParse(rule, inkrementToken);
+            if (inkrement is not IContainer inkCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            key.Inkrementation = inkrement;
+
+            IdentifierToken? closeBracket = request.Parser.Peek ( inkCon.Ende, 1);
+            if (closeBracket is null) return null;
+            if (closeBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(closeBracket, $"Expected ) and not", request.Token, openBrackettoken);
+            key.AllTokens.Add(closeBracket);
+
+            IdentifierToken? statementchild = request.Parser.Peek ( closeBracket, 1);
+            if (statementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a for", openBrackettoken, deklarationToken);
 
             IParseTreeNode? statement = request.Parser.ParseCleanToken(statementchild);
-            if (statement is null) return new ParserError(statementchild, $"for statement can not be parse", token, conditionToken, request.Token);
+            if (statement is null) return new ParserError(request.Token, $"for statement can not be parse", openBrackettoken);
 
             key.Statement = statement;
 

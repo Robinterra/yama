@@ -222,7 +222,7 @@ namespace Yama.Parser
             token = request.Parser.Peek ( t.Ende, 1);
             if ( token is null ) return null;
 
-            IParseTreeNode? container = request.Parser.ParseCleanToken(token, this.getsetlayer);
+            IParseTreeNode? container = request.Parser.ParseCleanToken(token, this.getsetlayer, false);
 
             if (container is not Container ab) return null;
 

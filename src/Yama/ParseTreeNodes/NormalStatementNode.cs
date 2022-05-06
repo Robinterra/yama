@@ -67,7 +67,7 @@ namespace Yama.Parser
 
             expression.Token = request.Token;
 
-            IParseTreeNode? node = request.Parser.ParseCleanToken(request.Token, this.identifierStatementLayer);
+            IParseTreeNode? node = request.Parser.ParseCleanToken(request.Token, this.identifierStatementLayer, false);
             if (node is null) return null;
 
             IdentifierToken? ende = request.Token;
@@ -76,14 +76,21 @@ namespace Yama.Parser
             ende = request.Parser.Peek(ende, 1);
             if (ende is null) return null;
 
-            IParseTreeNode? statementnode = request.Parser.ParseCleanToken(ende, this.statementLayer);
+            IParseTreeNode? statementnode = request.Parser.ParseCleanToken(ende, this.statementLayer, false);
             if (statementnode is not IParentNode parentNode) return null;
-            parentNode.LeftNode = node;
+            request.Parser.SetChild(parentNode, node);
 
             if (statementnode is IContainer statementContainer) ende = statementContainer.Ende;
             expression.Ende = ende;
 
             expression.StatementChild = statementnode;
+
+            IdentifierToken? semikolon = request.Parser.Peek(ende, 1);
+            if (semikolon is null) return expression;
+            if (semikolon.Kind != IdentifierKind.EndOfCommand) return expression;
+
+            expression.AllTokens.Add(semikolon);
+            expression.Ende = semikolon;
 
             return expression;
         }

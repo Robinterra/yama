@@ -196,6 +196,11 @@ namespace Yama.Parser
             return childNode.Token.ParentNode;
         }
 
+        internal void ActivateLayer(object expressionLayer)
+        {
+            throw new NotImplementedException();
+        }
+
         // -----------------------------------------------
 
         #endregion ctor
@@ -310,7 +315,8 @@ namespace Yama.Parser
 
             this.possibleParents = new List<IParseTreeNode>();
 
-            bool isok = true;
+            this.ParsePrimary ( this.Max, this.possibleParents );
+            /*bool isok = true;
             bool vorgangOhneNeueNodes = true;
             while ( isok )
             {
@@ -329,11 +335,11 @@ namespace Yama.Parser
                 this.Position = von;
                 isok = true;
                 vorgangOhneNeueNodes = true;
-            }
+            }*/
 
-            List<IParseTreeNode> nodeParents = this.GetCleanNodeParents();
+            List<IParseTreeNode> nodeParents = this.possibleParents;//this.GetCleanNodeParents();
 
-            this.FindTokensThatHasNoMatchNode();
+            //this.FindTokensThatHasNoMatchNode();
 
             pos.SetToParser(this);
 
@@ -400,25 +406,25 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private IParseTreeNode? ParsePrimary ( int max )
+        private IParseTreeNode? ParsePrimary ( int max, List<IParseTreeNode> possibleParents )
         {
-            int pos = this.Position;
-
             while ( this.Position < max )
             {
                 if (this.Current == null) return null;
-                if ( this.Current.Node == null )
+                if ( this.Current.Node != null )
                 {
-                    IParseTreeNode? node = this.ParseSteuerTokens ( this.Current );
-                    if ( node is not null ) return node;
+                    this.NextToken (  );
+                    continue;
                 }
 
-                this.NextToken (  );
+                IParseTreeNode? node = this.ParseSteuerTokens ( this.Current );
+                if (node is null) node = this.SyntaxErrorToken(this.Current);
+                if (node is not ParserError) possibleParents.Add(node);
+
+                this.NextToken();
             }
 
-            this.Position = pos;
-
-            for ( int i = this.GetGrosstePrio (  ); i > -1; i-- )
+            /*for ( int i = this.GetGrosstePrio (  ); i > -1; i-- )
             {
                 pos = this.Position;
 
@@ -427,15 +433,15 @@ namespace Yama.Parser
                 this.Position = pos;
 
                 if ( node != null ) return node;
-            }
+            }*/
 
-            while ( this.Position < max )
+            /*while ( this.Position < max )
             {
                 if (this.Current == null) return null;
                 if ( this.Current.Node == null ) return this.SyntaxErrorToken ( this.Current );
 
                 this.NextToken (  );
-            }
+            }*/
 
             return null;
         }
@@ -481,25 +487,26 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public IParseTreeNode? ParseCleanToken ( IdentifierToken token, ParserLayer neuerLayer )
+        public IParseTreeNode? ParseCleanToken ( IdentifierToken token, ParserLayer neuerLayer, bool isoptional )
         {
             if ( token.Node != null ) return this.GetNodeFromToken ( token );
 
             this.ActivateLayer(neuerLayer);
 
-            IParseTreeNode? result = this.ParseEndExpression ( token );
+            /*IParseTreeNode? result = this.ParseEndExpression ( token );
 
             if ( result != null ) { this.VorherigesLayer(); return result; }
 
             result = this.ParsePrioSystem ( token, this.GetGrosstePrio (  ), true );
 
-            if ( result != null ) { this.VorherigesLayer(); return result; }
+            if ( result != null ) { this.VorherigesLayer(); return result; }*/
 
-            result = this.ParseSteuerTokens ( token );
+            IParseTreeNode? result = this.ParseSteuerTokens ( token );
 
             this.VorherigesLayer();
 
             if ( result != null ) return result;
+            if (isoptional) return null;
 
             return this.SyntaxErrorToken ( token );
         }
@@ -510,7 +517,7 @@ namespace Yama.Parser
         {
             if (this.CurrentLayer is null) return null;
 
-            return this.ParseCleanToken(token, this.CurrentLayer);
+            return this.ParseCleanToken(token, this.CurrentLayer, false);
         }
 
         // -----------------------------------------------
@@ -536,14 +543,14 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private IParseTreeNode? SyntaxErrorToken ( IdentifierToken? token )
+        private IParseTreeNode SyntaxErrorToken ( IdentifierToken? token )
         {
             if ( token == null ) token = new IdentifierToken ( IdentifierKind.Unknown, -1, -1, -1, "Unexpectet Error", "Unexpectet Error" );
 
-            IParseTreeNode? error = this.ErrorNode.Parse ( new Request.RequestParserTreeParser ( this, token ) );
-            if (error is not ParserError pe) return null;
+            IParseTreeNode? error = this.TryToParse(this.ErrorNode, token);
+            if (error is not ParserError pe) throw new Exception("mhhhhhh");
 
-            this.ParserErrors.Add ( pe );
+            if (!this.ParserErrors.Contains(pe)) this.ParserErrors.Add ( pe );
 
             return error;
         }
@@ -556,8 +563,6 @@ namespace Yama.Parser
 
             foreach ( IParseTreeNode member in this.CurrentParserMembers )
             {
-                if ( member is IPriority ) continue;
-
                 IParseTreeNode? result = member.Parse ( request );
                 if ( result == null ) continue;
 
@@ -628,7 +633,8 @@ namespace Yama.Parser
 
         private bool CleanPareNode ( IParseTreeNode result )
         {
-            if (result is ParserError pe) this.ParserErrors.Add(pe);
+            if (result is ParserError pe)
+                if (!this.ParserErrors.Contains(pe)) this.ParserErrors.Add(pe);
 
             foreach ( IdentifierToken token in result.AllTokens )
             {

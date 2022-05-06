@@ -138,8 +138,6 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            if (node.LeftNode == null) return null;
-
             return node;
         }
 

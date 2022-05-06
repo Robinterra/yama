@@ -84,10 +84,10 @@ namespace Yama.Parser
             IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
             if (token is null) return null;
 
-            node.ChildNode = request.Parser.ParseCleanToken ( token, this.expressionLayer );
+            node.ChildNode = request.Parser.ParseCleanToken ( token, this.expressionLayer, false );
 
             node.Ende = token;
-            if (node is IContainer container) node.Ende = container.Ende;
+            if (node.ChildNode is IContainer container) node.Ende = container.Ende;
 
             return node;
         }

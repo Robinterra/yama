@@ -239,7 +239,7 @@ namespace Yama.Parser
             token = this.MakeInheritanceBase ( request.Parser, token, deklaration );
             if (token is null) return new ParserError(deklaration.Token, $"Can not find a '{{' after the class name", request.Token, deklaration.ClassDefinition);
 
-            deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer);
+            deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer, false);
 
             if (deklaration.Statement is null) return new ParserError(deklaration.Token, $"Can not find a '{{' after the class name", request.Token, deklaration.ClassDefinition);
 

@@ -276,7 +276,7 @@ namespace Yama.Parser
             IdentifierToken? statementchild = request.Parser.Peek ( t.Ende, 1);
             if (statementchild is null) return null;
 
-            deklaration.Statement = request.Parser.ParseCleanToken(statementchild, this.methodenStatementLayer);
+            deklaration.Statement = request.Parser.ParseCleanToken(statementchild, this.methodenStatementLayer, false);
             if (deklaration.Statement is null) return null;
 
             deklaration.Tags.AddRange(request.Parser.PopMethodTag (  ));

@@ -71,6 +71,7 @@ namespace Yama.Parser
         {
             get;
         }
+
         public List<string> ValidOperators
         {
             get;
@@ -98,31 +99,34 @@ namespace Yama.Parser
             get;
         }
 
+        private ParserLayer expressionLayer;
+
         #endregion get/set
 
         #region ctor
 
-        public Operator2Childs ()
+        public Operator2Childs (ParserLayer expressionLayer)
         {
+            this.expressionLayer = expressionLayer;
             this.AllTokens = new List<IdentifierToken> ();
             this.Token = new();
             this.ValidOperators = new();
         }
 
-        public Operator2Childs ( int prio ) : this()
+        public Operator2Childs ( int prio, ParserLayer expressionLayer ) : this(expressionLayer)
         {
             this.Prio = prio;
         }
 
-        public Operator2Childs ( List<string> validOperators, int prio )
-            : this ( prio )
+        public Operator2Childs ( List<string> validOperators, int prio, ParserLayer expressionLayer )
+            : this ( prio, expressionLayer )
         {
             this.ValidKind = IdentifierKind.Operator;
             this.ValidOperators = validOperators;
         }
 
-        public Operator2Childs ( IdentifierKind kind, int prio )
-            : this ( prio )
+        public Operator2Childs ( IdentifierKind kind, int prio, ParserLayer expressionLayer )
+            : this ( prio, expressionLayer )
         {
             this.ValidKind = kind;
         }
@@ -148,14 +152,14 @@ namespace Yama.Parser
             if ( request.Token.Kind != this.ValidKind ) return null;
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
-            Operator2Childs node = new Operator2Childs ( this.Prio );
+            Operator2Childs node = new Operator2Childs ( this.Prio, this.expressionLayer );
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
             IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
             if (token is null) return null;
 
-            node.RightNode = request.Parser.ParseCleanToken ( token );
+            node.RightNode = request.Parser.ParseCleanToken (token, expressionLayer, false);
 
             return node;
         }

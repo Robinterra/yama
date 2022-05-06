@@ -195,7 +195,7 @@ namespace Yama.Parser
 
             request.Parser.ActivateLayer(this.layer);
 
-            IParseTreeNode? container = request.Parser.ParseCleanToken(token, this.layer);
+            IParseTreeNode? container = request.Parser.ParseCleanToken(token, this.layer, false);
 
             request.Parser.VorherigesLayer();
 

@@ -67,15 +67,18 @@ namespace Yama.Parser
 
         private ParserLayer expressionCallLayer;
 
+        private ParserLayer operationExpressionLayer;
+
         #endregion get/set
 
         #region ctor
 
-        public ExpressionNode (ParserLayer expressionIdenLayer, ParserLayer expressionCallLayer)
+        public ExpressionNode (ParserLayer expressionIdenLayer, ParserLayer expressionCallLayer, ParserLayer operationExpressionLayer)
         {
             this.AllTokens = new List<IdentifierToken> ();
             this.expressionCallLayer = expressionCallLayer;
             this.expressionIdenLayer = expressionIdenLayer;
+            this.operationExpressionLayer = operationExpressionLayer;
             this.Token = new();
         }
 
@@ -90,7 +93,7 @@ namespace Yama.Parser
             if (isKlammerung) expressionIdenToken = request.Parser.Peek(request.Token, 1);
             if (expressionIdenToken is null) return null;
 
-            ExpressionNode node = new ExpressionNode(this.expressionIdenLayer, this.expressionCallLayer);
+            ExpressionNode node = new ExpressionNode(this.expressionIdenLayer, this.expressionCallLayer, operationExpressionLayer);
 
             IParseTreeNode? firstNode = this.ParseFirstNode(request, expressionIdenToken);
             node.ChildNode = firstNode;
@@ -111,6 +114,7 @@ namespace Yama.Parser
             IdentifierToken? maybeCloseBracket = this.ParseOperationExpressionToken(operationExpressionToken, request, node, node.ChildNode);
             if (node.ChildNode is null) return null;
             if (maybeCloseBracket is null) return this.GetResult(isKlammerung, node);
+            if (maybeCloseBracket.Kind == IdentifierKind.Comma) node.AllTokens.Add(maybeCloseBracket);
             if (!isKlammerung) return this.GetResult(false, node);
             if (maybeCloseBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(maybeCloseBracket, "Expected a ')' and not a", node.AllTokens.ToArray());
 
@@ -125,7 +129,10 @@ namespace Yama.Parser
             if (node.ChildNode is null) return null;
             if (maybeOperationExpression is null) return node;
 
-            this.ParseOperationExpressionToken(maybeOperationExpression, request, node, node.ChildNode);
+            IdentifierToken? maybeComma = this.ParseOperationExpressionToken(maybeOperationExpression, request, node, node.ChildNode);
+            if (maybeComma is null) return node;
+
+            node.AllTokens.Add(maybeComma);
 
             return node;
         }
@@ -150,23 +157,25 @@ namespace Yama.Parser
         {
             if (isKlammerung && !node.isCloseBracketEnde) return new ParserError(node.Token, "missing close ')' bracket", node.AllTokens.ToArray());
 
-            if (!isKlammerung) return node.ChildNode;
+            if (isKlammerung) return node;
+            if (node.ChildNode is Operator2Childs) return node.ChildNode;
 
             return node;
         }
 
         private IdentifierToken? ParseOperationExpressionToken(IdentifierToken operationExpressionToken, RequestParserTreeParser request, ExpressionNode node, IParseTreeNode childNode)
         {
-            if (operationExpressionToken.Kind != IdentifierKind.OperatorKey) return operationExpressionToken;
+            if (operationExpressionToken.Kind != IdentifierKind.Operator) return operationExpressionToken;
 
             node.isCloseBracketEnde = false;
 
-            IParseTreeNode? callNode = request.Parser.ParseCleanToken(operationExpressionToken, this.expressionCallLayer);
+            IParseTreeNode? callNode = request.Parser.ParseCleanToken(operationExpressionToken, this.operationExpressionLayer, true);
             if (callNode is not Operator2Childs opNode) return null;
 
             request.Parser.SetChild(opNode, childNode);
 
             Operator2Childs newParent = CleanUpOperation2Childs(opNode, childNode, request);
+            node.ChildNode = newParent;
 
             return request.Parser.Peek(newParent.Ende, 1);
         }
@@ -190,7 +199,7 @@ namespace Yama.Parser
             || callConvertToken.Kind != IdentifierKind.OpenBracket
             || callConvertToken.Kind != IdentifierKind.OpenSquareBracket) return callConvertToken;
 
-            IParseTreeNode? callNode = request.Parser.ParseCleanToken(callConvertToken, this.expressionCallLayer);
+            IParseTreeNode? callNode = request.Parser.ParseCleanToken(callConvertToken, this.expressionCallLayer, true);
             if (callNode is not IParentNode parentNode) return null;
             if (callNode is not IContainer container) return null;
 
@@ -201,7 +210,7 @@ namespace Yama.Parser
 
         private IParseTreeNode? ParseFirstNode(RequestParserTreeParser request, IdentifierToken operatorToken)
         {
-            return request.Parser.ParseCleanToken(operatorToken, this.expressionIdenLayer);
+            return request.Parser.ParseCleanToken(operatorToken, this.expressionIdenLayer, true);
         }
 
         public bool Indezieren(RequestParserTreeIndezieren request)
