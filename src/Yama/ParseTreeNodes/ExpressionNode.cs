@@ -118,11 +118,12 @@ namespace Yama.Parser
             if (!isKlammerung) return this.GetResult(false, node);
             if (maybeCloseBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(maybeCloseBracket, "Expected a ')' and not a", node.AllTokens.ToArray());
 
+            node.AllTokens.Add(request.Token);
             node.CloseBracket = maybeCloseBracket;
             node.AllTokens.Add(maybeCloseBracket);
             node.isCloseBracketEnde = true;
 
-            IdentifierToken? maybeAsExpression = request.Parser.Peek(expressionIdenToken, 1);
+            IdentifierToken? maybeAsExpression = request.Parser.Peek(maybeCloseBracket, 1);
             if (maybeAsExpression is null) return this.GetResult(isKlammerung, node);
 
             IdentifierToken? maybeOperationExpression = this.TryAsExpression(request, maybeAsExpression, node, node.ChildNode);
@@ -131,6 +132,7 @@ namespace Yama.Parser
 
             IdentifierToken? maybeComma = this.ParseOperationExpressionToken(maybeOperationExpression, request, node, node.ChildNode);
             if (maybeComma is null) return node;
+            if (maybeComma.Kind != IdentifierKind.Comma) return node;
 
             node.AllTokens.Add(maybeComma);
 

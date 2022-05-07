@@ -278,6 +278,7 @@ namespace Yama
             ParserLayer layer = new ParserLayer("incontainerStatement");
 
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
+            layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
             layer.ParserMembers.Add ( new IfKey ( expressionLayer, layer ) );
             layer.ParserMembers.Add ( new ElseKey (  ) );
             layer.ParserMembers.Add ( new WhileKey (  ) );
