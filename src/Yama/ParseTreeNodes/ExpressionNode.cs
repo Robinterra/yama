@@ -46,7 +46,12 @@ namespace Yama.Parser
         {
             get
             {
-                if (this.isCloseBracketEnde) return this.CloseBracket!;
+                if (this.isCloseBracketEnde)
+                {
+                    if (this.ChildNode is IContainer cont && cont.Token.Position > this.CloseBracket!.Position) return cont.Ende;
+
+                    return this.CloseBracket!;
+                }
 
                 if (this.ChildNode is IContainer con) return con.Ende;
                 if (this.ChildNode is null) return this.Token;

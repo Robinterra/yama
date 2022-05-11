@@ -119,9 +119,9 @@ namespace Yama.Parser
         {
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
-            IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
-            if (lexerLeft is null) return null;
-            if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
+            //IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
+            //if (lexerLeft is null) return null;
+            //if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
 
             VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
 

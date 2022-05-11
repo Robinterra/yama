@@ -390,6 +390,7 @@ namespace Yama
         {
 
             expressionLayer.ParserMembers.Add ( new NewKey ( expressionLayer ) );
+            expressionLayer.ParserMembers.Add(new ConditionalCompilationNode (  ));
             expressionLayer.ParserMembers.Add(new ExpressionNode(expressionIdenLayer, expressionCallLayer, operationLayer));
 
             return expressionLayer;

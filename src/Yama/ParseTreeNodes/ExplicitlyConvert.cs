@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Yama.Parser
 {
-    public class ExplicitlyConvert : IParseTreeNode, IIndexNode, ICompileNode, IParentNode
+    public class ExplicitlyConvert : IParseTreeNode, IIndexNode, ICompileNode, IParentNode, IContainer
     {
 
         #region get/set
@@ -51,6 +51,12 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get;
+            private set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -60,6 +66,7 @@ namespace Yama.Parser
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
+            this.Ende = this.Token;
         }
 
         #endregion ctor
@@ -86,6 +93,7 @@ namespace Yama.Parser
             if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the as keyword and not a '{node.RightToken.Text}'", node.RightToken);
 
             node.AllTokens.Add(node.RightToken);
+            node.Ende = node.RightToken;
 
             return node;
         }
