@@ -96,15 +96,17 @@ namespace Yama.Parser
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
             if (this.ChildNode is not IIndexNode rightNode) return request.Index.CreateError(this);
+            if (this.LeftNode is not IIndexNode leftNode) return request.Index.CreateError(this);
 
+            leftNode.Indezieren(request);
             IndexVariabelnReference? varref = container.VariabelnReferences.LastOrDefault();
 
             rightNode.Indezieren(request);
-
             IndexVariabelnReference? indexVariabelnReference = container.VariabelnReferences.LastOrDefault();
 
             if (varref is null) return false;
             if (indexVariabelnReference is null) return false;
+            if (leftNode is ConditionalCompilationNode) return true;
 
             request.Index.IndexTypeSafeties.Add(new IndexSetValue(varref, indexVariabelnReference));
 

@@ -116,20 +116,21 @@ namespace Yama.Parser
 
             node.AssigmentNode = assimgentNode;
             request.Parser.SetChild(parent, node);
+            node.Token.Node = node;
 
-            return node;
+            return assimgentNode;
         }
 
         public bool Indezieren(RequestParserTreeIndezieren request)
         {
-            if (this.AssigmentNode is IIndexNode indexNode) return indexNode.Indezieren(request);
+            //if (this.AssigmentNode is IIndexNode indexNode) return indexNode.Indezieren(request);
 
             return true;
         }
 
         public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.AssigmentNode is ICompileNode compileNode) compileNode.Compile(request);
+            //if (this.AssigmentNode is ICompileNode compileNode) compileNode.Compile(request);
 
             if (this.Token.Text.Contains("#defalgo"))
             {

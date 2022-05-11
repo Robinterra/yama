@@ -191,7 +191,7 @@ namespace Yama.Parser
             if (request.Mode == "set") modeCall = "setvektorcall";
 
             leftNode.Compile(new RequestParserTreeCompile(request.Compiler, modeCall));
-            if (this.LeftNode is not OperatorPoint op) return false;
+            if (this.LeftNode is not PointIdentifier op) return false;
 
             if (op.IsANonStatic) parasCount++;
 

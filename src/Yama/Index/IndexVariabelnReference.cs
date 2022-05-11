@@ -45,6 +45,12 @@ namespace Yama.Index
             }
         }
 
+        public bool IsPointIdentifier
+        {
+            get;
+            set;
+        }
+
         public ValidUses ParentUsesSet
         {
             get;

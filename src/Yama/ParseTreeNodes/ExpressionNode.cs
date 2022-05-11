@@ -226,18 +226,7 @@ namespace Yama.Parser
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
             if (this.ChildNode is not IIndexNode rightNode) return request.Index.CreateError(this);
 
-            IndexVariabelnReference? varref = container.VariabelnReferences.LastOrDefault();
-
-            rightNode.Indezieren(request);
-
-            IndexVariabelnReference? indexVariabelnReference = container.VariabelnReferences.LastOrDefault();
-
-            if (varref is null) return false;
-            if (indexVariabelnReference is null) return false;
-
-            request.Index.IndexTypeSafeties.Add(new IndexSetValue(varref, indexVariabelnReference));
-
-            return true;
+            return rightNode.Indezieren(request);
         }
 
         public bool Compile(RequestParserTreeCompile request)

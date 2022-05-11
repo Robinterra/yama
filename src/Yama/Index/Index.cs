@@ -194,7 +194,7 @@ namespace Yama.Index
         public string GetTypeName(IndexVariabelnReference reference)
         {
             if (reference == null) return string.Empty;
-            if (reference.ParentCall != null) return this.GetTypeName(reference.ParentCall, reference);
+            if (reference.IsPointIdentifier && reference.ParentCall != null) return this.GetTypeName(reference.ParentCall, reference);
 
             if (reference.Deklaration is IndexKlassenDeklaration t) return t.Name;
             if (reference.Deklaration is IndexVariabelnDeklaration vd) return vd.Type.Name;

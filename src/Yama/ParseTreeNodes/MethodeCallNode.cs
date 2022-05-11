@@ -200,7 +200,7 @@ namespace Yama.Parser
             }
 
             leftNode.Compile(new RequestParserTreeCompile(request.Compiler, "methode"));
-            if (this.LeftNode is not OperatorPoint op) return false;
+            if (this.LeftNode is not PointIdentifier op) return false;
 
             if (op.IsANonStatic) parasCount++;
 
