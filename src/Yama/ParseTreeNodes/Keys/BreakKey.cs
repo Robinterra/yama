@@ -5,7 +5,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class BreakKey : IParseTreeNode, IIndexNode, ICompileNode
+    public class BreakKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 
         #region get/set
@@ -37,13 +37,19 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public BreakKey()
         {
-            this.Token = new();
+            this.Ende = this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
 
@@ -56,8 +62,15 @@ namespace Yama.Parser
             if ( request.Token.Kind != IdentifierKind.Break ) return null;
 
             BreakKey key = new BreakKey (  );
-            key.Token = request.Token;
+            key.Ende = key.Token = request.Token;
             key.AllTokens.Add(request.Token);
+
+            IdentifierToken? maybeSemikolon = request.Parser.Peek(request.Token, 1);
+            if (maybeSemikolon is null) return key;
+            if (maybeSemikolon.Kind != IdentifierKind.EndOfCommand) return key;
+
+            key.AllTokens.Add(maybeSemikolon);
+            key.Ende = maybeSemikolon;
 
             return key;
         }

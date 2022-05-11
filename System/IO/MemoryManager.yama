@@ -73,11 +73,11 @@ namespace "System.IO"
         private static int CreateBlock ( int adresse, int blockState, int size )
         {
 
-            #defalgo Malloc,SetBlockAdresse: = adresse;
+            #defalgo Malloc,SetBlockAdresse: = adresse
 
-            #defalgo Malloc,SetBlockState: = blockState;
+            #defalgo Malloc,SetBlockState: = blockState
 
-            #defalgo Malloc,SetBlockSize: = size;
+            #defalgo Malloc,SetBlockSize: = size
 
         }
 
@@ -112,7 +112,7 @@ namespace "System.IO"
         {
             if (addresse == null) return null;
 
-            #defalgo MallocFree,default: = addresse;
+            #defalgo MallocFree,default: = addresse
 
             return MemoryManager.CleanMerge2Blocks ( addresse - #defalgo Malloc,HeaderSize: );
         }
@@ -121,7 +121,7 @@ namespace "System.IO"
 
         private static bool CleanMerge2Blocks ( int addresse )
         {
-            #defalgo MallocMerge,default: = addresse;
+            #defalgo MallocMerge,default: = addresse
 
             /*int nextAdress = #defalgo Malloc,GetNextAdress: = addresse;
 
@@ -147,7 +147,7 @@ namespace "System.IO"
             #defalgo Malloc,Init:
 
             int nextAdress = #defalgo Malloc,CurrentAdress:;
-            int currentadress;
+            int currentadress = null;
 
             while ( true )
             {
