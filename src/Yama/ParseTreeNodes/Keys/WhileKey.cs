@@ -8,6 +8,12 @@ namespace Yama.Parser
     public class WhileKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 
+        #region vars
+
+        private ParserLayer expressionLayer;
+
+        #endregion vars
+
         #region get/set
 
         public IParseTreeNode? Condition
@@ -72,8 +78,9 @@ namespace Yama.Parser
 
         #region ctor
 
-        public WhileKey ()
+        public WhileKey (ParserLayer expressionLayer)
         {
+            this.expressionLayer = expressionLayer;
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
         }
@@ -97,31 +104,36 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.While ) return null;
 
-            IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
-            if (token is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'while' Keyword {request.Token.Kind}");
-            if (token.Kind != IdentifierKind.OpenBracket) return new ParserError(token, $"Expectet a open Bracket '(' after Keyword 'while' and not a {token.Kind}", request.Token);
+            IdentifierToken? openBrackettoken = request.Parser.Peek ( request.Token, 1 );
+            if (openBrackettoken is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'while' Keyword {request.Token.Kind}");
+            if (openBrackettoken.Kind != IdentifierKind.OpenBracket) return new ParserError(openBrackettoken, $"Expectet a open Bracket '(' after Keyword 'while' and not a {openBrackettoken.Kind}", request.Token);
 
-            WhileKey key = new WhileKey (  );
+            WhileKey key = new WhileKey ( this.expressionLayer );
             key.Token = request.Token;
-            key.AllTokens.Add ( request.Token );
+            key.AllTokens.Add(request.Token);
+            key.AllTokens.Add(openBrackettoken);
 
-            IdentifierToken? conditionToken = request.Parser.Peek ( request.Token, 1 );
-            IParseTreeNode? rule = request.Parser.GetRule<ContainerExpression>();
+            IdentifierToken? conditionToken = request.Parser.Peek ( openBrackettoken, 1 );
+            if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", openBrackettoken);
 
-            if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", token);
-            if (rule is null) return null;
+            IParseTreeNode? condition = request.Parser.ParseCleanToken(conditionToken, this.expressionLayer, false);
+            if (condition is not IContainer conCon) return new ParserError(request.Token, $"Can not parse Condition of a while", openBrackettoken);
+            key.Condition = condition;
 
-            key.Condition = request.Parser.TryToParse ( rule, conditionToken );
+            IdentifierToken? closeBracket = request.Parser.Peek ( conCon.Ende, 1);
+            if (closeBracket is null) return null;
+            if (closeBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(closeBracket, $"Expected ) and not", request.Token, openBrackettoken);
+            key.AllTokens.Add(closeBracket);
 
-            if (key.Condition is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", token);
+            IdentifierToken? statementchild = request.Parser.Peek ( closeBracket, 1);
+            if (statementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a while", openBrackettoken, conditionToken);
 
-            IdentifierToken? statementchild = request.Parser.Peek ( ((ContainerExpression)key.Condition).Ende, 1);
-            if (statementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a while", token, conditionToken);
+            if (!this.IsAllowedStatmentToken (statementchild)) return new ParserError(statementchild, $"Can not find a allowd Statement after a while", openBrackettoken, conditionToken, request.Token);
 
-            if (!this.IsAllowedStatmentToken (statementchild)) return new ParserError(statementchild, $"Can not find a allowd Statement after a while", token, conditionToken, request.Token);
+            IParseTreeNode? statementNode = request.Parser.ParseCleanToken(statementchild);
+            if (statementNode is null) return new ParserError(statementchild, $"while statement can not be parse", openBrackettoken, conditionToken, request.Token);
 
-            key.Statement = request.Parser.ParseCleanToken(statementchild);
-            if (key.Statement is null) return new ParserError(statementchild, $"while statement can not be parse", token, conditionToken, request.Token);
+            key.Statement = statementNode;
 
             return key;
         }

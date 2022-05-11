@@ -115,7 +115,7 @@ namespace Yama.Parser
             if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", openBrackettoken);
 
             IParseTreeNode? condition = request.Parser.ParseCleanToken(conditionToken, this.expressionLayer, false);
-            if (condition is not IContainer conCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            if (condition is not IContainer conCon) return new ParserError(request.Token, $"Can not parse Condition of a if", openBrackettoken);
             key.Condition = condition;
 
             IdentifierToken? closeBracket = request.Parser.Peek ( conCon.Ende, 1);

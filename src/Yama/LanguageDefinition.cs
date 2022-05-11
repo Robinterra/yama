@@ -281,7 +281,7 @@ namespace Yama
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
             layer.ParserMembers.Add ( new IfKey ( expressionLayer, layer ) );
             layer.ParserMembers.Add ( new ElseKey (  ) );
-            layer.ParserMembers.Add ( new WhileKey (  ) );
+            layer.ParserMembers.Add ( new WhileKey (expressionLayer  ) );
             layer.ParserMembers.Add ( new ForKey ( expressionLayer ) );
             layer.ParserMembers.Add ( new ContinueKey (  ) );
             layer.ParserMembers.Add ( new BreakKey (  ) );
@@ -328,7 +328,7 @@ namespace Yama
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
             //layer.ParserMembers.Add ( new IfKey (  ) );
             layer.ParserMembers.Add ( new ElseKey (  ) );
-            layer.ParserMembers.Add ( new WhileKey (  ) );
+            //layer.ParserMembers.Add ( new WhileKey (  ) );
             layer.ParserMembers.Add ( new ForKey ( layer ) );
             //layer.ParserMembers.Add ( new NewKey (  ) );
             layer.ParserMembers.Add ( new NullKey (  ) );
