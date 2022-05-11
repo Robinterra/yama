@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
 using Yama.Lexer;
 using Yama.Parser;
 using Yama.Parser.Request;
@@ -62,15 +60,6 @@ namespace Yama.ProjectConfig.Nodes
 
         #region methods
 
-        // -----------------------------------------------
-
-        public bool Compile(RequestParserTreeCompile request)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        // -----------------------------------------------
-
         public bool Deserialize(RequestDeserialize request)
         {
             if (this.ValueToken.Value == null) return false;
@@ -82,15 +71,6 @@ namespace Yama.ProjectConfig.Nodes
 
             return true;
         }
-
-        // -----------------------------------------------
-
-        public bool Indezieren(RequestParserTreeIndezieren request)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        // -----------------------------------------------
 
         public IParseTreeNode? Parse(RequestParserTreeParser request)
         {

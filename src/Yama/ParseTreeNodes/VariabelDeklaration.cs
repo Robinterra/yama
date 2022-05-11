@@ -7,7 +7,7 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class VariabelDeklaration : IParseTreeNode, IPriority
+    public class VariabelDeklaration : IParseTreeNode, IIndexNode, ICompileNode, IPriority, IContainer
     {
 
         #region get/set
@@ -34,6 +34,11 @@ namespace Yama.Parser
         {
             get;
             set;
+        }
+
+        public bool IsInMethodeDeklaration
+        {
+            get;
         }
 
         public int Prio
@@ -65,15 +70,23 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public VariabelDeklaration ( int prio )
+        public VariabelDeklaration ( int prio, bool isinmethoddeklaration = false )
         {
             this.Token = new();
+            this.IsInMethodeDeklaration = isinmethoddeklaration;
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
+            this.Ende = new();
         }
 
         #endregion ctor
@@ -106,9 +119,9 @@ namespace Yama.Parser
         {
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
-            IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
-            if (lexerLeft is null) return null;
-            if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
+            //IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
+            //if (lexerLeft is null) return null;
+            //if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
 
             VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
 
@@ -121,12 +134,22 @@ namespace Yama.Parser
 
             node.Token = lexerRight;
             node.AllTokens.Add(lexerRight);
+            node.Ende = lexerRight;
 
             IParseTreeNode? callRule = request.Parser.GetRule<ReferenceCall>();
             if (callRule is null) return null;
 
             node.TypeDefinition = request.Parser.TryToParse ( callRule, request.Token );
             if ( node.TypeDefinition is null ) return null;
+
+            if (!IsInMethodeDeklaration) return node;
+
+            IdentifierToken? optionalComma = request.Parser.Peek ( lexerRight, 1 );
+            if (optionalComma is null) return node;
+            if (optionalComma.Kind != IdentifierKind.Comma) return node;
+
+            node.AllTokens.Add(optionalComma);
+            node.Ende = optionalComma;
 
             return node;
         }
@@ -144,7 +167,7 @@ namespace Yama.Parser
             return request.Parser.Peek(genericCall.Ende, 1);
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
@@ -152,9 +175,9 @@ namespace Yama.Parser
 
             if (reference is null)
             {
-                if (this.TypeDefinition is null) return request.Index.CreateError(this);
+                if (this.TypeDefinition is not IIndexNode typeNode) return request.Index.CreateError(this);
 
-                this.TypeDefinition.Indezieren(request);
+                typeNode.Indezieren(request);
 
                 IndexVariabelnReference? type = container.VariabelnReferences.LastOrDefault();
                 if (type is null) return request.Index.CreateError(this);
@@ -175,7 +198,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (request.Mode != "set") return true;
             if (this.Deklaration is null) return false;

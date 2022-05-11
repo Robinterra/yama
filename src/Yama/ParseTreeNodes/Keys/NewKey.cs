@@ -5,12 +5,14 @@ using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class NewKey : IParseTreeNode, IEndExpression, IContainer
+    public class NewKey : IParseTreeNode, IIndexNode, ICompileNode, IEndExpression, IContainer
     {
 
         #region vars
 
         private IdentifierToken? ende;
+
+        private ParserLayer expressionLayer;
 
         #endregion vars
 
@@ -95,8 +97,9 @@ namespace Yama.Parser
 
         #region ctor
 
-        public NewKey ()
+        public NewKey (ParserLayer expressionLayer)
         {
+            this.expressionLayer = expressionLayer;
             this.Parameters = new List<IParseTreeNode>();
             this.AllTokens = new List<IdentifierToken> ();
             this.Token = new IdentifierToken();
@@ -125,7 +128,7 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.New ) return null;
 
-            NewKey newKey = new NewKey();
+            NewKey newKey = new NewKey(this.expressionLayer);
             newKey.Token = request.Token;
             newKey.AllTokens.Add ( request.Token );
 
@@ -147,7 +150,12 @@ namespace Yama.Parser
             IdentifierToken? endToken = request.Parser.FindEndToken ( beginToken, IdentifierKind.CloseBracket, IdentifierKind.OpenBracket );
             if ( endToken is null ) return new ParserError(beginToken, $"Wrong Syntax for a new Keyword. Can not find close Bracket", token, request.Token);
 
+            request.Parser.ActivateLayer(this.expressionLayer);
+
             List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( beginToken.Position + 1, endToken.Position, true );
+
+            request.Parser.VorherigesLayer();
+
             if (nodes is null) return null;
 
             newKey.Parameters = nodes;
@@ -172,7 +180,7 @@ namespace Yama.Parser
             return request.Parser.Peek(genericCall.Ende, 1);
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             //if (parent is IndexVariabelnReference varref) return this.RefComb(varref);
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
@@ -182,7 +190,9 @@ namespace Yama.Parser
 
             foreach (IParseTreeNode node in this.Parameters)
             {
-                node.Indezieren(request);
+                if (node is not IIndexNode indexnode) return request.Index.CreateError(this);
+
+                indexnode.Indezieren(request);
 
                 IndexVariabelnReference? parRef = container.VariabelnReferences.LastOrDefault();
                 if (parRef is null) return request.Index.CreateError(this);
@@ -213,7 +223,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Reference is null) return false;
 
@@ -227,10 +237,9 @@ namespace Yama.Parser
             foreach (IParseTreeNode par in copylist )
             {
                 dek = par;
-                if (par is EnumartionExpression b) dek = b.ExpressionParent;
-                if (dek == null) continue;
+                if (dek is not ICompileNode compileNode) continue;
 
-                dek.Compile(request);
+                compileNode.Compile(request);
 
                 CompilePushResult compilePushResult = new CompilePushResult();
                 compilePushResult.Compile(request.Compiler, null, "default");

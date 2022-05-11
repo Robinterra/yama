@@ -134,7 +134,39 @@ namespace LearnCsStuf.CommandLines
             if (args == null) return false;
             if (args.Length == 0) return false;
 
+            if (args[0] == "time") return Imperialstandard();
+
             return true;
+        }
+
+        // -----------------------------------------------
+
+        private const string imperialStandardPattern = "{6}-{5}.{4} {3} 0 {0} {1}.M{2}";
+        private static bool Imperialstandard()
+        {
+            DateTime jetzt = DateTime.UtcNow;
+            long isSchaltjahr = DateTime.IsLeapYear(jetzt.Year) ? 1 : 0;
+            long maxstunden = 8760 + 24 * isSchaltjahr;
+            long maxminuten = maxstunden * 60;
+            long maxsekunden = maxminuten * 60 * 1000;
+            long vergangeneStunden = (jetzt.DayOfYear - 1 * isSchaltjahr) * 24 + jetzt.Hour;
+            long currentState = (((vergangeneStunden * 60 + jetzt.Minute) * 60 + jetzt.Second) * 1000 + jetzt.Millisecond) * 1000000 * 100 / maxsekunden;
+            long Jahrestausendstel = currentState / 100 / 100 / 10;
+            //vergangeneStunden * 1000 / maxstunden;
+            // ein Jahrtausendstel sind 8,76 Stunden
+            long ZehntelDrittelTag = currentState / 100 / 100 % 10;
+            //ein ZehntelDrittelTag sind 52,56 Minuten
+            long ZehntelDritteMinute = currentState / 100 % 100;
+            //eine ZehntelDritteMinute sind 31,536 Sekunden
+            long ZehntelDritteSekunde = currentState % 100;
+            //eine ZehntelDritteSekunde sind 0,31536 Sekunden
+            long jahr = (jetzt.Year % 1000);
+            long millenium = (jetzt.Year / 1000) + 1;
+            string output = string.Format(imperialStandardPattern, Jahrestausendstel, jahr, millenium, jetzt.DayOfWeek.ToString(), ZehntelDrittelTag, ZehntelDritteMinute, ZehntelDritteSekunde);
+
+            Console.WriteLine(output);
+
+            return false;
         }
 
         // -----------------------------------------------

@@ -5,7 +5,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class EnumKeyValue : IParseTreeNode
+    public class EnumKeyValue : IParseTreeNode, IIndexNode, ICompileNode
     {
 
         #region get/set
@@ -74,10 +74,16 @@ namespace Yama.Parser
             node.Value = token;
             node.AllTokens.Add(token);
 
+            token = request.Parser.Peek ( equalToken, 1 );
+            if ( token is null ) return node;
+            if (token.Kind != IdentifierKind.Comma) return node;
+
+            node.AllTokens.Add(token);
+
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexEnumDeklaration dek) return request.Index.CreateError(this);
             if (this.Value is null) return request.Index.CreateError(this);
@@ -91,7 +97,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             return true;
         }

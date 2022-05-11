@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class GenericCall : IParseTreeNode, IEndExpression, IContainer
+    public class GenericCall : IParseTreeNode, IIndexNode, ICompileNode, IEndExpression, IContainer
     {
 
         #region vars
@@ -142,7 +143,7 @@ namespace Yama.Parser
             return false;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is IndexKlassenDeklaration idk) return this.IndezKlassenGeneric(request, idk);
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
@@ -161,7 +162,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             return true;
         }

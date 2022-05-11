@@ -59,16 +59,6 @@ namespace Yama.Assembler.ARMT32
 
         #endregion ctor
 
-        public bool Compile(Parser.Request.RequestParserTreeCompile request)
-        {
-            return true;
-        }
-
-        public bool Indezieren(Parser.Request.RequestParserTreeIndezieren request)
-        {
-            return true;
-        }
-
         public IParseTreeNode? Parse(Parser.Request.RequestParserTreeParser request)
         {
             if (request.Token.Kind != IdentifierKind.Word) return null;

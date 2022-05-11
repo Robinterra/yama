@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Yama.Parser
 {
-    public class ExplicitlyConvert : IParseTreeNode
+    public class ExplicitlyConvert : IParseTreeNode, IIndexNode, ICompileNode, IParentNode, IContainer
     {
 
         #region get/set
@@ -51,6 +51,12 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get;
+            private set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -60,6 +66,7 @@ namespace Yama.Parser
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
+            this.Ende = this.Token;
         }
 
         #endregion ctor
@@ -81,27 +88,23 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            IdentifierToken? token = request.Parser.Peek ( request.Token, -1 );
-            if (token is null) return new ParserError(request.Token, $"Expectet a token before the 'as' Keyword, like 'isOk as int'");
-
-            node.LeftNode = request.Parser.ParseCleanToken ( token );
-
             node.RightToken = request.Parser.Peek ( request.Token, 1 );
-            if (node.RightToken is null) return new ParserError(request.Token, $"Expectet a word after the as keyword", token);
-            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the as keyword and not a '{node.RightToken.Text}'", token, node.RightToken);
+            if (node.RightToken is null) return new ParserError(request.Token, $"Expectet a word after the as keyword");
+            if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the as keyword and not a '{node.RightToken.Text}'", node.RightToken);
 
             node.AllTokens.Add(node.RightToken);
+            node.Ende = node.RightToken;
 
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.LeftNode is null) return request.Index.CreateError(this);
+            if (this.LeftNode is not IIndexNode leftNode) return request.Index.CreateError(this);
             if (this.RightToken is null) return request.Index.CreateError(this);
 
-            this.LeftNode.Indezieren(request);
+            leftNode.Indezieren(request);
 
             IndexVariabelnReference type = new IndexVariabelnReference (this, this.RightToken.Text);
             container.VariabelnReferences.Add(type);
@@ -109,11 +112,11 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.LeftNode is null) return false;
+            if (this.LeftNode is not ICompileNode leftNode) return false;
 
-            return this.LeftNode.Compile(request);
+            return leftNode.Compile(request);
         }
 
         #endregion methods

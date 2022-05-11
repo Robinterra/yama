@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Yama.Assembler;
 using Yama.Compiler;
+using Yama.Index;
 using Yama.InformationOutput;
 using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
@@ -206,6 +207,17 @@ namespace Yama
 
         // -----------------------------------------------
 
+        private ParserLayer MethodenVektorDeklarationsHeader()
+        {
+            ParserLayer layer = new ParserLayer("methodevektorDeklarationsHeader");
+
+            layer.ParserMembers.Add(new VariabelDeklaration(0, true));
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
         private ParserLayer InPropertyLayer(ParserLayer execlayer)
         {
             ParserLayer layer = new ParserLayer("inproperty");
@@ -226,7 +238,6 @@ namespace Yama
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new GetKey(execlayer));
             layer.ParserMembers.Add(new SetKey(execlayer));
-            layer.ParserMembers.Add(new EnumartionExpression());
             layer.ParserMembers.Add(new VariabelDeklaration(11));
 
             return layer;
@@ -234,13 +245,13 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private ParserLayer InKlassenLayer(ParserLayer execlayer, ParserLayer inpropertyLayer, ParserLayer invektorlayer)
+        private ParserLayer InKlassenLayer(ParserLayer execlayer, ParserLayer inpropertyLayer, ParserLayer invektorlayer, ParserLayer methodeVektorDeklarationsHeader)
         {
             ParserLayer layer = new ParserLayer("inclass");
 
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
-            layer.ParserMembers.Add(new MethodeDeclarationNode ( execlayer ));
-            layer.ParserMembers.Add ( new VektorDeclaration ( invektorlayer ) );
+            layer.ParserMembers.Add(new MethodeDeclarationNode ( execlayer, methodeVektorDeklarationsHeader ));
+            layer.ParserMembers.Add(new VektorDeclaration(invektorlayer, methodeVektorDeklarationsHeader));
             layer.ParserMembers.Add(new PropertyDeklaration ( inpropertyLayer ));
             layer.ParserMembers.Add(new PropertyGetSetDeklaration ( invektorlayer ));
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
@@ -255,8 +266,54 @@ namespace Yama
             ParserLayer layer = new ParserLayer("inenum");
 
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
-            layer.ParserMembers.Add(new EnumartionExpression());
             layer.ParserMembers.Add(new EnumKeyValue());
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer InContainerStatement(ParserLayer statementLayer, ParserLayer identifierStatementLayer, ParserLayer expressionLayer)
+        {
+            ParserLayer layer = new ParserLayer("incontainerStatement");
+
+            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
+            layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
+            layer.ParserMembers.Add ( new IfKey ( expressionLayer, layer ) );
+            layer.ParserMembers.Add ( new ElseKey (  ) );
+            layer.ParserMembers.Add ( new WhileKey (expressionLayer  ) );
+            layer.ParserMembers.Add ( new ForKey ( expressionLayer ) );
+            layer.ParserMembers.Add ( new ContinueKey (  ) );
+            layer.ParserMembers.Add ( new BreakKey (  ) );
+            layer.ParserMembers.Add ( new ReturnKey ( expressionLayer ) );
+            layer.ParserMembers.Add ( new NormalStatementNode(identifierStatementLayer, statementLayer));
+
+            return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer StatementLayer(ParserLayer expressionLayer)
+        {
+            ParserLayer layer = new ParserLayer("statementLayer");
+
+            layer.ParserMembers.Add(new AssigmentNode(expressionLayer));
+            layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12, expressionLayer ) );
+            layer.ParserMembers.Add ( new VektorCall ( IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket, 12, expressionLayer ) );
+
+            return layer;
+
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer IdentifierStatementLayer()
+        {
+            ParserLayer layer = new ParserLayer("IdentifierStatementLayer");
+
+            layer.ParserMembers.Add(new PointIdentifier());
+            layer.ParserMembers.Add(new VariabelDeklaration(0));
+            layer.ParserMembers.Add(new ReferenceCall());
 
             return layer;
         }
@@ -269,31 +326,31 @@ namespace Yama
 
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
-            layer.ParserMembers.Add ( new IfKey (  ) );
+            //layer.ParserMembers.Add ( new IfKey (  ) );
             layer.ParserMembers.Add ( new ElseKey (  ) );
-            layer.ParserMembers.Add ( new WhileKey (  ) );
-            layer.ParserMembers.Add ( new ForKey (  ) );
-            layer.ParserMembers.Add ( new NewKey (  ) );
+            //layer.ParserMembers.Add ( new WhileKey (  ) );
+            layer.ParserMembers.Add ( new ForKey ( layer ) );
+            //layer.ParserMembers.Add ( new NewKey (  ) );
             layer.ParserMembers.Add ( new NullKey (  ) );
             layer.ParserMembers.Add ( new ContinueKey (  ) );
             layer.ParserMembers.Add ( new BreakKey (  ) );
             layer.ParserMembers.Add ( new TypePatternMatching ( 10 ) );
             layer.ParserMembers.Add ( new ExplicitlyConvert ( 10 ) );
-            layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12 ) );
-            layer.ParserMembers.Add ( new VektorCall ( IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket, 12 ) );
+            layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12, layer ) );
+            //layer.ParserMembers.Add ( new VektorCall ( IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket, 12 ) );
             layer.ParserMembers.Add ( new ContainerExpression ( 11 ) );
             layer.ParserMembers.Add ( new NormalExpression (  ) );
             layer.ParserMembers.Add ( new EnumartionExpression (  ) );
-            layer.ParserMembers.Add ( new ReturnKey (  ) );
+            //layer.ParserMembers.Add ( new ReturnKey (  ) );
             layer.ParserMembers.Add ( new TrueFalseKey ( 1 ) );
             layer.ParserMembers.Add ( new VariabelDeklaration ( 11 ) );
             layer.ParserMembers.Add ( new ReferenceCall ( 1 ) );
             layer.ParserMembers.Add ( new Number ( 1 ) );
             layer.ParserMembers.Add ( new TextParser ( 1 ) );
             layer.ParserMembers.Add ( new OperatorPoint ( 11 ) );
-            layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "--", "++", "-", "~", "!" }, 11, new List<IdentifierKind> { IdentifierKind.NumberToken, IdentifierKind.Word, IdentifierKind.OpenBracket }, new List<IdentifierKind> { IdentifierKind.OpenBracket } ) );
-            layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++", "!", "~" }, 11, new List<IdentifierKind> { IdentifierKind.Word, IdentifierKind.Unknown } ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 2 ) );
+            //layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "-", "~", "!" }, 11, new List<IdentifierKind> { IdentifierKind.NumberToken, IdentifierKind.Word, IdentifierKind.OpenBracket }, new List<IdentifierKind> { IdentifierKind.OpenBracket } ) );
+            //layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++", "!", "~" }, 11, new List<IdentifierKind> { IdentifierKind.Word, IdentifierKind.Unknown } ) );
+            /*layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 2 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.LessThan, 3 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.GreaterThan, 3 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=", "<", ">" }, 3 ) );
@@ -304,11 +361,39 @@ namespace Yama
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9 ) );
             layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 10 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=" }, 1 ) );
-            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, IdentifierKind.DoublePoint, 2 ) );
-            layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, IdentifierKind.DoublePoint, 2 ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=" }, 1 ) );*/
+            //layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, IdentifierKind.DoublePoint, 2 ) );
+            //layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, IdentifierKind.DoublePoint, 2 ) );
 
             return layer;
+        }
+
+        // -----------------------------------------------
+
+        private ParserLayer ExpressionIdenLayer()
+        {
+            ParserLayer layer = new ParserLayer("ExpressionIdenLayer");
+
+            layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "-", "~", "!" }, 11, new List<IdentifierKind> { IdentifierKind.NumberToken, IdentifierKind.Word, IdentifierKind.OpenBracket }, new List<IdentifierKind> { IdentifierKind.OpenBracket } ) );
+            layer.ParserMembers.Add ( new TextParser ( 1 ) );
+            layer.ParserMembers.Add ( new NullKey (  ) );
+            layer.ParserMembers.Add ( new Number ( 1 ) );
+            layer.ParserMembers.Add ( new TrueFalseKey ( 1 ) );
+            layer.ParserMembers.Add(new PointIdentifier());
+            layer.ParserMembers.Add(new ReferenceCall());
+
+            return layer;
+        }
+
+
+        private ParserLayer ExpressionLayer(ParserLayer expressionCallLayer, ParserLayer expressionIdenLayer, ParserLayer operationLayer, ParserLayer expressionLayer)
+        {
+
+            expressionLayer.ParserMembers.Add ( new NewKey ( expressionLayer ) );
+            expressionLayer.ParserMembers.Add(new ConditionalCompilationNode (  ));
+            expressionLayer.ParserMembers.Add(new ExpressionNode(expressionIdenLayer, expressionCallLayer, operationLayer));
+
+            return expressionLayer;
         }
 
         // -----------------------------------------------
@@ -322,24 +407,75 @@ namespace Yama
             return layer;
         }
 
+        private ParserLayer ExpressionCallLayer(ParserLayer expressionLayer)
+        {
+            ParserLayer layer = new ParserLayer("expressionCall");
+
+            layer.ParserMembers.Add ( new ExplicitlyConvert ( 10 ) );
+            layer.ParserMembers.Add ( new TypePatternMatching ( 10 ) );
+            layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12, expressionLayer ) );
+            layer.ParserMembers.Add ( new VektorCall ( IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket, 12, expressionLayer ) );
+
+            return layer;
+        }
+
+        private ParserLayer OperationLayer(ParserLayer layer, ParserLayer expressionLayer)
+        {
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 2 , expressionLayer) );
+            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.LessThan, 3, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.GreaterThan, 3, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=", "<", ">" }, 3, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 4, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 5, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 6, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 7, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 10, expressionLayer ) );
+            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=" }, 1, expressionLayer ) );
+
+            return layer;
+        }
+
         // -----------------------------------------------
 
         private List<ParserLayer> GetParserRules (  )
         {
             List<ParserLayer> parserRules = new List<ParserLayer>();
+            ParserLayer operationLayer = new ParserLayer("operationLayer");
 
-            ParserLayer executionlayer = this.ExecutionLayer();
+            ParserLayer expressionLayer = new ParserLayer("expressionLayer");
+
+            ParserLayer methodenVektorDeklarationsHeader = this.MethodenVektorDeklarationsHeader();
+            //ParserLayer executionlayer = this.ExecutionLayer();
+            ParserLayer expressionIdenLayer = this.ExpressionIdenLayer();
+            ParserLayer expressionCallLayer = this.ExpressionCallLayer(expressionLayer);
+
+            this.ExpressionLayer(expressionCallLayer, expressionIdenLayer, operationLayer, expressionLayer);
+            this.OperationLayer(operationLayer, expressionLayer);
+
+            ParserLayer identifierLayer = this.IdentifierStatementLayer();
+            ParserLayer statementLayer = this.StatementLayer(expressionLayer);
+            ParserLayer inContainerLayer = this.InContainerStatement(statementLayer, identifierLayer, expressionLayer);
             ParserLayer inenumlayer = this.InEnumLayer();
-            ParserLayer inpropertyLayer = this.InPropertyLayer(executionlayer);
-            ParserLayer invektorlayer = this.InVektorLayer(executionlayer);
-            ParserLayer inclassLayer = this.InKlassenLayer(executionlayer, inpropertyLayer, invektorlayer);
+            ParserLayer inpropertyLayer = this.InPropertyLayer(inContainerLayer);
+            ParserLayer invektorlayer = this.InVektorLayer(inContainerLayer);
+            ParserLayer inclassLayer = this.InKlassenLayer(inContainerLayer, inpropertyLayer, invektorlayer, methodenVektorDeklarationsHeader);
             ParserLayer classLayer = this.KlassenLayer(inclassLayer, inenumlayer);
             ParserLayer namespaceLayer = this.NamespaceLayer(classLayer);
             parserRules.Add(namespaceLayer);
+            parserRules.Add(operationLayer);
+            parserRules.Add(expressionLayer);
+            parserRules.Add(expressionCallLayer);
+            parserRules.Add(expressionIdenLayer);
+            parserRules.Add(methodenVektorDeklarationsHeader);
             parserRules.Add(classLayer);
+            parserRules.Add(identifierLayer);
+            parserRules.Add(statementLayer);
+            parserRules.Add(inContainerLayer);
             parserRules.Add(inclassLayer);
             parserRules.Add(inpropertyLayer);
-            parserRules.Add(executionlayer);
+            //parserRules.Add(executionlayer);
             parserRules.Add(invektorlayer);
             parserRules.Add(inenumlayer);
             parserRules.Add(this.GetGenericLayer());
@@ -501,7 +637,11 @@ namespace Yama
             {
                 stopwatch.Stop();
 
-                return this.PrintingErrors(p, file, stopwatch);
+                this.PrintingErrors(p, file, stopwatch);
+
+                if (this.PrintParserTree && p.ParentContainer is not null) this.Output.Print(new ParserTreeOut(p.ParentContainer));
+
+                return false;
             }
 
             stopwatch.Stop();
@@ -521,10 +661,7 @@ namespace Yama
 
         private bool Indezieren(ref List<IParseTreeNode> nodes, ref MethodeDeclarationNode? main)
         {
-            Yama.Index.Index index = new Yama.Index.Index();
-            index.Roots = nodes;
-            index.StartNamespace = this.StartNamespace;
-            index.AllUseFiles = this.AllFilesInUse;
+            Yama.Index.Index index = new Yama.Index.Index(nodes.Cast<IIndexNode>(), this.StartNamespace, this.AllFilesInUse);
 
             if (!index.CreateIndex()) return this.PrintingIndexErrors(index);
 
@@ -624,7 +761,7 @@ namespace Yama
 
             if (!compiler.Definition.LoadExtensions(extensionsFiles)) return this.PrintCompilerErrors(compiler.Errors);
 
-            if (compiler.Compilen(nodes))
+            if (compiler.Compilen(nodes.Cast<ICompileNode>()))
             {
                 roots = compiler.AssemblerSequence;
 
@@ -816,7 +953,12 @@ namespace Yama
                 if (token.Kind == IdentifierKind.Unknown && error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
             }
 
-            this.Output.Print(p.ParserErrors.Where(q=>!removes.Contains(q)).Select(t=>t.OutputNode));
+
+            IEnumerable<ParserError> validParserErrors = p.ParserErrors.Where(q=>!removes.Contains(q));
+
+            IEnumerable<IOutputNode> outputNodes = validParserErrors.Select(t=>t.OutputNode);
+
+            this.Output.Print(outputNodes);
 
             return false;
         }

@@ -4,10 +4,11 @@ using System.Text;
 using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
-    public class ConditionalCompilationNode : IParseTreeNode
+    public class ConditionalCompilationNode : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 
         #region get/set
@@ -22,7 +23,10 @@ namespace Yama.Parser
         {
             get
             {
-                return new List<IParseTreeNode> (  );
+                List<IParseTreeNode> result = new List<IParseTreeNode> (  );
+                if (this.AssigmentNode is not null) result.Add(this.AssigmentNode);
+
+                return result;
             }
         }
 
@@ -41,6 +45,22 @@ namespace Yama.Parser
         public List<IdentifierToken> AllTokens
         {
             get;
+        }
+
+        public IParseTreeNode? AssigmentNode
+        {
+            get;
+            set;
+        }
+
+        public IdentifierToken Ende
+        {
+            get
+            {
+                if (this.AssigmentNode is IContainer con) return con.Ende;
+
+                return this.Token;
+            }
         }
 
         #endregion get/set
@@ -64,6 +84,7 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
+            if (node.Token.Text.Contains("#defalgo")) return this.FinishDefAlgo(request, node);
             if (!node.Token.Text.Contains("#tag")) return node;
 
             request.Parser.MethodTag.Add ( node );
@@ -81,14 +102,36 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        private IParseTreeNode? FinishDefAlgo(RequestParserTreeParser request, ConditionalCompilationNode node)
         {
+            IdentifierToken? assigmentToken = request.Parser.Peek(request.Token, 1);
+            if (assigmentToken is null) return node;
+            if (assigmentToken.Kind != IdentifierKind.Operator) return node;
+            if (assigmentToken.Text != "=") return node;
+
+            IParseTreeNode? assigmentRule = request.Parser.GetRule<AssigmentNode>();
+            if (assigmentRule is null) return null;
+            IParseTreeNode? assimgentNode = request.Parser.TryToParse(assigmentRule, assigmentToken);
+            if (assimgentNode is not IParentNode parent) return null;
+
+            node.AssigmentNode = assimgentNode;
+            request.Parser.SetChild(parent, node);
+            node.Token.Node = node;
+
+            return assimgentNode;
+        }
+
+        public bool Indezieren(RequestParserTreeIndezieren request)
+        {
+            //if (this.AssigmentNode is IIndexNode indexNode) return indexNode.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
+            //if (this.AssigmentNode is ICompileNode compileNode) compileNode.Compile(request);
+
             if (this.Token.Text.Contains("#defalgo"))
             {
                 CompileRegionDefAlgo regionDefAlgo = new CompileRegionDefAlgo();

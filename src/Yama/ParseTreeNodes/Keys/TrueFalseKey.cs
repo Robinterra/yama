@@ -5,7 +5,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class TrueFalseKey : IParseTreeNode, IPriority
+    public class TrueFalseKey : IParseTreeNode, IIndexNode, ICompileNode, IPriority
     {
 
         #region get/set
@@ -68,7 +68,7 @@ namespace Yama.Parser
             return result;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
@@ -78,7 +78,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             Number number = new Number();
             if (this.Token.Text == "true") number.Token = new IdentifierToken { Value = 0xff };

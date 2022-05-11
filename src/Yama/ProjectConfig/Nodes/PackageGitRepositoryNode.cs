@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Yama.Lexer;
+﻿using Yama.Lexer;
 using Yama.Parser;
 using Yama.Parser.Request;
 
@@ -64,13 +63,6 @@ namespace Yama.ProjectConfig.Nodes
 
         // -----------------------------------------------
 
-        public bool Compile(RequestParserTreeCompile request)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        // -----------------------------------------------
-
         public bool Deserialize(RequestDeserialize request)
         {
             if (this.ValueToken.Value is null) return false;
@@ -81,13 +73,6 @@ namespace Yama.ProjectConfig.Nodes
             request.Package.GitRepository = define;
 
             return true;
-        }
-
-        // -----------------------------------------------
-
-        public bool Indezieren(RequestParserTreeIndezieren request)
-        {
-            throw new System.NotImplementedException();
         }
 
         // -----------------------------------------------

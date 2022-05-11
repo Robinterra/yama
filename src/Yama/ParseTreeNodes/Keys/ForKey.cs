@@ -5,7 +5,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class ForKey : IParseTreeNode, IContainer
+    public class ForKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 
         #region get/set
@@ -82,14 +82,17 @@ namespace Yama.Parser
             get;
         }
 
+        private ParserLayer expressionLayer;
+
         #endregion get/set
 
         #region ctor
 
-        public ForKey ()
+        public ForKey (ParserLayer expressionLayer)
         {
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
+            this.expressionLayer = expressionLayer;
         }
 
         #endregion ctor
@@ -100,31 +103,93 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != IdentifierKind.For ) return null;
 
+            IdentifierToken? openBrackettoken = request.Parser.Peek ( request.Token, 1 );
+            if (openBrackettoken is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'for' Keyword {request.Token.Kind}");
+            if ( openBrackettoken.Kind != IdentifierKind.OpenBracket ) return new ParserError(openBrackettoken, $"Expectet a open Bracket '(' after Keyword 'for' and not a {openBrackettoken.Kind}", request.Token);
+
+            ForKey key = new ForKey ( this.expressionLayer );
+            key.Token = request.Token;
+            key.AllTokens.Add(request.Token);
+            key.AllTokens.Add(openBrackettoken);
+
+            IdentifierToken? deklarationToken = request.Parser.Peek ( openBrackettoken, 1 );
+            if (deklarationToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", openBrackettoken);
+
+            IParseTreeNode? rule = request.Parser.GetRule<NormalStatementNode>();
+            if (rule is null) return null;
+
+            IParseTreeNode? deklaration = request.Parser.TryToParse(rule, deklarationToken);
+            if (deklaration is not IContainer dekCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            key.Deklaration = deklaration;
+
+            IdentifierToken? conditionToken = request.Parser.Peek ( dekCon.Ende, 1 );
+            if (conditionToken is null) return null;
+
+            IParseTreeNode? condition = request.Parser.ParseCleanToken(conditionToken, this.expressionLayer, false);
+            if (condition is not IContainer conCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            key.Condition = condition;
+
+            IdentifierToken? semikolonToken = request.Parser.Peek ( conCon.Ende, 1 );
+            if (semikolonToken is null) return new ParserError(request.Token, $"Can not parse Condition of a for, missing ';'", openBrackettoken);
+            key.AllTokens.Add(semikolonToken);
+
+            IdentifierToken? inkrementToken = request.Parser.Peek ( semikolonToken, 1 );
+            if (inkrementToken is null) return null;
+
+            IParseTreeNode? inkrement = request.Parser.TryToParse(rule, inkrementToken);
+            if (inkrement is not IContainer inkCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            key.Inkrementation = inkrement;
+
+            IdentifierToken? closeBracket = request.Parser.Peek ( inkCon.Ende, 1);
+            if (closeBracket is null) return null;
+            if (closeBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(closeBracket, $"Expected ) and not", request.Token, openBrackettoken);
+            key.AllTokens.Add(closeBracket);
+
+            IdentifierToken? statementchild = request.Parser.Peek ( closeBracket, 1);
+            if (statementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a for", openBrackettoken, deklarationToken);
+
+            IParseTreeNode? statement = request.Parser.ParseCleanToken(statementchild);
+            if (statement is null) return new ParserError(request.Token, $"for statement can not be parse", openBrackettoken);
+
+            key.Statement = statement;
+
+            return key;
+        }
+
+        /*public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
+        {
+            if ( request.Token.Kind != IdentifierKind.For ) return null;
+
             IdentifierToken? token = request.Parser.Peek ( request.Token, 1 );
             if (token is null) return new ParserError(request.Token, $"Expectet a open Bracket '(' after a 'for' Keyword {request.Token.Kind}");
             if ( token.Kind != IdentifierKind.OpenBracket ) return new ParserError(token, $"Expectet a open Bracket '(' after Keyword 'for' and not a {token.Kind}", request.Token);
 
-            ForKey key = new ForKey (  );
+            ForKey key = new ForKey ( this.expressionLayer );
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
+            key.AllTokens.Add(token);
 
-            IdentifierToken? conditionToken = request.Parser.Peek ( request.Token, 1 );
+            IdentifierToken? conditionToken = request.Parser.Peek ( token, 1 );
             if (conditionToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", token);
 
-            IParseTreeNode rule = new Container(IdentifierKind.OpenBracket, IdentifierKind.CloseBracket);
+            IParseTreeNode? rule = request.Parser.GetRule<NormalStatementNode>();
+            if (rule is null) return null;
 
-            IParseTreeNode? klammer = request.Parser.TryToParse ( rule, conditionToken );
+            key.Deklaration = request.Parser.TryToParse(rule, conditionToken);
+            if (key.Deklaration is not NormalStatementNode deklaration) return null;
 
-            if (klammer is not Container t) return new ParserError(conditionToken, $"Can not parse Condition of a for", token, request.Token);
-            if (t.Statements.Count != 3) return new ParserError(conditionToken, $"Can not parse Condition of a for, expected 3 statments and not {t.Statements.Count}", token, request.Token);
+            token = request.Parser.Peek ( deklaration.Ende, 1 );
+            if (token is null) return null;
+            if (token.Kind != IdentifierKind.EndOfCommand) return null;
 
-            t.Token.ParentNode = key;
+            token = request.Parser.Peek ( token, 1 );
+            if (token is null) return null;
 
-            key.Deklaration = t.Statements[0];
-            key.Condition = t.Statements[1];
-            key.Inkrementation = t.Statements[2];
+            key.Condition = request.Parser.ParseCleanToken(token, this.expressionLayer);
 
-            IdentifierToken? statementchild = request.Parser.Peek ( t.Ende, 1);
+            key.Inkrementation = request.Parser.TryToParse(rule, token);
+
+            IdentifierToken? statementchild = request.Parser.Peek ( token, 1);
             if (statementchild is null) return new ParserError(request.Token, $"Can not find a Statement after a for", token, conditionToken);
 
             IParseTreeNode? statement = request.Parser.ParseCleanToken(statementchild);
@@ -133,33 +198,28 @@ namespace Yama.Parser
             key.Statement = statement;
 
             return key;
-        }
+        }*/
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
             if (this.Statement is null) return request.Index.CreateError(this);
-            if (this.Inkrementation is null) return request.Index.CreateError(this);
-            if (this.Condition is null) return request.Index.CreateError(this);
-            if (this.Deklaration is null) return request.Index.CreateError(this);
 
             this.IndexContainer = container;
 
-            this.Statement.Indezieren(request);
+            if (this.Statement is IIndexNode statementIndexNode) statementIndexNode.Indezieren(request);
             if (this.Statement is Container ec) this.IndexContainer = ec.IndexContainer;
-            this.Inkrementation.Indezieren(request);
-            this.Condition.Indezieren(request);
-            this.Deklaration.Indezieren(request);
+
+            if (this.Inkrementation is IIndexNode inkrementationIndexNode) inkrementationIndexNode.Indezieren(request);
+            if (this.Condition is IIndexNode conditionIndexNode) conditionIndexNode.Indezieren(request);
+            if (this.Deklaration is IIndexNode deklarationIndexNode) deklarationIndexNode.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Statement is null) return false;
-            if (this.Inkrementation is null) return false;
-            if (this.Condition is null) return false;
-            if (this.Deklaration is null) return false;
             if (this.IndexContainer is null) return false;
 
             this.CompileContainer.Begin = new CompileSprungPunkt();
@@ -168,7 +228,7 @@ namespace Yama.Parser
 
             CompileSprungPunkt sprungPunktSkipInc = new CompileSprungPunkt();
 
-            this.Deklaration.Compile(request);
+            if (this.Deklaration is ICompileNode deklarationNode) deklarationNode.Compile(request);
 
             request.Compiler.PushContainer(this.CompileContainer, this.IndexContainer.ThisUses, true);
 
@@ -182,16 +242,16 @@ namespace Yama.Parser
 
             this.CompileContainer.Begin.Compile(request.Compiler, this, request.Mode);
 
-            this.Inkrementation.Compile(request);
+            if (this.Inkrementation is ICompileNode inkrementationNode) inkrementationNode.Compile(request);
 
             sprungPunktSkipInc.Compile(request.Compiler, this, request.Mode);
 
-            this.Condition.Compile(request);
+            if (this.Condition is ICompileNode conditionNode) conditionNode.Compile(request);
 
             this.CompileContainer.Ende.Node = this;
             jumpende.Compile(request.Compiler, this.CompileContainer.Ende, "isZero");
 
-            this.Statement.Compile(request);
+            if (this.Statement is ICompileNode statementNode) statementNode.Compile(request);
 
             jumpbegin.Compile(request.Compiler, this.CompileContainer.Begin, request.Mode);
 

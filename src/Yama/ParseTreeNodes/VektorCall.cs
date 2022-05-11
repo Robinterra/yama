@@ -7,12 +7,14 @@ using System.Linq;
 
 namespace Yama.Parser
 {
-    public class VektorCall : IParseTreeNode, IEndExpression, IContainer
+    public class VektorCall : IParseTreeNode, IIndexNode, ICompileNode, IContainer, IParentNode
     {
 
         #region vars
 
         private IdentifierToken? ende;
+
+        private ParserLayer expressionLayer;
 
         #endregion vars
 
@@ -90,16 +92,17 @@ namespace Yama.Parser
 
         #region ctor
 
-        public VektorCall ( int prio )
+        public VektorCall ( int prio, ParserLayer expressionLayer )
         {
+            this.expressionLayer = expressionLayer;
             this.ParametersNodes = new();
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
         }
 
-        public VektorCall ( IdentifierKind begin, IdentifierKind end, int prio )
-            : this ( prio )
+        public VektorCall ( IdentifierKind begin, IdentifierKind end, int prio, ParserLayer expressionLayer )
+            : this ( prio, expressionLayer )
         {
             this.BeginZeichen = begin;
             this.EndeZeichen = end;
@@ -113,32 +116,22 @@ namespace Yama.Parser
         {
             if ( request.Token.Kind != this.BeginZeichen ) return null;
 
-            IdentifierToken? left = request.Parser.Peek ( request.Token, -1 );
-            if (left is null) return null;
-
-            if ( left.Kind == IdentifierKind.Operator ) return null;
-            if ( left.Kind == IdentifierKind.NumberToken ) return null;
-            if ( left.Kind == IdentifierKind.OpenBracket ) return null;
-            if ( left.Kind == IdentifierKind.BeginContainer ) return null;
-            if ( left.Kind == IdentifierKind.OpenSquareBracket ) return null;
-            if ( left.Kind == IdentifierKind.EndOfCommand ) return null;
-            if ( left.Kind == IdentifierKind.Comma ) return null;
-
             IdentifierToken? steuerToken = request.Parser.FindEndToken ( request.Token, this.EndeZeichen, this.BeginZeichen );
             if ( steuerToken is null ) return null;
 
-            VektorCall node = new VektorCall ( this.Prio );
+            VektorCall node = new VektorCall ( this.Prio, this.expressionLayer );
 
-            node.LeftNode = request.Parser.ParseCleanToken ( left );
+            request.Parser.ActivateLayer(this.expressionLayer);
 
             List<IParseTreeNode>? nodes = request.Parser.ParseCleanTokens ( request.Token.Position + 1, steuerToken.Position, true );
+
+            request.Parser.VorherigesLayer();
+
             if (nodes is null) return null;
             node.ParametersNodes.AddRange(nodes);
 
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
-
-            if (node.LeftNode == null) return null;
 
             node.ende = steuerToken;
             node.AllTokens.Add(steuerToken);
@@ -146,24 +139,26 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.LeftNode is null) return request.Index.CreateError(this);
+            if (this.LeftNode is not IIndexNode leftNode) return request.Index.CreateError(this);
 
             foreach (IParseTreeNode node in this.ParametersNodes)
             {
-                node.Indezieren(request);
+                if (node is not IIndexNode indexNode) continue;
+
+                indexNode.Indezieren(request);
             }
 
-            this.LeftNode.Indezieren(request);
+            leftNode.Indezieren(request);
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.LeftNode is null) return false;
+            if (this.LeftNode is not ICompileNode leftNode) return false;
 
             List<IParseTreeNode> copylist = this.ParametersNodes;//.ToArray().ToList();
             copylist.Reverse();
@@ -182,10 +177,9 @@ namespace Yama.Parser
             foreach (IParseTreeNode par in copylist )
             {
                 dek = par;
-                if (par is EnumartionExpression b) dek = b.ExpressionParent;
-                if (dek is null) continue;
+                if (dek is not ICompileNode compileNode) continue;
 
-                dek.Compile(new Request.RequestParserTreeCompile (request.Compiler, "default"));
+                compileNode.Compile(new RequestParserTreeCompile (request.Compiler, "default"));
 
                 CompilePushResult compilePushResult = new CompilePushResult();
                 compilePushResult.Compile(request.Compiler, null, "default");
@@ -196,8 +190,8 @@ namespace Yama.Parser
             string modeCall = "vektorcall";
             if (request.Mode == "set") modeCall = "setvektorcall";
 
-            this.LeftNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, modeCall));
-            if (this.LeftNode is not OperatorPoint op) return false;
+            leftNode.Compile(new RequestParserTreeCompile(request.Compiler, modeCall));
+            if (this.LeftNode is not PointIdentifier op) return false;
 
             if (op.IsANonStatic) parasCount++;
 

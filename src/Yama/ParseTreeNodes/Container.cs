@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class Container : IParseTreeNode, IContainer
+    public class Container : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 
         private IdentifierToken? ende;
@@ -111,7 +112,7 @@ namespace Yama.Parser
             return expression;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is IndexNamespaceDeklaration dek) return this.NamespaceIndezi(request);
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
@@ -122,27 +123,33 @@ namespace Yama.Parser
 
             foreach (IParseTreeNode node in this.Statements)
             {
-                node.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, indexContainer));
+                if (node is not IIndexNode indexNode) continue;
+
+                indexNode.Indezieren(new RequestParserTreeIndezieren(request.Index, indexContainer));
             }
 
             return true;
         }
 
-        private bool NamespaceIndezi(Request.RequestParserTreeIndezieren request)
+        private bool NamespaceIndezi(RequestParserTreeIndezieren request)
         {
             foreach (IParseTreeNode node in this.Statements)
             {
-                node.Indezieren(request);
+                if (node is not IIndexNode indexNode) continue;
+
+                indexNode.Indezieren(request);
             }
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            foreach (IParseTreeNode nodes in this.Statements)
+            foreach (IParseTreeNode node in this.Statements)
             {
-                nodes.Compile(request);
+                if (node is not ICompileNode compileNode) continue;
+
+                compileNode.Compile(request);
             }
 
             return true;

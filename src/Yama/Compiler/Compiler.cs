@@ -273,7 +273,7 @@ namespace Yama.Compiler
             return true;
         }
 
-        public bool Compilen(List<IParseTreeNode> nodes)
+        public bool Compilen(IEnumerable<ICompileNode> nodes)
         {
             if (this.Definition == null) return this.AddError("No assembler defintion for translating found");
             if (this.MainFunction is null) return false;
@@ -286,7 +286,7 @@ namespace Yama.Compiler
 
             if (!this.GenerateInheritanceDataStructure(nodes)) return false;
 
-            Parser.Request.RequestParserTreeCompile request = new Parser.Request.RequestParserTreeCompile(this);
+            RequestParserTreeCompile request = new RequestParserTreeCompile(this);
 
             if (!this.GenerateIRCode(nodes, request)) return false;
 
@@ -306,11 +306,11 @@ namespace Yama.Compiler
             return optimizeIRCode.Run();
         }
 
-        private bool GenerateIRCode(List<IParseTreeNode> nodes, RequestParserTreeCompile request)
+        private bool GenerateIRCode(IEnumerable<ICompileNode> nodes, RequestParserTreeCompile request)
         {
-            foreach (IParseTreeNode node in nodes)
+            foreach (ICompileNode node in nodes)
             {
-                if (!node.Compile(request)) this.AddError("One error orrcured: generate ir code", node);
+                if (!node.Compile(request)) this.AddError("One error orrcured: generate ir code", (IParseTreeNode)node);
             }
 
             /*foreach (SSACompileLine line in this.SSALines)
@@ -325,9 +325,9 @@ namespace Yama.Compiler
             return this.Errors.Count == 0;
         }
 
-        private bool GenerateInheritanceDataStructure(List<IParseTreeNode> nodes)
+        private bool GenerateInheritanceDataStructure(IEnumerable<ICompileNode> nodes)
         {
-            foreach (IParseTreeNode node in nodes)
+            foreach (ICompileNode node in nodes)
             {
                 if (node is not KlassenDeklaration k) continue;
                 if (k.Deklaration is null) continue;

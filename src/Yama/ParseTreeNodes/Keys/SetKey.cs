@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class SetKey : IParseTreeNode, IContainer
+    public class SetKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
         private ParserLayer layer;
 
@@ -75,7 +76,7 @@ namespace Yama.Parser
             IdentifierToken? conditionkind = request.Parser.Peek ( request.Token, 1 );
             if (conditionkind is null) return new ParserError(request.Token, "Expectet a open Bracket '{' after Keyword 'set'");
 
-            IParseTreeNode? node = request.Parser.ParseCleanToken(conditionkind, this.layer);
+            IParseTreeNode? node = request.Parser.ParseCleanToken(conditionkind, this.layer, false);
             if (node is not Container c) return new ParserError(request.Token, "failed to parse 'set' statement");
 
             key.Statement = c;
@@ -91,7 +92,7 @@ namespace Yama.Parser
 
             parent.SetContainer = container;
 
-            this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(index, container));
+            this.Statement.Indezieren(new RequestParserTreeIndezieren(index, container));
 
             return true;
         }
@@ -104,12 +105,12 @@ namespace Yama.Parser
 
             parent.SetContainer = container;
 
-            this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(index, container));
+            this.Statement.Indezieren(new RequestParserTreeIndezieren(index, container));
 
             return true;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is IndexVektorDeklaration vekdek) return this.IndezierenVektor(request.Index, vekdek);
             if (request.Parent is IndexPropertyGetSetDeklaration popdek) return this.IndezierenPropertyGetSet(request.Index, popdek);
@@ -120,12 +121,12 @@ namespace Yama.Parser
 
             propertyDeklaration.SetContainer = container;
 
-            this.Statement.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, container));
+            this.Statement.Indezieren(new RequestParserTreeIndezieren(request.Index, container));
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Statement is null) return false;
 

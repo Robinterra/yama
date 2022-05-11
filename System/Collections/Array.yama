@@ -64,7 +64,7 @@ namespace "System.Collections"
                 int orgSize = size << 2;
                 size = orgSize + 4;
 
-                Array array = MemoryManager.Malloc ( size ) as Array;
+                Array array = (MemoryManager.Malloc ( size )) as Array;
                 array.size = orgSize;
 
                 return array;

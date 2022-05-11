@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using Yama.Compiler;
 using Yama.Index;
 using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class ContainerExpression : IParseTreeNode, IPriority, IContainer
+    public class ContainerExpression : IParseTreeNode, IIndexNode, ICompileNode, IPriority, IContainer
     {
 
         private IdentifierToken? ende;
@@ -98,19 +99,19 @@ namespace Yama.Parser
             return expression;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.ExpressionParent is null) return request.Index.CreateError(this);
+            if (this.ExpressionParent is not IIndexNode expressionNode) return request.Index.CreateError(this);
 
-            return this.ExpressionParent.Indezieren(request);
+            return expressionNode.Indezieren(request);
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.ExpressionParent is null) return false;
+            if (this.ExpressionParent is not ICompileNode expressionNode) return false;
 
-            this.ExpressionParent.Compile(request);
+            expressionNode.Compile(request);
 
             return true;
         }

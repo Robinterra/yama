@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Yama.Lexer;
 using Yama.Index;
+using Yama.Compiler;
 
 namespace Yama.Parser
 {
-    public class EnumDeklaration : IParseTreeNode//, IPriority
+    public class EnumDeklaration : IParseTreeNode, IIndexNode, ICompileNode//, IPriority
     {
 
         #region get/set
@@ -131,13 +132,13 @@ namespace Yama.Parser
             token = request.Parser.Peek ( token, 1 );
             if (token is null) return new ParserError(request.Token, $"Can not find a '{{' after the enum name", deklaration.Token);
 
-            deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer);
+            deklaration.Statement = request.Parser.ParseCleanToken(token, this.NextLayer, false);
             if (deklaration.Statement is null) return new ParserError(request.Token, $"Can not find a enum Statement after the enum name", deklaration.Token);
 
             return deklaration;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieses Enums");
             if (this.Statement is null) return request.Index.CreateError(this);
@@ -149,13 +150,15 @@ namespace Yama.Parser
             dek.EnumDeklarationen.Add(deklaration);
             foreach (IParseTreeNode node in this.Statement.GetAllChilds)
             {
-                node.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration));
+                if (node is not IIndexNode indexNode) continue;
+
+                indexNode.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
             }
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             return true;
         }

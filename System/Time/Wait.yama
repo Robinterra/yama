@@ -21,7 +21,7 @@ namespace "System.Time"
         {
             while ( true )
             {
-                #defalgo Wait,second:;
+                #defalgo Wait,second:
 
                 seconds = seconds - 1;
 
@@ -44,7 +44,7 @@ namespace "System.Time"
         {
             while ( true )
             {
-                #defalgo Wait,milisecond:;
+                #defalgo Wait,milisecond:
 
                 miliseconds = #defalgo IntArimetics,Decremtation: = miliseconds;
 
@@ -67,7 +67,7 @@ namespace "System.Time"
         {
             while ( true )
             {
-                #defalgo Wait,microsecond:;
+                #defalgo Wait,microsecond:
 
                 microseconds = #defalgo IntArimetics,Decremtation: = microseconds;
 

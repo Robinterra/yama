@@ -6,7 +6,7 @@ using Yama.Compiler;
 
 namespace Yama.Parser
 {
-    public class ReferenceCall : IParseTreeNode, IPriority
+    public class ReferenceCall : IParseTreeNode, IIndexNode, ICompileNode, IPriority
     {
 
         #region get/set
@@ -84,7 +84,7 @@ namespace Yama.Parser
             return false;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is IndexVariabelnReference varref) return this.RefComb(varref);
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
@@ -100,6 +100,7 @@ namespace Yama.Parser
         {
             IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
             reference.RefCombination = varref;
+            varref.IsPointIdentifier = true;
             varref.ParentCall = reference;
             varref.VariabelnReferences.Add(reference);
             this.Reference = reference;
@@ -107,7 +108,7 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Reference is null) return false;
 

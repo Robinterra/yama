@@ -12,10 +12,9 @@ namespace Yama.Index
 
         #region get/set
 
-        public List<IParseTreeNode> Roots
+        public IEnumerable<IIndexNode> Roots
         {
             get;
-            set;
         }
 
         public ValidUses RootValidUses
@@ -33,7 +32,6 @@ namespace Yama.Index
         public string StartNamespace
         {
             get;
-            set;
         } = "Program";
 
         public List<IndexKlassenDeklaration> Register
@@ -63,7 +61,6 @@ namespace Yama.Index
         public List<string> AllUseFiles
         {
             get;
-            set;
         }
 
         public List<IndexEnumDeklaration> RegisterEnums
@@ -88,17 +85,18 @@ namespace Yama.Index
 
         #region ctor
 
-        public Index (  )
+        public Index ( IEnumerable<IIndexNode> rootIndexNodes, string startNamespace, List<string> allFilesInUse)
         {
             this.RootValidUses = new ValidUses(this);
-            this.Roots = new List<IParseTreeNode>();
+            this.Roots = rootIndexNodes;
+            this.StartNamespace = startNamespace;
             this.Register = new List<IndexKlassenDeklaration>();
             this.Errors = new List<IndexError>();
             this.Namespaces = new Dictionary<string, IndexNamespaceDeklaration>();
             this.ZuCompilenNodes = new List<IParseTreeNode>();
             this.RegisterEnums = new List<IndexEnumDeklaration>();
             this.IndexTypeSafeties = new List<IIndexTypeSafety>();
-            this.AllUseFiles = new List<string>();
+            this.AllUseFiles = allFilesInUse;
         }
 
         #endregion ctor
@@ -107,14 +105,14 @@ namespace Yama.Index
 
         private bool Indezieren()
         {
-            Parser.Request.RequestParserTreeIndezieren request = new Parser.Request.RequestParserTreeIndezieren(this, null);
+            RequestParserTreeIndezieren request = new RequestParserTreeIndezieren(this, null);
 
-            foreach (IParseTreeNode node in this.Roots)
+            foreach (IIndexNode node in this.Roots)
             {
                 node.Indezieren(request);
             }
 
-            if (this.MainFunction == null) this.CreateError(this.Roots[0], "No main method found!");
+            if (this.MainFunction == null) return false;//this.CreateError("No main method found!");
 
             if (this.Errors.Count != 0) return false;
 
@@ -196,7 +194,7 @@ namespace Yama.Index
         public string GetTypeName(IndexVariabelnReference reference)
         {
             if (reference == null) return string.Empty;
-            if (reference.ParentCall != null) return this.GetTypeName(reference.ParentCall, reference);
+            if (reference.IsPointIdentifier && reference.ParentCall != null) return this.GetTypeName(reference.ParentCall, reference);
 
             if (reference.Deklaration is IndexKlassenDeklaration t) return t.Name;
             if (reference.Deklaration is IndexVariabelnDeklaration vd) return vd.Type.Name;

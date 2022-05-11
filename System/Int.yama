@@ -26,7 +26,7 @@ namespace "System"
         */
         copy operator bool <(int a, int b)
         {
-            #defalgo IntCompare,LessThan:;
+            #defalgo IntCompare,LessThan:
         }
 
         // -----------------------------------------------
@@ -41,7 +41,7 @@ namespace "System"
         */
         copy operator bool >(int a, int b)
         {
-            #defalgo IntCompare,GreaterThan:;
+            #defalgo IntCompare,GreaterThan:
         }
 
         // -----------------------------------------------
@@ -56,7 +56,7 @@ namespace "System"
         */
         copy operator bool >=(int a, int b)
         {
-            #defalgo IntCompare,GreaterEqualsThan:;
+            #defalgo IntCompare,GreaterEqualsThan:
         }
 
         // -----------------------------------------------
@@ -71,7 +71,7 @@ namespace "System"
         */
         copy operator bool <=(int a, int b)
         {
-            #defalgo IntCompare,LessEqualsThan:;
+            #defalgo IntCompare,LessEqualsThan:
         }
 
         // -----------------------------------------------
@@ -86,7 +86,7 @@ namespace "System"
         */
         copy operator bool ==(int a, int b)
         {
-            #defalgo IntCompare,Equals:;
+            #defalgo IntCompare,Equals:
         }
 
         // -----------------------------------------------
@@ -101,7 +101,7 @@ namespace "System"
         */
         copy operator bool !=(int a, int b)
         {
-            #defalgo IntCompare,NotEquals:;
+            #defalgo IntCompare,NotEquals:
         }
 
         // -----------------------------------------------
@@ -124,7 +124,7 @@ namespace "System"
         */
         copy operator int &(int a, int b)
         {
-            #defalgo IntArimetics,BinaryAnd:;
+            #defalgo IntArimetics,BinaryAnd:
         }
 
         // -----------------------------------------------
@@ -139,7 +139,7 @@ namespace "System"
         */
         copy operator int |(int a, int b)
         {
-            #defalgo IntArimetics,BinaryOr:;
+            #defalgo IntArimetics,BinaryOr:
         }
 
         // -----------------------------------------------
@@ -153,7 +153,7 @@ namespace "System"
         */
         copy operator int !(int a)
         {
-            #defalgo IntArimetics,BinaryNegation:;
+            #defalgo IntArimetics,BinaryNegation:
         }
 
         // -----------------------------------------------
@@ -168,7 +168,7 @@ namespace "System"
         */
         copy operator int ^(int a, int b)
         {
-            #defalgo IntArimetics,BinaryXor:;
+            #defalgo IntArimetics,BinaryXor:
         }
 
         // -----------------------------------------------
@@ -183,7 +183,7 @@ namespace "System"
         */
         copy operator int <<(int a, int b)
         {
-            #defalgo IntArimetics,BinaryLeftShift:;
+            #defalgo IntArimetics,BinaryLeftShift:
         }
 
         // -----------------------------------------------
@@ -198,7 +198,7 @@ namespace "System"
         */
         copy operator int >>(int a, int b)
         {
-            #defalgo IntArimetics,BinaryRightShift:;
+            #defalgo IntArimetics,BinaryRightShift:
         }
 
         // -----------------------------------------------
@@ -222,7 +222,7 @@ namespace "System"
         copy operator int -(int a, int b)
         {
 
-            #defalgo IntArimetics,Subtraction:;
+            #defalgo IntArimetics,Subtraction:
         }
 
         // -----------------------------------------------
@@ -236,7 +236,7 @@ namespace "System"
         */
         copy operator int ++(int a)
         {
-            #defalgo IntArimetics,Incremtation:;
+            #defalgo IntArimetics,Incremtation:
         }
 
         // -----------------------------------------------
@@ -250,7 +250,7 @@ namespace "System"
         */
         copy operator int --(int a)
         {
-            #defalgo IntArimetics,Decremtation:;
+            #defalgo IntArimetics,Decremtation:
         }
 
         // -----------------------------------------------
@@ -265,7 +265,7 @@ namespace "System"
         */
         copy operator int +(int a, int b)
         {
-            #defalgo IntArimetics,Addition:;
+            #defalgo IntArimetics,Addition:
         }
 
         // -----------------------------------------------
@@ -280,7 +280,7 @@ namespace "System"
         */
         copy operator int *(int a, int b)
         {
-            #defalgo IntArimetics,Mul:;
+            #defalgo IntArimetics,Mul:
         }
 
         // -----------------------------------------------
@@ -295,7 +295,7 @@ namespace "System"
         */
         copy operator int /(int a, int b)
         {
-            #defalgo IntArimetics,Division:;
+            #defalgo IntArimetics,Division:
         }
 
         // -----------------------------------------------

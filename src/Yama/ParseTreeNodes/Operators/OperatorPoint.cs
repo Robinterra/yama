@@ -7,7 +7,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class OperatorPoint : IParseTreeNode//, IPriority
+    public class OperatorPoint : IParseTreeNode, IIndexNode, ICompileNode//, IPriority
     {
 
         #region get/set
@@ -125,27 +125,27 @@ namespace Yama.Parser
             return node;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
-            if (this.LeftNode is null) return request.Index.CreateError(this);
-            if (this.RightNode is null) return request.Index.CreateError(this);
+            if (this.LeftNode is not IIndexNode leftNode) return request.Index.CreateError(this);
+            if (this.RightNode is not IIndexNode rightNode) return request.Index.CreateError(this);
 
-            if (!this.LeftNode.Indezieren(request)) return request.Index.CreateError(this);
+            if (!leftNode.Indezieren(request)) return request.Index.CreateError(this);
 
             IndexVariabelnReference? reference = container.VariabelnReferences.LastOrDefault();
             if (reference is null) return request.Index.CreateError(this);
 
-            this.RightNode.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, reference));
+            rightNode.Indezieren(new RequestParserTreeIndezieren(request.Index, reference));
 
             //container.VariabelnReferences.Add(reference);
 
             return true;
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.RightNode is null) return false;
+            if (this.RightNode is not ICompileNode rightNode) return false;
 
             if (this.RightNode is ReferenceCall rct)
             {
@@ -194,14 +194,14 @@ namespace Yama.Parser
                 }
             }
 
-            this.RightNode.Compile(new Request.RequestParserTreeCompile(request.Compiler, moderesult));
+            rightNode.Compile(new RequestParserTreeCompile(request.Compiler, moderesult));
 
             return true;
         }
 
         private bool CompileLeftNodeIfNotStaticClass(Compiler.Compiler compiler, string mode)
         {
-            if (this.LeftNode is null) return false;
+            if (this.LeftNode is not ICompileNode leftNode) return false;
 
             if (this.RightNode is ReferenceCall rct)
             {
@@ -220,7 +220,7 @@ namespace Yama.Parser
                     if (klu.Zusatz == MethodeType.Static) return true;
             }
 
-            return this.LeftNode.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+            return leftNode.Compile(new RequestParserTreeCompile(compiler, "default"));
         }
 
         private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexMethodDeklaration methdek)
@@ -263,10 +263,10 @@ namespace Yama.Parser
             {
                 if ("default" == mode) mode = "point";
 
-                VektorCall call = new VektorCall(5);
+                VektorCall call = new VektorCall(5, new ParserLayer("a"));
                 call.LeftNode = this;
 
-                call.Compile(new Request.RequestParserTreeCompile(compiler, mode));
+                call.Compile(new RequestParserTreeCompile(compiler, mode));
 
                 return false;
             }

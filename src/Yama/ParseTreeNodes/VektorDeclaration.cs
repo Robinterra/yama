@@ -7,9 +7,11 @@ using Yama.Compiler;
 
 namespace Yama.Parser
 {
-    public class VektorDeclaration : IParseTreeNode
+    public class VektorDeclaration : IParseTreeNode, IIndexNode, ICompileNode
     {
-        private ParserLayer layer;
+        private ParserLayer getsetlayer;
+
+        private ParserLayer methodeVektorDeklarationsHeader;
 
         #region get/set
 
@@ -107,12 +109,13 @@ namespace Yama.Parser
 
         #region ctor
 
-        public VektorDeclaration(ParserLayer layer)
+        public VektorDeclaration(ParserLayer getsetlayer, ParserLayer methodeVektorDeklarationsHeader)
         {
             this.Parameters = new();
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
-            this.layer = layer;
+            this.getsetlayer = getsetlayer;
+            this.methodeVektorDeklarationsHeader = methodeVektorDeklarationsHeader;
         }
 
         #endregion ctor
@@ -177,7 +180,7 @@ namespace Yama.Parser
 
         public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
-            VektorDeclaration deklaration = new VektorDeclaration(this.layer);
+            VektorDeclaration deklaration = new VektorDeclaration(this.getsetlayer, this.methodeVektorDeklarationsHeader);
 
             IdentifierToken? token = this.MakeAccessValid(request.Parser, request.Token, deklaration);
             if (token is null) return null;
@@ -204,7 +207,7 @@ namespace Yama.Parser
 
             if ( token == null ) return null;
 
-            request.Parser.ActivateLayer(this.layer);
+            request.Parser.ActivateLayer(this.methodeVektorDeklarationsHeader);
 
             IParseTreeNode? parametersVektor = request.Parser.TryToParse ( rule, token );
 
@@ -219,13 +222,8 @@ namespace Yama.Parser
             token = request.Parser.Peek ( t.Ende, 1);
             if ( token is null ) return null;
 
-            request.Parser.ActivateLayer(this.layer);
+            IParseTreeNode? container = request.Parser.ParseCleanToken(token, this.getsetlayer, false);
 
-            IParseTreeNode? container = request.Parser.ParseCleanToken(token, this.layer);
-
-            request.Parser.VorherigesLayer();
-
-            if (container is null) return null;
             if (container is not Container ab) return null;
 
             ab.Token.ParentNode = deklaration;
@@ -251,7 +249,7 @@ namespace Yama.Parser
             return type;
         }
 
-        public bool Indezieren(Request.RequestParserTreeIndezieren request)
+        public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexKlassenDeklaration klasse) return request.Index.CreateError(this);
             if (this.GetStatement is null) return request.Index.CreateError(this);
@@ -267,8 +265,8 @@ namespace Yama.Parser
 
             deklaration.Type = this.GetMethodeType();
 
-            this.GetStatement.Indezieren(new Request.RequestParserTreeIndezieren ( request.Index, deklaration ));
-            this.SetStatement.Indezieren(new Request.RequestParserTreeIndezieren ( request.Index, deklaration ));
+            this.GetStatement.Indezieren(new RequestParserTreeIndezieren ( request.Index, deklaration ));
+            this.SetStatement.Indezieren(new RequestParserTreeIndezieren ( request.Index, deklaration ));
 
             VariabelDeklaration? dek = null;
 
@@ -277,20 +275,15 @@ namespace Yama.Parser
             foreach (IParseTreeNode par in this.Parameters)
             {
                 if (par is VariabelDeklaration t) dek = t;
-                if (par is EnumartionExpression b)
-                {
-                    if (b.ExpressionParent == null) continue;
-                    dek = (VariabelDeklaration)b.ExpressionParent;
-                }
 
                 if (dek is null) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
-                if (!dek.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration.SetContainer))) continue;
+                if (!dek.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration.SetContainer))) continue;
                 if (dek.Deklaration is null) return request.Index.CreateError(this);
 
                 deklaration.Parameters.Add(dek.Deklaration);
 
                 if (dek.Token.Text == "invalue") continue;
-                if (!dek.Indezieren(new Request.RequestParserTreeIndezieren(request.Index, deklaration.GetContainer))) continue;
+                if (!dek.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration.GetContainer))) continue;
             }
 
             IndexVariabelnDeklaration invaluesdek = new IndexVariabelnDeklaration(this, "invalue", deklaration.ReturnValue);
@@ -394,7 +387,7 @@ namespace Yama.Parser
             return t.CanCompile();
         }
 
-        public bool Compile(Request.RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile request)
         {
             if (!this.CanCompile(request.Compiler)) return true;
 
@@ -430,7 +423,7 @@ namespace Yama.Parser
 
             compileContainer.Begin.Compile(compiler, this, "default");
 
-            this.SetStatement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+            this.SetStatement.Compile(new RequestParserTreeCompile(compiler, "default"));
 
             if (compileContainer.Ende is null) return false;
 
@@ -468,7 +461,7 @@ namespace Yama.Parser
 
             compileContainer.Begin.Compile(compiler, this, "default");
 
-            this.GetStatement.Compile(new Request.RequestParserTreeCompile(compiler, "default"));
+            this.GetStatement.Compile(new RequestParserTreeCompile(compiler, "default"));
 
             if (compileContainer.Ende is null) return false;
 
