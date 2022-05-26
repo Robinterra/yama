@@ -55,6 +55,8 @@ namespace Yama.Parser
 
         public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
+            if (request.Token.Kind != IdentifierKind.Word) return null;
+
             EnumKeyValue node = new EnumKeyValue();
 
             node.Token = request.Token;
@@ -74,7 +76,7 @@ namespace Yama.Parser
             node.Value = token;
             node.AllTokens.Add(token);
 
-            token = request.Parser.Peek ( equalToken, 1 );
+            token = request.Parser.Peek ( token, 1 );
             if ( token is null ) return node;
             if (token.Kind != IdentifierKind.Comma) return node;
 
