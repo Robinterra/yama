@@ -128,6 +128,8 @@ namespace Yama.Index
             set;
         }
 
+        private bool? isownerinUser;
+
         #endregion get/set
 
         #region ctor
@@ -146,9 +148,10 @@ namespace Yama.Index
 
         public bool IsOwnerInUse(int depth)
         {
-            if (this.Owner == null) return false;
+            if (this.isownerinUser is not null) return (bool)this.isownerinUser;
+            if (this.Owner == null) return (bool)(this.isownerinUser = false);
 
-            return this.Owner.IsInUse(depth);
+            return (bool)(this.isownerinUser = this.Owner.IsInUse(depth));
         }
 
         public bool IsInUse (int depth)
@@ -160,6 +163,8 @@ namespace Yama.Index
 
         public bool Mappen(IndexVariabelnReference parentCall)
         {
+            this.Owner = parentCall.Owner;
+
             if ( this.ChildUse != null ) parentCall = this.GetChildUse ( this.ChildUse );
             if ( this.IsMapped ) return true;
 

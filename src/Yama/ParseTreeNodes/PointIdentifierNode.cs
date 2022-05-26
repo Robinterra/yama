@@ -12,12 +12,6 @@ namespace Yama.Parser
 
         #region get/set
 
-        public IndexMethodReference? Reference
-        {
-            get;
-            set;
-        }
-
         public IParseTreeNode? LeftNode
         {
             get;
@@ -34,11 +28,6 @@ namespace Yama.Parser
         {
             get;
             set;
-        }
-
-        public int Prio
-        {
-            get;
         }
 
         public bool IsANonStatic
