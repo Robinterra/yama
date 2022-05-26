@@ -89,6 +89,7 @@ namespace Yama.Parser
             get
             {
                 if (this.ChildNode is IContainer con) return con.Ende;
+                if (this.ChildNode is not null) return this.ChildNode.Token;
 
                 return this.Token;
             }
