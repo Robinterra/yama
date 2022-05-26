@@ -86,11 +86,11 @@ namespace Yama.Parser
             {
                 IdentifierToken? assigmentToken = request.Parser.Peek(ende, 1);
                 if (assigmentToken is null) return null;
-                IParseTreeNode? assigmentRule = request.Parser.GetRule<AssigmentNode>();
-                if (assigmentRule is null) return null;
-                IParseTreeNode? assigmentNode = request.Parser.TryToParse(assigmentRule, assigmentToken);
-                if (assigmentNode is not IParentNode parentAssigment) return null;
-                request.Parser.SetChild(parentAssigment, statementnode);
+                AssigmentNode assigmentRule = request.Parser.GetRule<AssigmentNode>();
+
+                AssigmentNode? assigmentNode = request.Parser.TryToParse(assigmentRule, assigmentToken);
+                if (assigmentNode is null) return null;
+                request.Parser.SetChild(assigmentNode, statementnode);
                 statementnode = assigmentNode;
                 if (statementnode is IContainer assigmentContainer) ende = assigmentContainer.Ende;
             }

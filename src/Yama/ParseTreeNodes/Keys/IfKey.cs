@@ -139,10 +139,9 @@ namespace Yama.Parser
             if ( elseStatementChild.Node is not null ) return key;
             if ( elseStatementChild.Kind != IdentifierKind.Else ) return key;
 
-            IParseTreeNode? elseRule = request.Parser.GetRule<ElseKey>();
-            if (elseRule is null) return null;
+            ElseKey elseRule = request.Parser.GetRule<ElseKey>();
 
-            IParseTreeNode? elseNode = request.Parser.TryToParse(elseRule, elseStatementChild);
+            ElseKey? elseNode = request.Parser.TryToParse(elseRule, elseStatementChild);
             if (elseNode is null) return new ParserError(elseStatementChild, $"else statement can not be parse", openBrackettoken, conditionToken, request.Token);
 
             key.ElseStatement = elseNode;

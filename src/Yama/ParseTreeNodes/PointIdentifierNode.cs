@@ -128,8 +128,7 @@ namespace Yama.Parser
             node.Token = token;
             node.AllTokens.Add(token);
 
-            IParseTreeNode? referenceRule = request.Parser.GetRule<ReferenceCall>();
-            if (referenceRule is null) return null;
+            ReferenceCall referenceRule = request.Parser.GetRule<ReferenceCall>();
 
             token = request.Parser.Peek ( token, 1 );
             if (token is null) return null;

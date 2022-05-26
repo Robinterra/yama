@@ -115,14 +115,13 @@ namespace Yama.Parser
             IdentifierToken? deklarationToken = request.Parser.Peek ( openBrackettoken, 1 );
             if (deklarationToken is null) return new ParserError(request.Token, $"Expectet a begin of a Condition after '('", openBrackettoken);
 
-            IParseTreeNode? rule = request.Parser.GetRule<NormalStatementNode>();
-            if (rule is null) return null;
+            NormalStatementNode normalStatementRule = request.Parser.GetRule<NormalStatementNode>();
 
-            IParseTreeNode? deklaration = request.Parser.TryToParse(rule, deklarationToken);
-            if (deklaration is not IContainer dekCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            NormalStatementNode? deklaration = request.Parser.TryToParse(normalStatementRule, deklarationToken);
+            if (deklaration is null) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
             key.Deklaration = deklaration;
 
-            IdentifierToken? conditionToken = request.Parser.Peek ( dekCon.Ende, 1 );
+            IdentifierToken? conditionToken = request.Parser.Peek ( deklaration.Ende, 1 );
             if (conditionToken is null) return null;
 
             IParseTreeNode? condition = request.Parser.ParseCleanToken(conditionToken, this.expressionLayer, false);
@@ -136,11 +135,11 @@ namespace Yama.Parser
             IdentifierToken? inkrementToken = request.Parser.Peek ( semikolonToken, 1 );
             if (inkrementToken is null) return null;
 
-            IParseTreeNode? inkrement = request.Parser.TryToParse(rule, inkrementToken);
-            if (inkrement is not IContainer inkCon) return new ParserError(request.Token, $"Can not parse Condition of a for", openBrackettoken);
+            NormalStatementNode? inkrement = request.Parser.TryToParse(normalStatementRule, inkrementToken);
+            if (inkrement is null) return new ParserError(request.Token, $"Can not parse inkrement of a for", openBrackettoken);
             key.Inkrementation = inkrement;
 
-            IdentifierToken? closeBracket = request.Parser.Peek ( inkCon.Ende, 1);
+            IdentifierToken? closeBracket = request.Parser.Peek ( inkrement.Ende, 1);
             if (closeBracket is null) return null;
             if (closeBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(closeBracket, $"Expected ) and not", request.Token, openBrackettoken);
             key.AllTokens.Add(closeBracket);

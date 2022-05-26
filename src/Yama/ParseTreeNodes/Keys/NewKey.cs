@@ -169,11 +169,10 @@ namespace Yama.Parser
 
         private IdentifierToken? TryParseGeneric(RequestParserTreeParser request, NewKey deklaration, IdentifierToken token)
         {
-            GenericCall? genericRule = request.Parser.GetRule<GenericCall>();
-            if (genericRule is null) return token;
+            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
 
-            IParseTreeNode? node = request.Parser.TryToParse ( genericRule, token );
-            if (node is not GenericCall genericCall) return token;
+            GenericCall? genericCall = request.Parser.TryToParse ( genericRule, token );
+            if (genericCall is null) return token;
 
             deklaration.GenericDefintion = genericCall;
 
