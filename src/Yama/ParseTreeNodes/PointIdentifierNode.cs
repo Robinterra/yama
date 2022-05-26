@@ -155,13 +155,14 @@ namespace Yama.Parser
 
         public bool Indezieren(RequestParserTreeIndezieren request)
         {
-            if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
             if (this.LeftNode is not IIndexNode leftNode) return request.Index.CreateError(this);
             if (this.RightNode is not IIndexNode rightNode) return request.Index.CreateError(this);
 
             if (!leftNode.Indezieren(request)) return request.Index.CreateError(this);
 
-            IndexVariabelnReference? reference = container.VariabelnReferences.LastOrDefault();
+            IndexVariabelnReference? reference = null;
+            if (request.Parent is IndexContainer container) reference = container.VariabelnReferences.LastOrDefault();
+            if (request.Parent is IndexVariabelnReference varRef) reference = varRef.VariabelnReferences.LastOrDefault();
             if (reference is null) return request.Index.CreateError(this);
 
             rightNode.Indezieren(new RequestParserTreeIndezieren(request.Index, reference));
@@ -193,6 +194,11 @@ namespace Yama.Parser
 
                 if (rctu.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
                     this.CompileNonStaticCall(request.Compiler, request.Mode, pgsdek);
+
+
+                if (rctu.Reference.Deklaration is IndexMethodDeklaration dek) request.Mode = "methode";
+
+                if (rctu.Reference.Deklaration is IndexVektorDeklaration vdek) request.Mode = request.Mode == "point" ? "vektorcall" : "setvektorcall";
             }
 
             string moderesult = "point";
@@ -200,9 +206,10 @@ namespace Yama.Parser
 
             if (request.Mode == "methode")
             {
-                moderesult = request.Mode;
                 if (this.RightNode is ReferenceCall rc)
                 {
+                    moderesult = request.Mode;
+
                     if (rc.Reference is null) return false;
 
                     if (rc.Reference.Deklaration is IndexMethodDeklaration dek)
@@ -212,9 +219,10 @@ namespace Yama.Parser
 
             if (request.Mode == "vektorcall" || request.Mode == "setvektorcall")
             {
-                moderesult = request.Mode;
                 if (this.RightNode is ReferenceCall rc)
                 {
+                    moderesult = request.Mode;
+
                     if (rc.Reference is null) return false;
 
                     if (rc.Reference.Deklaration is IndexVektorDeklaration dek)
@@ -248,7 +256,7 @@ namespace Yama.Parser
                     if (klu.Zusatz == MethodeType.Static) return true;
             }
 
-            return leftNode.Compile(new RequestParserTreeCompile(compiler, "default"));
+            return leftNode.Compile(new RequestParserTreeCompile(compiler, mode == "point" ? mode : "default"));
         }
 
         private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexMethodDeklaration methdek)
