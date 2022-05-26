@@ -6,7 +6,7 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
-    public class Operator1ChildRight : IParseTreeNode, IIndexNode, ICompileNode, IPriority
+    public class Operator1ChildRight : IParseTreeNode, IIndexNode, ICompileNode, IPriority, IContainer, IParentNode
     {
 
         #region get/set
@@ -84,6 +84,29 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken Ende
+        {
+            get
+            {
+                if (this.ChildNode is IContainer con) return con.Ende;
+                if (this.ChildNode is not null) return this.ChildNode.Token;
+
+                return this.Token;
+            }
+        }
+
+        public IParseTreeNode? LeftNode
+        {
+            get
+            {
+                return this.ChildNode;
+            }
+            set
+            {
+                this.ChildNode = value;
+            }
+        }
+
         #endregion get/set
 
         #region ctor
@@ -154,19 +177,9 @@ namespace Yama.Parser
             if ( request.Token.Kind != IdentifierKind.Operator ) return null;
             if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
 
-            IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
-            if ( this.CheckHashValidChild ( lexerLeft ) && !this.CheckAusnahmen ( lexerLeft ) ) return null;
-
-            IdentifierToken? lexerRight = request.Parser.Peek ( request.Token, 1 );
-            if (lexerRight is null) return null;
-            if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
-
             Operator1ChildRight node = new Operator1ChildRight ( this.Prio );
             node.Token = request.Token;
             node.AllTokens.Add ( request.Token );
-
-            node.ChildNode = request.Parser.ParseCleanToken ( lexerRight );
-            if ( node.ChildNode is null ) return null;
 
             return node;
         }

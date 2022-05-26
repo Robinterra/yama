@@ -109,13 +109,13 @@ namespace Yama.Parser
             if (assigmentToken.Kind != IdentifierKind.Operator) return node;
             if (assigmentToken.Text != "=") return node;
 
-            IParseTreeNode? assigmentRule = request.Parser.GetRule<AssigmentNode>();
-            if (assigmentRule is null) return null;
-            IParseTreeNode? assimgentNode = request.Parser.TryToParse(assigmentRule, assigmentToken);
-            if (assimgentNode is not IParentNode parent) return null;
+            AssigmentNode assigmentRule = request.Parser.GetRule<AssigmentNode>();
+
+            AssigmentNode? assimgentNode = request.Parser.TryToParse(assigmentRule, assigmentToken);
+            if (assimgentNode is null) return null;
 
             node.AssigmentNode = assimgentNode;
-            request.Parser.SetChild(parent, node);
+            request.Parser.SetChild(assimgentNode, node);
             node.Token.Node = node;
 
             return assimgentNode;

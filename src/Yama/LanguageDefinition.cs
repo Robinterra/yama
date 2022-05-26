@@ -374,7 +374,6 @@ namespace Yama
         {
             ParserLayer layer = new ParserLayer("ExpressionIdenLayer");
 
-            layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "-", "~", "!" }, 11, new List<IdentifierKind> { IdentifierKind.NumberToken, IdentifierKind.Word, IdentifierKind.OpenBracket }, new List<IdentifierKind> { IdentifierKind.OpenBracket } ) );
             layer.ParserMembers.Add ( new TextParser ( 1 ) );
             layer.ParserMembers.Add ( new NullKey (  ) );
             layer.ParserMembers.Add ( new Number ( 1 ) );
@@ -403,6 +402,7 @@ namespace Yama
             ParserLayer layer = new ParserLayer("generic");
 
             layer.ParserMembers.Add(new GenericCall());
+            layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "-", "~", "!" }, 11, new List<IdentifierKind> { IdentifierKind.NumberToken, IdentifierKind.Word, IdentifierKind.OpenBracket }, new List<IdentifierKind> { IdentifierKind.OpenBracket } ) );
 
             return layer;
         }

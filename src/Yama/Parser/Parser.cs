@@ -241,7 +241,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public T? GetRule<T>() where T : IParseTreeNode
+        public T GetRule<T>() where T : IParseTreeNode
         {
             foreach (ParserLayer layer in this.ParserLayers)
             {
@@ -250,7 +250,7 @@ namespace Yama.Parser
                 if (rule != null) return (T)rule;
             }
 
-            return default;
+            throw new Exception("can not find rule");
         }
 
         // -----------------------------------------------
@@ -619,14 +619,17 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public IParseTreeNode? TryToParse ( IParseTreeNode rule, IdentifierToken token )
+        public TRule? TryToParse<TRule> ( TRule rule, IdentifierToken token ) where TRule : IParseTreeNode
         {
             IParseTreeNode? result = rule.Parse ( new RequestParserTreeParser (this, token) );
-            if ( result is null ) return null;
+            if ( result is null ) return default;
 
             this.CleanPareNode ( result );
+            if (result is  TRule res) return res;
 
-            return result;
+            Console.WriteLine("badumms");
+
+            return default;
         }
         
         // -----------------------------------------------

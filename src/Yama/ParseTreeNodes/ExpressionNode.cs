@@ -100,6 +100,10 @@ namespace Yama.Parser
 
             ExpressionNode node = new ExpressionNode(this.expressionIdenLayer, this.expressionCallLayer, operationExpressionLayer);
 
+            Operator1ChildRight? operationNode = this.ParseUnairOperation(request, expressionIdenToken);
+            if (operationNode is not null) expressionIdenToken = request.Parser.Peek(operationNode.Ende, 1);
+            if (expressionIdenToken is null) return null;
+
             IParseTreeNode? firstNode = this.ParseFirstNode(request, expressionIdenToken);
             node.ChildNode = firstNode;
 
@@ -108,19 +112,19 @@ namespace Yama.Parser
             node.Token = request.Token;
 
             IdentifierToken? callConvertToken = request.Parser.Peek(expressionIdenToken, 1);
-            if (callConvertToken is null) return this.GetResult(isKlammerung, node);
-            if (callConvertToken.Kind == IdentifierKind.EndOfCommand) return this.GetResult(isKlammerung, node);
+            if (callConvertToken is null) return this.GetResult(isKlammerung, node, operationNode, request);
+            if (callConvertToken.Kind == IdentifierKind.EndOfCommand) return this.GetResult(isKlammerung, node, operationNode, request);
 
-            IdentifierToken? operationExpressionToken = this.ParseCallConvertToken(callConvertToken, request, node, firstNode);
+            IdentifierToken? operationExpressionToken = this.ParseCallConvertToken(callConvertToken, request, node, firstNode, operationNode);
             if (node.ChildNode is null) return null;
-            if (operationExpressionToken is null) return this.GetResult(isKlammerung, node);
-            if (operationExpressionToken.Kind == IdentifierKind.EndOfCommand) return this.GetResult(isKlammerung, node);
+            if (operationExpressionToken is null) return this.GetResult(isKlammerung, node, null, request);
+            if (operationExpressionToken.Kind == IdentifierKind.EndOfCommand) return this.GetResult(isKlammerung, node, null, request);
 
             IdentifierToken? maybeCloseBracket = this.ParseOperationExpressionToken(operationExpressionToken, request, node, node.ChildNode);
             if (node.ChildNode is null) return null;
-            if (maybeCloseBracket is null) return this.GetResult(isKlammerung, node);
+            if (maybeCloseBracket is null) return this.GetResult(isKlammerung, node, null, request);
             if (maybeCloseBracket.Kind == IdentifierKind.Comma) node.AllTokens.Add(maybeCloseBracket);
-            if (!isKlammerung) return this.GetResult(false, node);
+            if (!isKlammerung) return this.GetResult(false, node, null, request);
             if (maybeCloseBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(maybeCloseBracket, "Expected a ')' and not a", node.AllTokens.ToArray());
 
             node.AllTokens.Add(request.Token);
@@ -129,7 +133,7 @@ namespace Yama.Parser
             node.isCloseBracketEnde = true;
 
             IdentifierToken? maybeAsExpression = request.Parser.Peek(maybeCloseBracket, 1);
-            if (maybeAsExpression is null) return this.GetResult(isKlammerung, node);
+            if (maybeAsExpression is null) return this.GetResult(isKlammerung, node, null, request);
 
             IdentifierToken? maybeOperationExpression = this.TryAsExpression(request, maybeAsExpression, node, node.ChildNode);
             if (node.ChildNode is null) return null;
@@ -144,24 +148,34 @@ namespace Yama.Parser
             return node;
         }
 
+        private Operator1ChildRight? ParseUnairOperation(RequestParserTreeParser request, IdentifierToken expressionIdenToken)
+        {
+            Operator1ChildRight unairRule = request.Parser.GetRule<Operator1ChildRight>();
+
+            Operator1ChildRight? result = request.Parser.TryToParse(unairRule, expressionIdenToken);
+
+            return result;
+        }
+
         private IdentifierToken? TryAsExpression(RequestParserTreeParser request, IdentifierToken maybeAsExpression, ExpressionNode node, IParseTreeNode childNode)
         {
             if (maybeAsExpression.Kind != IdentifierKind.As) return maybeAsExpression;
 
-            IParseTreeNode? rule = request.Parser.GetRule<ExplicitlyConvert>();
-            if (rule is null) return null;
+            ExplicitlyConvert rule = request.Parser.GetRule<ExplicitlyConvert>();
 
-            IParseTreeNode? callNode = request.Parser.TryToParse(rule, maybeAsExpression);
-            if (callNode is not IParentNode parentNode) return null;
-            if (callNode is not IContainer container) return null;
+            ExplicitlyConvert? callNode = request.Parser.TryToParse(rule, maybeAsExpression);
+            if (callNode is null) return null;
 
-            node.ChildNode = request.Parser.SetChild(parentNode, childNode);
+            node.ChildNode = request.Parser.SetChild(callNode, childNode);
 
-            return request.Parser.Peek(container.Ende, 1);
+            return request.Parser.Peek(callNode.Ende, 1);
         }
 
-        private IParseTreeNode? GetResult(bool isKlammerung, ExpressionNode node)
+        private IParseTreeNode? GetResult(bool isKlammerung, ExpressionNode node, Operator1ChildRight? unairOperator, RequestParserTreeParser request)
         {
+            if (node.ChildNode is null) return null;
+            if (unairOperator is not null) node.ChildNode = request.Parser.SetChild(unairOperator, node.ChildNode);
+
             if (isKlammerung && !node.isCloseBracketEnde) return new ParserError(node.Token, "missing close ')' bracket", node.AllTokens.ToArray());
 
             if (isKlammerung) return node;
@@ -200,7 +214,7 @@ namespace Yama.Parser
             return rightNode;
         }
 
-        private IdentifierToken? ParseCallConvertToken(IdentifierToken callConvertToken, RequestParserTreeParser request, ExpressionNode node, IParseTreeNode firstNode)
+        private IdentifierToken? ParseCallConvertToken(IdentifierToken callConvertToken, RequestParserTreeParser request, ExpressionNode node, IParseTreeNode firstNode, Operator1ChildRight? operationNode)
         {
             if (callConvertToken.Kind != IdentifierKind.As
             && callConvertToken.Kind != IdentifierKind.OpenBracket
@@ -212,6 +226,8 @@ namespace Yama.Parser
             if (callNode is not IContainer container) return null;
 
             node.ChildNode = request.Parser.SetChild(parentNode, firstNode);
+
+            if (operationNode is not null) node.ChildNode = request.Parser.SetChild(operationNode, node.ChildNode);
 
             return request.Parser.Peek(container.Ende, 1);
         }

@@ -8,13 +8,13 @@ identiefier = letter{letter | digit | _}
 number = digit {digit}
 hexnumber = "0x" (digit | hexletter) {digit | hexletter}
 pointIdentifion = identiefier.identiefier
-expressionIden = [ operator ] pointIdentifion | number | hexnumber | "true" | "false" | "null"
+expressionIden = pointIdentifion | number | hexnumber | "true" | "false" | "null"
 
 asExpression = "as" identiefier
 isExpression = "is" (null | identiefier identiefier)
 
 operationExpression = operator expression
-expression = [ "(" ] expressionIden [ asExpression | methodeCall | vektorCall ] [ operationExpression ] [ ")" ] [ asExpression ] [ operationExpression ]
+expression = [ "(" ] [ operator ] expressionIden [ asExpression | methodeCall | vektorCall ] [ operationExpression ] [ ")" ] [ asExpression ] [ operationExpression ]
 
 genericCall = "<" identiefier {, identiefier} ">"
 methodeCall = [ genericCall ] "(" expression {, expression} ")" [ asExpression ]
@@ -32,7 +32,7 @@ statementInLoop = statementInMehtode | continue | break
 containerLoopStatement = "{" { statementInLoop [ ; ] } "}"
 inLoopStatement = containerLoopStatement | ifStatement | whileStatement | forStatement | returnStatement | continue | break
 
-conditionExpression = expressionIden [ asExpression | isExpression | methodeCall | vektorCall ] { operationExpression }
+conditionExpression = [ operator ] expressionIden [ asExpression | isExpression | methodeCall | vektorCall ] { operationExpression }
 
 inIfStatement = containerStatement | ifStatement | whileStatement | forStatement | returnStatement
 ifStatement = "if" "(" conditionExpression ")" inIfStatement [ else inIfStatement ]

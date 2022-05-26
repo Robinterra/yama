@@ -136,8 +136,7 @@ namespace Yama.Parser
             node.AllTokens.Add(lexerRight);
             node.Ende = lexerRight;
 
-            IParseTreeNode? callRule = request.Parser.GetRule<ReferenceCall>();
-            if (callRule is null) return null;
+            ReferenceCall callRule = request.Parser.GetRule<ReferenceCall>();
 
             node.TypeDefinition = request.Parser.TryToParse ( callRule, request.Token );
             if ( node.TypeDefinition is null ) return null;
@@ -156,11 +155,10 @@ namespace Yama.Parser
 
         private IdentifierToken? TryParseGeneric(RequestParserTreeParser request, VariabelDeklaration deklaration, IdentifierToken token)
         {
-            GenericCall? genericRule = request.Parser.GetRule<GenericCall>();
-            if (genericRule is null) return token;
+            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
 
-            IParseTreeNode? node = request.Parser.TryToParse(genericRule, token);
-            if (node is not GenericCall genericCall) return token;
+            GenericCall? genericCall = request.Parser.TryToParse(genericRule, token);
+            if (genericCall is null) return token;
 
             deklaration.GenericDefintion = genericCall;
 
