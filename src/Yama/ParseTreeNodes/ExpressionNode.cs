@@ -115,16 +115,17 @@ namespace Yama.Parser
             if (callConvertToken is null) return this.GetResult(isKlammerung, node, operationNode, request);
             if (callConvertToken.Kind == IdentifierKind.EndOfCommand) return this.GetResult(isKlammerung, node, operationNode, request);
 
-            IdentifierToken? operationExpressionToken = this.ParseCallConvertToken(callConvertToken, request, node, firstNode, operationNode);
+            IdentifierToken? operationExpressionToken = this.ParseCallConvertToken(callConvertToken, request, node, firstNode);
             if (node.ChildNode is null) return null;
-            if (operationExpressionToken is null) return this.GetResult(isKlammerung, node, null, request);
-            if (operationExpressionToken.Kind == IdentifierKind.EndOfCommand) return this.GetResult(isKlammerung, node, null, request);
+            if (operationExpressionToken is null) return this.GetResult(isKlammerung, node, operationNode, request);
+            if (operationExpressionToken.Kind == IdentifierKind.EndOfCommand) return this.GetResult(isKlammerung, node, operationNode, request);
 
             IdentifierToken? maybeCloseBracket = this.ParseOperationExpressionToken(operationExpressionToken, request, node, node.ChildNode);
             if (node.ChildNode is null) return null;
-            if (maybeCloseBracket is null) return this.GetResult(isKlammerung, node, null, request);
+            if (maybeCloseBracket is null) return this.GetResult(isKlammerung, node, operationNode, request);
             if (maybeCloseBracket.Kind == IdentifierKind.Comma) node.AllTokens.Add(maybeCloseBracket);
-            if (!isKlammerung) return this.GetResult(false, node, null, request);
+            if (!isKlammerung) return this.GetResult(false, node, operationNode, request);
+            if (operationNode is not null) node.ChildNode = request.Parser.SetChild(operationNode, node.ChildNode);
             if (maybeCloseBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(maybeCloseBracket, "Expected a ')' and not a", node.AllTokens.ToArray());
 
             node.AllTokens.Add(request.Token);
@@ -214,7 +215,7 @@ namespace Yama.Parser
             return rightNode;
         }
 
-        private IdentifierToken? ParseCallConvertToken(IdentifierToken callConvertToken, RequestParserTreeParser request, ExpressionNode node, IParseTreeNode firstNode, Operator1ChildRight? operationNode)
+        private IdentifierToken? ParseCallConvertToken(IdentifierToken callConvertToken, RequestParserTreeParser request, ExpressionNode node, IParseTreeNode firstNode)
         {
             if (callConvertToken.Kind != IdentifierKind.As
             && callConvertToken.Kind != IdentifierKind.OpenBracket
@@ -226,8 +227,6 @@ namespace Yama.Parser
             if (callNode is not IContainer container) return null;
 
             node.ChildNode = request.Parser.SetChild(parentNode, firstNode);
-
-            if (operationNode is not null) node.ChildNode = request.Parser.SetChild(operationNode, node.ChildNode);
 
             return request.Parser.Peek(container.Ende, 1);
         }
