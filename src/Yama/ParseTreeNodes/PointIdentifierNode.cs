@@ -187,7 +187,7 @@ namespace Yama.Parser
 
                 if (rctu.Reference.Deklaration is IndexMethodDeklaration dek) request.Mode = "methode";
 
-                if (rctu.Reference.Deklaration is IndexVektorDeklaration vdek) request.Mode = request.Mode == "point" ? "vektorcall" : "setvektorcall";
+                if (rctu.Reference.Deklaration is IndexVektorDeklaration vdek) request.Mode = request.Mode == "point" || request.Mode == "vektorcall" ? "vektorcall" : "setvektorcall";
             }
 
             string moderesult = "point";
