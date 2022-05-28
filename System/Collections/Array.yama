@@ -49,7 +49,7 @@ namespace "System.Collections"
                 int address = index + this;
                 Pointer pointer = address as Pointer;
 
-                pointer.Value = invalue;
+                pointer.Value = value;
             }
         }
 

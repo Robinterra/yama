@@ -138,12 +138,15 @@ namespace Yama.Index
         public bool Mappen(ValidUses uses)
         {
             this.ParentUsesSet = uses;
+            if (uses.GetIndex is null) throw new NullReferenceException();
 
-            if (this.Name == "this") return this.VariableIsThisKeyword ();
+            VariableNameing nameing = uses.GetIndex.Nameing;
 
-            if (this.Name == "base") return this.VariableIsBaseKeyword ();
+            if (this.Name == "this") return this.VariableIsThisKeyword (nameing);
 
-            if (this.Name == "invalue") return this.VariableIsInValueKeyword ( uses );
+            if (this.Name == "base") return this.VariableIsBaseKeyword (nameing);
+
+            if (this.Name == "invalue") return this.VariableIsInValueKeyword (uses, nameing);
 
             this.Type.Mappen(uses);
             if ( this.Type.Deklaration is IndexKlassenDeklaration kd ) return this.TypeIsKlassenDeklaration ( kd );
@@ -151,9 +154,9 @@ namespace Yama.Index
             return true;
         }
 
-        private bool VariableIsThisKeyword ()
+        private bool VariableIsThisKeyword (VariableNameing nameing)
         {
-            IParent? parent = this.ParentUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "this" );
+            IParent? parent = this.ParentUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == nameing.This);
 
             if (parent is not IndexVariabelnDeklaration dek) return false;
 
@@ -163,11 +166,11 @@ namespace Yama.Index
             return true;
         }
 
-        private bool VariableIsBaseKeyword ()
+        private bool VariableIsBaseKeyword (VariableNameing nameing)
         {
             if (this.BaseUsesSet is null) return false;
 
-            IParent? parent = this.BaseUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "base" );
+            IParent? parent = this.BaseUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == nameing.Base );
 
             if (parent is not IndexVariabelnDeklaration dek) return false;
 
@@ -177,11 +180,11 @@ namespace Yama.Index
             return true;
         }
 
-        private bool VariableIsInValueKeyword ( ValidUses uses )
+        private bool VariableIsInValueKeyword ( ValidUses uses, VariableNameing nameing)
         {
             this.SetUsesSet = uses;
 
-            IParent? parent = this.SetUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == "invalue" );
+            IParent? parent = this.SetUsesSet.Deklarationen.FirstOrDefault ( t => t.Name == nameing.InValue );
             if (parent is not IndexVariabelnDeklaration dek) return false;
 
             this.Type = dek.Type;

@@ -122,7 +122,7 @@ namespace Yama.Index
             for (int i = 0; i < this.Deklaration.Parameters.Count; i++)
             {
                 IndexVariabelnDeklaration dek = this.Deklaration.Parameters[i];
-                if (dek.Name == "this") continue;
+                if (dek.Name == this.Index.Nameing.This) continue;
 
                 if (this.Index.GetTypeName(this.Parameters[count]) != dek.Type.Name) return false;
 
@@ -164,8 +164,8 @@ namespace Yama.Index
             for (int i = 0; i < this.Deklaration.Parameters.Count; i++)
             {
                 IndexVariabelnDeklaration dek = this.Deklaration.Parameters[i];
-                if (dek.Name == "this") continue;
                 if (thisUses.GetIndex is null) return false;
+                if (dek.Name == thisUses.GetIndex.Nameing.This) continue;
 
                 thisUses.GetIndex.IndexTypeSafeties.Add(new IndexParameterType(dek, this.Parameters[count], count, this.Deklaration, this.CallRef));
 

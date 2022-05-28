@@ -99,11 +99,12 @@ namespace Yama.Index
                 if (this.thisUses != null) return this.thisUses;
 
                 this.thisUses = new ValidUses(this.ParentUsesSet);
+                if (this.thisUses.GetIndex is null) throw new NullReferenceException();
 
                 if (this.ReturnValue.Deklaration is null) return this.thisUses;
 
                 IndexVariabelnReference varref = new IndexVariabelnReference (this.Use, this.ReturnValue.Deklaration.Name) { Deklaration = this.ReturnValue.Deklaration };
-                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration(this.Use, "invalue", varref);
+                IndexVariabelnDeklaration dekThisVar = new IndexVariabelnDeklaration(this.Use, this.thisUses.GetIndex.Nameing.InValue, varref);
 
                 dekThisVar.SetUsesSet = this.thisUses;
 
@@ -219,7 +220,7 @@ namespace Yama.Index
             {
                 dek.Mappen(this.SetUses);
 
-                if (dek.Name == "invalue") continue;
+                if (dek.Name == uses.GetIndex.Nameing.InValue) continue;
 
                 dek.Mappen(this.GetUses);
             }
