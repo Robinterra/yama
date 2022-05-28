@@ -19,6 +19,12 @@ namespace Yama.Parser
             set;
         }
 
+        public string InValueNameing
+        {
+            get;
+            private set;
+        }
+
         public IdentifierToken? AccessDefinition
         {
             get;
@@ -103,6 +109,7 @@ namespace Yama.Parser
 
         public PropertyGetSetDeklaration(ParserLayer layer)
         {
+            this.InValueNameing = string.Empty;
             this.AllTokens = new List<IdentifierToken> ();
             this.Token = new();
             this.layer = layer;
@@ -231,12 +238,12 @@ namespace Yama.Parser
             return new IndexVariabelnReference(this, typeDef.Text);
         }
 
-        private bool IndezierenNonStaticDek(IndexPropertyGetSetDeklaration deklaration, IndexKlassenDeklaration klasse)
+        private bool IndezierenNonStaticDek(IndexPropertyGetSetDeklaration deklaration, IndexKlassenDeklaration klasse, VariableNameing nameing)
         {
             if (deklaration.Type != MethodeType.PropertyGetSet) return true;
 
             IndexVariabelnReference varref = new IndexVariabelnReference(this, klasse.Name);
-            IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration(this, "this", varref);
+            IndexVariabelnDeklaration thisdek = new IndexVariabelnDeklaration(this, nameing.This, varref);
             deklaration.Parameters.Add(thisdek);
 
             return true;
@@ -253,6 +260,8 @@ namespace Yama.Parser
 
             this.Deklaration = deklaration;
 
+            this.InValueNameing = request.Index.Nameing.InValue;
+
             AccessModify access = AccessModify.Private;
             if (this.AccessDefinition != null) if (this.AccessDefinition.Kind == IdentifierKind.Public) access = AccessModify.Public;
             deklaration.AccessModify = access;
@@ -262,9 +271,9 @@ namespace Yama.Parser
             this.GetStatement.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
             this.SetStatement.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
 
-            this.IndezierenNonStaticDek(deklaration, klasse);
+            this.IndezierenNonStaticDek(deklaration, klasse, request.Index.Nameing);
 
-            IndexVariabelnDeklaration invaluesdek = new IndexVariabelnDeklaration(this, "invalue", deklaration.ReturnValue);
+            IndexVariabelnDeklaration invaluesdek = new IndexVariabelnDeklaration(this, this.InValueNameing, deklaration.ReturnValue);
             deklaration.Parameters.Add(invaluesdek);
 
             this.AddMethode(klasse, deklaration);
@@ -410,7 +419,7 @@ namespace Yama.Parser
 
             foreach(IndexVariabelnDeklaration node in this.Deklaration.Parameters)
             {
-                if (node.Name == "invalue") continue;
+                if (node.Name == this.InValueNameing) continue;
 
                 CompilePopResult compilePopResult = new CompilePopResult();
                 compilePopResult.Position = count;

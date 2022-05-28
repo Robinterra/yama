@@ -48,7 +48,7 @@ namespace "System.Collections"
             {
                 if (index > this.size) return 0;
 
-                invalue = invalue & 0xff;
+                value = value & 0xff;
 
                 int clean = 4 + index + this as int;
                 int bits = clean & 0x3;
@@ -56,11 +56,11 @@ namespace "System.Collections"
                 Pointer pointer = address as Pointer;
 
                 bits = bits << 0x3;
-                invalue = invalue << bits;
+                value = value << bits;
                 bits = 0xff << bits;
 
                 pointer.Value = bits ^ (pointer.Value | bits);
-                pointer.Value = pointer.Value | invalue;
+                pointer.Value = pointer.Value | value;
             }
         }
 

@@ -29,6 +29,11 @@ namespace Yama.Index
             set;
         }
 
+        public VariableNameing Nameing
+        {
+            get;
+        }
+
         public string StartNamespace
         {
             get;
@@ -87,6 +92,7 @@ namespace Yama.Index
 
         public Index ( IEnumerable<IIndexNode> rootIndexNodes, string startNamespace, List<string> allFilesInUse)
         {
+            this.Nameing = new VariableNameing();
             this.RootValidUses = new ValidUses(this);
             this.Roots = rootIndexNodes;
             this.StartNamespace = startNamespace;
