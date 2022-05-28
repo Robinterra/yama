@@ -619,8 +619,6 @@ namespace Yama
 
         public bool ParseIteration(string fullFileName, ParserLayer startlayer, List<ParserLayer> layers, Lexer.Lexer lexer, List<IParseTreeNode> nodes)
         {
-            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-
             System.IO.FileInfo file = new System.IO.FileInfo ( fullFileName );
             if (!file.Exists) return false;
 
@@ -629,23 +627,19 @@ namespace Yama
 
             Parser.Parser p = new Parser.Parser (layers, lexer, new ParserInputData(file.FullName, stream));
 
-            if (this.ParseTime) this.Output.Print(new ParseFileStart(file));
-
-            stopwatch.Start();
-
-            if (!p.Parse(startlayer))
+            using (MessaureTimeOutput messaureTimeOutput = new MessaureTimeOutput(new ParseFileStart(file), this.ParseTime, this.Output))
             {
-                stopwatch.Stop();
+                if (!p.Parse(startlayer))
+                {
+                    messaureTimeOutput.IsPrintingEnabled = true;
 
-                this.PrintingErrors(p, file, stopwatch);
+                    this.PrintingErrors(p);
 
-                if (this.PrintParserTree && p.ParentContainer is not null) this.Output.Print(new ParserTreeOut(p.ParentContainer));
+                    if (this.PrintParserTree && p.ParentContainer is not null) this.Output.Print(new ParserTreeOut(p.ParentContainer));
 
-                return false;
+                    return messaureTimeOutput.IsOK = false;
+                }
             }
-
-            stopwatch.Stop();
-            if (this.ParseTime) this.Output.Print(new OutputEnde(stopwatch, true));
 
             IParseTreeNode? node = p.ParentContainer;
             if (node is null) return false;
@@ -934,11 +928,8 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private bool PrintingErrors(Parser.Parser p, FileInfo file, System.Diagnostics.Stopwatch stopWatch)
+        private bool PrintingErrors(Parser.Parser p)
         {
-            this.Output.Print(new ParseFileStart(file));
-            this.Output.Print(new OutputEnde(stopWatch, false));
-
             List<ParserError> removes = new();
             IdentifierToken? previous = null;
 
@@ -952,7 +943,6 @@ namespace Yama
 
                 if (token.Kind == IdentifierKind.Unknown && error.Token.ParentNode != null) token = error.Token.ParentNode.Token;
             }
-
 
             IEnumerable<ParserError> validParserErrors = p.ParserErrors.Where(q=>!removes.Contains(q));
 

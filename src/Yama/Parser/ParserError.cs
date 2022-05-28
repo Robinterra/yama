@@ -20,10 +20,7 @@ namespace Yama.Parser
 
         public List<IParseTreeNode> GetAllChilds
         {
-            get
-            {
-                return new ();
-            }
+            get;
         }
 
         public IOutputNode OutputNode
@@ -46,6 +43,7 @@ namespace Yama.Parser
             this.Token = new();
             this.OutputNode = new ParserSyntaxError("error", new IdentifierToken());
             this.AllTokens = new List<IdentifierToken> ();
+            this.GetAllChilds = new List<IParseTreeNode>();
         }
 
         public ParserError(IdentifierToken token)
@@ -53,6 +51,7 @@ namespace Yama.Parser
             this.Token = token;
             this.OutputNode = new ParserSyntaxError(token.Text, token);
             this.AllTokens = new() { token };
+            this.GetAllChilds = new List<IParseTreeNode>();
         }
 
         public ParserError(IdentifierToken token, string errorMessage, params IdentifierToken[] tokens)
@@ -61,6 +60,16 @@ namespace Yama.Parser
             this.OutputNode = new ParserSyntaxError(errorMessage, token);
             this.AllTokens = new() { token };
             this.AllTokens.AddRange(tokens);
+            this.GetAllChilds = new List<IParseTreeNode>();
+        }
+
+        public ParserError(IdentifierToken token, string errorMessage, List<IParseTreeNode> childs, params IdentifierToken[] tokens)
+        {
+            this.Token = token;
+            this.OutputNode = new ParserSyntaxError(errorMessage, token);
+            this.AllTokens = new() { token };
+            this.AllTokens.AddRange(tokens);
+            this.GetAllChilds = childs;
         }
 
         #endregion ctor

@@ -141,7 +141,7 @@ namespace Yama.Parser
 
             IdentifierToken? closeBracket = request.Parser.Peek ( inkrement.Ende, 1);
             if (closeBracket is null) return null;
-            if (closeBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(closeBracket, $"Expected ) and not", request.Token, openBrackettoken);
+            if (closeBracket.Kind != IdentifierKind.CloseBracket) return new ParserError(request.Token, $"Expected a ')' and not a '{closeBracket.Text}' on the", key.GetAllChilds, request.Token, openBrackettoken, semikolonToken);
             key.AllTokens.Add(closeBracket);
 
             IdentifierToken? statementchild = request.Parser.Peek ( closeBracket, 1);
