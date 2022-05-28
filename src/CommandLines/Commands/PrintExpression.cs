@@ -1,4 +1,4 @@
-namespace LearnCsStuf.CommandLines.Commands
+namespace Yama.CommandLines.Commands
 {
     public class PrintExpression : ICommandLine
     {
@@ -33,7 +33,7 @@ namespace LearnCsStuf.CommandLines.Commands
         {
             get
             {
-                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, "<subcommand>", "Zum Einstellen des Consolen Output: Um den ParserTree auszugeben 'tree', um die Parsetime für einzelne Dateien auszugeben 'parsetime'" );
+                return string.Format (CommandLines.HelpController.HilfePattern, this.Key, "<subcommand>", "Zum Einstellen des Consolen Output: Um den ParserTree auszugeben 'tree', um die Parsetime für einzelne Dateien auszugeben 'parsetime', um die Zeit der einzlenen Pahsen auszugeben 'phasetime'" );
             }
         }
 

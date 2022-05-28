@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace LearnCsStuf.Automaten
+namespace Yama.Automaten
 {
     public interface Zustand
     {

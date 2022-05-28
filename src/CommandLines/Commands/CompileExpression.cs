@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace LearnCsStuf.CommandLines.Commands
+namespace Yama.CommandLines.Commands
 {
     public class BuildExpression : ICommandLine, ICommandParent
     {

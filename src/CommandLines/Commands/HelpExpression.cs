@@ -1,6 +1,6 @@
-namespace LearnCsStuf.CommandLines.Commands
+namespace Yama.CommandLines.Commands
 {
-    public class Help : ICommandLine
+    public class HelpExpression : ICommandLine
     {
 
         // -----------------------------------------------

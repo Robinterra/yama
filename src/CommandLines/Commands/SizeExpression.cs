@@ -1,4 +1,4 @@
-namespace LearnCsStuf.CommandLines.Commands
+namespace Yama.CommandLines.Commands
 {
     public class SizeExpression : ICommandLine
     {

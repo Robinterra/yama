@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace LearnCsStuf.CommandLines
+namespace Yama.CommandLines
 {
     public interface ICommandParent
     {

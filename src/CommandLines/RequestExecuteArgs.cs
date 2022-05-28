@@ -1,4 +1,4 @@
-namespace LearnCsStuf.CommandLines
+namespace Yama.CommandLines
 {
     public class RequestExecuteArgs
     {

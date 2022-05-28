@@ -1,4 +1,4 @@
-namespace LearnCsStuf.Automaten
+namespace Yama.Automaten
 {
     public interface Token
     {

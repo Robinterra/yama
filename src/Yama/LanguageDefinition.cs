@@ -98,6 +98,14 @@ namespace Yama
 
         // -----------------------------------------------
 
+        public bool PhaseTime
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public string StartNamespace
         {
             get;
@@ -682,12 +690,16 @@ namespace Yama
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
 
+            using (_ = new MessaureTimeOutput("Parsen ", this.PhaseTime, this.Output))
             if (!this.Parse(nodes)) return this.Output.Print(new BuildEnde(stopwatch, false));
 
+            using (_ = new MessaureTimeOutput("Indezieren ", this.PhaseTime, this.Output))
             if (!this.Indezieren(ref nodes, ref main)) return this.Output.Print(new BuildEnde(stopwatch, false));
 
+            using (_ = new MessaureTimeOutput("Compilen ", this.PhaseTime, this.Output))
             if (!this.Compilen(nodes, main, ref compileRoots)) return this.Output.Print(new BuildEnde(stopwatch, false));
 
+            using (_ = new MessaureTimeOutput("Assemblen ", this.PhaseTime, this.Output))
             if (!this.Assemblen(compileRoots)) return this.Output.Print(new BuildEnde(stopwatch, false));
 
             this.Output.Print(new BuildEnde(stopwatch, true));

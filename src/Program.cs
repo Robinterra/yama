@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using Yama.Compiler;
 using Yama.Compiler.Definition;
 
-using LearnCsStuf.Automaten;
-using LearnCsStuf.CommandLines;
-using LearnCsStuf.CommandLines.Commands;
+using Yama.Automaten;
+using Yama.CommandLines;
+using Yama.CommandLines.Commands;
 using Yama.Assembler;
 using Yama.Debug;
 using Yama.ProjectConfig;
@@ -78,7 +78,7 @@ namespace Yama
             if (firstCommand is DebugExpression) return Program.Debug ( commands, defs, outputController );
             if (firstCommand is AssembleExpression) return Program.Assemble ( commands, outputController );
             if (firstCommand is RunExpression) return Program.Run ( commands, outputController );
-            if (firstCommand is LearnCsStuf.CommandLines.Commands.Help) return Program.HelpPrinten (  ) == 1;
+            if (firstCommand is Yama.CommandLines.Commands.HelpExpression) return Program.HelpPrinten (  ) == 1;
             if (firstCommand is AutoExpression) return Program.RunAuto ( firstCommand );
             if (firstCommand is PrintDefinitionsExpression) return defs.PrintAllDefinitions (  );
 
@@ -273,6 +273,7 @@ namespace Yama
         {
             if (t.Value == "tree") yama.PrintParserTree = true;
             if (t.Value == "parsetime") yama.ParseTime = true;
+            if (t.Value == "phasetime") yama.PhaseTime = true;
 
             return true;
         }
@@ -292,7 +293,7 @@ namespace Yama
 
         private static int HelpPrinten (  )
         {
-            LearnCsStuf.CommandLines.HelpController hilfe = new LearnCsStuf.CommandLines.HelpController(Program.EnabledCommandLines);
+            Yama.CommandLines.HelpController hilfe = new Yama.CommandLines.HelpController(Program.EnabledCommandLines);
 
             hilfe.Print (  );
 
@@ -360,7 +361,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new SizeExpression (  ) );
             Program.EnabledCommandLines.Add ( new PrintExpression (  ) );
             Program.EnabledCommandLines.Add ( new FileExpression (  ) );
-            Program.EnabledCommandLines.Add ( new LearnCsStuf.CommandLines.Commands.Help (  ) );
+            Program.EnabledCommandLines.Add ( new HelpExpression (  ) );
 
             return true;
         }
