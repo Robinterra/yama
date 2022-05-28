@@ -588,9 +588,9 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public Lexer.Lexer GetBasicLexer()
+        public Lexer.Lexer GetBasicLexer(Stream stream)
         {
-            Lexer.Lexer lexer = new Lexer.Lexer();
+            Lexer.Lexer lexer = new Lexer.Lexer(stream);
 
             lexer.LexerTokens.AddRange(this.GetLexerRules());
 
@@ -608,16 +608,17 @@ namespace Yama
             List<string> files = this.GetFiles();
 
             List<ParserLayer> layers = this.GetParserRules();
-            Lexer.Lexer lexer = this.GetBasicLexer();
 
             ParserLayer? startlayer = layers.Find(t=>t.Name == "namespace");
             if (startlayer == null) return false;
 
             bool isfailed = false;
 
+            RequestParseIteration? requestParseIteration = null;
+
             foreach (string file in files)
             {
-                if (!this.ParseIteration(file, startlayer, layers, lexer, nodes)) isfailed = true;
+                if (!this.ParseIteration(file, startlayer, layers, nodes, ref requestParseIteration)) isfailed = true;
             }
 
             return !isfailed;
@@ -625,7 +626,9 @@ namespace Yama
 
         // -----------------------------------------------
 
-        public bool ParseIteration(string fullFileName, ParserLayer startlayer, List<ParserLayer> layers, Lexer.Lexer lexer, List<IParseTreeNode> nodes)
+        record RequestParseIteration(Parser.Parser Parser, Lexer.Lexer Lexer);
+
+        private bool ParseIteration(string fullFileName, ParserLayer startlayer, List<ParserLayer> layers, List<IParseTreeNode> nodes, ref RequestParseIteration? requestParseIteration)
         {
             System.IO.FileInfo file = new System.IO.FileInfo ( fullFileName );
             if (!file.Exists) return false;
@@ -633,23 +636,36 @@ namespace Yama
             Stream stream;
             try {stream = file.OpenRead();} catch {return false;}
 
-            Parser.Parser p = new Parser.Parser (layers, lexer, new ParserInputData(file.FullName, stream));
+            ParserInputData parserInputData = new ParserInputData(file.FullName, stream);
+
+            if (requestParseIteration is null)
+            {
+                Lexer.Lexer lexer = this.GetBasicLexer(stream);
+                requestParseIteration = new RequestParseIteration(new Parser.Parser (layers, lexer, parserInputData), lexer);
+            }
+            else
+            {
+                requestParseIteration.Lexer.Daten = stream;
+                requestParseIteration.Parser.NewParse(requestParseIteration.Lexer, parserInputData);
+            }
+
+            Parser.Parser parser = requestParseIteration.Parser;
 
             using (MessaureTimeOutput messaureTimeOutput = new MessaureTimeOutput(new ParseFileStart(file), this.ParseTime, this.Output))
             {
-                if (!p.Parse(startlayer))
+                if (!parser.Parse(startlayer))
                 {
                     messaureTimeOutput.IsPrintingEnabled = true;
 
-                    this.PrintingErrors(p);
+                    this.PrintingErrors(parser);
 
-                    if (this.PrintParserTree && p.ParentContainer is not null) this.Output.Print(new ParserTreeOut(p.ParentContainer));
+                    if (this.PrintParserTree && parser.ParentContainer is not null) this.Output.Print(new ParserTreeOut(parser.ParentContainer));
 
                     return messaureTimeOutput.IsOK = false;
                 }
             }
 
-            IParseTreeNode? node = p.ParentContainer;
+            IParseTreeNode? node = parser.ParentContainer;
             if (node is null) return false;
 
             if (this.PrintParserTree) this.Output.Print(new ParserTreeOut(node));

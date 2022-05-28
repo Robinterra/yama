@@ -70,7 +70,7 @@ namespace Yama.Assembler
 
         public Parser.Parser GetParser(ParserInputData inputData)
         {
-            Parser.Parser p = new Parser.Parser (this.GetParserRules(), this.GetBasicLexer(), inputData);
+            Parser.Parser p = new Parser.Parser (this.GetParserRules(), this.GetBasicLexer(inputData.InputStream), inputData);
             p.ErrorNode = new ParserError();
 
             return p;
@@ -132,9 +132,9 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public Lexer.Lexer GetBasicLexer()
+        public Lexer.Lexer GetBasicLexer(Stream stream)
         {
-            Lexer.Lexer lexer = new Lexer.Lexer();
+            Lexer.Lexer lexer = new Lexer.Lexer(stream);
 
             lexer.LexerTokens.AddRange(this.GetLexerRules());
 

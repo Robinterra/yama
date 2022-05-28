@@ -203,7 +203,8 @@ namespace Yama.Assembler
 
             MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString()));
 
-            this.Parser.NewParse(new ParserInputData("assemblerStream", stream));
+            IEnumerable<IdentifierToken> tokens = definition.GetBasicLexer(stream);
+            this.Parser.NewParse(tokens, new ParserInputData("assemblerStream", stream));
 
             if (!this.Parser.Parse(startlayer))
             {

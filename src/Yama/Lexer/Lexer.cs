@@ -5,7 +5,7 @@ using System;
 
 namespace Yama.Lexer
 {
-    public class Lexer : IEnumerator, IEnumerable
+    public class Lexer : IEnumerator<IdentifierToken>, IEnumerable<IdentifierToken>
     {
 
         // -----------------------------------------------
@@ -74,10 +74,18 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public object? Current
+        public IdentifierToken Current
         {
             get;
             private set;
+        }
+
+        object? IEnumerator.Current
+        {
+            get
+            {
+                return this.Current;
+            }
         }
 
         // -----------------------------------------------
@@ -93,6 +101,7 @@ namespace Yama.Lexer
         public Lexer (  )
         {
             this.LexerTokens = new List<ILexerToken> ();
+            this.Current = new IdentifierToken();
         }
 
         // -----------------------------------------------
@@ -324,9 +333,12 @@ namespace Yama.Lexer
 
         public bool MoveNext()
         {
-            this.Current = this.NextToken (  );
+            IdentifierToken? result = this.NextToken (  );
+            if (result is null) return false;
 
-            return this.Current != null;
+            this.Current = result;
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -355,9 +367,23 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public IEnumerator GetEnumerator()
+        public IEnumerator<IdentifierToken> GetEnumerator()
         {
             return this;
+        }
+
+        // -----------------------------------------------
+
+        public void Dispose()
+        {
+            this.Reset();
+        }
+
+        // -----------------------------------------------
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
 
         // -----------------------------------------------

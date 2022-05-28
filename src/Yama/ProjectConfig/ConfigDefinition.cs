@@ -275,9 +275,9 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        private Lexer.Lexer GetBasicLexer()
+        private Lexer.Lexer GetBasicLexer(Stream stream)
         {
-            Lexer.Lexer lexer = new Lexer.Lexer();
+            Lexer.Lexer lexer = new Lexer.Lexer(stream);
 
             lexer.LexerTokens.AddRange(this.GetLexerRules());
 
@@ -348,7 +348,7 @@ namespace Yama.ProjectConfig
             Stream stream;
             try {stream = file.OpenRead();} catch {return false;}
 
-            Parser.Parser p = new Parser.Parser (this.GetParserRules(), this.GetBasicLexer(), new ParserInputData(file.FullName, stream));
+            Parser.Parser p = new Parser.Parser (this.GetParserRules(), this.GetBasicLexer(stream), new ParserInputData(file.FullName, stream));
             ParserLayer? startlayer = p.ParserLayers.Find(t=>t.Name == "root");
 
             if (startlayer == null) return false;

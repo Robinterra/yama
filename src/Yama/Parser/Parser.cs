@@ -54,7 +54,7 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private Lexer.Lexer? Tokenizer
+        private IEnumerable<IdentifierToken> Tokenizer
         {
             get;
             set;
@@ -177,28 +177,14 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public Parser ( List<ParserLayer> layers, Lexer.Lexer lexer, IParserInputData inputData )
+        public Parser ( List<ParserLayer> layers, IEnumerable<IdentifierToken> tokens, IParserInputData inputData )
         {
             this.MethodTag = new List<IParseTreeNode> (  );
             this.ParserLayers = layers;
-            this.Tokenizer = lexer;
-            lexer.Reset();
+            this.Tokenizer = tokens;
+            //lexer.Reset();
 
             this.InputData = inputData;
-        }
-
-        public IParseTreeNode SetChild(IParentNode parentNode, IParseTreeNode childNode)
-        {
-            parentNode.LeftNode = childNode;
-
-            childNode.Token.ParentNode = (IParseTreeNode)parentNode;
-
-            return childNode.Token.ParentNode;
-        }
-
-        internal void ActivateLayer(object expressionLayer)
-        {
-            throw new NotImplementedException();
         }
 
         // -----------------------------------------------
@@ -211,9 +197,21 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public bool NewParse(IParserInputData inputData)
+        public IParseTreeNode SetChild(IParentNode parentNode, IParseTreeNode childNode)
+        {
+            parentNode.LeftNode = childNode;
+
+            childNode.Token.ParentNode = (IParseTreeNode)parentNode;
+
+            return childNode.Token.ParentNode;
+        }
+
+        // -----------------------------------------------
+
+        public bool NewParse(IEnumerable<IdentifierToken> tokens, IParserInputData inputData)
         {
             this.InputData = inputData;
+            this.Tokenizer = tokens;
             this.ParentContainer = null;
 
             this.ParserErrors.Clear();
@@ -277,7 +275,7 @@ namespace Yama.Parser
         {
             if (this.Tokenizer is null) return false;
 
-            this.Tokenizer.Daten = this.InputData.InputStream;
+            //this.Tokenizer.Daten = this.InputData.InputStream;
             this.CleanTokens = new List<IdentifierToken>();
 
             ITokenInfo info = new TokenInfo(this.InputData.Name);
