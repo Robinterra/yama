@@ -8,7 +8,9 @@ namespace Yama.Index
 
         public string This = "this";
 
-        public string Base = "Base";
+        public string Base = "base";
+
+        public string Field = "field";
 
     }
 }
