@@ -269,6 +269,7 @@ namespace Yama.Compiler
             {
                 map.Value = SSAVariableMap.LastValue.Unknown;
                 if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+                if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
             }
             else map.Value = SSAVariableMap.LastValue.NotNull;
 

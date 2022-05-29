@@ -165,9 +165,12 @@ namespace Yama.Parser
             container.VariabelnReferences.Add(varref);
 
             this.BooleascherReturn = new IndexVariabelnReference(this, "bool");
-            container.VariabelnReferences.Add(this.BooleascherReturn);
 
-            if ( this.IsNullChecking ) return true;
+            if (this.IsNullChecking)
+            {
+                container.VariabelnReferences.Add(this.BooleascherReturn);
+                return true;
+            }
             if (this.ReferenceDeklaration is null) return false;
             if (this.RightToken is null) return false;
 
@@ -177,6 +180,7 @@ namespace Yama.Parser
             reference.Name = this.ReferenceDeklaration.Text;
             container.VariabelnDeklarations.Add(reference);
             container.VariabelnReferences.Add(type);
+            container.VariabelnReferences.Add(this.BooleascherReturn);
 
             this.Deklaration = reference;
 
@@ -186,7 +190,7 @@ namespace Yama.Parser
         public bool Compile(RequestParserTreeCompile request)
         {
             if (this.LeftNode is not ICompileNode leftNode) return false;
-            if ( this.IsNullChecking ) return this.CompileNullChecking ( request, leftNode );
+            if (this.IsNullChecking) return this.CompileNullChecking ( request, leftNode );
             if (this.Deklaration is null) return false;
             if (this.Deklaration.Type.Deklaration is not IndexKlassenDeklaration t) return false;
             if (t.InheritanceBase == null && t.InheritanceChilds.Count == 0) return request.Compiler.AddError("The Is Keyword works only with inheritance.", this);
@@ -201,6 +205,7 @@ namespace Yama.Parser
             ReferenceCall call = new ReferenceCall();
             call.Token = this.ReferenceDeklaration;
             call.Reference = new IndexVariabelnReference(this, this.Deklaration.Name) { Deklaration = this.Deklaration, ParentUsesSet = this.BooleascherReturn.ThisUses };
+            compileReference.IsNullCheck = true;
             compileReference.Compile(request.Compiler, call, "set");
 
             compileReference = new CompileReferenceCall();
