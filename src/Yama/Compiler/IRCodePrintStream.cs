@@ -43,14 +43,18 @@ namespace Yama.Compiler
 
             StringBuilder result = new StringBuilder();
 
-            if (this.PrintUnit(line, result) == ContinueMode.Break) return true;
+            ContinueMode continueMode = this.PrintUnit(line, result);
+            if (continueMode == ContinueMode.Break) return true;
 
-            foreach (SSACompileArgument arg in line.Arguments)
+            if (continueMode == ContinueMode.Continue)
             {
-                if (arg.Mode == SSACompileArgumentMode.Const) result.AppendFormat(" #0x{0:x}", arg.Const);
-                if (arg.Mode == SSACompileArgumentMode.Reference && arg.Reference is not null) result.AppendFormat(" {0}", arg.Reference.Order);
-                if (arg.Mode == SSACompileArgumentMode.Variable && arg.Variable is not null && arg.Variable.Reference is not null) result.AppendFormat(" {0}", arg.Variable.Reference.Order);
-                if (arg.Mode == SSACompileArgumentMode.JumpReference && arg.CompileReference is not null) result.AppendFormat(" {0}", arg.CompileReference.Line?.Order);
+                foreach (SSACompileArgument arg in line.Arguments)
+                {
+                    if (arg.Mode == SSACompileArgumentMode.Const) result.AppendFormat(" #0x{0:x}", arg.Const);
+                    if (arg.Mode == SSACompileArgumentMode.Reference && arg.Reference is not null) result.AppendFormat(" {0}", arg.Reference.Order);
+                    if (arg.Mode == SSACompileArgumentMode.Variable && arg.Variable is not null && arg.Variable.Reference is not null) result.AppendFormat(" {0}", arg.Variable.Reference.Order);
+                    if (arg.Mode == SSACompileArgumentMode.JumpReference && arg.CompileReference is not null) result.AppendFormat(" {0}", arg.CompileReference.Line?.Order);
+                }
             }
 
             this.Writer.WriteLine(result);
@@ -63,8 +67,10 @@ namespace Yama.Compiler
             if (this.AddFunktionsDeklaration(line, result)) return ContinueMode.Continue;
             if (this.AddFunktionsEnde(line, result)) return ContinueMode.Continue;
             if (this.AddWhileLoop(line, result)) return ContinueMode.Continue;
+            if (this.AddIfExpression(line, result)) return ContinueMode.PrintDirect;
             if (this.AddForLoop(line, result)) return ContinueMode.Continue;
             if (this.AddFreeLoop(line, result)) return ContinueMode.Break;
+            if (this.AddFreeIfExpression(line, result)) return ContinueMode.PrintDirect;
             if (this.AddReferenceCall(line, result)) return ContinueMode.Continue;
 
             string? printMode = line.Owner.Algo!.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
@@ -72,6 +78,36 @@ namespace Yama.Compiler
             result.AppendFormat("{3}{0}: {4}{1}{2}", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
 
             return ContinueMode.Continue;
+        }
+
+        private bool AddFreeIfExpression(SSACompileLine line, StringBuilder result)
+        {
+            if (!(line.Owner is CompileSprungPunkt)) return false;
+            if (!(line.Owner.Node is IfKey ifk)) return false;
+
+            string? printMode = line.Owner.Algo!.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
+            string isNotUseChar = line.IsUsed ? "" : "/!\\";
+            //result.AppendFormat("{3}{0}: {4}{1}{2}\n", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
+
+            if (emptyStrings != 0) this.emptyStrings = this.emptyStrings - 4;
+
+            result.AppendFormat("{0}}}", new string(' ', emptyStrings));
+
+            return true;
+        }
+
+        private bool AddIfExpression(SSACompileLine line, StringBuilder result)
+        {
+            if (!(line.Owner is CompileJumpWithCondition)) return false;
+            if (!(line.Owner.Node is IfKey ifk)) return false;
+
+            SSACompileArgument arg = line.Arguments.First();
+
+            result.AppendFormat("{2}{0}: {1} {3}\n{2}{{", line.Order, ifk.Token.Text, new string(' ', emptyStrings), arg.Reference?.Order);
+
+            this.emptyStrings = this.emptyStrings + 4;
+
+            return true;
         }
 
         private bool AddFreeLoop(SSACompileLine line, StringBuilder result)
@@ -176,6 +212,7 @@ namespace Yama.Compiler
     public enum ContinueMode
     {
         Continue,
-        Break
+        Break,
+        PrintDirect
     }
 }
