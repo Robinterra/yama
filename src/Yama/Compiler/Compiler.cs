@@ -159,6 +159,14 @@ namespace Yama.Compiler
             return null;
         }
 
+        public SSACompileLine GetLatestSSALine()
+        {
+            SSACompileLine? result = this.SSALines.LastOrDefault();
+            if (result is null) throw new NullReferenceException();
+
+            return result;
+        }
+
         public SSACompileLine AddSSALine(SSACompileLine line)
         {
             line.Order = this.OrderCounter;

@@ -67,6 +67,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public ProgramFlowTask FlowTask
+        {
+            get;
+            set;
+        }
+
         public List<SSACompileLine> PhiMap
         {
             get;
@@ -320,4 +326,15 @@ namespace Yama.Compiler
         #endregion methods
 
     }
+
+    public enum ProgramFlowTask
+    {
+        None,
+        IsNullCheck,
+        IsTypeChecking,
+        IsNotNullCheck,
+        IsNotTypeChecking,
+        CanComputeAndOptimizeConstOperation
+    }
+
 }

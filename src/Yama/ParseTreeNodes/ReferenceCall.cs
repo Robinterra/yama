@@ -149,7 +149,7 @@ namespace Yama.Parser
 
             if (this.CheckAndCompileBase(request.Compiler, compileReference, moderesult)) return true;
 
-            if ( request.Mode == "nullChecking" ) compileReference.IsNullCheck = true;
+            //if ( request.Mode == "nullChecking" ) compileReference.IsNullCheck = true;
             return compileReference.Compile(request.Compiler, this, moderesult);
         }
 
