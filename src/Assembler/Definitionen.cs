@@ -197,9 +197,11 @@ namespace Yama.Assembler
         private bool T1RegisterDefinition(AssemblerDefinition definition)
         {
             definition.Formats.Add(new T1SmallRegisterFormat());
+            definition.Formats.Add(new T1MrsFormat());
 
             definition.Commands.Add(new T1RegistersCommand("cmp", "T1Register", 0x45, 2));
             definition.Commands.Add(new T1RegistersCommand("mov", "T1Register", 0x46, 2));
+            definition.Commands.Add(new T1RegisterCommand("mrs", "T1MrsFormat", 0xF3E, 4));
 
             return true;
         }
