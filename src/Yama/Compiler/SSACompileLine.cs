@@ -275,7 +275,7 @@ namespace Yama.Compiler
 
         private bool SpecialRules(RegisterAllocater allocater, CompileContainer container, GenericDefinition gd)
         {
-            if (this.Owner is CompileFreeLoop)
+            if (this.FlowTask == ProgramFlowTask.IsLoopEnde)
             {
                 if (this.LoopContainer is null) return false;
 
