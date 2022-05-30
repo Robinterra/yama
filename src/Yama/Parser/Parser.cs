@@ -16,8 +16,6 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private int grosstePrio = -1;
-
         public List<IParseTreeNode>? possibleParents;
 
         // -----------------------------------------------
@@ -542,8 +540,6 @@ namespace Yama.Parser
 
         public bool VorherigesLayer()
         {
-            this.grosstePrio = -1;
-
             this.ParserStack.Pop();
 
             return true;
@@ -553,8 +549,6 @@ namespace Yama.Parser
 
         public bool ActivateLayer(ParserLayer start)
         {
-            this.grosstePrio = -1;
-
             this.ParserStack.Push(start);
 
             return true;

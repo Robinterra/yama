@@ -64,6 +64,7 @@ namespace Yama.Compiler
 
         private ContinueMode PrintUnit(SSACompileLine line, StringBuilder result)
         {
+            if (this.AddReturn(line, result)) return ContinueMode.PrintDirect;
             if (this.AddFunktionsDeklaration(line, result)) return ContinueMode.Continue;
             if (this.AddFunktionsEnde(line, result)) return ContinueMode.Continue;
             if (this.AddWhileLoop(line, result)) return ContinueMode.Continue;
@@ -82,16 +83,26 @@ namespace Yama.Compiler
 
         private bool AddFreeIfExpression(SSACompileLine line, StringBuilder result)
         {
-            if (!(line.Owner is CompileSprungPunkt)) return false;
-            if (!(line.Owner.Node is IfKey ifk)) return false;
+            if (line.FlowTask != ProgramFlowTask.IsIfStatementEnde) return false;
 
-            string? printMode = line.Owner.Algo!.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
-            string isNotUseChar = line.IsUsed ? "" : "/!\\";
+            //string? printMode = line.Owner.Algo!.Mode == "default" ? string.Empty : line.Owner.Algo.Mode;
+            //string isNotUseChar = line.IsUsed ? "" : "/!\\";
             //result.AppendFormat("{3}{0}: {4}{1}{2}\n", line.Order, line.Owner.Algo.Name, printMode, new string(' ', emptyStrings), isNotUseChar);
 
             if (emptyStrings != 0) this.emptyStrings = this.emptyStrings - 4;
 
             result.AppendFormat("{0}}}", new string(' ', emptyStrings));
+
+            return true;
+        }
+
+        private bool AddReturn(SSACompileLine line, StringBuilder result)
+        {
+            if (line.FlowTask != ProgramFlowTask.IsReturn) return false;
+
+            SSACompileArgument? arg = line.References.FirstOrDefault();
+
+            result.AppendFormat("{1}{0}: return {2}", line.Order, new string(' ', emptyStrings), arg?.Reference?.Order);
 
             return true;
         }
@@ -112,7 +123,7 @@ namespace Yama.Compiler
 
         private bool AddFreeLoop(SSACompileLine line, StringBuilder result)
         {
-            if (!(line.Owner is CompileFreeLoop)) return false;
+            if (line.FlowTask != ProgramFlowTask.IsLoopEnde) return false;
 
             if (emptyStrings != 0) this.emptyStrings = this.emptyStrings - 4;
 

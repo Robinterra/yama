@@ -91,6 +91,7 @@ namespace Yama.Compiler
             this.Node = node;
 
             SSACompileLine line = new SSACompileLine(this, true);
+            line.FlowTask = ProgramFlowTask.IsLoopEnde;
             line.LoopContainer = compiler.ContainerMgmt.CurrentContainer;
             if (line.LoopContainer is null) return compiler.AddError("ende des loop konnte nicht gefunden werden", node);
 

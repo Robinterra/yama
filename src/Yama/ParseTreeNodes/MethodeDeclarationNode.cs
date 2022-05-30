@@ -457,6 +457,7 @@ namespace Yama.Parser
 
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
+            this.CompileContainer.Ende.Node = this;
 
             request.Compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, c.IndexContainer.ThisUses);
 
