@@ -314,51 +314,12 @@ namespace Yama.Parser
             this.possibleParents = new List<IParseTreeNode>();
 
             this.ParsePrimary ( this.Max, this.possibleParents );
-            /*bool isok = true;
-            bool vorgangOhneNeueNodes = true;
-            while ( isok )
-            {
-                IParseTreeNode? node = this.ParsePrimary ( this.Max );
-                if ( node != null && !(node is ParserError) ) vorgangOhneNeueNodes = false;
 
-                isok = node != null;
-
-                if (node is not null) this.possibleParents.Add ( node );
-
-                this.NextToken (  );
-
-                if ( isok ) continue;
-                if ( vorgangOhneNeueNodes ) continue;
-
-                this.Position = von;
-                isok = true;
-                vorgangOhneNeueNodes = true;
-            }*/
-
-            List<IParseTreeNode> nodeParents = this.possibleParents;//this.GetCleanNodeParents();
-
-            //this.FindTokensThatHasNoMatchNode();
+            List<IParseTreeNode> nodeParents = this.possibleParents;
 
             pos.SetToParser(this);
 
             return nodeParents;
-        }
-
-        // -----------------------------------------------
-
-        private bool FindTokensThatHasNoMatchNode()
-        {
-            for (int i = this.Start; i < this.Max; i++)
-            {
-                IdentifierToken? token = this.Peek(i);
-
-                if ( token is null ) continue;
-                if ( token.Node != null ) continue;
-
-                this.SyntaxErrorToken ( token );
-            }
-
-            return true;
         }
 
         // -----------------------------------------------
@@ -368,36 +329,6 @@ namespace Yama.Parser
             List<IParseTreeNode> result = this.MethodTag;
 
             this.MethodTag = new List<IParseTreeNode>();
-
-            return result;
-        }
-
-        // -----------------------------------------------
-
-        private List<IParseTreeNode> GetCleanNodeParents()
-        {
-            if (this.Max - this.Start < 0) return new List<IParseTreeNode>();
-            if (this.CleanTokens == null) return new List<IParseTreeNode>();
-
-            List<IdentifierToken> unclean = this.CleanTokens.GetRange(this.Start, this.Max - this.Start);
-            List<IParseTreeNode> result = new List<IParseTreeNode>();
-            List<IParseTreeNode> clean = new List<IParseTreeNode>();
-
-            foreach ( IdentifierToken token in unclean )
-            {
-                if (token == null) continue;
-                if (token.Node == null) continue;
-                if (clean.Contains(token.Node)) continue;
-
-                clean.Add(token.Node);
-            }
-
-            foreach ( IParseTreeNode node in clean )
-            {
-                if ( node.Token.ParentNode != null ) continue;
-
-                result.Add ( node );
-            }
 
             return result;
         }
@@ -420,45 +351,6 @@ namespace Yama.Parser
                 if (node is not ParserError) possibleParents.Add(node);
 
                 this.NextToken();
-            }
-
-            /*for ( int i = this.GetGrosstePrio (  ); i > -1; i-- )
-            {
-                pos = this.Position;
-
-                IParseTreeNode? node = this.ParsePrimaryPrioSystem ( max, i );
-
-                this.Position = pos;
-
-                if ( node != null ) return node;
-            }*/
-
-            /*while ( this.Position < max )
-            {
-                if (this.Current == null) return null;
-                if ( this.Current.Node == null ) return this.SyntaxErrorToken ( this.Current );
-
-                this.NextToken (  );
-            }*/
-
-            return null;
-        }
-
-        // -----------------------------------------------
-
-        private IParseTreeNode? ParsePrimaryPrioSystem ( int max, int prio )
-        {
-            while ( this.Position < max )
-            {
-                if (this.Current is null) return null;
-
-                if ( this.Current.Node == null )
-                {
-                    IParseTreeNode? node = this.ParsePrioSystem ( this.Current, prio );
-                    if ( node is not null ) return node;
-                }
-
-                this.NextToken (  );
             }
 
             return null;
@@ -491,14 +383,6 @@ namespace Yama.Parser
 
             this.ActivateLayer(neuerLayer);
 
-            /*IParseTreeNode? result = this.ParseEndExpression ( token );
-
-            if ( result != null ) { this.VorherigesLayer(); return result; }
-
-            result = this.ParsePrioSystem ( token, this.GetGrosstePrio (  ), true );
-
-            if ( result != null ) { this.VorherigesLayer(); return result; }*/
-
             IParseTreeNode? result = this.ParseSteuerTokens ( token );
 
             this.VorherigesLayer();
@@ -516,27 +400,6 @@ namespace Yama.Parser
             if (this.CurrentLayer is null) return null;
 
             return this.ParseCleanToken(token, this.CurrentLayer, false);
-        }
-
-        // -----------------------------------------------
-
-        private IParseTreeNode? ParseEndExpression(IdentifierToken token)
-        {
-            Request.RequestParserTreeParser request = new Request.RequestParserTreeParser(this, token);
-
-            foreach ( IParseTreeNode node in this.CurrentParserMembers )
-            {
-                if (node is not IEndExpression) continue;
-
-                IParseTreeNode? nodet = node.Parse ( request );
-                if (nodet is null) continue;
-
-                this.CleanPareNode ( nodet );
-
-                return nodet;
-            }
-
-            return null;
         }
 
         // -----------------------------------------------
@@ -570,23 +433,6 @@ namespace Yama.Parser
             }
 
             return null;
-        }
-
-        // -----------------------------------------------
-
-        private int GetGrosstePrio()
-        {
-            if ( this.grosstePrio != -1 ) return this.grosstePrio;
-
-            foreach ( IParseTreeNode member in this.CurrentParserMembers )
-            {
-                if ( !(member is IPriority t) ) continue;
-                if ( t.Prio < this.grosstePrio ) continue;
-
-                this.grosstePrio = t.Prio;
-            }
-
-            return this.grosstePrio;
         }
 
         // -----------------------------------------------
@@ -766,31 +612,6 @@ namespace Yama.Parser
             this.CleanTokens[pos] = token;
 
             return true;
-        }
-
-        // -----------------------------------------------
-
-        public IdentifierToken? FindAToken ( IdentifierToken von, IdentifierKind zufinden )
-        {
-            IdentifierToken? kind = von;
-
-            for ( int i = 1; kind != null; i++ )
-            {
-                if ( kind.Kind == zufinden && kind.Node == null ) return kind;
-
-                kind = this.Peek ( von, i );
-            }
-
-            return null;
-        }
-
-        // -----------------------------------------------
-
-        public IdentifierToken? Peek ( int offset )
-        {
-            if (this.Current is null) return null;
-
-            return this.Peek ( this.Current, offset );
         }
 
         // -----------------------------------------------
