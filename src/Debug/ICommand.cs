@@ -10,7 +10,6 @@ namespace Yama.Debug
         uint CommandId
         {
             get;
-            set;
         }
 
         bool Execute(Runtime runtime);

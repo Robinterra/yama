@@ -34,18 +34,9 @@ namespace Yama.Debug
 
         // -----------------------------------------------
 
-        public bool Carry
+        public StatusRegister StatusRegister
         {
             get;
-            set;
-        }
-
-        // -----------------------------------------------
-
-        public bool Zero
-        {
-            get;
-            set;
         }
 
         // -----------------------------------------------
@@ -182,6 +173,7 @@ namespace Yama.Debug
         public Runtime()
         {
             this.Memory = new byte[0];
+            this.StatusRegister = new StatusRegister();
             this.Init();
         }
 
@@ -197,6 +189,7 @@ namespace Yama.Debug
             this.Commands.Add(new AddImediateCommand());
             this.Commands.Add(new AddRegisterCommand());
             this.Commands.Add(new AndRegisterCommand());
+            this.Commands.Add(new AndImediateCommand());
             this.Commands.Add(new AslImediateCommand());
             this.Commands.Add(new AslRegisterCommand());
             this.Commands.Add(new ASRImediateCommand());
@@ -219,6 +212,7 @@ namespace Yama.Debug
             this.Commands.Add(new StrCommand());
             this.Commands.Add(new SubImediateCommand());
             this.Commands.Add(new SubRegisterCommand());
+            this.Commands.Add(new MrsCommand());
         }
 
         // -----------------------------------------------
@@ -710,12 +704,12 @@ namespace Yama.Debug
         private bool CheckCondition()
         {
             if (this.Condition == 0) return true;
-            if (this.Condition == 1) return this.Zero;
-            if (this.Condition == 2) return !this.Zero;
-            if (this.Condition == 3) return (!this.Zero) && (!this.Carry);
-            if (this.Condition == 4) return (this.Zero) || (!this.Carry);
-            if (this.Condition == 5) return (!this.Zero) && (this.Carry);
-            if (this.Condition == 6) return (this.Zero) || (this.Carry);
+            if (this.Condition == 1) return this.StatusRegister.Zero;
+            if (this.Condition == 2) return !this.StatusRegister.Zero;
+            if (this.Condition == 3) return (!this.StatusRegister.Zero) && (!this.StatusRegister.Carry);
+            if (this.Condition == 4) return (this.StatusRegister.Zero) || (!this.StatusRegister.Carry);
+            if (this.Condition == 5) return (!this.StatusRegister.Zero) && (this.StatusRegister.Carry);
+            if (this.Condition == 6) return (this.StatusRegister.Zero) || (this.StatusRegister.Carry);
             if (this.Condition == 15) this.Register[15] += 4;
 
             return true;

@@ -18,8 +18,8 @@ namespace Yama.Debug
 
             long cmpresult = (long)runtime.Register[runtime.A] - (long)runtime.Register[runtime.B];
 
-            runtime.Carry = cmpresult < 0;
-            runtime.Zero = cmpresult == 0;
+            runtime.StatusRegister.Carry = cmpresult < 0;
+            runtime.StatusRegister.Zero = cmpresult == 0;
 
             return true;
         }

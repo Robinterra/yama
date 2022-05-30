@@ -413,6 +413,8 @@ namespace Yama.Assembler
             definition.Commands.Add(new CommandF3List("push", "Format3", 0x40, 4, 15));
             definition.Commands.Add(new CommandF3List("pop", "Format3", 0x41, 4, 15));
 
+            definition.Commands.Add(new Command1Register("mrs", "Format3", 0x42, 4));
+
             definition.Commands.Add(new CommandJumpPoint("b", "Format3", 0x32, 4, 0x1FFFF, 0));
             definition.Commands.Add(new CommandJumpPoint("beq", "Format3", 0x32, 4, 0x1FFFF, 1));
             definition.Commands.Add(new CommandJumpPoint("bne", "Format3", 0x32, 4, 0x1FFFF, 2));
