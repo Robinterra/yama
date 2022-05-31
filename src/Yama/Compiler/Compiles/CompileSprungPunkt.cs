@@ -95,6 +95,7 @@ namespace Yama.Compiler
 
             SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
+            if (this.Node is IfKey) line.FlowTask = ProgramFlowTask.IsIfStatementEnde;
             this.Line = line;
 
             if (string.IsNullOrEmpty(this.JumpPointName)) this.JumpPointName = compiler.Definition.GenerateJumpPointName();

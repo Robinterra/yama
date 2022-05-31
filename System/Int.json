@@ -256,6 +256,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryAnd",
+                "CanBeCompute": true,
                 "Description": "BinaryAnd",
                 "Keys": [
                     {
@@ -278,6 +279,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryOr",
+                "CanBeCompute": true,
                 "Description": "BinaryOr",
                 "Keys": [
                     {
@@ -300,6 +302,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryLeftShift",
+                "CanBeCompute": true,
                 "Description": "BinaryLeftShift",
                 "Keys": [
                     {
@@ -322,6 +325,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryRightShift",
+                "CanBeCompute": true,
                 "Description": "BinaryRightShift",
                 "Keys": [
                     {
@@ -344,6 +348,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryNegation",
+                "CanBeCompute": true,
                 "Description": "BinaryNegation",
                 "Keys": [
                     {
@@ -367,6 +372,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryXor",
+                "CanBeCompute": true,
                 "Description": "BinaryXor",
                 "Keys": [
                     {
@@ -389,6 +395,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Subtraction",
+                "CanBeCompute": true,
                 "Description": "Subtraction",
                 "Keys": [
                     {
@@ -411,6 +418,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Addition",
+                "CanBeCompute": true,
                 "Description": "Addition",
                 "Keys": [
                     {
@@ -433,6 +441,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Mul",
+                "CanBeCompute": true,
                 "Description": "mul",
                 "Keys": [
                     {
@@ -455,6 +464,7 @@
             {
               "Name": "IntArimetics",
               "Mode": "Division",
+              "CanBeCompute": true,
               "Description": "Division",
               "Keys": [
                   {
@@ -477,6 +487,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Incremtation",
+                "CanBeCompute": true,
                 "Description": "Incremtation",
                 "Keys": [
                     {
@@ -499,6 +510,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Decremtation",
+                "CanBeCompute": true,
                 "Description": "Decremtation",
                 "Keys": [
                     {
@@ -554,6 +566,7 @@
             {
                 "Name": "IntCompare",
                 "Mode": "NotEquals",
+                "CanBeCompute": true,
                 "Description": "NotEquals",
                 "Keys": [
                     {
@@ -723,6 +736,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryAnd",
+                "CanBeCompute": true,
                 "Description": "BinaryAnd",
                 "Keys": [
                     {
@@ -745,6 +759,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryOr",
+                "CanBeCompute": true,
                 "Description": "BinaryOr",
                 "Keys": [
                     {
@@ -767,6 +782,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryLeftShift",
+                "CanBeCompute": true,
                 "Description": "BinaryLeftShift",
                 "Keys": [
                     {
@@ -789,6 +805,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryRightShift",
+                "CanBeCompute": true,
                 "Description": "BinaryRightShift",
                 "Keys": [
                     {
@@ -811,6 +828,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryNegation",
+                "CanBeCompute": true,
                 "Description": "BinaryNegation",
                 "Keys": [
                     {
@@ -834,6 +852,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "BinaryXor",
+                "CanBeCompute": true,
                 "Description": "BinaryXor",
                 "Keys": [
                     {
@@ -856,6 +875,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Subtraction",
+                "CanBeCompute": true,
                 "Description": "Subtraction",
                 "Keys": [
                     {
@@ -878,6 +898,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Addition",
+                "CanBeCompute": true,
                 "Description": "Addition",
                 "Keys": [
                     {
@@ -900,6 +921,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Mul",
+                "CanBeCompute": true,
                 "Description": "mul",
                 "Keys": [
                     {
@@ -922,6 +944,7 @@
             {
               "Name": "IntArimetics",
               "Mode": "Division",
+              "CanBeCompute": true,
               "Description": "Division",
               "Keys": [
                   {
@@ -944,6 +967,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Incremtation",
+                "CanBeCompute": true,
                 "Description": "Incremtation",
                 "Keys": [
                     {
@@ -966,6 +990,7 @@
             {
                 "Name": "IntArimetics",
                 "Mode": "Decremtation",
+                "CanBeCompute": true,
                 "Description": "Decremtation",
                 "Keys": [
                     {
@@ -1021,6 +1046,7 @@
             {
                 "Name": "IntCompare",
                 "Mode": "NotEquals",
+                "CanBeCompute": true,
                 "Description": "NotEquals",
                 "Keys": [
                     {

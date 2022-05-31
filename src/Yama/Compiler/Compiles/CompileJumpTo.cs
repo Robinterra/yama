@@ -106,11 +106,13 @@ namespace Yama.Compiler
             if (this.Point == PointMode.RootEnde)
             {
                 this.Punkt = compiler.ContainerMgmt.RootContainer?.Ende;
+                line.FlowTask = ProgramFlowTask.IsReturn;
 
                 try
                 {
                     SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
-                    arg.Reference!.IsReturn = true;
+                    arg.Reference!.FlowTask = ProgramFlowTask.IsReturnChild;
+                    line.AddReference(arg);
                 }
                 catch{}
             }

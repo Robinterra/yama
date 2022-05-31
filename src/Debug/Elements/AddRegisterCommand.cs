@@ -17,7 +17,7 @@ namespace Yama.Debug
         {
             ulong result = (ulong)runtime.Register[runtime.B] + (ulong)runtime.Register[runtime.C];
 
-            runtime.Carry = result == 0x100000000;
+            runtime.StatusRegister.Carry = result == 0x100000000;
 
             runtime.Register[runtime.A] = (uint) result;
 

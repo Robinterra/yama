@@ -37,6 +37,7 @@ namespace Yama.Compiler
 
             this.Methods = new List<OptimizeMethod>();
             this.Methods.Add(this.RemoveNotNecessaryJumps);
+            this.Methods.Add(this.RemoveNotNecessaryMovReg);
             //this.Methods.Add(this.RemovedUnusedArgs);
             this.Methods.Add(this.RemoveNotUsedLines);
             //this.Methods.Add(this.RemoveJumpPointsWith0Calls);
@@ -116,6 +117,35 @@ namespace Yama.Compiler
             return true;
         }
 
+        private bool RemoveNotNecessaryMovReg(RequestOptimize request)
+        {
+            SSACompileLine line = request.Current;
+            if (line.FlowTask != ProgramFlowTask.IsReturn) return false;
+
+            SSACompileArgument? returnargument = line.References.FirstOrDefault();
+            if (returnargument is null) return false;
+            if (returnargument.Reference is null) return false;
+
+            SSACompileLine returnChild = returnargument.Reference;
+            if (returnChild.FlowTask != ProgramFlowTask.IsReturnChild) return false;
+            if (returnChild.Owner is not CompileMovReg movReg) return false;
+
+            SSACompileArgument? argument = returnChild.Arguments.FirstOrDefault();
+            if (argument is null) return false;
+            if (argument.Reference is null) return false;
+            if (argument.Reference.Order + 1 != returnChild.Order) return false;
+
+            argument.Reference.FlowTask = ProgramFlowTask.IsReturnChild;
+            argument.Reference.Calls.Add(line);
+
+            returnargument.Reference = argument.Reference;
+            returnChild.ReplaceLine = argument.Reference;
+
+            request.ToRemove.Add(returnChild);
+
+            return true;
+        }
+
         private bool RemoveNotNecessaryJumps(RequestOptimize request)
         {
             SSACompileLine line = request.Current;
@@ -128,6 +158,8 @@ namespace Yama.Compiler
             if (arg.CompileReference is null) return false;
             if (arg.CompileReference.Line is null) return false;
             if (arg.CompileReference.Line.Order != line.Order + 1) return false;
+
+            this.RemoveNotNecessaryMovReg(request);
 
             arg.CompileReference.Line.Calls.Remove(line);
 

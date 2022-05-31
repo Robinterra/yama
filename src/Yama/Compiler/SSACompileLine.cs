@@ -67,6 +67,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public ProgramFlowTask FlowTask
+        {
+            get;
+            set;
+        }
+
         public List<SSACompileLine> PhiMap
         {
             get;
@@ -89,8 +95,10 @@ namespace Yama.Compiler
         {
             get
             {
+                if (this.ReplaceLine is not null) return false;
                 if (this.IsPrimary) return true;
-                if (this.IsReturn) return true;
+                if (this.FlowTask == ProgramFlowTask.IsReturn) return true;
+                if (this.FlowTask == ProgramFlowTask.IsReturnChild) return true;
 
                 return this.Calls.Count != 0;
             }
@@ -102,13 +110,12 @@ namespace Yama.Compiler
             set;
         } = new List<SSACompileArgument>();
 
-        public bool HasReturn
+        public List<SSACompileArgument> References
         {
             get;
-            set;
-        }
+        } = new List<SSACompileArgument>();
 
-        public bool IsReturn
+        public bool HasReturn
         {
             get;
             set;
@@ -153,8 +160,20 @@ namespace Yama.Compiler
             return true;
         }
 
+        public bool AddReference(SSACompileArgument arg)
+        {
+            this.References.Add(arg);
+            if (arg.Mode != SSACompileArgumentMode.Reference) return true;
+            if (arg.Reference is null) return false;
+
+            arg.Reference.Calls.Add(this);
+
+            return true;
+        }
+
         public bool DoAllocate(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
         {
+            if (!this.IsUsed) return true;
             if (this.SpecialRules(allocater, container, genericDefinition)) return true;
 
             this.DoAllocateArguments(compiler, genericDefinition, allocater);
@@ -163,7 +182,7 @@ namespace Yama.Compiler
 
             if (allocater.ExistAllocation(this)) return this.DoAllocateExist(compiler, genericDefinition, allocater, container);
 
-            if (this.Calls.Count == 0)
+            if (this.Calls.Count == 0 || this.FlowTask == ProgramFlowTask.IsReturnChild)
             {
                 this.Owner.PrimaryKeys.Add("[SSAPUSH]", genericDefinition.GetRegister(genericDefinition.ResultRegister));
 
@@ -258,7 +277,7 @@ namespace Yama.Compiler
 
         private bool SpecialRules(RegisterAllocater allocater, CompileContainer container, GenericDefinition gd)
         {
-            if (this.Owner is CompileFreeLoop)
+            if (this.FlowTask == ProgramFlowTask.IsLoopEnde)
             {
                 if (this.LoopContainer is null) return false;
 
@@ -320,4 +339,20 @@ namespace Yama.Compiler
         #endregion methods
 
     }
+
+    public enum ProgramFlowTask
+    {
+        None,
+        IsReturnChild,
+        IsReturn,
+        IsLoopEnde,
+        IsIfStatementEnde,
+        IsNullCheck,
+        IsTypeChecking,
+        IsNotNullCheck,
+        IsNotTypeChecking,
+        IsConst,
+        CanComputeAndOptimizeConstOperation
+    }
+
 }

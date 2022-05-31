@@ -103,6 +103,7 @@ namespace Yama.Compiler
             if (this.Algo == null) return false;
 
             SSACompileLine line = new SSACompileLine(this, true);
+            if (this.Algo.CanBeCompute) line.FlowTask = ProgramFlowTask.CanComputeAndOptimizeConstOperation;
             compiler.AddSSALine(line);
             this.Line = line;
 

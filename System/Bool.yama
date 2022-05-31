@@ -16,11 +16,9 @@ namespace "System"
         *
         * @return (bool) Negate result
         */
-        public operator bool !( bool a )
+        copy operator bool !( bool a )
         {
-            if ( a ) return false;
-
-            return true;
+            #defalgo BoolOperations,Negate:
         }
 
         // -----------------------------------------------

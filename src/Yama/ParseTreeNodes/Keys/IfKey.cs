@@ -196,10 +196,12 @@ namespace Yama.Parser
             CompileContainer ifcontainer = new CompileContainer();
             ifcontainer.Begin = request.Compiler.ContainerMgmt.CurrentContainer.Begin;
             ifcontainer.Ende = new CompileSprungPunkt();
+            ifcontainer.Ende.Node = this;
 
             CompileContainer elsecontainer = new CompileContainer();
             elsecontainer.Begin = request.Compiler.ContainerMgmt.CurrentContainer.Begin;
             elsecontainer.Ende = new CompileSprungPunkt();
+            elsecontainer.Ende.Node = this.ElseStatement;
 
             CompileJumpTo jumpafterelse = new CompileJumpTo();
 

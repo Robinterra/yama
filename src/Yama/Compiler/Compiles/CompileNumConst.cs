@@ -86,6 +86,7 @@ namespace Yama.Compiler
             if (this.Algo == null) return false;
 
             SSACompileLine line = new SSACompileLine(this);
+            line.FlowTask = ProgramFlowTask.IsConst;
             compiler.AddSSALine(line);
             if (node.Token.Value is not int constI) return compiler.AddError("keine Zahl gefunden", node);
 

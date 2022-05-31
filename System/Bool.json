@@ -1,0 +1,67 @@
+[
+    {
+        "Name": "avr",
+        "Algos": [
+        ]
+    },
+    {
+        "Name": "arm-t32",
+        "Algos": [
+            {
+                "Name": "BoolOperations",
+                "Mode": "Negate",
+                "CanBeCompute": true,
+                "Description": "Negate",
+                "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp [SSAPOP[0]], #0x0",
+                "mrs [SSAPUSH]",
+                "lsr [SSAPUSH], [SSAPUSH], #0x1E",
+                "and [SSAPUSH], [SSAPUSH], #0x1"
+                ]
+            }
+        ]
+    },
+    {
+        "Name": "runtime",
+        "Algos": [
+            {
+                "Name": "BoolOperations",
+                "Mode": "Negate",
+                "Description": "Negate",
+                "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "cmp [SSAPOP[0]], #0x0",
+                "mrs [SSAPUSH]",
+                "and [SSAPUSH], [SSAPUSH], #0x4"
+                ]
+            }
+        ]
+    }
+]

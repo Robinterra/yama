@@ -31,6 +31,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public bool CanBeCompute
+        {
+            get;
+            set;
+        }
+
         public List<AlgoKeyCall> Keys
         {
             get;

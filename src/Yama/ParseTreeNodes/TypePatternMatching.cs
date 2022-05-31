@@ -205,7 +205,7 @@ namespace Yama.Parser
             ReferenceCall call = new ReferenceCall();
             call.Token = this.ReferenceDeklaration;
             call.Reference = new IndexVariabelnReference(this, this.Deklaration.Name) { Deklaration = this.Deklaration, ParentUsesSet = this.BooleascherReturn.ThisUses };
-            compileReference.IsNullCheck = true;
+            //compileReference.IsNullCheck = true;
             compileReference.Compile(request.Compiler, call, "set");
 
             compileReference = new CompileReferenceCall();
@@ -218,6 +218,9 @@ namespace Yama.Parser
             if (this.EqualsReference.Deklaration.Use is not MethodeDeclarationNode mdn) return false;
 
             this.CompileCopy(request.Compiler, request.Mode, mdn);
+
+            SSACompileLine compileLine = request.Compiler.GetLatestSSALine();
+            compileLine.FlowTask = ProgramFlowTask.IsTypeChecking;
 
             return request.Compiler.Definition.ParaClean();
         }
@@ -236,6 +239,9 @@ namespace Yama.Parser
             if (this.EqualsReference.Deklaration.Use is not MethodeDeclarationNode mdn) return false;
 
             this.CompileCopy(request.Compiler, request.Mode, mdn);
+
+            SSACompileLine compileLine = request.Compiler.GetLatestSSALine();
+            compileLine.FlowTask = ProgramFlowTask.IsNullCheck;
 
             return request.Compiler.Definition.ParaClean();
         }
