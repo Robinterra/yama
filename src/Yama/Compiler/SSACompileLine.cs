@@ -95,6 +95,7 @@ namespace Yama.Compiler
         {
             get
             {
+                if (this.ReplaceLine is not null) return false;
                 if (this.IsPrimary) return true;
                 if (this.FlowTask == ProgramFlowTask.IsReturn) return true;
                 if (this.FlowTask == ProgramFlowTask.IsReturnChild) return true;
@@ -172,6 +173,7 @@ namespace Yama.Compiler
 
         public bool DoAllocate(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
         {
+            if (!this.IsUsed) return true;
             if (this.SpecialRules(allocater, container, genericDefinition)) return true;
 
             this.DoAllocateArguments(compiler, genericDefinition, allocater);
