@@ -757,7 +757,7 @@ namespace Yama.Compiler.Definition
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
 
-            if (!(query.Value is RequestSSAArgument request)) return result;
+            if (query.Value is not RequestSSAArgument request) return result;
             if (query.Key is null) return null;
             if (query.Key.Values is null) return null;
 
@@ -769,6 +769,7 @@ namespace Yama.Compiler.Definition
                 try
                 {
                     SSACompileArgument arg = this.Compiler!.ContainerMgmt.StackArguments.Pop();
+                    if (request.Target.FlowTask == ProgramFlowTask.CanComputeAndOptimizeConstOperation) this.OperateAndCleanFlowTask(arg, request);
 
                     request.Target.AddArgument(arg);
                 }
@@ -779,6 +780,20 @@ namespace Yama.Compiler.Definition
             }
 
             return result;
+        }
+
+        private bool OperateAndCleanFlowTask(SSACompileArgument arg, RequestSSAArgument request)
+        {
+            if (arg.Mode == SSACompileArgumentMode.Const) return true;
+            if (arg.Mode == SSACompileArgumentMode.Reference)
+            {
+                if (arg.Reference!.FlowTask == ProgramFlowTask.IsConst) return true;
+                if (arg.Reference!.FlowTask == ProgramFlowTask.CanComputeAndOptimizeConstOperation) return true;
+            }
+
+            request.Target.FlowTask = ProgramFlowTask.None;
+
+            return true;
         }
 
         // -----------------------------------------------

@@ -97,6 +97,7 @@ namespace Yama.Compiler
         {
 
             NotSet,
+            Const,
             Unknown,
             Null,
             NotNull

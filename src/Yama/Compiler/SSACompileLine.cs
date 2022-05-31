@@ -351,6 +351,7 @@ namespace Yama.Compiler
         IsTypeChecking,
         IsNotNullCheck,
         IsNotTypeChecking,
+        IsConst,
         CanComputeAndOptimizeConstOperation
     }
 

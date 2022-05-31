@@ -10,6 +10,7 @@
             {
                 "Name": "BoolOperations",
                 "Mode": "Negate",
+                "CanBeCompute": true,
                 "Description": "Negate",
                 "Keys": [
                     {
