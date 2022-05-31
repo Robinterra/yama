@@ -222,21 +222,6 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public List<IParseTreeNode>? ParseCleanTokens(IdentifierToken left, int start, int position)
-        {
-            if (left.Node == null) return this.ParseCleanTokens(start, position);
-
-            List<IParseTreeNode> result = new List<IParseTreeNode>();
-
-            IdentifierToken token = this.GetParent(left);
-            if (token.Node != null) result.Add(token.Node);
-            else result.Add(left.Node);
-
-            return result;
-        }
-
-        // -----------------------------------------------
-
         public T GetRule<T>() where T : IParseTreeNode
         {
             foreach (ParserLayer layer in this.ParserLayers)
@@ -435,32 +420,6 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        private IParseTreeNode? ParsePrioSystem ( IdentifierToken token, int prio, bool isrekursiv = false )
-        {
-            if ( prio < 0 ) return null;
-
-            Request.RequestParserTreeParser request = new Request.RequestParserTreeParser ( this, token );
-
-            foreach ( IParseTreeNode member in this.CurrentParserMembers )
-            {
-                if ( !(member is IPriority t) ) continue;
-                if ( t.Prio != prio ) continue;
-
-                IParseTreeNode? result = member.Parse ( request );
-                if ( result is null ) continue;
-
-                this.CleanPareNode ( result );
-
-                return result;
-            }
-
-            if (isrekursiv) return this.ParsePrioSystem ( token, prio - 1, isrekursiv );
-
-            return null;
-        }
-
-        // -----------------------------------------------
-
         public TRule? TryToParse<TRule> ( TRule rule, IdentifierToken token ) where TRule : IParseTreeNode
         {
             IParseTreeNode? result = rule.Parse ( new RequestParserTreeParser (this, token) );
@@ -468,8 +427,6 @@ namespace Yama.Parser
 
             this.CleanPareNode ( result );
             if (result is  TRule res) return res;
-
-            Console.WriteLine("badumms");
 
             return default;
         }

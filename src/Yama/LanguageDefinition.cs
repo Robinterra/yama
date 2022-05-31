@@ -328,56 +328,6 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private ParserLayer ExecutionLayer()
-        {
-            ParserLayer layer = new ParserLayer("execute");
-
-            layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
-            layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
-            //layer.ParserMembers.Add ( new IfKey (  ) );
-            layer.ParserMembers.Add ( new ElseKey (  ) );
-            //layer.ParserMembers.Add ( new WhileKey (  ) );
-            layer.ParserMembers.Add ( new ForKey ( layer ) );
-            //layer.ParserMembers.Add ( new NewKey (  ) );
-            layer.ParserMembers.Add ( new NullKey (  ) );
-            layer.ParserMembers.Add ( new ContinueKey (  ) );
-            layer.ParserMembers.Add ( new BreakKey (  ) );
-            layer.ParserMembers.Add ( new TypePatternMatching ( 10 ) );
-            layer.ParserMembers.Add ( new ExplicitlyConvert ( 10 ) );
-            layer.ParserMembers.Add ( new MethodeCallNode ( IdentifierKind.OpenBracket, IdentifierKind.CloseBracket, 12, layer ) );
-            //layer.ParserMembers.Add ( new VektorCall ( IdentifierKind.OpenSquareBracket, IdentifierKind.CloseSquareBracket, 12 ) );
-            layer.ParserMembers.Add ( new ContainerExpression ( 11 ) );
-            layer.ParserMembers.Add ( new NormalExpression (  ) );
-            layer.ParserMembers.Add ( new EnumartionExpression (  ) );
-            //layer.ParserMembers.Add ( new ReturnKey (  ) );
-            layer.ParserMembers.Add ( new TrueFalseKey ( 1 ) );
-            layer.ParserMembers.Add ( new VariabelDeklaration ( 11 ) );
-            layer.ParserMembers.Add ( new ReferenceCall ( 1 ) );
-            layer.ParserMembers.Add ( new Number ( 1 ) );
-            layer.ParserMembers.Add ( new TextParser ( 1 ) );
-            layer.ParserMembers.Add ( new OperatorPoint ( 11 ) );
-            //layer.ParserMembers.Add ( new Operator1ChildRight ( new List<string> { "-", "~", "!" }, 11, new List<IdentifierKind> { IdentifierKind.NumberToken, IdentifierKind.Word, IdentifierKind.OpenBracket }, new List<IdentifierKind> { IdentifierKind.OpenBracket } ) );
-            //layer.ParserMembers.Add ( new Operator1ChildLeft ( new List<string> { "--", "++", "!", "~" }, 11, new List<IdentifierKind> { IdentifierKind.Word, IdentifierKind.Unknown } ) );
-            /*layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&&", "||" }, 2 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.LessThan, 3 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( IdentifierKind.GreaterThan, 3 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "==", "!=", "<=", ">=", "<", ">" }, 3 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "|" }, 4 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "^" }, 5 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "&" }, 6 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "<<", ">>" }, 7 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "+", "-" }, 8 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "*", "/", "%" }, 9 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "√", "^^" }, 10 ) );
-            layer.ParserMembers.Add ( new Operator2Childs ( new List<string> { "=" }, 1 ) );*/
-            //layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "?" }, IdentifierKind.DoublePoint, 2 ) );
-            //layer.ParserMembers.Add ( new Operator3Childs ( new List<string> { "∑" }, IdentifierKind.DoublePoint, 2 ) );
-
-            return layer;
-        }
-
-        // -----------------------------------------------
-
         private ParserLayer ExpressionIdenLayer()
         {
             ParserLayer layer = new ParserLayer("ExpressionIdenLayer");
