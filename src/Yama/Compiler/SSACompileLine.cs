@@ -100,7 +100,10 @@ namespace Yama.Compiler
                 if (this.FlowTask == ProgramFlowTask.IsReturn) return true;
                 if (this.FlowTask == ProgramFlowTask.IsReturnChild) return true;
 
-                return this.Calls.Count != 0;
+                if (this.Calls.Count == 0) return false;
+                if (this.Calls.Count > 1) return true;
+
+                return this.Calls[0].IsUsed;
             }
         }
 
@@ -214,7 +217,8 @@ namespace Yama.Compiler
         private bool DoAllocateExist(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
         {
             RegisterMap? map = allocater.GetReferenceRegister(this, this);
-            if (map is null) return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
+            if (map is null)
+                return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
 
             this.Owner.PrimaryKeys.Add("[SSAPUSH]", map.Name);
 
@@ -243,10 +247,12 @@ namespace Yama.Compiler
         {
             if (arg.Mode == SSACompileArgumentMode.Const) return true;
             if (arg.Mode == SSACompileArgumentMode.JumpReference) return true;
-            if (arg.Reference is null) return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
+            if (arg.Reference is null)
+                return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
 
             RegisterMap? map = allocater.GetReferenceRegister(arg.Reference, this);
-            if (map == null) return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
+            if (map == null)
+                return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
 
             this.Owner.PrimaryKeys.Add(string.Format("[SSAPOP[{0}]]", counter), map.Name);
 
@@ -282,6 +288,21 @@ namespace Yama.Compiler
                 if (this.LoopContainer is null) return false;
 
                 allocater.FreeLoops(this.LoopContainer, this);
+
+                return true;
+            }
+
+            if (this.FlowTask == ProgramFlowTask.Phi)
+            {
+                foreach (SSACompileArgument arg in this.Arguments)
+                {
+                    RegisterMap? map = allocater.GetReferenceRegister(arg.Reference, this);
+                    if (arg.Reference is not null) arg.Reference.RegisterMap = null;
+                    if (map is null) continue;
+
+                    this.RegisterMap = map;
+                    map.Line = this;
+                }
 
                 return true;
             }
@@ -352,7 +373,8 @@ namespace Yama.Compiler
         IsNotNullCheck,
         IsNotTypeChecking,
         IsConst,
-        CanComputeAndOptimizeConstOperation
+        CanComputeAndOptimizeConstOperation,
+        Phi
     }
 
 }
