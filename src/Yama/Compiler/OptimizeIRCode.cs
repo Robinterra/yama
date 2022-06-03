@@ -133,6 +133,7 @@ namespace Yama.Compiler
             SSACompileArgument? argument = returnChild.Arguments.FirstOrDefault();
             if (argument is null) return false;
             if (argument.Reference is null) return false;
+            if (argument.Reference.FlowTask == ProgramFlowTask.Phi) return false;
             if (argument.Reference.Order + 1 != returnChild.Order) return false;
 
             argument.Reference.FlowTask = ProgramFlowTask.IsReturnChild;

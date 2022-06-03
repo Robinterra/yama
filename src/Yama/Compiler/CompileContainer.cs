@@ -68,6 +68,12 @@ namespace Yama.Compiler
             set;
         } = new List<SSACompileLine>();
 
+        public bool HasReturned
+        {
+            get;
+            set;
+        }
+
         public SSACompileLine? LoopLine
         {
             get;

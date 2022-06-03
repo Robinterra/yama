@@ -193,6 +193,8 @@ namespace Yama.Parser
             if (this.IfStatement is not ICompileNode statementNode) return false;
             if (request.Compiler.ContainerMgmt.CurrentContainer is null) return false;
 
+            CompilePhi compilePhi = new CompilePhi();
+
             CompileContainer ifcontainer = new CompileContainer();
             ifcontainer.Begin = request.Compiler.ContainerMgmt.CurrentContainer.Begin;
             ifcontainer.Ende = new CompileSprungPunkt();
@@ -215,22 +217,27 @@ namespace Yama.Parser
 
             statementNode.Compile(request);
 
-            request.Compiler.PopContainer();
+            IEnumerable<KeyValuePair<string, SSAVariableMap>> variableMaps = request.Compiler.PopContainerAndReturnVariableMapper();
 
             if (this.ElseStatement is not null) jumpafterelse.Compile(request.Compiler, elsecontainer.Ende, request.Mode);
 
             ifcontainer.Ende.Compile(request.Compiler, this, request.Mode);
 
-            if (this.ElseStatement is not ICompileNode elseStatementNode) return true;
+            if (this.ElseStatement is not ICompileNode elseStatementNode) return compilePhi.Compile(request.Compiler, variableMaps, this);
             if (this.ElseContainer is null) return true;
 
             request.Compiler.PushContainer(elsecontainer, this.ElseContainer.ThisUses);
 
             elseStatementNode.Compile(request);
 
-            request.Compiler.PopContainer();
+            IEnumerable<KeyValuePair<string, SSAVariableMap>> elseVariableMaps = request.Compiler.PopContainerAndReturnVariableMapper();
 
             elsecontainer.Ende.Compile(request.Compiler, this, request.Mode);
+
+            compilePhi.Compile(request.Compiler, variableMaps, this);
+
+            compilePhi = new CompilePhi();
+            compilePhi.Compile(request.Compiler, elseVariableMaps, this.ElseStatement);
 
             return true;
         }

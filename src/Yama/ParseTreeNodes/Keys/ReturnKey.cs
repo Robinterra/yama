@@ -120,6 +120,13 @@ namespace Yama.Parser
 
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
+            if (request.Compiler.ContainerMgmt.CurrentMethod is null) return true;
+
+            foreach (KeyValuePair<string, SSAVariableMap> varilabeMap in request.Compiler.ContainerMgmt.CurrentMethod.VarMapper)
+            {
+                varilabeMap.Value.Reference = null;
+            }
+
             return true;
         }
 

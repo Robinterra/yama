@@ -189,6 +189,7 @@ namespace Yama.Compiler
                 this.SSALines.Add(line);
                 if (this.ContainerMgmt.CurrentMethod is null) return line;
                 this.ContainerMgmt.CurrentMethod.Lines.Add(line);
+                this.ContainerMgmt.CurrentContainer?.Lines.Add(line);
 
                 return line;
             }
@@ -205,6 +206,7 @@ namespace Yama.Compiler
 
             if (this.ContainerMgmt.CurrentMethod is null) return line;
             this.ContainerMgmt.CurrentMethod.Lines.Add(line);
+            this.ContainerMgmt.CurrentContainer.Lines.Add(line);
             this.SSALines.Add(line);
 
             return line;
@@ -308,6 +310,11 @@ namespace Yama.Compiler
         private bool OptimizeIRCode()
         {
             if (this.OptimizeLevel != Optimize.SSA) return false;
+
+            foreach (SSACompileLine phi in this.SSALines.Where(t=>t.FlowTask == ProgramFlowTask.Phi && !t.IsUsed))
+            {
+                phi.Arguments.ForEach(t=>t.Reference?.Calls.Remove(phi));
+            }
 
             OptimizeIRCode optimizeIRCode = new OptimizeIRCode(this.SSALines);
 
@@ -524,6 +531,29 @@ namespace Yama.Compiler
             }
 
             return true;
+        }
+
+        public IEnumerable<KeyValuePair<string, SSAVariableMap>> PopContainerAndReturnVariableMapper()
+        {
+            if (this.ContainerMgmt.ContainerStack.Count == 0) yield break;
+
+            CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
+            if (container.HasReturned) yield break;
+            if (this.ContainerMgmt.CurrentMethod is null) yield break;
+
+            Dictionary<string, SSAVariableMap>? containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
+            if (containerMaps is null) yield break;
+
+            SSACompileLine? firstLine = container.Lines.FirstOrDefault();
+            if (firstLine is null) yield break;
+
+            foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
+            {
+                if (varibaleMap.Value.Reference is null) continue;
+                if (varibaleMap.Value.Reference.Order < firstLine.Order) continue;
+
+                yield return varibaleMap;
+            }
         }
 
         private bool PopContainerIterationContainerMap(CompileContainer? loop, bool isloop, Dictionary<string, SSAVariableMap> parentVarMap, KeyValuePair<string, SSAVariableMap> conMap)
