@@ -217,7 +217,7 @@ namespace Yama.Parser
 
             statementNode.Compile(request);
 
-            IEnumerable<KeyValuePair<string, SSAVariableMap>> variableMaps = request.Compiler.PopContainerAndReturnVariableMapper();
+            IEnumerable<KeyValuePair<string, SSAVariableMap>> variableMaps = request.Compiler.PopContainerAndReturnVariableMapperForIfs();
 
             if (this.ElseStatement is not null) jumpafterelse.Compile(request.Compiler, elsecontainer.Ende, request.Mode);
 
@@ -230,7 +230,7 @@ namespace Yama.Parser
 
             elseStatementNode.Compile(request);
 
-            IEnumerable<KeyValuePair<string, SSAVariableMap>> elseVariableMaps = request.Compiler.PopContainerAndReturnVariableMapper();
+            IEnumerable<KeyValuePair<string, SSAVariableMap>> elseVariableMaps = request.Compiler.PopContainerAndReturnVariableMapperForIfs();
 
             elsecontainer.Ende.Compile(request.Compiler, this, request.Mode);
 

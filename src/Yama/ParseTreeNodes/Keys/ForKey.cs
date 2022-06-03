@@ -260,7 +260,10 @@ namespace Yama.Parser
             CompileFreeLoop freeLoop = new CompileFreeLoop(this.CompileContainer.Begin.Line);
             freeLoop.Compile(request.Compiler, this, request.Mode);
 
-            request.Compiler.PopContainer();
+            IEnumerable<KeyValuePair<string, SSAVariableMap>> variableMaps = request.Compiler.PopContainerAndReturnVariableMapperForLoops();
+
+            CompilePhi compilePhis = new CompilePhi();
+            compilePhis.Compile(request.Compiler, variableMaps, this);
 
             return true;
         }

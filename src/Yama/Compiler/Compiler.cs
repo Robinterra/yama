@@ -533,7 +533,42 @@ namespace Yama.Compiler
             return true;
         }
 
-        public IEnumerable<KeyValuePair<string, SSAVariableMap>> PopContainerAndReturnVariableMapper()
+        public IEnumerable<KeyValuePair<string, SSAVariableMap>> PopContainerAndReturnVariableMapperForLoops()
+        {
+            if (this.ContainerMgmt.ContainerStack.Count == 0) yield break;
+            CompileContainer? loop = this.ContainerMgmt.CurrentLoop;
+            if (loop is null) yield break;
+            if (!loop.Equals(this.ContainerMgmt.CurrentContainer)) yield break;
+
+            this.ContainerMgmt.LoopStack.Pop();
+
+            CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
+            if (container.HasReturned) yield break;
+            if (this.ContainerMgmt.CurrentMethod is null) yield break;
+
+            Dictionary<string, SSAVariableMap>? containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
+            if (containerMaps is null) yield break;
+
+            SSACompileLine? firstLine = container.Lines.FirstOrDefault();
+            if (firstLine is null) yield break;
+
+            Dictionary<string, SSAVariableMap> parentVarMap = this.ContainerMgmt.CurrentMethod.VarMapper;
+
+            foreach (KeyValuePair<string, SSAVariableMap> conMap in containerMaps)
+            {
+                this.PopContainerIterationContainerMap(loop, true, parentVarMap, conMap);
+            }
+
+            foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
+            {
+                if (varibaleMap.Value.Reference is null) continue;
+                if (varibaleMap.Value.Reference.Order < firstLine.Order) continue;
+
+                yield return varibaleMap;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<string, SSAVariableMap>> PopContainerAndReturnVariableMapperForIfs()
         {
             if (this.ContainerMgmt.ContainerStack.Count == 0) yield break;
 
