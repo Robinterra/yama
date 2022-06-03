@@ -299,6 +299,7 @@ namespace Yama.Compiler
                     RegisterMap? map = allocater.GetReferenceRegister(arg.Reference, this);
                     if (map is null) continue;
 
+                    this.RegisterMap = map;
                     map.Line = this;
                 }
 
