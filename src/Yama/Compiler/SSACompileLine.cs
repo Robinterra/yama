@@ -297,6 +297,7 @@ namespace Yama.Compiler
                 foreach (SSACompileArgument arg in this.Arguments)
                 {
                     RegisterMap? map = allocater.GetReferenceRegister(arg.Reference, this);
+                    if (arg.Reference is not null) arg.Reference.RegisterMap = null;
                     if (map is null) continue;
 
                     this.RegisterMap = map;

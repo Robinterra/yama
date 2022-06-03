@@ -125,6 +125,10 @@ namespace Yama.Compiler
                 arg.Reference.PhiMap.Add(theoriginLine);
                 theoriginLine.PhiMap.Add(arg.Reference);
             }
+
+
+            theoriginLine.PhiMap.Add(thePhiLine);
+            thePhiLine.PhiMap.Add(theoriginLine);
         }
 
         public bool InFileCompilen(Compiler compiler)
