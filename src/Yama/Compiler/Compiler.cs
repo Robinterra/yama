@@ -566,6 +566,25 @@ namespace Yama.Compiler
 
                 yield return varibaleMap;
             }
+
+            foreach (SSACompileLine line in container.PhiSetNewVar)
+            {
+                if (line.ReplaceLine == null) continue;
+                if (line.ReplaceLine.PhiMap.Count == 1) continue;
+                if (!this.CheckPhiMaps(line, line.PhiMap)) continue;
+
+                line.ReplaceLine = null;
+                if (line.Owner is CompileReferenceCall t) t.IsUsed = true;
+                line.HasReturn = true;
+            }
+
+            foreach (SSACompileLine line in container.PhiSetNewVar)
+            {
+                if (line.ReplaceLine == null) continue;
+
+                line.ReplaceLine.PhiMap.Add(line);
+                line.ReplaceLine.Calls.AddRange(line.Calls);
+            }
         }
 
         public IEnumerable<KeyValuePair<string, SSAVariableMap>> PopContainerAndReturnVariableMapperForIfs()
