@@ -139,10 +139,12 @@ namespace Yama.Compiler
         public bool IsReferenceInVarsContains(SSACompileLine reference)
         {
             if (reference == null) return false;
+            //if (reference.FlowTask == ProgramFlowTask.Phi) return false;
 
             foreach (KeyValuePair<string, SSAVariableMap> keyValuePair in this.VarMapper)
             {
                 if (keyValuePair.Value.Reference == null) continue;
+                //if (keyValuePair.Value.Reference == reference) return true;
 
                 foreach (SSACompileLine line in keyValuePair.Value.Reference.PhiMap)
                 {

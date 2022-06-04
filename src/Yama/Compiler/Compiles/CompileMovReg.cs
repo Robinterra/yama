@@ -6,7 +6,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileMovReg : ICompile<ReturnKey>
+    public class CompileMovReg : ICompileRoot
     {
 
         #region get/set

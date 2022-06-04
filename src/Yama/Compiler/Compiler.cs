@@ -635,6 +635,14 @@ namespace Yama.Compiler
                 SSACompileLine phiLoop = currentVarMap.Reference;
                 if (phiLoop.FlowTask != ProgramFlowTask.Phi) continue;
 
+                SSACompileLine? fixReplace = container.PhiSetNewVar.FirstOrDefault(t=>t.Owner is CompileReferenceCall && t.Arguments.Any(q=>q.Reference == phiLoop));
+                if (fixReplace is not null)
+                {
+                    fixReplace.ReplaceLine = null;
+                    fixReplace.HasReturn = true;
+                    ((CompileReferenceCall)fixReplace.Owner).IsUsed = true;
+                }
+
                 CompilePhi compilePhi = new CompilePhi();
                 compilePhi.CompileLoopEndPhis(this, phiLoop, phis, varibaleMap.Value.Reference, currentVarMap);
 
