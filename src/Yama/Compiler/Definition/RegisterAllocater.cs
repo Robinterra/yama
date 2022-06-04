@@ -86,6 +86,7 @@ namespace Yama.Compiler.Definition
 
         public RegisterMap? GetReferenceRegister(SSACompileLine? line, SSACompileLine from)
         {
+            if (from == line && this.CheckLastSet(from)) return from.LastSet!.RegisterMap;
             if (this.Defintion is null) return null;
             if (line is null) return null;
 
@@ -135,7 +136,23 @@ namespace Yama.Compiler.Definition
 
         public bool FreeLoops(CompileContainer loopContainer, SSACompileLine line)
         {
-            foreach (RegisterMap map in this.RegisterMaps)
+            if (line.Owner is not CompileFreeLoop freeLoop) return false;
+
+            foreach (SSACompileLine phi in freeLoop.Phis)
+            {
+                SSACompileArgument? phiArg = phi.Arguments.FirstOrDefault(t=>t.Reference is not null && t.Reference.RegisterMap is not null);
+                if (phiArg is null) continue;
+                if (phiArg.Reference!.RegisterMap!.Mode != RegisterUseMode.Used) continue;
+                if (phiArg.Reference.RegisterMap.Line != phiArg.Reference) continue;
+
+                phiArg.Reference.RegisterMap.Line = phi;
+
+                if (phiArg.Reference.Order < phi.GreateOrder) continue;
+
+                phiArg.Reference.RegisterMap.Mode = RegisterUseMode.Free;
+            }
+
+            /*foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
                 if (map.Line is null) continue;
@@ -148,12 +165,12 @@ namespace Yama.Compiler.Definition
 
                 this.CheckLoopForFree(map, line);
                 //map.Mode = RegisterUseMode.Free;
-            }
+            }*/
 
             return true;
         }
 
-        private bool CheckToFreePhiLoops(RegisterMap map, CompileContainer loopContainer, SSACompileLine position)
+        /*private bool CheckToFreePhiLoops(RegisterMap map, CompileContainer loopContainer, SSACompileLine position)
         {
             if (!this.HasALoopContainer(map)) return true;
 
@@ -179,19 +196,21 @@ namespace Yama.Compiler.Definition
         {
             if (map.Line is null) return false;
 
+            //freeLoop.Phis.FirstOrDefault(t=> t.Arguments.Any(q=>q.Reference == map.Line));
+
             int greatOrder = map.Line.GreateOrder;
 
             /*for (int i = 0; i < map.Line.Calls.Count; i++)
             {
                 if (greatOrder < map.Line.Calls[i].Order) greatOrder = map.Line.Calls[i].Order;
             }*/
-
+/*
             if (greatOrder > line.Order) return true;
 
             map.Mode = RegisterUseMode.Free;
 
             return true;
-        }
+        }*/
 
         private SSACompileLine? GetOriginal(SSACompileLine line)
         {
@@ -201,8 +220,23 @@ namespace Yama.Compiler.Definition
             return this.GetOriginal(line.ReplaceLine);
         }
 
+        private bool CheckLastSet(SSACompileLine line)
+        {
+            SSACompileLine? lastSet = line.LastSet;
+            if (lastSet is null) return false;
+
+            RegisterMap? map = lastSet.RegisterMap;
+            if (map is null) return false;
+
+            if (map.Mode != RegisterUseMode.Used) return false;
+
+            return map.Line == lastSet;
+        }
+
         public bool ExistAllocation(SSACompileLine line)
         {
+            if (this.CheckLastSet(line)) return true;
+
             SSACompileLine? phimap = line.PhiMap.Find(t=>t.RegisterMap != null);
             if (phimap != null && phimap.RegisterMap!.Line!.FindEquals(line)) return true;
 

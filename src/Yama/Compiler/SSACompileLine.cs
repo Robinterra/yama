@@ -55,6 +55,12 @@ namespace Yama.Compiler
             }
         }
 
+        public SSACompileLine? LastSet
+        {
+            get;
+            set;
+        }
+
         public RegisterMap? RegisterMap
         {
             get;
@@ -102,6 +108,7 @@ namespace Yama.Compiler
 
                 if (this.Calls.Count == 0) return false;
                 if (this.Calls.Count > 1) return true;
+                if (this.Calls[0] == this) return false;
 
                 return this.Calls[0].IsUsed;
             }
@@ -177,7 +184,7 @@ namespace Yama.Compiler
         public bool DoAllocate(Compiler compiler, GenericDefinition genericDefinition, RegisterAllocater allocater, CompileContainer container)
         {
             if (!this.IsUsed) return true;
-            if (this.SpecialRules(allocater, container, genericDefinition)) return true;
+            if (this.SpecialRules(compiler, allocater, container, genericDefinition)) return true;
 
             this.DoAllocateArguments(compiler, genericDefinition, allocater);
 
@@ -225,6 +232,7 @@ namespace Yama.Compiler
             if (map.Type == RegisterType.Stack) this.HandleVirtuellSetRegister(container, genericDefinition, compiler, map);
 
             this.RegisterMap = map;
+            map.Line = this;
 
             return true;
         }
@@ -281,7 +289,7 @@ namespace Yama.Compiler
             return true;
         }
 
-        private bool SpecialRules(RegisterAllocater allocater, CompileContainer container, GenericDefinition gd)
+        private bool SpecialRules(Compiler compiler, RegisterAllocater allocater, CompileContainer container, GenericDefinition gd)
         {
             if (this.FlowTask == ProgramFlowTask.IsLoopEnde)
             {
@@ -296,12 +304,23 @@ namespace Yama.Compiler
             {
                 foreach (SSACompileArgument arg in this.Arguments)
                 {
-                    RegisterMap? map = allocater.GetReferenceRegister(arg.Reference, this);
-                    if (arg.Reference is not null) arg.Reference.RegisterMap = null;
+                    if (arg.Reference is null) continue;
+
+                    RegisterMap? map = arg.Reference.RegisterMap;
                     if (map is null) continue;
+
+                    arg.Reference.RegisterMap = null;
 
                     this.RegisterMap = map;
                     map.Line = this;
+                    if (this.GreateOrder == this.Order) map.Mode = RegisterUseMode.Free;
+                    if (this.Calls.Count != 1) continue;
+
+                    SSACompileLine line = this.Calls[0];
+                    if (line.FlowTask != ProgramFlowTask.Phi) continue;
+                    if (line.GreateOrder != line.Order) continue;
+
+                    map.Mode = RegisterUseMode.Free;
                 }
 
                 return true;
@@ -320,6 +339,14 @@ namespace Yama.Compiler
             }
 
             return false;
+        }
+
+        public bool RemoveCall(SSACompileLine phi)
+        {
+            this.Calls.Remove(phi);
+            this.greateOrder = -1;
+
+            return true;
         }
 
         private bool HandleVirtuellSetRegister(CompileContainer container, GenericDefinition generic, Compiler compiler, RegisterMap map)

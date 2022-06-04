@@ -162,6 +162,7 @@ namespace Yama.Parser
 
             this.CompileContainer.Begin = new CompileSprungPunkt();
             this.CompileContainer.Ende = new CompileSprungPunkt();
+            this.CompileContainer.CurrentNode = this;
 
             request.Compiler.PushContainer(this.CompileContainer, this.IndexContainer.ThisUses, true);
 
@@ -191,10 +192,7 @@ namespace Yama.Parser
 
             freeLoop.Compile(request.Compiler, this, request.Mode);
 
-            IEnumerable<KeyValuePair<string, SSAVariableMap>> variableMaps = request.Compiler.PopContainerAndReturnVariableMapperForLoops();
-
-            CompilePhi compilePhis = new CompilePhi();
-            compilePhis.Compile(request.Compiler, variableMaps, this);
+            request.Compiler.PopContainerForLoops(freeLoop.Phis);
 
             return true;
         }

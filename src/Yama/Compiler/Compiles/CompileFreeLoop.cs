@@ -6,7 +6,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileFreeLoop : ICompile<IParseTreeNode>
+    public class CompileFreeLoop : ICompileRoot
     {
 
         #region get/set
@@ -73,6 +73,11 @@ namespace Yama.Compiler
             set;
         }
 
+        public List<SSACompileLine> Phis
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -80,6 +85,7 @@ namespace Yama.Compiler
         public CompileFreeLoop(SSACompileLine begin)
         {
             this.Begin = begin;
+            this.Phis = new List<SSACompileLine>();
         }
 
         #endregion ctor
