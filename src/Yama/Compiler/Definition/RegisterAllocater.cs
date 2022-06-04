@@ -135,7 +135,23 @@ namespace Yama.Compiler.Definition
 
         public bool FreeLoops(CompileContainer loopContainer, SSACompileLine line)
         {
-            foreach (RegisterMap map in this.RegisterMaps)
+            if (line.Owner is not CompileFreeLoop freeLoop) return false;
+
+            foreach (SSACompileLine phi in freeLoop.Phis)
+            {
+                SSACompileArgument? phiArg = phi.Arguments.FirstOrDefault(t=>t.Reference is not null && t.Reference.RegisterMap is not null);
+                if (phiArg is null) continue;
+                if (phiArg.Reference!.RegisterMap!.Mode != RegisterUseMode.Used) continue;
+                if (phiArg.Reference.RegisterMap.Line != phiArg.Reference) continue;
+
+                phiArg.Reference.RegisterMap.Line = phi;
+
+                if (phiArg.Reference.Order < phi.GreateOrder) continue;
+
+                phiArg.Reference.RegisterMap.Mode = RegisterUseMode.Free;
+            }
+
+            /*foreach (RegisterMap map in this.RegisterMaps)
             {
                 if (map.Mode != RegisterUseMode.Used) continue;
                 if (map.Line is null) continue;
@@ -148,12 +164,12 @@ namespace Yama.Compiler.Definition
 
                 this.CheckLoopForFree(map, line);
                 //map.Mode = RegisterUseMode.Free;
-            }
+            }*/
 
             return true;
         }
 
-        private bool CheckToFreePhiLoops(RegisterMap map, CompileContainer loopContainer, SSACompileLine position)
+        /*private bool CheckToFreePhiLoops(RegisterMap map, CompileContainer loopContainer, SSACompileLine position)
         {
             if (!this.HasALoopContainer(map)) return true;
 
@@ -179,19 +195,21 @@ namespace Yama.Compiler.Definition
         {
             if (map.Line is null) return false;
 
+            //freeLoop.Phis.FirstOrDefault(t=> t.Arguments.Any(q=>q.Reference == map.Line));
+
             int greatOrder = map.Line.GreateOrder;
 
             /*for (int i = 0; i < map.Line.Calls.Count; i++)
             {
                 if (greatOrder < map.Line.Calls[i].Order) greatOrder = map.Line.Calls[i].Order;
             }*/
-
+/*
             if (greatOrder > line.Order) return true;
 
             map.Mode = RegisterUseMode.Free;
 
             return true;
-        }
+        }*/
 
         private SSACompileLine? GetOriginal(SSACompileLine line)
         {

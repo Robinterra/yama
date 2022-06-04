@@ -311,9 +311,16 @@ namespace Yama.Compiler
         {
             if (this.OptimizeLevel != Optimize.SSA) return false;
 
-            foreach (SSACompileLine phi in this.SSALines.Where(t=>t.FlowTask == ProgramFlowTask.Phi && !t.IsUsed))
+            for (int i = this.SSALines.Count - 1; i >= 0; i--)
             {
-                phi.Arguments.ForEach(t=>t.Reference?.Calls.Remove(phi));
+                SSACompileLine phi = this.SSALines[i];
+                if (phi.FlowTask != ProgramFlowTask.Phi) continue;
+                if (phi.IsUsed) continue;
+
+                phi.Arguments.ForEach(t=>
+                {
+                    t.Reference?.RemoveCall(phi);
+                });
             }
 
             OptimizeIRCode optimizeIRCode = new OptimizeIRCode(this.SSALines);
@@ -458,8 +465,16 @@ namespace Yama.Compiler
 
         public bool PushContainer(CompileContainer compileContainer, ValidUses? uses, bool isloop = false)
         {
-            this.ContainerMgmt.ContainerStack.Push(compileContainer);
-            if (isloop) this.ContainerMgmt.LoopStack.Push(compileContainer);
+            if (isloop)
+            {
+                CompilePhi phis = new CompilePhi();
+                phis.CompileBeginLoop(this, compileContainer.CurrentNode!);
+
+                this.ContainerMgmt.ContainerStack.Push(compileContainer);
+
+                this.ContainerMgmt.LoopStack.Push(compileContainer);
+            }
+            else this.ContainerMgmt.ContainerStack.Push(compileContainer);
 
             this.Containers.Add(compileContainer);
 
@@ -585,6 +600,50 @@ namespace Yama.Compiler
                 line.ReplaceLine.PhiMap.Add(line);
                 line.ReplaceLine.Calls.AddRange(line.Calls);
             }
+        }
+
+        public bool PopContainerForLoops(List<SSACompileLine> phis)
+        {
+            if (this.ContainerMgmt.ContainerStack.Count == 0) return false;
+            CompileContainer? loop = this.ContainerMgmt.CurrentLoop;
+            if (loop is null) return true;
+            if (!loop.Equals(this.ContainerMgmt.CurrentContainer)) return true;
+
+            this.ContainerMgmt.LoopStack.Pop();
+
+            CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
+            if (container.HasReturned) return true;
+            if (this.ContainerMgmt.CurrentMethod is null) return true;
+
+            Dictionary<string, SSAVariableMap>? containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
+            if (containerMaps is null) return true;
+
+            SSACompileLine? firstLine = container.Lines.FirstOrDefault();
+            if (firstLine is null) return true;
+
+            Dictionary<string, SSAVariableMap> parentVarMap = this.ContainerMgmt.CurrentMethod.VarMapper;
+
+            foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
+            {
+                if (varibaleMap.Value.Reference is null) continue;
+                //if (varibaleMap.Value.Reference.Order < firstLine.Order) continue;
+                if (!this.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(varibaleMap.Key)) continue;
+
+                SSAVariableMap currentVarMap = this.ContainerMgmt.CurrentMethod.VarMapper[varibaleMap.Key];
+                if (currentVarMap.Reference is null) continue;
+
+                SSACompileLine phiLoop = currentVarMap.Reference;
+                if (phiLoop.FlowTask != ProgramFlowTask.Phi) continue;
+
+                CompilePhi compilePhi = new CompilePhi();
+                compilePhi.CompileLoopEndPhis(this, phiLoop, phis, varibaleMap.Value.Reference, currentVarMap);
+
+                //varibaleMap.Value.Reference.PhiMap.Add(phiLoop);
+                //phiLoop.PhiMap.Add(varibaleMap.Value.Reference);
+                //phiLoop.AddArgument(new SSACompileArgument(varibaleMap.Value.Reference));
+            }
+
+            return true;
         }
 
         public IEnumerable<KeyValuePair<string, SSAVariableMap>> PopContainerAndReturnVariableMapperForIfs()

@@ -80,6 +80,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public IParseTreeNode? CurrentNode
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
