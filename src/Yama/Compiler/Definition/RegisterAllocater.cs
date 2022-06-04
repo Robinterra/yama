@@ -86,6 +86,7 @@ namespace Yama.Compiler.Definition
 
         public RegisterMap? GetReferenceRegister(SSACompileLine? line, SSACompileLine from)
         {
+            if (from == line && this.CheckLastSet(from)) return from.LastSet!.RegisterMap;
             if (this.Defintion is null) return null;
             if (line is null) return null;
 
@@ -219,8 +220,23 @@ namespace Yama.Compiler.Definition
             return this.GetOriginal(line.ReplaceLine);
         }
 
+        private bool CheckLastSet(SSACompileLine line)
+        {
+            SSACompileLine? lastSet = line.LastSet;
+            if (lastSet is null) return false;
+
+            RegisterMap? map = lastSet.RegisterMap;
+            if (map is null) return false;
+
+            if (map.Mode != RegisterUseMode.Used) return false;
+
+            return map.Line == lastSet;
+        }
+
         public bool ExistAllocation(SSACompileLine line)
         {
+            if (this.CheckLastSet(line)) return true;
+
             SSACompileLine? phimap = line.PhiMap.Find(t=>t.RegisterMap != null);
             if (phimap != null && phimap.RegisterMap!.Line!.FindEquals(line)) return true;
 

@@ -55,6 +55,12 @@ namespace Yama.Compiler
             }
         }
 
+        public SSACompileLine? LastSet
+        {
+            get;
+            set;
+        }
+
         public RegisterMap? RegisterMap
         {
             get;
@@ -226,6 +232,7 @@ namespace Yama.Compiler
             if (map.Type == RegisterType.Stack) this.HandleVirtuellSetRegister(container, genericDefinition, compiler, map);
 
             this.RegisterMap = map;
+            map.Line = this;
 
             return true;
         }

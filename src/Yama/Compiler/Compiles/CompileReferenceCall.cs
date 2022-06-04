@@ -216,6 +216,7 @@ namespace Yama.Compiler
 
             SSACompileLine lineset = new SSACompileLine(this);
             this.Line = lineset;
+            lineset.LastSet = map.Reference;
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
@@ -250,6 +251,7 @@ namespace Yama.Compiler
                 else map.Value = SSAVariableMap.LastValue.NotNull;
 
                 arg.Reference.Calls.Remove(lineset);
+                arg.Reference.LastSet = lineset.LastSet;
 
                 return true;
             }
