@@ -245,15 +245,6 @@ namespace Yama.Parser
 
         // -----------------------------------------------
 
-        public IdentifierToken GetParent ( IdentifierToken token )
-        {
-            if ( token.ParentNode == null ) return token;
-
-            return this.GetParent ( token.ParentNode.Token );
-        }
-
-        // -----------------------------------------------
-
         private bool CheckTokens()
         {
             if (this.Tokenizer is null) return false;
