@@ -552,7 +552,7 @@
                   "cmp [SSAPOP[1]], [SSAPOP[0]]",
                   "mrs [SSAPUSH]",
                   "lsr [SSAPUSH], [SSAPUSH], #0x1E",
-                  "eor [SSAPUSH], [SSAPUSH], #0x1"
+                  "and [SSAPUSH], [SSAPUSH], #0x1"
                 ]
             },
             {
@@ -1023,7 +1023,7 @@
                 "AssemblyCommands": [
                     "cmp [SSAPOP[1]], [SSAPOP[0]]",
                     "mrs [SSAPUSH]",
-                    "eor [SSAPUSH], [SSAPUSH], #0x4"
+                    "and [SSAPUSH], [SSAPUSH], #0x4"
                 ]
             },
             {
