@@ -536,12 +536,6 @@
                 "Description": "Equals",
                 "Keys": [
                     {
-                        "Name": "[JUMPTO]",
-                        "Values": [
-                        "1"
-                        ]
-                    },
-                    {
                         "Name": "[SSAPOP]",
                         "Values": [
                           "2"
@@ -555,12 +549,10 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                "mov r12, #0xff",
-                "cmp [SSAPOP[1]], [SSAPOP[0]]",
-                "beq [JUMPTO[0]]",
-                "mov r12, #0x0",
-                "[JUMPTO[0]]:",
-                "mov [SSAPUSH], r12"
+                  "cmp [SSAPOP[1]], [SSAPOP[0]]",
+                  "mrs [SSAPUSH]",
+                  "lsr [SSAPUSH], [SSAPUSH], #0x1E",
+                  "and [SSAPUSH], [SSAPUSH], #0x1"
                 ]
             },
             {
@@ -1015,13 +1007,7 @@
                 "Mode": "Equals",
                 "Description": "Equals",
                 "Keys": [
-                    {
-                        "Name": "[JUMPTO]",
-                        "Values": [
-                        "1"
-                        ]
-                    },
-                    {
+                      {
                         "Name": "[SSAPOP]",
                         "Values": [
                           "2"
@@ -1035,12 +1021,9 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov r12, #0xff",
                     "cmp [SSAPOP[1]], [SSAPOP[0]]",
-                    "beq [JUMPTO[0]]",
-                    "mov r12, #0x0",
-                    "[JUMPTO[0]]:",
-                    "mov [SSAPUSH], r12"
+                    "mrs [SSAPUSH]",
+                    "and [SSAPUSH], [SSAPUSH], #0x4"
                 ]
             },
             {

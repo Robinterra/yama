@@ -201,6 +201,7 @@ namespace Yama.Debug
             this.Commands.Add(new CmpRegisterCommand());
             this.Commands.Add(new DivRegisterCommand());
             this.Commands.Add(new EorRegisterCommand());
+            this.Commands.Add(new EorImediateCommand());
             this.Commands.Add(new ExecRegisterCommand());
             this.Commands.Add(new LdrCommand());
             this.Commands.Add(new MovImediateCommand());

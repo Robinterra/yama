@@ -31,12 +31,6 @@ namespace Yama.Compiler
 
         public List<ICompileRoot> toRemove = new List<ICompileRoot>();
 
-        public bool IsLoopHeaderBegin
-        {
-            get;
-            set;
-        }
-
         public FileInfo? OutputFile
         {
             get;
@@ -335,15 +329,6 @@ namespace Yama.Compiler
                 if (!node.Compile(request)) this.AddError("One error orrcured: generate ir code", (IParseTreeNode)node);
             }
 
-            /*foreach (SSACompileLine line in this.SSALines)
-            {
-                SSACompileArgument arg = line.Arguments.FirstOrDefault();
-                if (arg == null) continue;
-                if (arg.Mode != SSACompileArgumentMode.JumpReference) continue;
-
-                arg.CompileReference.Line.Calls.Add(line);
-            }*/
-
             return this.Errors.Count == 0;
         }
 
@@ -418,36 +403,10 @@ namespace Yama.Compiler
             return this.Errors.Count == 0;
         }
 
-        /*private bool PrintIr()
-        {
-            IRCodePrintStream iRCodePrintStream = new IRCodePrintStream(this.IRCodeStream);
-
-            foreach (CompileContainer container in this.ContainerMgmt.RootContainer.Containers)
-            {
-                this.PrintIrContainer(container, iRCodePrintStream);
-            }
-
-            return true;
-        }
-
-        private bool PrintIrContainer(CompileContainer container, IRCodePrintStream iRCodePrintStream)
-        {
-            
-
-            return true;
-        }*/
-
         public bool AddError(string msg, IParseTreeNode? node = null)
         {
             CompilerError error = node is null ? new(new SimpleErrorOut(msg)) : new(node, msg);
 
-            this.Errors.Add(error);
-
-            return false;
-        }
-
-        public bool AddError(CompilerError error)
-        {
             this.Errors.Add(error);
 
             return false;
@@ -505,11 +464,6 @@ namespace Yama.Compiler
 
             Dictionary<string, SSAVariableMap>? containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
 
-            bool isloop = false;
-
-            CompileContainer? loop = this.ContainerMgmt.CurrentLoop;
-            if (loop != null) if (isloop = loop.Equals(container)) this.ContainerMgmt.LoopStack.Pop();
-
             if (this.ContainerMgmt.CurrentContainer == null) return true;
 
             this.ContainerMgmt.CurrentContainer.DataHolds.AddRange(container.DataHolds);
@@ -520,11 +474,6 @@ namespace Yama.Compiler
 
             Dictionary<string, SSAVariableMap> parentVarMap = this.ContainerMgmt.CurrentMethod.VarMapper;
             if (parentVarMap.Equals(containerMaps)) return true;
-
-            foreach (KeyValuePair<string, SSAVariableMap> conMap in containerMaps)
-            {
-                this.PopContainerIterationContainerMap(loop, isloop, parentVarMap, conMap);
-            }
 
             foreach (SSACompileLine line in container.PhiSetNewVar)
             {
@@ -546,60 +495,6 @@ namespace Yama.Compiler
             }
 
             return true;
-        }
-
-        public IEnumerable<KeyValuePair<string, SSAVariableMap>> PopContainerAndReturnVariableMapperForLoops()
-        {
-            if (this.ContainerMgmt.ContainerStack.Count == 0) yield break;
-            CompileContainer? loop = this.ContainerMgmt.CurrentLoop;
-            if (loop is null) yield break;
-            if (!loop.Equals(this.ContainerMgmt.CurrentContainer)) yield break;
-
-            this.ContainerMgmt.LoopStack.Pop();
-
-            CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
-            if (container.HasReturned) yield break;
-            if (this.ContainerMgmt.CurrentMethod is null) yield break;
-
-            Dictionary<string, SSAVariableMap>? containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
-            if (containerMaps is null) yield break;
-
-            SSACompileLine? firstLine = container.Lines.FirstOrDefault();
-            if (firstLine is null) yield break;
-
-            Dictionary<string, SSAVariableMap> parentVarMap = this.ContainerMgmt.CurrentMethod.VarMapper;
-
-            foreach (KeyValuePair<string, SSAVariableMap> conMap in containerMaps)
-            {
-                this.PopContainerIterationContainerMap(loop, true, parentVarMap, conMap);
-            }
-
-            foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
-            {
-                if (varibaleMap.Value.Reference is null) continue;
-                if (varibaleMap.Value.Reference.Order < firstLine.Order) continue;
-
-                yield return varibaleMap;
-            }
-
-            foreach (SSACompileLine line in container.PhiSetNewVar)
-            {
-                if (line.ReplaceLine == null) continue;
-                if (line.ReplaceLine.PhiMap.Count == 1) continue;
-                if (!this.CheckPhiMaps(line, line.PhiMap)) continue;
-
-                line.ReplaceLine = null;
-                if (line.Owner is CompileReferenceCall t) t.IsUsed = true;
-                line.HasReturn = true;
-            }
-
-            foreach (SSACompileLine line in container.PhiSetNewVar)
-            {
-                if (line.ReplaceLine == null) continue;
-
-                line.ReplaceLine.PhiMap.Add(line);
-                line.ReplaceLine.Calls.AddRange(line.Calls);
-            }
         }
 
         public bool PopContainerForLoops(List<SSACompileLine> phis)
@@ -626,7 +521,6 @@ namespace Yama.Compiler
             foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
             {
                 if (varibaleMap.Value.Reference is null) continue;
-                //if (varibaleMap.Value.Reference.Order < firstLine.Order) continue;
                 if (!this.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(varibaleMap.Key)) continue;
 
                 SSAVariableMap currentVarMap = this.ContainerMgmt.CurrentMethod.VarMapper[varibaleMap.Key];
@@ -645,10 +539,6 @@ namespace Yama.Compiler
 
                 CompilePhi compilePhi = new CompilePhi();
                 compilePhi.CompileLoopEndPhis(this, phiLoop, phis, varibaleMap.Value.Reference, currentVarMap);
-
-                //varibaleMap.Value.Reference.PhiMap.Add(phiLoop);
-                //phiLoop.PhiMap.Add(varibaleMap.Value.Reference);
-                //phiLoop.AddArgument(new SSACompileArgument(varibaleMap.Value.Reference));
             }
 
             return true;
@@ -675,48 +565,6 @@ namespace Yama.Compiler
 
                 yield return varibaleMap;
             }
-        }
-
-        private bool PopContainerIterationContainerMap(CompileContainer? loop, bool isloop, Dictionary<string, SSAVariableMap> parentVarMap, KeyValuePair<string, SSAVariableMap> conMap)
-        {
-            if (!parentVarMap.ContainsKey(conMap.Key)) return false;
-            if (conMap.Value.Reference == null) return false;
-
-            if (isloop)
-            {
-                if (loop is null) return false;
-                if (loop.LoopLine is null) return false;
-                conMap.Value.Reference.LoopContainer = loop;
-                conMap.Value.Reference.Calls.Add(loop.LoopLine);
-            }
-
-            if (parentVarMap[conMap.Key].Reference == null || conMap.Value.Reference.Equals(parentVarMap[conMap.Key].Reference))
-            {
-                parentVarMap[conMap.Key].Reference = conMap.Value.Reference;
-
-                if (conMap.Value.Reference == null) return false;
-            }
-
-            //if (containerMaps[orgMap.Key].Reference.ReplaceLine != null) this.CheckForCopy(containerMaps[orgMap.Key].Reference);
-
-            SSAVariableMap orig = parentVarMap[conMap.Key];
-            if (orig.Reference is null) return false;
-
-            foreach (SSACompileLine line in conMap.Value.AllSets)
-            {
-                orig.Reference.PhiMap.AddRange(line.PhiMap);
-                line.PhiMap.AddRange(orig.Reference.PhiMap.Where(t=>!line.PhiMap.Contains(t)));
-                foreach (SSACompileLine phi in line.PhiMap)
-                {
-                    orig.Reference.Calls.AddRange(phi.Calls);
-                    phi.Calls.AddRange(orig.Reference.Calls.Where(t=>!phi.Calls.Contains(t)));
-                }
-            }
-
-            //
-            //orig.Reference.PhiMap.AddRange(conMap.Value.Reference.PhiMap);
-
-            return true;
         }
 
         public bool ComeLeftBeforeRight(SSACompileLine line, SSACompileLine right)
