@@ -218,8 +218,8 @@ namespace Yama.Parser
                 if (node is SetKey sk) deklaration.SetStatement = sk;
             }
 
-            if (deklaration.GetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a get statement", deklaration.AllTokens.ToArray());
-            if (deklaration.SetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a set statement", deklaration.AllTokens.ToArray());
+            //if (deklaration.GetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a get statement", deklaration.AllTokens.ToArray());
+            //if (deklaration.SetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a set statement", deklaration.AllTokens.ToArray());
 
             return deklaration;
         }
@@ -253,8 +253,6 @@ namespace Yama.Parser
         {
             if (request.Parent is not IndexKlassenDeklaration klasse) return request.Index.CreateError(this);
             if (this.TypeDefinition is null) return request.Index.CreateError(this);
-            if (this.GetStatement is null) return request.Index.CreateError(this);
-            if (this.SetStatement is null) return request.Index.CreateError(this);
 
             IndexPropertyGetSetDeklaration deklaration = new IndexPropertyGetSetDeklaration(this, this.Token.Text, this.GetReturnValueIndex(klasse, this.TypeDefinition));
 
@@ -268,8 +266,8 @@ namespace Yama.Parser
 
             deklaration.Type = this.GetMethodeType();
 
-            this.GetStatement.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
-            this.SetStatement.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
+            if (this.GetStatement is not null) this.GetStatement.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
+            if (this.SetStatement is not null) this.SetStatement.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration));
 
             this.IndezierenNonStaticDek(deklaration, klasse, request.Index.Nameing);
 
