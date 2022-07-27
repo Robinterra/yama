@@ -222,6 +222,15 @@ namespace Yama.Parser
             SSACompileLine compileLine = request.Compiler.GetLatestSSALine();
             compileLine.FlowTask = ProgramFlowTask.IsTypeChecking;
 
+            CompileContainer? currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
+            if (currentMethod is null) throw new NullReferenceException();
+
+            SSAVariableMap? nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.LeftNode!.Token.Text];
+            SSAVariableMap? nextKontextReference = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.ReferenceDeklaration!.Text];
+
+            if (nextKontext is not null) nextKontext.Value = SSAVariableMap.LastValue.NotNull;
+            if (nextKontextReference is not null) nextKontextReference.Value = SSAVariableMap.LastValue.NotNull;
+
             return request.Compiler.Definition.ParaClean();
         }
 
@@ -243,13 +252,22 @@ namespace Yama.Parser
             SSACompileLine compileLine = request.Compiler.GetLatestSSALine();
             compileLine.FlowTask = ProgramFlowTask.IsNullCheck;
 
+            CompileContainer? currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
+            if (currentMethod is null) throw new NullReferenceException();
+
+            SSAVariableMap currentKontext = currentMethod.VarMapper[this.LeftNode!.Token.Text];
+            SSAVariableMap? nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.LeftNode!.Token.Text];
+
+            currentKontext.Value = SSAVariableMap.LastValue.NotNull;
+            if (nextKontext is not null) nextKontext.Value = SSAVariableMap.LastValue.Null;
+
             return request.Compiler.Definition.ParaClean();
         }
 
         private bool CompileCopy(Compiler.Compiler compiler, string mode, MethodeDeclarationNode t)
         {
             if (t.Statement is not ICompileNode statementNode) return false;
-            if (t.AccessDefinition == null) return false;
+            if (t.AccessDefinition is null) return false;
             if (t.AccessDefinition.Kind != IdentifierKind.Copy) return false;
 
             statementNode.Compile(new RequestParserTreeCompile(compiler, "default"));

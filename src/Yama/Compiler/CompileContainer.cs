@@ -86,6 +86,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public Dictionary<string, SSAVariableMap>? NextContext
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -115,7 +121,7 @@ namespace Yama.Compiler
             return true;
         }
 
-        public bool BeginNewContainerVars()
+        public Dictionary<string, SSAVariableMap> GetCopyOfCurrentContext()
         {
             Dictionary<string, SSAVariableMap> copyMap = new Dictionary<string, SSAVariableMap>();
 
@@ -123,6 +129,15 @@ namespace Yama.Compiler
             {
                 copyMap.Add(orgMap.Key, new SSAVariableMap(orgMap.Value));
             }
+
+            return this.NextContext = copyMap;
+        }
+
+        public bool BeginNewKontextPath()
+        {
+            Dictionary<string, SSAVariableMap>? copyMap = this.NextContext;
+            this.NextContext = null;
+            if (copyMap is null) copyMap = this.GetCopyOfCurrentContext();
 
             this.StackVarMapper.Push(copyMap);
 

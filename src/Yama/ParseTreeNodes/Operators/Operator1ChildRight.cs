@@ -213,6 +213,8 @@ namespace Yama.Parser
             if (this.ChildNode is not ICompileNode compileNode) return false;
             if (this.Reference.Deklaration is null) return false;
 
+            if (this.ChildNode is TypePatternMatching tpm) this.MakeNullReferences(request.Compiler, tpm);
+
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {
                 bool isok = this.CompileCopy(request.Compiler, request.Mode, t);
@@ -228,6 +230,36 @@ namespace Yama.Parser
             this.OperatorCall.Compile(request.Compiler, this.Reference, "methode");
 
             this.FunctionExecute.Compile(request.Compiler, null, request.Mode);
+
+            return true;
+        }
+
+        private bool MakeNullReferences(Compiler.Compiler compiler, TypePatternMatching tpm)
+        {
+            CompileContainer? currentMethod = compiler.ContainerMgmt.CurrentMethod;
+            if (currentMethod is null) return false;
+
+            SSAVariableMap currentKontext = currentMethod.VarMapper[tpm.LeftNode!.Token.Text];
+            SSAVariableMap? nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[tpm.LeftNode!.Token.Text];
+
+            SSAVariableMap.LastValue tmp = currentKontext.Value;
+            currentKontext.Value = SSAVariableMap.LastValue.Null;
+            if (nextKontext is not null)
+            {
+                currentKontext.Value = nextKontext.Value;
+
+                nextKontext.Value = tmp;
+            }
+
+            if (tpm.ReferenceDeklaration is null) return true;
+
+            currentKontext = currentMethod.VarMapper[tpm.ReferenceDeklaration!.Text];
+            nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[tpm.ReferenceDeklaration!.Text];
+
+            if (nextKontext is null) return true;
+
+            currentKontext.Value = nextKontext.Value;
+            nextKontext.Value = SSAVariableMap.LastValue.NotSet;
 
             return true;
         }

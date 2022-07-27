@@ -422,6 +422,13 @@ namespace Yama.Compiler
             return true;
         }
 
+        public Dictionary<string, SSAVariableMap> GetCopyOfCurrentContext()
+        {
+            if (this.ContainerMgmt.CurrentMethod is null) throw new NullReferenceException();
+
+            return this.ContainerMgmt.CurrentMethod.GetCopyOfCurrentContext();
+        }
+
         public bool PushContainer(CompileContainer compileContainer, ValidUses? uses, bool isloop = false)
         {
             if (isloop)
@@ -437,7 +444,7 @@ namespace Yama.Compiler
 
             this.Containers.Add(compileContainer);
 
-            if (this.ContainerMgmt.CurrentMethod != null) this.ContainerMgmt.CurrentMethod.BeginNewContainerVars();
+            if (this.ContainerMgmt.CurrentMethod != null) this.ContainerMgmt.CurrentMethod.BeginNewKontextPath();
 
             if (uses is null) return true;
 
