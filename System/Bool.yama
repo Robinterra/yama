@@ -31,7 +31,7 @@ namespace "System"
         *
         * @return (bool) The result of Or
         */
-        public operator bool ||( bool a, bool b )
+        public operator bool |( bool a, bool b )
         {
             if ( a ) return true;
 
@@ -48,12 +48,9 @@ namespace "System"
         *
         * @return (bool) The result of And
         */
-        public operator bool &&( bool a, bool b )
+        public operator bool &( bool a, bool b )
         {
-            if ( a )
-            {
-                if ( b ) return true;
-            }
+            if ( a ) return b;
 
             return false;
         }

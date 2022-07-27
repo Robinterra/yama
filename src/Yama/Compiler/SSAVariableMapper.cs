@@ -71,6 +71,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public bool PhiOnlyValueChecking
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor

@@ -271,7 +271,7 @@ namespace Yama.Compiler
             {
                 map.Value = SSAVariableMap.LastValue.Unknown;
                 if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
-                if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
+                //if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
             }
             else map.Value = SSAVariableMap.LastValue.NotNull;
 
@@ -344,10 +344,12 @@ namespace Yama.Compiler
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[deklaration.Name];
 
-            if ( this.IsNullCheck ) map.Value = SSAVariableMap.LastValue.NotNull;
-            if ( map.Value == SSAVariableMap.LastValue.NotSet ) return compiler.AddError ( "variable is not set!", use );
-            if ( map.Value == SSAVariableMap.LastValue.Null ) return compiler.AddError ( "variable is null", use );
-            if ( map.Value == SSAVariableMap.LastValue.Unknown ) return compiler.AddError ( "null checking for variable is missing", use );
+            SSAVariableMap.LastValue lastValue = map.Value;
+
+            if ( this.IsNullCheck ) lastValue = SSAVariableMap.LastValue.NotNull;
+            if ( lastValue == SSAVariableMap.LastValue.NotSet ) return compiler.AddError ( "variable is not set!", use );
+            if ( lastValue == SSAVariableMap.LastValue.Null ) return compiler.AddError ( "variable is null", use );
+            if ( lastValue == SSAVariableMap.LastValue.Unknown  ) return compiler.AddError ( "null checking for variable is missing", use );
 
             if (map.Reference == null) return compiler.AddError("variable is not set!", deklaration.Use);
 

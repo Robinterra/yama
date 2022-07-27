@@ -232,6 +232,36 @@ namespace Yama.Parser
             return true;
         }
 
+        private bool MakeNullReferences(Compiler.Compiler compiler, TypePatternMatching tpm)
+        {
+            CompileContainer? currentMethod = compiler.ContainerMgmt.CurrentMethod;
+            if (currentMethod is null) return false;
+
+            SSAVariableMap currentKontext = currentMethod.VarMapper[tpm.LeftNode!.Token.Text];
+            SSAVariableMap? nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[tpm.LeftNode!.Token.Text];
+
+            SSAVariableMap.LastValue tmp = currentKontext.Value;
+            currentKontext.Value = SSAVariableMap.LastValue.Null;
+            if (nextKontext is not null)
+            {
+                currentKontext.Value = nextKontext.Value;
+
+                nextKontext.Value = tmp;
+            }
+
+            if (tpm.ReferenceDeklaration is null) return true;
+
+            currentKontext = currentMethod.VarMapper[tpm.ReferenceDeklaration!.Text];
+            nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[tpm.ReferenceDeklaration!.Text];
+
+            if (nextKontext is null) return true;
+
+            currentKontext.Value = nextKontext.Value;
+            nextKontext.Value = SSAVariableMap.LastValue.NotSet;
+
+            return true;
+        }
+
         private bool CompileCopy(Compiler.Compiler compiler, string mode, MethodeDeclarationNode t)
         {
             if (t.AccessDefinition == null) return false;
@@ -240,6 +270,8 @@ namespace Yama.Parser
             if (t.Statement is not ICompileNode statement) return false;
 
             childNode.Compile(new RequestParserTreeCompile(compiler, mode));
+
+            if (this.ChildNode is TypePatternMatching tpm) this.MakeNullReferences(compiler, tpm);
 
             statement.Compile(new RequestParserTreeCompile(compiler, "default"));
 

@@ -209,6 +209,8 @@ namespace Yama.Parser
 
             CompileJumpWithCondition jumpWithCondition = new CompileJumpWithCondition();
 
+            request.Compiler.GetCopyOfCurrentContext();
+
             conditionNode.Compile(request);
 
             jumpWithCondition.Compile(request.Compiler, ifcontainer.Ende, "isZero");

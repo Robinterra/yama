@@ -422,6 +422,13 @@ namespace Yama.Compiler
             return true;
         }
 
+        public Dictionary<string, SSAVariableMap> GetCopyOfCurrentContext()
+        {
+            if (this.ContainerMgmt.CurrentMethod is null) throw new NullReferenceException();
+
+            return this.ContainerMgmt.CurrentMethod.GetCopyOfCurrentContext();
+        }
+
         public bool PushContainer(CompileContainer compileContainer, ValidUses? uses, bool isloop = false)
         {
             if (isloop)
@@ -437,7 +444,7 @@ namespace Yama.Compiler
 
             this.Containers.Add(compileContainer);
 
-            if (this.ContainerMgmt.CurrentMethod != null) this.ContainerMgmt.CurrentMethod.BeginNewContainerVars();
+            if (this.ContainerMgmt.CurrentMethod != null) this.ContainerMgmt.CurrentMethod.BeginNewKontextPath();
 
             if (uses is null) return true;
 
@@ -561,7 +568,8 @@ namespace Yama.Compiler
             foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
             {
                 if (varibaleMap.Value.Reference is null) continue;
-                if (varibaleMap.Value.Reference.Order < firstLine.Order) continue;
+
+                varibaleMap.Value.PhiOnlyValueChecking = varibaleMap.Value.Reference.Order < firstLine.Order;
 
                 yield return varibaleMap;
             }

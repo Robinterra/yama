@@ -91,6 +91,14 @@ namespace Yama.Compiler
                 if (variableMap.Value.Reference is null) continue;
                 if (!container.VarMapper.ContainsKey(variableMap.Key)) continue;
                 SSAVariableMap currentVarMap = container.VarMapper[variableMap.Key];
+
+                if (variableMap.Value.Value == SSAVariableMap.LastValue.NotSet) currentVarMap.Value = SSAVariableMap.LastValue.NotSet;
+                if (variableMap.Value.Value == SSAVariableMap.LastValue.Unknown) currentVarMap.Value = SSAVariableMap.LastValue.Unknown;
+                if (variableMap.Value.Value == SSAVariableMap.LastValue.Null && currentVarMap.Value == SSAVariableMap.LastValue.Null) currentVarMap.Value = SSAVariableMap.LastValue.Null;
+                else if (variableMap.Value.Value == SSAVariableMap.LastValue.Null) currentVarMap.Value = SSAVariableMap.LastValue.Unknown;
+
+                if (variableMap.Value.PhiOnlyValueChecking) continue;
+
                 if (currentVarMap.Reference is null)
                 {
                     currentVarMap.Reference = variableMap.Value.Reference;
@@ -102,11 +110,6 @@ namespace Yama.Compiler
                 varLine.FlowTask = ProgramFlowTask.Phi;
                 varLine.AddArgument(new SSACompileArgument(currentVarMap.Reference));
                 varLine.AddArgument(new SSACompileArgument(variableMap.Value.Reference));
-
-                if (variableMap.Value.Value == SSAVariableMap.LastValue.NotSet) currentVarMap.Value = SSAVariableMap.LastValue.NotSet;
-                if (variableMap.Value.Value == SSAVariableMap.LastValue.Unknown) currentVarMap.Value = SSAVariableMap.LastValue.Unknown;
-                if (variableMap.Value.Value == SSAVariableMap.LastValue.Null && currentVarMap.Value == SSAVariableMap.LastValue.Null) currentVarMap.Value = SSAVariableMap.LastValue.Null;
-                else if (variableMap.Value.Value == SSAVariableMap.LastValue.Null) currentVarMap.Value = SSAVariableMap.LastValue.Unknown;
 
                 compiler.AddSSALine(varLine);
 
