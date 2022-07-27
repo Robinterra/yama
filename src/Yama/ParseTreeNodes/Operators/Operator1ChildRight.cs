@@ -213,8 +213,6 @@ namespace Yama.Parser
             if (this.ChildNode is not ICompileNode compileNode) return false;
             if (this.Reference.Deklaration is null) return false;
 
-            if (this.ChildNode is TypePatternMatching tpm) this.MakeNullReferences(request.Compiler, tpm);
-
             if (this.Reference.Deklaration.Use is MethodeDeclarationNode t)
             {
                 bool isok = this.CompileCopy(request.Compiler, request.Mode, t);
@@ -272,6 +270,8 @@ namespace Yama.Parser
             if (t.Statement is not ICompileNode statement) return false;
 
             childNode.Compile(new RequestParserTreeCompile(compiler, mode));
+
+            if (this.ChildNode is TypePatternMatching tpm) this.MakeNullReferences(compiler, tpm);
 
             statement.Compile(new RequestParserTreeCompile(compiler, "default"));
 

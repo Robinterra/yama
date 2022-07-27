@@ -136,8 +136,9 @@ namespace Yama.Compiler
         public bool BeginNewKontextPath()
         {
             Dictionary<string, SSAVariableMap>? copyMap = this.NextContext;
-            this.NextContext = null;
             if (copyMap is null) copyMap = this.GetCopyOfCurrentContext();
+
+            this.NextContext = null;
 
             this.StackVarMapper.Push(copyMap);
 

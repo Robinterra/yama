@@ -228,8 +228,12 @@ namespace Yama.Parser
             SSAVariableMap? nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.LeftNode!.Token.Text];
             SSAVariableMap? nextKontextReference = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.ReferenceDeklaration!.Text];
 
-            if (nextKontext is not null) nextKontext.Value = SSAVariableMap.LastValue.NotNull;
-            if (nextKontextReference is not null) nextKontextReference.Value = SSAVariableMap.LastValue.NotNull;
+            if (nextKontextReference is not null && nextKontext is not null)
+            {
+                nextKontext.Value = SSAVariableMap.LastValue.NotNull;
+                nextKontextReference.Value = SSAVariableMap.LastValue.NotNull;
+                nextKontextReference.Reference = nextKontext.Reference;
+            }
 
             return request.Compiler.Definition.ParaClean();
         }

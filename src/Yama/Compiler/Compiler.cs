@@ -568,7 +568,8 @@ namespace Yama.Compiler
             foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
             {
                 if (varibaleMap.Value.Reference is null) continue;
-                if (varibaleMap.Value.Reference.Order < firstLine.Order) continue;
+
+                varibaleMap.Value.PhiOnlyValueChecking = varibaleMap.Value.Reference.Order < firstLine.Order;
 
                 yield return varibaleMap;
             }
