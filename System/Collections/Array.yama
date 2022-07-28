@@ -62,9 +62,9 @@ namespace "System.Collections"
             get
             {
                 int orgSize = size << 2;
-                size = orgSize + 4;
+                int sizeOnDisk = orgSize + 4;
 
-                Array array = (MemoryManager.Malloc ( size )) as Array;
+                Array array = (MemoryManager.Malloc ( sizeOnDisk )) as Array;
                 array.size = orgSize;
 
                 return array;

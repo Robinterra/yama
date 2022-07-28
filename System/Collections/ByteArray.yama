@@ -22,7 +22,6 @@ namespace "System.Collections"
             {
                 return this.size;
             }
-            set{}
         }
 
         public int Data[int index]
@@ -72,16 +71,15 @@ namespace "System.Collections"
         {
             get
             {
-                int orgSize = size;
-                size = size + 4;
-                if (size & 0x3)
+                int sizeOnDisk = size + 4;
+                if (sizeOnDisk & 0x3)
                 {
-                    size = size | 0x3;
-                    size = 4 + (size ^ 0x3);
+                    sizeOnDisk = sizeOnDisk | 0x3;
+                    sizeOnDisk = 4 + (sizeOnDisk ^ 0x3);
                 }
 
-                ByteArray array = (MemoryManager.Malloc ( size )) as ByteArray;
-                array.size = orgSize;
+                ByteArray array = (MemoryManager.Malloc ( sizeOnDisk )) as ByteArray;
+                array.size = size;
 
                 return array;
             }
