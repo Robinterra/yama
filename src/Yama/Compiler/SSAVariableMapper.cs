@@ -17,6 +17,11 @@ namespace Yama.Compiler
             set;
         }
 
+        public List<SSACompileLine> LoopBranchReferencesForPhis
+        {
+            get;
+        } = new List<SSACompileLine>();
+
         public List<SSACompileLine> AllSets
         {
             get;

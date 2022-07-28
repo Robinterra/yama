@@ -92,6 +92,8 @@ namespace Yama.Compiler
                 if (!container.VarMapper.ContainsKey(variableMap.Key)) continue;
                 SSAVariableMap currentVarMap = container.VarMapper[variableMap.Key];
 
+                currentVarMap.LoopBranchReferencesForPhis.AddRange(variableMap.Value.LoopBranchReferencesForPhis);
+
                 if (variableMap.Value.Value == SSAVariableMap.LastValue.NotSet) currentVarMap.Value = SSAVariableMap.LastValue.NotSet;
                 if (variableMap.Value.Value == SSAVariableMap.LastValue.Unknown) currentVarMap.Value = SSAVariableMap.LastValue.Unknown;
                 if (variableMap.Value.Value == SSAVariableMap.LastValue.Null && currentVarMap.Value == SSAVariableMap.LastValue.Null) currentVarMap.Value = SSAVariableMap.LastValue.Null;
@@ -158,18 +160,30 @@ namespace Yama.Compiler
             return true;
         }
 
-        public bool CompileLoopEndPhis(Compiler compiler, SSACompileLine phiLoop, List<SSACompileLine> phis, SSACompileLine reference, SSAVariableMap currentVarMap)
+        public bool CompileLoopEndPhis(Compiler compiler, SSACompileLine phiLoop, List<SSACompileLine> phis, SSAVariableMap oldVarMap, SSAVariableMap currentVarMap)
         {
+            if (oldVarMap.Reference is null) return false;
+
             SSACompileLine varLine = new SSACompileLine(this);
             varLine.FlowTask = ProgramFlowTask.Phi;
             varLine.AddArgument(new SSACompileArgument(phiLoop));
-            varLine.AddArgument(new SSACompileArgument(reference));
-            if (reference != phiLoop)
+            if (oldVarMap.Reference != phiLoop)
             {
-                phiLoop.AddArgument(new SSACompileArgument(reference));
-                phiLoop.PhiMap.Add(reference);
-                reference.PhiMap.Add(phiLoop);
+                varLine.AddArgument(new SSACompileArgument(oldVarMap.Reference));
+                phiLoop.AddArgument(new SSACompileArgument(oldVarMap.Reference));
+                oldVarMap.LoopBranchReferencesForPhis.ForEach(t =>
+                {
+                    if (t == phiLoop) return;
+                    if (t == oldVarMap.Reference) return;
+
+                    phiLoop.AddArgument(new SSACompileArgument(t));
+                    varLine.AddArgument(new SSACompileArgument(t));
+                });
+                phiLoop.PhiMap.Add(oldVarMap.Reference);
+                oldVarMap.Reference.PhiMap.Add(phiLoop);
             }
+
+            oldVarMap.LoopBranchReferencesForPhis.Clear();
 
             // wird gemacht um IsUsed zu verwenden
             int dex = phiLoop.Calls.IndexOf(varLine);

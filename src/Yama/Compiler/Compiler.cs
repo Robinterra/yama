@@ -528,9 +528,9 @@ namespace Yama.Compiler
             foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
             {
                 if (varibaleMap.Value.Reference is null) continue;
-                if (!this.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(varibaleMap.Key)) continue;
+                if (!parentVarMap.ContainsKey(varibaleMap.Key)) continue;
 
-                SSAVariableMap currentVarMap = this.ContainerMgmt.CurrentMethod.VarMapper[varibaleMap.Key];
+                SSAVariableMap currentVarMap = parentVarMap[varibaleMap.Key];
                 if (currentVarMap.Reference is null) continue;
 
                 SSACompileLine phiLoop = currentVarMap.Reference;
@@ -545,7 +545,7 @@ namespace Yama.Compiler
                 }
 
                 CompilePhi compilePhi = new CompilePhi();
-                compilePhi.CompileLoopEndPhis(this, phiLoop, phis, varibaleMap.Value.Reference, currentVarMap);
+                compilePhi.CompileLoopEndPhis(this, phiLoop, phis, varibaleMap.Value, currentVarMap);
             }
 
             return true;

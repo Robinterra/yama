@@ -82,6 +82,16 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
+            CompileContainer? currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
+            if (currentMethod is null) return false;
+
+            foreach (KeyValuePair<string, SSAVariableMap> varMap in currentMethod.VarMapper)
+            {
+                if (varMap.Value.Reference is null) continue;
+
+                varMap.Value.LoopBranchReferencesForPhis.Add(varMap.Value.Reference);
+            }
+
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
             return true;
