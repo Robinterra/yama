@@ -167,8 +167,6 @@ namespace Yama.Compiler
             this.Node = node;
             compiler.AssemblerSequence.Add(this);
 
-            compiler.EndCurrentMethod();
-
             this.MethodNode = node;
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
             if (this.Algo == null) return false;
@@ -176,6 +174,8 @@ namespace Yama.Compiler
             SSACompileLine line = new SSACompileLine(this, true);
             compiler.AddSSALine(line);
             this.Line = line;
+
+            compiler.EndCurrentMethod();
 
             this.PrimaryKeys = new Dictionary<string, string>();
 
