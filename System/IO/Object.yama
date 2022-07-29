@@ -1,0 +1,15 @@
+namespace "System.IO"
+{
+    /**
+    * Object
+    */
+    public primitive class object
+    {
+
+        public this ~()
+        {
+            return null;
+        }
+
+    }
+}
