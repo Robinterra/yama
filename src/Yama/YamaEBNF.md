@@ -11,7 +11,7 @@ pointIdentifion = identiefier.identiefier
 expressionIden = pointIdentifion | number | hexnumber | "true" | "false" | "null"
 
 asExpression = "as" identiefier
-isExpression = "is" (null | identiefier identiefier)
+isExpression = "is" (null | [&]identiefier identiefier)
 
 operationExpression = operator expression
 expression = [ "(" ] [ operator ] expressionIden [ asExpression | methodeCall | vektorCall ] [ operationExpression ] [ ")" ] [ asExpression ] [ operationExpression ]

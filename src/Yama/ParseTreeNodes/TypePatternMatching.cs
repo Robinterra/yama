@@ -93,6 +93,12 @@ namespace Yama.Parser
             }
         }
 
+        public IdentifierToken? BorrowingToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -126,8 +132,9 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            node.RightToken = request.Parser.Peek ( request.Token, 1 );
-            if ( node.RightToken == null ) return new ParserError(request.Token, $"Expectet a word after the is keyword");
+            IdentifierToken? patternToken = this.TryParseBorrwoing(request.Parser, request.Token, node);
+            if ( patternToken is null ) return new ParserError(request.Token, $"Expectet a word after the is keyword");
+            node.RightToken = patternToken;
 
             node.AllTokens.Add(node.RightToken);
             if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the is keyword and not a '{node.RightToken.Text}'", node.RightToken);
@@ -140,6 +147,18 @@ namespace Yama.Parser
             node.AllTokens.Add(node.ReferenceDeklaration);
 
             return node;
+        }
+
+        private IdentifierToken? TryParseBorrwoing(Parser parser, IdentifierToken token, TypePatternMatching node)
+        {
+            if (token.Kind != IdentifierKind.Operator) return token;
+            if (token.Text != "&") return token;
+
+            node.BorrowingToken = token;
+            node.AllTokens.Add(token);
+
+            IdentifierToken? nextToken = parser.Peek(token, 1);
+            return nextToken;
         }
 
         private IParseTreeNode ParseNullChecking ( TypePatternMatching node )

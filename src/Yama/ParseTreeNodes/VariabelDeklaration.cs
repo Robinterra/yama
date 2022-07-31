@@ -76,6 +76,12 @@ namespace Yama.Parser
             set;
         }
 
+        public IdentifierToken? BorrowingToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -117,33 +123,35 @@ namespace Yama.Parser
 
         public IParseTreeNode? Parse ( RequestParserTreeParser request )
         {
-            if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
+            VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
+
+            IdentifierToken? typeToken = this.TryParseBorrwoing(request, node);
+            if (typeToken is null) return null;
+            if ( !this.CheckHashValidOperator ( typeToken ) ) return null;
 
             //IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
             //if (lexerLeft is null) return null;
             //if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
 
-            VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
+            IdentifierToken? variableNameToken = request.Parser.Peek ( typeToken, 1 );
+            if (variableNameToken is null) return null;
 
-            IdentifierToken? lexerRight = request.Parser.Peek ( request.Token, 1 );
-            if (lexerRight is null) return null;
+            variableNameToken = this.TryParseGeneric(request, node, variableNameToken);
+            if (variableNameToken is null) return null;
+            if ( !this.CheckHashValidChild ( variableNameToken ) ) return null;
 
-            lexerRight = this.TryParseGeneric(request, node, lexerRight);
-            if (lexerRight is null) return null;
-            if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
-
-            node.Token = lexerRight;
-            node.AllTokens.Add(lexerRight);
-            node.Ende = lexerRight;
+            node.Token = variableNameToken;
+            node.AllTokens.Add(variableNameToken);
+            node.Ende = variableNameToken;
 
             ReferenceCall callRule = request.Parser.GetRule<ReferenceCall>();
 
-            node.TypeDefinition = request.Parser.TryToParse ( callRule, request.Token );
+            node.TypeDefinition = request.Parser.TryToParse ( callRule, typeToken );
             if ( node.TypeDefinition is null ) return null;
 
             if (!IsInMethodeDeklaration) return node;
 
-            IdentifierToken? optionalComma = request.Parser.Peek ( lexerRight, 1 );
+            IdentifierToken? optionalComma = request.Parser.Peek ( variableNameToken, 1 );
             if (optionalComma is null) return node;
             if (optionalComma.Kind != IdentifierKind.Comma) return node;
 
@@ -151,6 +159,18 @@ namespace Yama.Parser
             node.Ende = optionalComma;
 
             return node;
+        }
+
+        private IdentifierToken? TryParseBorrwoing(RequestParserTreeParser request, VariabelDeklaration node)
+        {
+            if (request.Token.Kind != IdentifierKind.Operator) return request.Token;
+            if (request.Token.Text != "&") return request.Token;
+
+            node.BorrowingToken = request.Token;
+            node.AllTokens.Add(request.Token);
+
+            IdentifierToken? nextToken = request.Parser.Peek(request.Token, 1);
+            return nextToken;
         }
 
         private IdentifierToken? TryParseGeneric(RequestParserTreeParser request, VariabelDeklaration deklaration, IdentifierToken token)
