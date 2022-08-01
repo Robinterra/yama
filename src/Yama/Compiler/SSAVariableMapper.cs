@@ -9,6 +9,7 @@ namespace Yama.Compiler
 {
     public class SSAVariableMap
     {
+
         #region get/set
 
         public string Key
@@ -94,12 +95,18 @@ namespace Yama.Compiler
             set;
         }
 
+        public SSAVariableMap OrgMap
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public SSAVariableMap(IndexVariabelnDeklaration dek)
         {
+            this.OrgMap = this;
             this.Key = dek.Name;
             this.Deklaration = dek;
             this.Value = LastValue.NotSet;
@@ -110,6 +117,7 @@ namespace Yama.Compiler
         public SSAVariableMap(SSAVariableMap value)
         {
             //this.AllSets.AddRange(value.AllSets);
+            this.OrgMap = value;
             this.Key = value.Key;
             this.Reference = value.Reference;
             this.Deklaration = value.Deklaration;

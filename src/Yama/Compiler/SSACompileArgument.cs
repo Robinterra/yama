@@ -32,6 +32,11 @@ namespace Yama.Compiler
             set;
         }
 
+        public SSAVariableMap? Map
+        {
+            get;
+        }
+
         public ICompileRoot? Root
         {
             get;
@@ -53,11 +58,12 @@ namespace Yama.Compiler
             this.Mode = mode;
         }
 
-        public SSACompileArgument(SSACompileLine line)
+        public SSACompileArgument(SSACompileLine line, SSAVariableMap? map = null)
         {
             this.Reference = line;
             this.Mode = SSACompileArgumentMode.Reference;
             this.Root = line.Owner;
+            if (map is not null) this.Map = new SSAVariableMap(map);
         }
 
         #endregion ctor

@@ -132,7 +132,10 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            IdentifierToken? patternToken = this.TryParseBorrwoing(request.Parser, request.Token, node);
+            IdentifierToken? maybeBorrowingToken = request.Parser.Peek(request.Token, 1);
+            if (maybeBorrowingToken is null) return null;
+
+            IdentifierToken? patternToken = this.TryParseBorrwoing(request.Parser, maybeBorrowingToken, node);
             if ( patternToken is null ) return new ParserError(request.Token, $"Expectet a word after the is keyword");
             node.RightToken = patternToken;
 

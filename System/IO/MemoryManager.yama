@@ -53,19 +53,19 @@ namespace "System.IO"
         {
             MemoryManager.CreateBlock ( currentadress, 2, size );
 
-            currentadress = currentadress + #defalgo Malloc,HeaderSize:;
+            int dataAdress = currentadress + #defalgo Malloc,HeaderSize:;
 
-            if (nextBlockState == 0) return currentadress;
+            if (nextBlockState == 0) return dataAdress;
 
-            int nextAdress = currentadress + size;
+            int nextAdress = dataAdress + size;
 
-            size = size + #defalgo Malloc,HeaderSize:;
+            int sizeAndHeaderSize = size + #defalgo Malloc,HeaderSize:;
 
-            size = currentBlockSize - size;
+            int notReservedSize = currentBlockSize - sizeAndHeaderSize;
 
-            MemoryManager.CreateBlock ( nextAdress, 1, size );
+            MemoryManager.CreateBlock ( nextAdress, 1, notReservedSize );
 
-            return currentadress;
+            return dataAdress;
         }
 
         // -----------------------------------------------

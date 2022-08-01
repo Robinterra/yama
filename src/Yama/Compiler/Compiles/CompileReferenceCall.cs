@@ -73,6 +73,11 @@ namespace Yama.Compiler
             set;
         }
 
+        public SSAVariableMap? VariableMap{
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -211,6 +216,7 @@ namespace Yama.Compiler
             if (this.Algo == null) return false;
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+            this.VariableMap = map;
             if (map.MutableState == SSAVariableMap.VariableMutableState.NotMutable && map.Value != SSAVariableMap.LastValue.NotSet)
                 return compiler.AddError($"variable '{map.Key}' is not mutable", node.Use);
 
@@ -245,8 +251,7 @@ namespace Yama.Compiler
 
                 if ( map.IsNullable )
                 {
-                    map.Value = SSAVariableMap.LastValue.Unknown;
-                    if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+                    if (!this.SetVariableByReferenceCheck(compiler, arg, map, node)) return false;
                 }
                 else map.Value = SSAVariableMap.LastValue.NotNull;
 
@@ -269,11 +274,34 @@ namespace Yama.Compiler
 
             if ( map.IsNullable )
             {
-                map.Value = SSAVariableMap.LastValue.Unknown;
-                if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
-                //if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
+                if (!this.SetVariableByReferenceCheck(compiler, arg, map, node)) return false;
             }
             else map.Value = SSAVariableMap.LastValue.NotNull;
+
+            return true;
+        }
+
+        private bool SetVariableByReferenceCheck(Compiler compiler, SSACompileArgument arg, SSAVariableMap map, IndexVariabelnDeklaration node)
+        {
+            if (map.Reference is null) return false;
+
+            map.Value = SSAVariableMap.LastValue.Unknown;
+            if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+            //if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
+
+            if (arg.Map is null) return true;
+
+            map.Value = arg.Map.Value;
+            if (arg.Map.Kind == SSAVariableMap.VariableType.OwnerReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
+            {
+                arg.Map.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                arg.Map.OrgMap.Value = SSAVariableMap.LastValue.NotSet;
+                arg.Map.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+            }
+            if (arg.Map.Kind == SSAVariableMap.VariableType.BorrowingReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
+            {
+                return compiler.AddError("You can not set a Borrowing variable to a owner variable", node.Use);
+            }
 
             return true;
         }
@@ -343,6 +371,7 @@ namespace Yama.Compiler
             if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(deklaration.Name)) return compiler.AddError("variable not in varmapper", deklaration.Use);
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[deklaration.Name];
+            this.VariableMap = map;
 
             SSAVariableMap.LastValue lastValue = map.Value;
 
@@ -353,7 +382,7 @@ namespace Yama.Compiler
 
             if (map.Reference == null) return compiler.AddError("variable is not set!", deklaration.Use);
 
-            SSACompileArgument arg = new SSACompileArgument(map.Reference);
+            SSACompileArgument arg = new SSACompileArgument(map.Reference, map);
             compiler.ContainerMgmt.StackArguments.Push(arg);
 
             return true;
