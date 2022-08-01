@@ -211,8 +211,8 @@ namespace Yama.Compiler
             if (this.Algo == null) return false;
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
-            //if (map.Calls.Count == 0) return true;
-            //SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
+            if (map.MutableState == SSAVariableMap.VariableMutableState.NotMutable && map.Value != SSAVariableMap.LastValue.NotSet)
+                return compiler.AddError($"variable '{map.Key}' is not mutable", node.Use);
 
             SSACompileLine lineset = new SSACompileLine(this);
             this.Line = lineset;

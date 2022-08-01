@@ -357,15 +357,13 @@ namespace Yama.Parser
 
             IndexContainer container = deklaration.Container;
 
-            VariabelDeklaration? dek = null;
-
             this.IndezierenNonStaticDek(deklaration, klasse);
 
             foreach (IParseTreeNode par in this.Parameters)
             {
-                if (par is VariabelDeklaration t) dek = t;
+                if (par is not VariabelDeklaration dek) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
 
-                if (dek == null) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
+                dek.IsMutable = false;
 
                 if (!dek.Indezieren(new RequestParserTreeIndezieren(request.Index, container))) continue;
                 if (dek.Deklaration is null) return request.Index.CreateError(this);

@@ -82,6 +82,18 @@ namespace Yama.Compiler
             set;
         }
 
+        public VariableType Kind
+        {
+            get;
+            set;
+        }
+
+        public VariableMutableState MutableState
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -91,6 +103,8 @@ namespace Yama.Compiler
             this.Key = dek.Name;
             this.Deklaration = dek;
             this.Value = LastValue.NotSet;
+            this.Kind = this.GetVariableKind(dek);
+            if (!dek.IsMutable) this.MutableState = VariableMutableState.NotMutable;
         }
 
         public SSAVariableMap(SSAVariableMap value)
@@ -100,9 +114,23 @@ namespace Yama.Compiler
             this.Reference = value.Reference;
             this.Deklaration = value.Deklaration;
             this.Value = value.Value;
+            this.Kind = value.Kind;
+            this.MutableState = value.MutableState;
         }
 
         #endregion ctor
+
+        #region methods
+
+        private VariableType GetVariableKind(IndexVariabelnDeklaration dek)
+        {
+            if (!dek.IsNullable) return VariableType.Primitive;
+            if (dek.IsBorrowing) return VariableType.BorrowingReference;
+
+            return VariableType.OwnerReference;
+        }
+
+        #endregion methods
 
         public enum LastValue
         {
@@ -113,6 +141,19 @@ namespace Yama.Compiler
             Null,
             NotNull
 
+        }
+
+        public enum VariableType
+        {
+            Primitive, //ByValue
+            OwnerReference, //ByReference
+            BorrowingReference //ByReference
+        }
+
+        public enum VariableMutableState
+        {
+            Mutable,
+            NotMutable
         }
 
     }
