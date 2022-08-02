@@ -92,6 +92,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public SSAVariableMap? ReturnType
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods

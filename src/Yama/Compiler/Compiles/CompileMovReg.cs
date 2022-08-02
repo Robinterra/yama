@@ -104,6 +104,28 @@ namespace Yama.Compiler
                 }
             }
 
+            SSACompileArgument? arg = line.Arguments.FirstOrDefault();
+            if (arg is null) return true;
+            if (arg.Map is null) return true;
+
+            CompileContainer? currentMethode = compiler.ContainerMgmt.CurrentMethod;
+            if (currentMethode is null) return true;
+            if (currentMethode.ReturnType is null) return true;
+            if (!currentMethode.ReturnType.IsNullable) return true;
+            if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.BorrowingReference && arg.Map.Kind == SSAVariableMap.VariableType.OwnerReference)
+                return compiler.AddError($"can not borrowing from variable '{arg.Map.Key}', variable will be clear after leaving the scope", node);
+
+            if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.OwnerReference && arg.Map.Kind == SSAVariableMap.VariableType.OwnerReference)
+            {
+                arg.Map.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                arg.Map.OrgMap.Value = SSAVariableMap.LastValue.NotSet;
+                arg.Map.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+
+                return true;
+            }
+
+            //arg.Map.OrgMap
+
             return true;
         }
 

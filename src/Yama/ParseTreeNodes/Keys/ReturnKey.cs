@@ -107,16 +107,12 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.Statement is not ICompileNode compileNode)
-                return false;
+            if (this.Statement is not ICompileNode compileNode) return false;
 
             compileNode.Compile(request);
 
-            if (this.Statement is not null)
-            {
-                CompileMovReg movReg = new CompileMovReg();
-                movReg.Compile(request.Compiler, this);
-            }
+            CompileMovReg movReg = new CompileMovReg();
+            movReg.Compile(request.Compiler, this);
 
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
