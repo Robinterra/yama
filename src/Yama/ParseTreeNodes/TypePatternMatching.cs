@@ -200,6 +200,9 @@ namespace Yama.Parser
             IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration(this, this.ReferenceDeklaration.Text, type);
             reference.Use = this;
             reference.Name = this.ReferenceDeklaration.Text;
+            reference.IsMutable = false;
+            reference.IsNullable = true;
+            reference.IsBorrowing = this.BorrowingToken is not null;
             container.VariabelnDeklarations.Add(reference);
             container.VariabelnReferences.Add(type);
             container.VariabelnReferences.Add(this.BooleascherReturn);
