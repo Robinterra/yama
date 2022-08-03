@@ -156,7 +156,8 @@ namespace Yama.Compiler
             Const,
             Unknown,
             Null,
-            NotNull
+            NotNull,
+            NeverCall
 
         }
 

@@ -230,6 +230,12 @@ namespace Yama.Parser
             ReferenceCall call = new ReferenceCall();
             call.Token = this.ReferenceDeklaration;
             call.Reference = new IndexVariabelnReference(this, this.Deklaration.Name) { Deklaration = this.Deklaration, ParentUsesSet = this.BooleascherReturn.ThisUses };
+
+            CompileContainer? currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
+            if (currentMethod is null) throw new NullReferenceException();
+
+            SSAVariableMap currentKontext = currentMethod.VarMapper[this.LeftNode.Token.Text];
+            SSAVariableMap orgCurrentKontext = new SSAVariableMap(currentKontext);
             //compileReference.IsNullCheck = true;
             compileReference.Compile(request.Compiler, call, "set");
 
@@ -247,17 +253,29 @@ namespace Yama.Parser
             SSACompileLine compileLine = request.Compiler.GetLatestSSALine();
             compileLine.FlowTask = ProgramFlowTask.IsTypeChecking;
 
-            CompileContainer? currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
-            if (currentMethod is null) throw new NullReferenceException();
-
             SSAVariableMap? nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.LeftNode!.Token.Text];
             SSAVariableMap? nextKontextReference = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.ReferenceDeklaration!.Text];
+            SSAVariableMap currentKontextReference = currentMethod.VarMapper[this.ReferenceDeklaration.Text];
 
             if (nextKontextReference is not null && nextKontext is not null)
             {
-                nextKontext.Value = SSAVariableMap.LastValue.NotNull;
+                if (nextKontextReference.Kind == SSAVariableMap.VariableType.BorrowingReference)
+                {
+                    nextKontext.Value = SSAVariableMap.LastValue.NotNull;
+                }
+                if (nextKontextReference.Kind == SSAVariableMap.VariableType.OwnerReference)
+                {
+                    nextKontext.Kind = currentKontext.Kind;
+                    nextKontext.MutableState = currentKontext.MutableState;
+                    nextKontext.Value = currentKontext.Value;
+
+                    currentKontext.Kind = orgCurrentKontext.Kind;
+                    currentKontext.MutableState = orgCurrentKontext.MutableState;
+                    currentKontext.Value = orgCurrentKontext.Value;
+                }
                 nextKontextReference.Value = SSAVariableMap.LastValue.NotNull;
                 nextKontextReference.Reference = nextKontext.Reference;
+                currentKontextReference.Value = SSAVariableMap.LastValue.NotSet;
             }
 
             return request.Compiler.Definition.ParaClean();

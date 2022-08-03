@@ -197,6 +197,7 @@ namespace Yama.Compiler
 
             currentVarMap.Reference = varLine;
             if (!currentVarMap.IsNullable) return true;
+            if (currentVarMap.Value == SSAVariableMap.LastValue.NotSet && oldVarMap.Value == SSAVariableMap.LastValue.NotSet) return true;
 
             currentVarMap.Value = SSAVariableMap.LastValue.Unknown;
 

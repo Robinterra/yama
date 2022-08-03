@@ -295,7 +295,7 @@ namespace Yama.Compiler
             if (arg.Map.Kind == SSAVariableMap.VariableType.OwnerReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
             {
                 arg.Map.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
-                arg.Map.OrgMap.Value = SSAVariableMap.LastValue.NotSet;
+                arg.Map.OrgMap.Value = SSAVariableMap.LastValue.NeverCall;
                 arg.Map.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
             }
             if (arg.Map.Kind == SSAVariableMap.VariableType.BorrowingReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
@@ -377,6 +377,7 @@ namespace Yama.Compiler
 
             if ( this.IsNullCheck ) lastValue = SSAVariableMap.LastValue.NotNull;
             if ( lastValue == SSAVariableMap.LastValue.NotSet ) return compiler.AddError ( "variable is not set!", use );
+            if ( lastValue == SSAVariableMap.LastValue.NeverCall ) return compiler.AddError ( "variable is unaviable!", use );
             if ( lastValue == SSAVariableMap.LastValue.Null ) return compiler.AddError ( "variable is null", use );
             if ( lastValue == SSAVariableMap.LastValue.Unknown  ) return compiler.AddError ( "null checking for variable is missing", use );
 

@@ -241,12 +241,18 @@ namespace Yama.Parser
             SSAVariableMap? nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[tpm.LeftNode!.Token.Text];
 
             SSAVariableMap.LastValue tmp = currentKontext.Value;
+            SSAVariableMap.VariableMutableState tmpmut = currentKontext.MutableState;
+            SSAVariableMap.VariableType tmpType = currentKontext.Kind;
             currentKontext.Value = SSAVariableMap.LastValue.Null;
             if (nextKontext is not null)
             {
                 currentKontext.Value = nextKontext.Value;
+                currentKontext.MutableState = nextKontext.MutableState;
+                currentKontext.Kind = nextKontext.Kind;
 
                 nextKontext.Value = tmp;
+                nextKontext.MutableState = tmpmut;
+                nextKontext.Kind = tmpType;
             }
 
             if (tpm.ReferenceDeklaration is null) return true;
