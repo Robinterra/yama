@@ -478,6 +478,8 @@ namespace Yama.Parser
             this.CompileContainer.Ende = new CompileSprungPunkt();
             this.CompileContainer.Ende.Node = this;
 
+            this.CompileReturnType(this.CompileContainer, this.Deklaration.ReturnValue.Deklaration, this.BorrowingToken is not null, this.Deklaration.ReturnValue );
+
             request.Compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, c.IndexContainer.ThisUses);
 
             if (this.AccessDefinition != null)
@@ -504,6 +506,24 @@ namespace Yama.Parser
             if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(request.Compiler, request.Mode);
 
             return this.CompileNormalFunktion(request.Compiler, request.Mode, count);
+        }
+
+        private void CompileReturnType(CompileContainer compileContainer, IParent? deklaration, bool isBorrowing, IndexVariabelnReference varref)
+        {
+            if (deklaration is not IndexKlassenDeklaration dk) return;
+
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
+            IndexVariabelnDeklaration vardek = new IndexVariabelnDeklaration(this, dk.Name, varref);
+            if (dk.MemberModifier == ClassMemberModifiers.None)
+            {
+                kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
+
+                vardek.IsNullable = true;
+            }
+
+            SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);
+
+            compileContainer.ReturnType = map;
         }
 
         private bool MakeOneArgument(IndexVariabelnDeklaration node, Compiler.Compiler compiler, int count)

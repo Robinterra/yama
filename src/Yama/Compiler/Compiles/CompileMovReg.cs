@@ -115,6 +115,9 @@ namespace Yama.Compiler
             if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.BorrowingReference && arg.Map.Kind == SSAVariableMap.VariableType.OwnerReference)
                 return compiler.AddError($"can not borrowing from variable '{arg.Map.Key}', variable will be clear after leaving the scope", node);
 
+            if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.OwnerReference && arg.Map.Kind == SSAVariableMap.VariableType.BorrowingReference)
+                return compiler.AddError($"Expectet a owner variable, but '{arg.Map.Key}' is a borrowing varaible", node);
+
             if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.OwnerReference && arg.Map.Kind == SSAVariableMap.VariableType.OwnerReference)
             {
                 arg.Map.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;

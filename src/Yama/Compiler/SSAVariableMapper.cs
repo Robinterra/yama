@@ -104,6 +104,15 @@ namespace Yama.Compiler
 
         #region ctor
 
+        public SSAVariableMap(string key, VariableType type, IndexVariabelnDeklaration dek)
+        {
+            this.OrgMap = this;
+            this.Key = key;
+            this.Deklaration = dek;
+            this.Kind = type;
+            this.MutableState = VariableMutableState.NotMutable;
+        }
+
         public SSAVariableMap(IndexVariabelnDeklaration dek)
         {
             this.OrgMap = this;
