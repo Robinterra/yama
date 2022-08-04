@@ -61,6 +61,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public SSAVariableMap? ParameterType
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods
@@ -104,6 +110,8 @@ namespace Yama.Compiler
                 }
             }
 
+            if (!this.CheckParameterTypeInfos(this.Line.Arguments.FirstOrDefault(), this.ParameterType, compiler)) return false;
+
             if (mode == "copy")
             {
                 if ( line.Arguments.Count == 0 ) return false;
@@ -113,6 +121,31 @@ namespace Yama.Compiler
                 SSACompileArgument arg = new SSACompileArgument(refere);
                 compiler.ContainerMgmt.StackArguments.Push(arg);
             }
+
+            return true;
+        }
+
+        private bool CheckParameterTypeInfos(SSACompileArgument? sSACompileArgument, SSAVariableMap? parameterType, Compiler compiler)
+        {
+            if (sSACompileArgument is null) return true;
+            if (parameterType is null) return true;
+            if (sSACompileArgument.Map is null) return true;
+
+            SSAVariableMap varaibleType = sSACompileArgument.Map;
+            if (!varaibleType.IsNullable) return true;
+            if (!parameterType.IsNullable) return compiler.AddError($"It is not possible to put a '{varaibleType.Key}' ReferenceType to a non '{parameterType.Key}' Reference Parameter", varaibleType.Deklaration.Use);
+
+            if (varaibleType.Kind == SSAVariableMap.VariableType.OwnerReference && parameterType.Kind == SSAVariableMap.VariableType.OwnerReference)
+            {
+                varaibleType.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                varaibleType.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+                varaibleType.Value = SSAVariableMap.LastValue.NeverCall;
+
+                return true;
+            }
+
+            if (varaibleType.Kind == SSAVariableMap.VariableType.BorrowingReference && parameterType.Kind == SSAVariableMap.VariableType.OwnerReference)
+                return compiler.AddError("", varaibleType.Deklaration.Use);
 
             return true;
         }

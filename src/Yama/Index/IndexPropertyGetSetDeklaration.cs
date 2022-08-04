@@ -7,11 +7,25 @@ namespace Yama.Index
 
         #region get/set
 
-        public IParseTreeNode Use
+        IParseTreeNode IParent.Use
+        {
+            get
+            {
+                return this.Use;
+            }
+            set
+            {
+                this.Use = (value as PropertyGetSetDeklaration)!;
+            }
+        }
+
+        public PropertyGetSetDeklaration Use
         {
             get;
             set;
         }
+
+
 
         public List<IndexVariabelnReference> References
         {
@@ -179,7 +193,7 @@ namespace Yama.Index
 
         #region ctor
 
-        public IndexPropertyGetSetDeklaration ( IParseTreeNode use, string name, IndexVariabelnReference returnValue )
+        public IndexPropertyGetSetDeklaration ( PropertyGetSetDeklaration use, string name, IndexVariabelnReference returnValue )
         {
             this.ParentUsesSet = new();
             this.Use = use;
