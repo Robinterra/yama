@@ -7,7 +7,19 @@ namespace Yama.Index
 
         #region get/set
 
-        public IParseTreeNode Use
+        IParseTreeNode IParent.Use
+        {
+            get
+            {
+                return this.Use;
+            }
+            set
+            {
+                this.Use = (value as VektorDeclaration)!;
+            }
+        }
+
+        public VektorDeclaration Use
         {
             get;
             set;
@@ -179,7 +191,7 @@ namespace Yama.Index
 
         #region ctor
 
-        public IndexVektorDeklaration ( IParseTreeNode use, string name, IndexVariabelnReference returnValue )
+        public IndexVektorDeklaration ( VektorDeclaration use, string name, IndexVariabelnReference returnValue )
         {
             this.Use = use;
             this.Name = name;

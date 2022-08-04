@@ -289,6 +289,7 @@ namespace Yama.Parser
                 if ("default" == mode) mode = "point";
 
                 VektorCall call = new VektorCall(5, new ParserLayer("a"));
+                call.Token = this.Token;
                 call.LeftNode = this;
 
                 call.Compile(new RequestParserTreeCompile(compiler, mode));

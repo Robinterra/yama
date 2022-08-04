@@ -111,6 +111,12 @@ namespace Yama.Parser
             private set;
         }
 
+        public IdentifierToken? BorrowingToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -195,6 +201,8 @@ namespace Yama.Parser
             token = this.MakeZusatzValid ( request.Parser, token, deklaration );
             if (token is null) return null;
 
+            token = this.TryParseBorrwoing(request.Parser, token, deklaration);
+            if (token is null) return null;
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
@@ -245,6 +253,18 @@ namespace Yama.Parser
             if (deklaration.SetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a set statement", deklaration.AllTokens.ToArray());
 
             return deklaration;
+        }
+
+        private IdentifierToken? TryParseBorrwoing(Parser parser, IdentifierToken token, VektorDeclaration node)
+        {
+            if (token.Kind != IdentifierKind.Operator) return token;
+            if (token.Text != "&") return token;
+
+            node.BorrowingToken = token;
+            node.AllTokens.Add(token);
+
+            IdentifierToken? nextToken = parser.Peek(token, 1);
+            return nextToken;
         }
 
         public MethodeType GetMethodeType()

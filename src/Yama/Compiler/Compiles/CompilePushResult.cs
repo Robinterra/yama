@@ -132,20 +132,21 @@ namespace Yama.Compiler
             if (sSACompileArgument.Map is null) return true;
 
             SSAVariableMap varaibleType = sSACompileArgument.Map;
+            if (parameterType.MutableState == SSAVariableMap.VariableMutableState.NotMutable) return compiler.AddError("The Property/Vektor has no set Statement", parameterType.Deklaration.Use);
             if (!varaibleType.IsNullable) return true;
-            if (!parameterType.IsNullable) return compiler.AddError($"It is not possible to put a '{varaibleType.Key}' ReferenceType to a non '{parameterType.Key}' Reference Parameter", varaibleType.Deklaration.Use);
+            if (!parameterType.IsNullable) return compiler.AddError($"It is not possible to put a '{varaibleType.Key}' ReferenceType to a non '{parameterType.Key}' Reference Parameter", parameterType.Deklaration.Use);
 
             if (varaibleType.Kind == SSAVariableMap.VariableType.OwnerReference && parameterType.Kind == SSAVariableMap.VariableType.OwnerReference)
             {
-                varaibleType.Kind = SSAVariableMap.VariableType.BorrowingReference;
-                varaibleType.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
-                varaibleType.Value = SSAVariableMap.LastValue.NeverCall;
+                varaibleType.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                varaibleType.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+                varaibleType.OrgMap.Value = SSAVariableMap.LastValue.NeverCall;
 
                 return true;
             }
 
             if (varaibleType.Kind == SSAVariableMap.VariableType.BorrowingReference && parameterType.Kind == SSAVariableMap.VariableType.OwnerReference)
-                return compiler.AddError("", varaibleType.Deklaration.Use);
+                return compiler.AddError("You can not set a Borrowing variable to a owner variable", parameterType.Deklaration.Use);
 
             return true;
         }
