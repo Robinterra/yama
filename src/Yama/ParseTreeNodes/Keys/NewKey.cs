@@ -250,7 +250,7 @@ namespace Yama.Parser
 
             parasCount++;
 
-            this.FunctionExecute.Compile(request.Compiler, null, request.Mode);
+            this.FunctionExecute.Compile(request.Compiler, this, request.Mode);
 
             return true;
         }

@@ -287,6 +287,12 @@ namespace Yama.Compiler
 
             map.Value = SSAVariableMap.LastValue.Unknown;
             if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+            if (map.Reference.Owner.Node is NewKey)
+            {
+                if (map.Kind == SSAVariableMap.VariableType.OwnerReference) return true;
+
+                return compiler.AddError("A new instance can not set to a borrowing variable", map.Reference.Owner.Node);
+            }
             //if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
 
             if (arg.Map is null) return true;
