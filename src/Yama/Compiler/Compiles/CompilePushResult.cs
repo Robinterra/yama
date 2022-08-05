@@ -129,9 +129,9 @@ namespace Yama.Compiler
         {
             if (sSACompileArgument is null) return true;
             if (parameterType is null) return true;
-            if (sSACompileArgument.Map is null) return true;
+            if (sSACompileArgument.Variable is null) return true;
 
-            SSAVariableMap varaibleType = sSACompileArgument.Map;
+            SSAVariableMap varaibleType = sSACompileArgument.Variable;
             if (parameterType.MutableState == SSAVariableMap.VariableMutableState.NotMutable) return compiler.AddError("The Property/Vektor has no set Statement", parameterType.Deklaration.Use);
             if (!varaibleType.IsNullable) return true;
             if (!parameterType.IsNullable) return compiler.AddError($"It is not possible to put a '{varaibleType.Key}' ReferenceType to a non '{parameterType.Key}' Reference Parameter", parameterType.Deklaration.Use);

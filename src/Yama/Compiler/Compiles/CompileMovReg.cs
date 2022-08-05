@@ -106,23 +106,23 @@ namespace Yama.Compiler
 
             SSACompileArgument? arg = line.Arguments.FirstOrDefault();
             if (arg is null) return true;
-            if (arg.Map is null) return true;
+            if (arg.Variable is null) return true;
 
             CompileContainer? currentMethode = compiler.ContainerMgmt.CurrentMethod;
             if (currentMethode is null) return true;
             if (currentMethode.ReturnType is null) return true;
             if (!currentMethode.ReturnType.IsNullable) return true;
-            if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.BorrowingReference && arg.Map.Kind == SSAVariableMap.VariableType.OwnerReference)
-                return compiler.AddError($"can not borrowing from variable '{arg.Map.Key}', variable will be clear after leaving the scope", node);
+            if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.BorrowingReference && arg.Variable.Kind == SSAVariableMap.VariableType.OwnerReference)
+                return compiler.AddError($"can not borrowing from variable '{arg.Variable.Key}', variable will be clear after leaving the scope", node);
 
-            if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.OwnerReference && arg.Map.Kind == SSAVariableMap.VariableType.BorrowingReference)
-                return compiler.AddError($"Expectet a owner variable, but '{arg.Map.Key}' is a borrowing varaible", node);
+            if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.OwnerReference && arg.Variable.Kind == SSAVariableMap.VariableType.BorrowingReference)
+                return compiler.AddError($"Expectet a owner variable, but '{arg.Variable.Key}' is a borrowing varaible", node);
 
-            if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.OwnerReference && arg.Map.Kind == SSAVariableMap.VariableType.OwnerReference)
+            if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.OwnerReference && arg.Variable.Kind == SSAVariableMap.VariableType.OwnerReference)
             {
-                arg.Map.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
-                arg.Map.OrgMap.Value = SSAVariableMap.LastValue.NotSet;
-                arg.Map.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+                arg.Variable.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                arg.Variable.OrgMap.Value = SSAVariableMap.LastValue.NotSet;
+                arg.Variable.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
 
                 return true;
             }

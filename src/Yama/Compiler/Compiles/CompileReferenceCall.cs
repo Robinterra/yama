@@ -287,24 +287,35 @@ namespace Yama.Compiler
 
             map.Value = SSAVariableMap.LastValue.Unknown;
             if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
-            if (map.Reference.Owner.Node is NewKey)
-            {
-                if (map.Kind == SSAVariableMap.VariableType.OwnerReference) return true;
-
-                return compiler.AddError("A new instance can not set to a borrowing variable", map.Reference.Owner.Node);
-            }
+            if (map.Reference.Owner.Node is NewKey && map.Kind == SSAVariableMap.VariableType.BorrowingReference) return compiler.AddError("A new instance can not set to a borrowing variable", map.Reference.Owner.Node);
             //if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
 
-            if (arg.Map is null) return true;
-
-            map.Value = arg.Map.Value;
-            if (arg.Map.Kind == SSAVariableMap.VariableType.OwnerReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
+            if (arg.IndexRef is IndexPropertyDeklaration ipd)
             {
-                arg.Map.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
-                arg.Map.OrgMap.Value = SSAVariableMap.LastValue.NeverCall;
-                arg.Map.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+                if (ipd.Use.BorrowingToken is not null)
+                {
+                    if (map.Kind == SSAVariableMap.VariableType.BorrowingReference) return true;
+                    return compiler.AddError("a global borrwoing variable can not set to a owner variable", ipd.Use);
+                }
+                if (map.Kind != SSAVariableMap.VariableType.OwnerReference) return true;
+                if (arg.Reference is null) return compiler.AddError("CompileReferenceCall.cs: darf nicht null sein");
+                if (arg.Reference.Owner is null) return compiler.AddError("CompileReferenceCall.cs: darf nicht null sein");
+                if (arg.Reference.Owner.Node is not ReferenceCall rc)return compiler.AddError("CompileReferenceCall.cs: muss ein ReferenceCall sein");
+
+                new CompileNumConst().Compile(compiler, new Number { Token = new Lexer.IdentifierToken() { Value = 0 } });
+                compiler.ContainerMgmt.StackArguments.Push(arg.Reference.Arguments.First());
+                new CompileReferenceCall().Compile(compiler, rc, "setpoint");
             }
-            if (arg.Map.Kind == SSAVariableMap.VariableType.BorrowingReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
+            if (arg.Variable is null) return true;
+
+            map.Value = arg.Variable.Value;
+            if (arg.Variable.Kind == SSAVariableMap.VariableType.OwnerReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
+            {
+                arg.Variable.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                arg.Variable.OrgMap.Value = SSAVariableMap.LastValue.NeverCall;
+                arg.Variable.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+            }
+            if (arg.Variable.Kind == SSAVariableMap.VariableType.BorrowingReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
             {
                 return compiler.AddError("You can not set a Borrowing variable to a owner variable", node.Use);
             }
@@ -366,6 +377,43 @@ namespace Yama.Compiler
                 {
                     if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
                 }
+            }
+
+            if (!this.CheckOwnershipForPorperty(node, compiler, line, mode)) return false;
+
+            return true;
+        }
+
+        private bool CheckOwnershipForPorperty(IndexVariabelnReference node, Compiler compiler, SSACompileLine line, string mode)
+        {
+            if (node.Deklaration is not IndexPropertyDeklaration ipd) return true;
+            if (mode == "point")
+            {
+                SSACompileArgument getArg = compiler.ContainerMgmt.StackArguments.Peek();
+                getArg.IndexRef = ipd;
+            }
+            if (mode != "setpoint") return true;
+            if (ipd.Type.Deklaration is IndexKlassenDeklaration dk)
+            {
+                if (dk.MemberModifier != ClassMemberModifiers.None) return true;
+            }
+
+            SSACompileArgument? arg = line.Arguments.LastOrDefault();
+            if (arg is null) return true;
+            if (arg.Reference is null) return true;
+            if (arg.Reference.Owner.Node is NewKey && ipd.Use.BorrowingToken is not null && arg.Variable is null) return compiler.AddError("A new instance can not set to a borrowing global variable", arg.Reference.Owner.Node);
+
+            if (arg.Variable is null) return true;
+
+            if (arg.Variable.Kind == SSAVariableMap.VariableType.OwnerReference && ipd.Use.BorrowingToken is null)
+            {
+                arg.Variable.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                arg.Variable.OrgMap.Value = SSAVariableMap.LastValue.NeverCall;
+                arg.Variable.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+            }
+            if (arg.Variable.Kind == SSAVariableMap.VariableType.BorrowingReference && ipd.Use.BorrowingToken is null)
+            {
+                return compiler.AddError("You can not set a Borrowing variable to a owner variable", node.Use);
             }
 
             return true;
