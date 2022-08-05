@@ -369,9 +369,28 @@ namespace Yama.Parser
             return this.CompileNormalFunktionSet(compiler, compileContainer);
         }
 
+        private void CompileReturnType(CompileContainer compileContainer, IParent? deklaration, bool isBorrowing, IndexVariabelnReference varref)
+        {
+            if (deklaration is not IndexKlassenDeklaration dk) return;
+
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
+            IndexVariabelnDeklaration vardek = new IndexVariabelnDeklaration(this, dk.Name, varref);
+            if (dk.MemberModifier == ClassMemberModifiers.None)
+            {
+                kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
+
+                vardek.IsNullable = true;
+            }
+
+            SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);
+
+            compileContainer.ReturnType = map;
+        }
+
         public bool CompileGetMethode(Compiler.Compiler compiler, string mode = "default")
         {
             if (this.GetStatement is null) return false;
+            if (this.Deklaration is null) return false;
 
             Container? c = this.GetStatement.Statement;
             if (c is null) return false;
@@ -380,6 +399,8 @@ namespace Yama.Parser
             CompileContainer compileContainer = new CompileContainer();
             compileContainer.Begin = new CompileSprungPunkt();
             compileContainer.Ende = new CompileSprungPunkt();
+
+            this.CompileReturnType(compileContainer, this.Deklaration.ReturnValue.Deklaration, this.BorrowingToken is not null, this.Deklaration.ReturnValue );
 
             compiler.BeginNewMethode( this.GetRegisterInUse, compileContainer, c.IndexContainer.ThisUses );
 
