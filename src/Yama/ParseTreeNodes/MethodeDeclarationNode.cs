@@ -425,7 +425,11 @@ namespace Yama.Parser
         private bool AddMethode(IndexKlassenDeklaration klasse, IndexMethodDeklaration deklaration)
         {
             if (deklaration.Type == MethodeType.Ctor) klasse.Ctors.Add(deklaration);
-            if (deklaration.Type == MethodeType.DeCtor) klasse.DeCtors.Add(deklaration);
+            if (deklaration.Type == MethodeType.DeCtor)
+            {
+                klasse.Methods.Add(deklaration);
+                klasse.DeCtors.Add(deklaration);
+            }
             if (deklaration.Type == MethodeType.Operator) klasse.Operators.Add(deklaration);
             if (deklaration.Type == MethodeType.Methode) klasse.Methods.Add(deklaration);
             if (deklaration.Type == MethodeType.Static) klasse.StaticMethods.Add(deklaration);
@@ -561,6 +565,9 @@ namespace Yama.Parser
 
         public bool CanCompile(Compiler.Compiler compiler)
         {
+            if (this.Deklaration is null) return false;
+            if (this.Deklaration.Type == MethodeType.DeCtor) return true;
+
             if (this.AccessDefinition != null)
             {
                 if (this.AccessDefinition.Kind == IdentifierKind.Copy) return false;
@@ -592,7 +599,7 @@ namespace Yama.Parser
 
         private bool CompileDeCtor(Compiler.Compiler compiler, string mode)
         {
-            if (this.Deklaration  is null) return false;
+            if (this.Deklaration is null) return false;
             if (this.Deklaration.Klasse is null) return false;
             if (this.Deklaration.Klasse.GetNonStaticPropCount == 0) return true;
 

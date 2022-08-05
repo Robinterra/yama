@@ -3,7 +3,7 @@ namespace "System.IO"
     /**
     * Object
     */
-    public primitive class object
+    public class object
     {
 
         public this ~()

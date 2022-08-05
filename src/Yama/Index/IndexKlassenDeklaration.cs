@@ -258,7 +258,7 @@ namespace Yama.Index
             this.StaticMethods.AddRange(dek.StaticMethods.Where(t=>!this.StaticMethods.Any(q=>q.Name == t.Name)));
             this.Operators.AddRange(dek.Operators.Where(t=>!this.Operators.Any(q=>q.Name == t.Name)));
             this.Ctors.AddRange(dek.Ctors.Where(t=>this.Ctors.Count == 0));
-            this.DeCtors.AddRange(dek.DeCtors.Where(t=>this.DeCtors.Count == 0));
+            //this.DeCtors.AddRange(dek.DeCtors.Where(t=>this.DeCtors.Count == 0));
 
             List<IndexPropertyDeklaration> deks = dek.IndexProperties.Where(t=>true).ToList();
 
@@ -289,7 +289,7 @@ namespace Yama.Index
             this.PreviusMethodeMappen(this.StaticMethods, this.ParentUsesSet);
             this.PreviusMethodeMappen(this.Operators, this.ParentUsesSet);
             this.PreviusMethodeMappen(this.Ctors, this.ThisUses);
-            this.PreviusMethodeMappen(this.DeCtors, this.ThisUses);
+            //this.PreviusMethodeMappen(this.DeCtors, this.ThisUses);
             this.PreviusPropertyMappen(this.IndexProperties, this.ThisUses);
             this.PreviusPropertyMappen(this.IndexStaticProperties, this.ParentUsesSet);
 
@@ -315,7 +315,7 @@ namespace Yama.Index
             this.MethodeMappen(this.StaticMethods, this.ParentUsesSet);
             this.MethodeMappen(this.Operators, this.ParentUsesSet);
             this.MethodeMappen(this.Ctors, this.ThisUses);
-            this.MethodeMappen(this.DeCtors, this.ThisUses);
+            //this.MethodeMappen(this.DeCtors, this.ThisUses);
             this.PropertyMappen(this.IndexProperties, this.ThisUses);
             this.PropertyMappen(this.IndexStaticProperties, this.ParentUsesSet);
 

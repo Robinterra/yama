@@ -263,6 +263,7 @@ namespace Yama.Parser
             if (request.Parent is not IndexNamespaceDeklaration dek) return request.Index.CreateError(this, "Kein Namespace als Parent dieser Klasse");
             if (this.Statement is null) return request.Index.CreateError(this);
 
+            if (this.Token.Text == "object") this.InheritanceBase = null;
             IndexKlassenDeklaration deklaration = new IndexKlassenDeklaration(this, this.Token.Text);
 
             if ( this.MemberModifier != null )
@@ -351,14 +352,14 @@ namespace Yama.Parser
                 compileNode.Compile(request);
             }
 
-            foreach (IndexMethodDeklaration m in this.Deklaration.DeCtors)
+            /*foreach (IndexMethodDeklaration m in this.Deklaration.DeCtors)
             {
                 if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;
                 compileNode.Compile(request);
-            }
+            }*/
 
             return true;
         }
