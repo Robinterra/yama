@@ -401,7 +401,9 @@ namespace Yama.Compiler
         IsNotTypeChecking,
         IsConst,
         CanComputeAndOptimizeConstOperation,
-        Phi
+        Phi,
+        CleanMemoryBegin,
+        CleanMemoryEnd
     }
 
 }

@@ -114,6 +114,9 @@ namespace Yama.Parser
             CompileMovReg movReg = new CompileMovReg();
             movReg.Compile(request.Compiler, this);
 
+            CompileCleanMemory cleanMemory = new CompileCleanMemory();
+            cleanMemory.Compile(request.Compiler, this);
+
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
             if (request.Compiler.ContainerMgmt.CurrentMethod is null) return true;
