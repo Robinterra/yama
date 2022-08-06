@@ -201,8 +201,7 @@ namespace Yama.Parser
 
                     if (rc.Reference is null) return false;
 
-                    if (rc.Reference.Deklaration is IndexMethodDeklaration dek)
-                        this.CompileNonStaticCall(request.Compiler, "default", dek);
+                    if (rc.Reference.Deklaration is IndexMethodDeklaration dek) this.CompileNonStaticCall(request.Compiler, "default", dek);
                 }
             }
 

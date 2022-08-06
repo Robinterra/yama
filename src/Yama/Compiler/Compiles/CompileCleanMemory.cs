@@ -92,15 +92,7 @@ namespace Yama.Compiler
 
             if (!this.IsUsed) return true;
 
-            SSACompileLine line = new SSACompileLine(this);
-            line.FlowTask = ProgramFlowTask.CleanMemoryBegin;
-            compiler.AddSSALine(line);
-
             this.CallDectors(compiler, returnKey);
-
-            line = new SSACompileLine(this);
-            line.FlowTask = ProgramFlowTask.CleanMemoryEnd;
-            compiler.AddSSALine(line);
 
             return true;
         }
@@ -127,12 +119,15 @@ namespace Yama.Compiler
                 if (!referenceCall.GetVariableCompile(compiler, map.Deklaration, returnKey)) continue;
 
                 CompilePushResult compilePushResult = new CompilePushResult();
-                compilePushResult.Compile(compiler, null, "default");
+                compilePushResult.Compile(compiler, null, "copy");
 
                 IndexVariabelnReference reference = new IndexVariabelnReference(returnKey, "~");
                 reference.Deklaration = dector;
+
+                CompileReferenceCall compileReference = new CompileReferenceCall();
+                compileReference.CompilePoint0(compiler);
                 CompileReferenceCall operatorCall = new CompileReferenceCall();
-                operatorCall.Compile(compiler, reference, "methode");
+                operatorCall.Compile(compiler, reference, "funcref");
 
                 CompileExecuteCall functionExecute = new CompileExecuteCall();
                 functionExecute.Compile(compiler, null);

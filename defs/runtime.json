@@ -259,6 +259,23 @@
         ]
       },
       {
+        "Name": "PushResult",
+        "Mode": "revoke",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "pop { [SSAPOP[0]] }"
+        ]
+      },
+      {
         "Name": "FunktionsDeklaration",
         "Mode": "default",
         "Description": "Die Deklaration einer Funktion",

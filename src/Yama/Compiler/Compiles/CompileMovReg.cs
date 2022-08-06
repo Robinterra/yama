@@ -77,16 +77,16 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, ReturnKey node, string mode = "default")
+        public SSACompileLine? Compile(Compiler compiler, ReturnKey node, string mode = "default")
         {
             this.Node = node;
-            compiler.AssemblerSequence.Add(this);
+            //compiler.AssemblerSequence.Add(this);
 
             this.Algo = compiler.GetAlgo(this.AlgoName, mode);
-            if (this.Algo == null) return false;
+            if (this.Algo == null) return null;
 
             SSACompileLine line = new SSACompileLine(this, true);
-            compiler.AddSSALine(line);
+            //compiler.AddSSALine(line);
             this.Line = line;
 
             this.PrimaryKeys = new Dictionary<string, string>();
@@ -96,27 +96,45 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
                 Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
+                if (result == null)
+                {
+                    compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
+
+                    return null;
+                }
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
-                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value ))
+                    {
+                        compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
+
+                        return null;
+                    }
                 }
             }
 
             SSACompileArgument? arg = line.Arguments.FirstOrDefault();
-            if (arg is null) return true;
-            if (arg.Variable is null) return true;
+            if (arg is null) return line;
+            if (arg.Variable is null) return line;
 
             CompileContainer? currentMethode = compiler.ContainerMgmt.CurrentMethod;
-            if (currentMethode is null) return true;
-            if (currentMethode.ReturnType is null) return true;
-            if (!currentMethode.ReturnType.IsNullable) return true;
+            if (currentMethode is null) return line;
+            if (currentMethode.ReturnType is null) return line;
+            if (!currentMethode.ReturnType.IsNullable) return line;
             if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.BorrowingReference && arg.Variable.Kind == SSAVariableMap.VariableType.OwnerReference)
-                return compiler.AddError($"can not borrowing from variable '{arg.Variable.Key}', variable will be clear after leaving the scope", node);
+            {
+                compiler.AddError($"can not borrowing from variable '{arg.Variable.Key}', variable will be clear after leaving the scope", node);
+
+                return null;
+            }
 
             if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.OwnerReference && arg.Variable.Kind == SSAVariableMap.VariableType.BorrowingReference)
-                return compiler.AddError($"Expectet a owner variable, but '{arg.Variable.Key}' is a borrowing varaible", node);
+            {
+                compiler.AddError($"Expectet a owner variable, but '{arg.Variable.Key}' is a borrowing varaible", node);
+
+                return null;
+            }
 
             if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.OwnerReference && arg.Variable.Kind == SSAVariableMap.VariableType.OwnerReference)
             {
@@ -124,12 +142,12 @@ namespace Yama.Compiler
                 arg.Variable.OrgMap.Value = SSAVariableMap.LastValue.NotSet;
                 arg.Variable.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
 
-                return true;
+                return line;
             }
 
             //arg.Map.OrgMap
 
-            return true;
+            return line;
         }
 
         public bool InFileCompilen(Compiler compiler)

@@ -112,10 +112,14 @@ namespace Yama.Parser
             compileNode.Compile(request);
 
             CompileMovReg movReg = new CompileMovReg();
-            movReg.Compile(request.Compiler, this);
+            SSACompileLine? moveRegLine = movReg.Compile(request.Compiler, this);
+            if (moveRegLine is null) return false;
 
             CompileCleanMemory cleanMemory = new CompileCleanMemory();
             cleanMemory.Compile(request.Compiler, this);
+
+            request.Compiler.AssemblerSequence.Add(movReg);
+            request.Compiler.AddSSALine(moveRegLine);
 
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
