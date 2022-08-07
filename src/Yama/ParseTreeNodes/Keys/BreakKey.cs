@@ -85,6 +85,13 @@ namespace Yama.Parser
             CompileContainer? currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
             if (currentMethod is null) return false;
 
+            CompileContainer? currentLoop = request.Compiler.ContainerMgmt.CurrentLoop;
+            if (currentLoop is null) return false;
+
+            CompileCleanMemory cleanMemory = new CompileCleanMemory();
+            if (currentLoop.CurrentNode is ForKey fk) cleanMemory.Compile(request.Compiler, fk);
+            if (currentLoop.CurrentNode is WhileKey wk) cleanMemory.Compile(request.Compiler, wk);
+
             foreach (KeyValuePair<string, SSAVariableMap> varMap in currentMethod.VarMapper)
             {
                 if (varMap.Value.Reference is null) continue;

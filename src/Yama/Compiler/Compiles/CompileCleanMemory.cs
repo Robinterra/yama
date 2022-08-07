@@ -138,7 +138,73 @@ namespace Yama.Compiler
             return true;
         }
 
-        private bool CallDectors(Compiler compiler, IParseTreeNode node, bool isreturn = false)
+        public bool Compile(Compiler compiler, ForKey ifKey)
+        {
+            this.Node = ifKey;
+
+            if (compiler.ContainerMgmt.CurrentMethod is null) return false;
+            if (compiler.ContainerMgmt.CurrentLoop is null) return false;
+            CompileContainer currentMethode = compiler.ContainerMgmt.CurrentMethod;
+            CompileContainer currentContainer = compiler.ContainerMgmt.CurrentLoop;
+
+            if (currentContainer.HasReturn) return true;
+            SSACompileLine? firstLine = currentContainer.Lines.FirstOrDefault();
+            if (firstLine is null) return true;
+
+            foreach (KeyValuePair<string, SSAVariableMap> keyvarmap in currentMethode.VarMapper)
+            {
+                SSAVariableMap varmap = keyvarmap.Value;
+                if (varmap.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
+                if (varmap.Value != SSAVariableMap.LastValue.Unknown && varmap.Value != SSAVariableMap.LastValue.NotNull) continue;
+                if (varmap.TryToClean) continue;
+                if (!currentContainer.Deklarations.Any(t=>t.Key == varmap.Key)) continue;
+
+                this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
+            }
+
+            if (!this.IsUsed) return true;
+
+            this.CallDectors(compiler, ifKey, true);
+
+            compiler.AddSSALine(line);
+
+            return true;
+        }
+
+        public bool Compile(Compiler compiler, WhileKey ifKey)
+        {
+            this.Node = ifKey;
+
+            if (compiler.ContainerMgmt.CurrentMethod is null) return false;
+            if (compiler.ContainerMgmt.CurrentContainer is null) return false;
+            CompileContainer currentMethode = compiler.ContainerMgmt.CurrentMethod;
+            CompileContainer currentContainer = compiler.ContainerMgmt.CurrentContainer;
+
+            if (currentContainer.HasReturn) return true;
+            SSACompileLine? firstLine = currentContainer.Lines.FirstOrDefault();
+            if (firstLine is null) return true;
+
+            foreach (KeyValuePair<string, SSAVariableMap> keyvarmap in currentMethode.VarMapper)
+            {
+                SSAVariableMap varmap = keyvarmap.Value;
+                if (varmap.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
+                if (varmap.Value != SSAVariableMap.LastValue.Unknown && varmap.Value != SSAVariableMap.LastValue.NotNull) continue;
+                if (varmap.TryToClean) continue;
+                if (!currentContainer.Deklarations.Contains(varmap)) continue;
+
+                this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
+            }
+
+            if (!this.IsUsed) return true;
+
+            this.CallDectors(compiler, ifKey, true);
+
+            compiler.AddSSALine(line);
+
+            return true;
+        }
+
+        private bool CallDectors(Compiler compiler, IParseTreeNode node, bool canBeDominated = false)
         {
             foreach (SSAVariableMap map in this.OwnerVarsToClear)
             {
@@ -157,50 +223,50 @@ namespace Yama.Compiler
                 }
 
                 CompileSprungPunkt sprungPunkt = new CompileSprungPunkt();
-                if (!isreturn) sprungPunkt.CleanMemoryLocation = line;
-                if (!isreturn) sprungPunkt.CleanMemoryUseErkenner = map;
+                if (!canBeDominated) sprungPunkt.CleanMemoryLocation = line;
+                if (!canBeDominated) sprungPunkt.CleanMemoryUseErkenner = map;
 
                 if (map.Value == SSAVariableMap.LastValue.Unknown)
                 {
                     map.OrgMap.Value = SSAVariableMap.LastValue.NotNull;
 
                     CompileReferenceCall referenceCallNullCheck = new CompileReferenceCall();
-                    if (!isreturn) referenceCallNullCheck.CleanMemoryLocation = line;
-                    if (!isreturn) referenceCallNullCheck.CleanMemoryUseErkenner = map;
+                    if (!canBeDominated) referenceCallNullCheck.CleanMemoryLocation = line;
+                    if (!canBeDominated) referenceCallNullCheck.CleanMemoryUseErkenner = map;
                     if (!referenceCallNullCheck.GetVariableCompile(compiler, map.Deklaration, node)) continue;
 
                     CompileJumpWithCondition jumpWithCondition = new CompileJumpWithCondition();
-                    if (!isreturn) jumpWithCondition.CleanMemoryLocation = line;
-                    if (!isreturn) jumpWithCondition.CleanMemoryUseErkenner = map;
+                    if (!canBeDominated) jumpWithCondition.CleanMemoryLocation = line;
+                    if (!canBeDominated) jumpWithCondition.CleanMemoryUseErkenner = map;
                     jumpWithCondition.Compile(compiler, sprungPunkt, "isZero");
                 }
 
                 CompileReferenceCall referenceCall = new CompileReferenceCall();
-                if (!isreturn) referenceCall.CleanMemoryLocation = line;
-                if (!isreturn) referenceCall.CleanMemoryUseErkenner = map;
+                if (!canBeDominated) referenceCall.CleanMemoryLocation = line;
+                if (!canBeDominated) referenceCall.CleanMemoryUseErkenner = map;
                 if (!referenceCall.GetVariableCompile(compiler, map.Deklaration, node)) continue;
 
                 CompilePushResult compilePushResult = new CompilePushResult();
-                if (!isreturn) compilePushResult.CleanMemoryLocation = line;
-                if (!isreturn) compilePushResult.CleanMemoryUseErkenner = map;
+                if (!canBeDominated) compilePushResult.CleanMemoryLocation = line;
+                if (!canBeDominated) compilePushResult.CleanMemoryUseErkenner = map;
                 compilePushResult.Compile(compiler, null, "copy");
 
                 IndexVariabelnReference reference = new IndexVariabelnReference(node, "~");
                 reference.Deklaration = dector;
 
                 CompileReferenceCall compileReference = new CompileReferenceCall();
-                if (!isreturn) compileReference.CleanMemoryLocation = line;
-                if (!isreturn) compileReference.CleanMemoryUseErkenner = map;
+                if (!canBeDominated) compileReference.CleanMemoryLocation = line;
+                if (!canBeDominated) compileReference.CleanMemoryUseErkenner = map;
                 compileReference.CompilePoint0(compiler);
 
                 CompileReferenceCall operatorCall = new CompileReferenceCall();
-                if (!isreturn) operatorCall.CleanMemoryLocation = line;
-                if (!isreturn) operatorCall.CleanMemoryUseErkenner = map;
+                if (!canBeDominated) operatorCall.CleanMemoryLocation = line;
+                if (!canBeDominated) operatorCall.CleanMemoryUseErkenner = map;
                 operatorCall.Compile(compiler, reference, "funcref");
 
                 CompileExecuteCall functionExecute = new CompileExecuteCall();
-                if (!isreturn) functionExecute.CleanMemoryLocation = line;
-                if (!isreturn) functionExecute.CleanMemoryUseErkenner = map;
+                if (!canBeDominated) functionExecute.CleanMemoryLocation = line;
+                if (!canBeDominated) functionExecute.CleanMemoryUseErkenner = map;
                 functionExecute.Compile(compiler, null);
 
                 if (map.Value == SSAVariableMap.LastValue.Unknown)
@@ -211,7 +277,7 @@ namespace Yama.Compiler
                 //map.OrgMap.Value = SSAVariableMap.LastValue.NeverCall;
                 //map.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
                 //map.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
-                if (!isreturn)
+                if (!canBeDominated)
                 {
                     map.OrgMap.First.TryToClean = true;
                     map.OrgMap.TryToClean = true;

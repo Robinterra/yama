@@ -232,6 +232,12 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
+            if (request.Compiler.ContainerMgmt.CurrentContainer is null) return false;
+            if (request.Compiler.ContainerMgmt.CurrentMethod is null) return false;
+
+            SSAVariableMap map = request.Compiler.ContainerMgmt.CurrentMethod.VarMapper[this.Token.Text];
+            request.Compiler.ContainerMgmt.CurrentContainer.Deklarations.Add(map);
+
             if (request.Mode != "set") return true;
             if (this.Deklaration is null) return false;
 
