@@ -49,11 +49,38 @@ namespace Yama.Compiler
             set;
         }
 
+        private bool isUsed = true;
+
         public bool IsUsed
+        {
+            get
+            {
+                if (this.CleanMemoryUseErkenner is not null && this.CleanMemoryLocation is not null)
+                {
+                    int order = this.CleanMemoryUseErkenner.ArgumentsCalls.Max(t=>t.Calls.Max(t=>t.Order));
+
+                    return order < this.CleanMemoryLocation.Order;
+                }
+
+                return this.isUsed;
+            }
+            set
+            {
+                this.isUsed = value;
+            }
+        }
+
+        public SSACompileLine? CleanMemoryLocation
         {
             get;
             set;
-        } = true;
+        }
+
+        public SSAVariableMap? CleanMemoryUseErkenner
+        {
+            get;
+            set;
+        }
 
         public List<string> PostAssemblyCommands
         {
@@ -69,6 +96,11 @@ namespace Yama.Compiler
 
         public bool IsNullCheck
         {
+            get;
+            set;
+        }
+
+        public SSAVariableMap? VariableMap{
             get;
             set;
         }
@@ -211,8 +243,9 @@ namespace Yama.Compiler
             if (this.Algo == null) return false;
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
-            //if (map.Calls.Count == 0) return true;
-            //SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Pop();
+            this.VariableMap = map;
+            if (map.MutableState == SSAVariableMap.VariableMutableState.NotMutable && map.Value != SSAVariableMap.LastValue.NotSet)
+                return compiler.AddError($"variable '{map.Key}' is not mutable", node.Use);
 
             SSACompileLine lineset = new SSACompileLine(this);
             this.Line = lineset;
@@ -234,7 +267,8 @@ namespace Yama.Compiler
             }
 
             SSACompileArgument? arg = lineset.Arguments.FirstOrDefault();
-            if (arg == null) return compiler.AddError("variable is not set", this.Node);
+            if (arg == null)
+                return compiler.AddError("variable is not set", this.Node);
             if (arg.Reference is null) return compiler.AddError("no reference", this.Node);
 
             compiler.ContainerMgmt.StackArguments.Push(new SSACompileArgument(arg.Reference));
@@ -245,8 +279,7 @@ namespace Yama.Compiler
 
                 if ( map.IsNullable )
                 {
-                    map.Value = SSAVariableMap.LastValue.Unknown;
-                    if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+                    if (!this.SetVariableByReferenceCheck(compiler, arg, map, node)) return false;
                 }
                 else map.Value = SSAVariableMap.LastValue.NotNull;
 
@@ -269,11 +302,51 @@ namespace Yama.Compiler
 
             if ( map.IsNullable )
             {
-                map.Value = SSAVariableMap.LastValue.Unknown;
-                if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
-                //if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
+                if (!this.SetVariableByReferenceCheck(compiler, arg, map, node)) return false;
             }
             else map.Value = SSAVariableMap.LastValue.NotNull;
+
+            return true;
+        }
+
+        private bool SetVariableByReferenceCheck(Compiler compiler, SSACompileArgument arg, SSAVariableMap map, IndexVariabelnDeklaration node)
+        {
+            if (map.Reference is null) return false;
+
+            map.Value = SSAVariableMap.LastValue.Unknown;
+            if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+            if (map.Reference.Owner.Node is NewKey && map.Kind == SSAVariableMap.VariableType.BorrowingReference) return compiler.AddError("A new instance can not set to a borrowing variable", map.Reference.Owner.Node);
+            //if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
+
+            if (arg.IndexRef is IndexPropertyDeklaration ipd)
+            {
+                if (ipd.Use.BorrowingToken is not null)
+                {
+                    if (map.Kind == SSAVariableMap.VariableType.BorrowingReference) return true;
+                    return compiler.AddError("a global borrwoing variable can not set to a owner variable", ipd.Use);
+                }
+                if (map.Kind != SSAVariableMap.VariableType.OwnerReference) return true;
+                if (arg.Reference is null) return compiler.AddError("CompileReferenceCall.cs: darf nicht null sein");
+                if (arg.Reference.Owner is null) return compiler.AddError("CompileReferenceCall.cs: darf nicht null sein");
+                if (arg.Reference.Owner.Node is not ReferenceCall rc)return compiler.AddError("CompileReferenceCall.cs: muss ein ReferenceCall sein");
+
+                new CompileNumConst().Compile(compiler, new Number { Token = new Lexer.IdentifierToken() { Value = 0 } });
+                compiler.ContainerMgmt.StackArguments.Push(arg.Reference.Arguments.First());
+                new CompileReferenceCall().Compile(compiler, rc, "setpoint");
+            }
+            if (arg.Variable is null) return true;
+
+            map.Value = arg.Variable.Value;
+            if (arg.Variable.Kind == SSAVariableMap.VariableType.OwnerReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
+            {
+                arg.Variable.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                arg.Variable.OrgMap.Value = SSAVariableMap.LastValue.NeverCall;
+                arg.Variable.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+            }
+            if (arg.Variable.Kind == SSAVariableMap.VariableType.BorrowingReference && map.Kind == SSAVariableMap.VariableType.OwnerReference)
+            {
+                return compiler.AddError("You can not set a Borrowing variable to a owner variable", node.Use);
+            }
 
             return true;
         }
@@ -334,27 +407,70 @@ namespace Yama.Compiler
                 }
             }
 
+            if (!this.CheckOwnershipForPorperty(node, compiler, line, mode)) return false;
+
             return true;
         }
 
-        private bool GetVariableCompile(Compiler compiler, IndexVariabelnDeklaration deklaration, IParseTreeNode use)
+        private bool CheckOwnershipForPorperty(IndexVariabelnReference node, Compiler compiler, SSACompileLine line, string mode)
+        {
+            if (node.Deklaration is not IndexPropertyDeklaration ipd) return true;
+            if (mode == "point")
+            {
+                SSACompileArgument getArg = compiler.ContainerMgmt.StackArguments.Peek();
+                getArg.IndexRef = ipd;
+            }
+            if (mode != "setpoint") return true;
+            if (ipd.Type.Deklaration is IndexKlassenDeklaration dk)
+            {
+                if (dk.MemberModifier != ClassMemberModifiers.None) return true;
+            }
+
+            SSACompileArgument? arg = line.Arguments.LastOrDefault();
+            if (arg is null) return true;
+            if (arg.Reference is null) return true;
+            if (arg.Reference.Owner.Node is NewKey && ipd.Use.BorrowingToken is not null && arg.Variable is null) return compiler.AddError("A new instance can not set to a borrowing global variable", arg.Reference.Owner.Node);
+
+            if (arg.Variable is null) return true;
+
+            if (arg.Variable.Kind == SSAVariableMap.VariableType.OwnerReference && ipd.Use.BorrowingToken is null)
+            {
+                arg.Variable.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                arg.Variable.OrgMap.Value = SSAVariableMap.LastValue.NeverCall;
+                arg.Variable.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+            }
+            if (arg.Variable.Kind == SSAVariableMap.VariableType.BorrowingReference && ipd.Use.BorrowingToken is null)
+            {
+                return compiler.AddError("You can not set a Borrowing variable to a owner variable", node.Use);
+            }
+
+            return true;
+        }
+
+        public bool GetVariableCompile(Compiler compiler, IndexVariabelnDeklaration deklaration, IParseTreeNode use)
         {
             if (compiler.ContainerMgmt.CurrentMethod is null) return compiler.AddError("no method found", deklaration.Use);
             if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(deklaration.Name)) return compiler.AddError("variable not in varmapper", deklaration.Use);
 
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[deklaration.Name];
+            this.VariableMap = map;
 
             SSAVariableMap.LastValue lastValue = map.Value;
 
             if ( this.IsNullCheck ) lastValue = SSAVariableMap.LastValue.NotNull;
-            if ( lastValue == SSAVariableMap.LastValue.NotSet ) return compiler.AddError ( "variable is not set!", use );
+            if ( lastValue == SSAVariableMap.LastValue.NotSet )
+                return compiler.AddError ( "variable is not set!", use );
+            if ( lastValue == SSAVariableMap.LastValue.NeverCall ) return compiler.AddError ( "variable is unaviable!", use );
             if ( lastValue == SSAVariableMap.LastValue.Null ) return compiler.AddError ( "variable is null", use );
             if ( lastValue == SSAVariableMap.LastValue.Unknown  ) return compiler.AddError ( "null checking for variable is missing", use );
 
-            if (map.Reference == null) return compiler.AddError("variable is not set!", deklaration.Use);
+            if (map.Reference == null)
+                return compiler.AddError("variable is not set!", deklaration.Use);
 
-            SSACompileArgument arg = new SSACompileArgument(map.Reference);
+            SSACompileArgument arg = new SSACompileArgument(map.Reference, map);
             compiler.ContainerMgmt.StackArguments.Push(arg);
+
+            map.AddArg(arg);
 
             return true;
         }

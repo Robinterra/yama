@@ -253,6 +253,9 @@ namespace Yama.Parser
 
             if (this.Statement is ICompileNode statementNode) statementNode.Compile(request);
 
+            CompileCleanMemory cleanMemory = new CompileCleanMemory();
+            cleanMemory.Compile(request.Compiler, this);
+
             jumpbegin.Compile(request.Compiler, this.CompileContainer.Begin, request.Mode);
 
             this.CompileContainer.Ende.Compile(request.Compiler, this, request.Mode);

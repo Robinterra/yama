@@ -119,6 +119,12 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken? BorrowingToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -244,6 +250,9 @@ namespace Yama.Parser
             token = this.MakeZusatzValid ( request.Parser, token, deklaration );
             if (token is null) return null;
 
+            token = this.TryParseBorrwoing(request.Parser, token, deklaration);
+            if (token is null) return null;
+
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
@@ -282,6 +291,18 @@ namespace Yama.Parser
             deklaration.Tags.AddRange(request.Parser.PopMethodTag (  ));
 
             return deklaration;
+        }
+
+        private IdentifierToken? TryParseBorrwoing(Parser parser, IdentifierToken token, MethodeDeclarationNode node)
+        {
+            if (token.Kind != IdentifierKind.Operator) return token;
+            if (token.Text != "&") return token;
+
+            node.BorrowingToken = token;
+            node.AllTokens.Add(token);
+
+            IdentifierToken? nextToken = parser.Peek(token, 1);
+            return nextToken;
         }
 
         private bool CheckSonderRegleung(IdentifierToken typeDefinition)
@@ -336,15 +357,13 @@ namespace Yama.Parser
 
             IndexContainer container = deklaration.Container;
 
-            VariabelDeklaration? dek = null;
-
             this.IndezierenNonStaticDek(deklaration, klasse);
 
             foreach (IParseTreeNode par in this.Parameters)
             {
-                if (par is VariabelDeklaration t) dek = t;
+                if (par is not VariabelDeklaration dek) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
 
-                if (dek == null) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
+                dek.IsMutable = false;
 
                 if (!dek.Indezieren(new RequestParserTreeIndezieren(request.Index, container))) continue;
                 if (dek.Deklaration is null) return request.Index.CreateError(this);
@@ -406,7 +425,11 @@ namespace Yama.Parser
         private bool AddMethode(IndexKlassenDeklaration klasse, IndexMethodDeklaration deklaration)
         {
             if (deklaration.Type == MethodeType.Ctor) klasse.Ctors.Add(deklaration);
-            if (deklaration.Type == MethodeType.DeCtor) klasse.DeCtors.Add(deklaration);
+            if (deklaration.Type == MethodeType.DeCtor)
+            {
+                klasse.Methods.Add(deklaration);
+                klasse.DeCtors.Add(deklaration);
+            }
             if (deklaration.Type == MethodeType.Operator) klasse.Operators.Add(deklaration);
             if (deklaration.Type == MethodeType.Methode) klasse.Methods.Add(deklaration);
             if (deklaration.Type == MethodeType.Static) klasse.StaticMethods.Add(deklaration);
@@ -459,6 +482,8 @@ namespace Yama.Parser
             this.CompileContainer.Ende = new CompileSprungPunkt();
             this.CompileContainer.Ende.Node = this;
 
+            this.CompileReturnType(this.CompileContainer, this.Deklaration.ReturnValue.Deklaration, this.BorrowingToken is not null, this.Deklaration.ReturnValue );
+
             request.Compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, c.IndexContainer.ThisUses);
 
             if (this.AccessDefinition != null)
@@ -485,6 +510,24 @@ namespace Yama.Parser
             if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(request.Compiler, request.Mode);
 
             return this.CompileNormalFunktion(request.Compiler, request.Mode, count);
+        }
+
+        private void CompileReturnType(CompileContainer compileContainer, IParent? deklaration, bool isBorrowing, IndexVariabelnReference varref)
+        {
+            if (deklaration is not IndexKlassenDeklaration dk) return;
+
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
+            IndexVariabelnDeklaration vardek = new IndexVariabelnDeklaration(this, dk.Name, varref);
+            if (dk.MemberModifier == ClassMemberModifiers.None)
+            {
+                kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
+
+                vardek.IsNullable = true;
+            }
+
+            SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);
+
+            compileContainer.ReturnType = map;
         }
 
         private bool MakeOneArgument(IndexVariabelnDeklaration node, Compiler.Compiler compiler, int count)
@@ -522,6 +565,9 @@ namespace Yama.Parser
 
         public bool CanCompile(Compiler.Compiler compiler)
         {
+            if (this.Deklaration is null) return false;
+            if (this.Deklaration.Type == MethodeType.DeCtor) return true;
+
             if (this.AccessDefinition != null)
             {
                 if (this.AccessDefinition.Kind == IdentifierKind.Copy) return false;
@@ -553,7 +599,7 @@ namespace Yama.Parser
 
         private bool CompileDeCtor(Compiler.Compiler compiler, string mode)
         {
-            if (this.Deklaration  is null) return false;
+            if (this.Deklaration is null) return false;
             if (this.Deklaration.Klasse is null) return false;
             if (this.Deklaration.Klasse.GetNonStaticPropCount == 0) return true;
 
@@ -563,6 +609,9 @@ namespace Yama.Parser
             /*CompilePopResult compilePopResult = new CompilePopResult();
             compilePopResult.Position = 0;
             compilePopResult.Compile(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");*/
+
+            CompileCleanMemory cleanMemory = new CompileCleanMemory();
+            cleanMemory.Compile(compiler, this, thisDek);
 
             CompileReferenceCall refCall = new CompileReferenceCall();
             refCall.CompileDek(compiler, thisDek, "default");

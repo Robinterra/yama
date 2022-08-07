@@ -92,6 +92,23 @@ namespace Yama.Compiler
             set;
         }
 
+        public SSAVariableMap? ReturnType
+        {
+            get;
+            set;
+        }
+
+        public bool HasReturn
+        {
+            get;
+            set;
+        }
+
+        public List<SSAVariableMap> Deklarations
+        {
+            get;
+        } = new List<SSAVariableMap>();
+
         #endregion get/set
 
         #region methods

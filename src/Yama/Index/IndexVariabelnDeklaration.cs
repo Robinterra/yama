@@ -101,6 +101,22 @@ namespace Yama.Index
 
         // -----------------------------------------------
 
+        public bool IsBorrowing
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public bool IsMutable
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -116,6 +132,7 @@ namespace Yama.Index
             this.Type = varType;
             this.ParentUsesSet = new();
             this.References = new List<IndexVariabelnReference>();
+            this.IsMutable = true;
         }
 
         // -----------------------------------------------
@@ -149,7 +166,7 @@ namespace Yama.Index
             if (this.Name == "invalue") return this.VariableIsInValueKeyword (uses, nameing);
 
             this.Type.Mappen(uses);
-            if ( this.Type.Deklaration is IndexKlassenDeklaration kd ) return this.TypeIsKlassenDeklaration ( kd );
+            if ( this.Type.Deklaration is IndexKlassenDeklaration kd ) return this.TypeIsKlassenDeklaration ( kd, uses.GetIndex );
 
             return true;
         }
@@ -193,9 +210,14 @@ namespace Yama.Index
             return true;
         }
 
-        private bool TypeIsKlassenDeklaration ( IndexKlassenDeklaration kd )
+        private bool TypeIsKlassenDeklaration ( IndexKlassenDeklaration kd, Index getIndex)
         {
-            if ( kd.MemberModifier != ClassMemberModifiers.None ) return true;
+            if ( kd.MemberModifier != ClassMemberModifiers.None )
+            {
+                if (this.IsBorrowing) getIndex.AddError(new IndexError(this.Use, "Borrowing is only possilbe on varaibles by reference"));
+
+                return true;
+            }
 
             this.IsNullable = true;
 

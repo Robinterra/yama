@@ -75,7 +75,7 @@ namespace Yama.Compiler
                 if (currentVarMap.Reference is not null) varLine.AddArgument(new SSACompileArgument(currentVarMap.Reference));
 
                 compiler.AddSSALine(varLine);
-                currentVarMap.Reference = varLine;
+                currentVarMap.reference = varLine;
             }
 
             return true;
@@ -197,6 +197,7 @@ namespace Yama.Compiler
 
             currentVarMap.Reference = varLine;
             if (!currentVarMap.IsNullable) return true;
+            if (currentVarMap.Value == SSAVariableMap.LastValue.NotSet && oldVarMap.Value == SSAVariableMap.LastValue.NotSet) return true;
 
             currentVarMap.Value = SSAVariableMap.LastValue.Unknown;
 

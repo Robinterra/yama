@@ -7,7 +7,7 @@ using Yama.Parser;
 namespace Yama.Compiler
 {
 
-    public class CompileExecuteCall : ICompile<MethodeDeclarationNode>
+    public class CompileExecuteCall : ICompileRoot
     {
 
         #region get/set
@@ -46,8 +46,27 @@ namespace Yama.Compiler
         {
             get
             {
+                if (this.CleanMemoryUseErkenner is not null && this.CleanMemoryLocation is not null)
+                {
+                    int order = this.CleanMemoryUseErkenner.ArgumentsCalls.Max(t=>t.Calls.Max(t=>t.Order));
+
+                    return order < this.CleanMemoryLocation.Order;
+                }
+
                 return true;
             }
+        }
+
+        public SSACompileLine? CleanMemoryLocation
+        {
+            get;
+            set;
+        }
+
+        public SSAVariableMap? CleanMemoryUseErkenner
+        {
+            get;
+            set;
         }
 
         public List<string> PostAssemblyCommands
@@ -75,7 +94,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        private DefaultRegisterQuery BuildQuery(MethodeDeclarationNode? node, AlgoKeyCall key, string mode, SSACompileLine line)
+        private DefaultRegisterQuery BuildQuery(IParseTreeNode? node, AlgoKeyCall key, string mode, SSACompileLine line)
         {
             DefaultRegisterQuery query = new DefaultRegisterQuery();
             query.Key = key;
@@ -87,7 +106,7 @@ namespace Yama.Compiler
             return query;
         }
 
-        public bool Compile(Compiler compiler, MethodeDeclarationNode? node, string mode = "default")
+        public bool Compile(Compiler compiler, IParseTreeNode? node, string mode = "default")
         {
             this.Node = node;
 
@@ -118,6 +137,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (!this.IsUsed) return true;
+
             this.ResultCompile(compiler);
 
             foreach (string str in this.AssemblyCommands)

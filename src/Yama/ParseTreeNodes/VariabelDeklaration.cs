@@ -76,6 +76,18 @@ namespace Yama.Parser
             set;
         }
 
+        public IdentifierToken? BorrowingToken
+        {
+            get;
+            set;
+        }
+
+        public bool IsMutable
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -87,6 +99,7 @@ namespace Yama.Parser
             this.AllTokens = new List<IdentifierToken> ();
             this.Prio = prio;
             this.Ende = new();
+            this.IsMutable = true;
         }
 
         #endregion ctor
@@ -117,33 +130,35 @@ namespace Yama.Parser
 
         public IParseTreeNode? Parse ( RequestParserTreeParser request )
         {
-            if ( !this.CheckHashValidOperator ( request.Token ) ) return null;
+            VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
+
+            IdentifierToken? typeToken = this.TryParseBorrwoing(request, node);
+            if (typeToken is null) return null;
+            if ( !this.CheckHashValidOperator ( typeToken ) ) return null;
 
             //IdentifierToken? lexerLeft = request.Parser.Peek ( request.Token, -1 );
             //if (lexerLeft is null) return null;
             //if ( this.CheckHashValidChild ( lexerLeft ) /*&& !this.CheckAusnahmen ( lexerLeft )*/ ) return null;
 
-            VariabelDeklaration node = new VariabelDeklaration ( this.Prio );
+            IdentifierToken? variableNameToken = request.Parser.Peek ( typeToken, 1 );
+            if (variableNameToken is null) return null;
 
-            IdentifierToken? lexerRight = request.Parser.Peek ( request.Token, 1 );
-            if (lexerRight is null) return null;
+            variableNameToken = this.TryParseGeneric(request, node, variableNameToken);
+            if (variableNameToken is null) return null;
+            if ( !this.CheckHashValidChild ( variableNameToken ) ) return null;
 
-            lexerRight = this.TryParseGeneric(request, node, lexerRight);
-            if (lexerRight is null) return null;
-            if ( !this.CheckHashValidChild ( lexerRight ) ) return null;
-
-            node.Token = lexerRight;
-            node.AllTokens.Add(lexerRight);
-            node.Ende = lexerRight;
+            node.Token = variableNameToken;
+            node.AllTokens.Add(variableNameToken);
+            node.Ende = variableNameToken;
 
             ReferenceCall callRule = request.Parser.GetRule<ReferenceCall>();
 
-            node.TypeDefinition = request.Parser.TryToParse ( callRule, request.Token );
+            node.TypeDefinition = request.Parser.TryToParse ( callRule, typeToken );
             if ( node.TypeDefinition is null ) return null;
 
             if (!IsInMethodeDeklaration) return node;
 
-            IdentifierToken? optionalComma = request.Parser.Peek ( lexerRight, 1 );
+            IdentifierToken? optionalComma = request.Parser.Peek ( variableNameToken, 1 );
             if (optionalComma is null) return node;
             if (optionalComma.Kind != IdentifierKind.Comma) return node;
 
@@ -151,6 +166,18 @@ namespace Yama.Parser
             node.Ende = optionalComma;
 
             return node;
+        }
+
+        private IdentifierToken? TryParseBorrwoing(RequestParserTreeParser request, VariabelDeklaration node)
+        {
+            if (request.Token.Kind != IdentifierKind.Operator) return request.Token;
+            if (request.Token.Text != "&") return request.Token;
+
+            node.BorrowingToken = request.Token;
+            node.AllTokens.Add(request.Token);
+
+            IdentifierToken? nextToken = request.Parser.Peek(request.Token, 1);
+            return nextToken;
         }
 
         private IdentifierToken? TryParseGeneric(RequestParserTreeParser request, VariabelDeklaration deklaration, IdentifierToken token)
@@ -171,25 +198,32 @@ namespace Yama.Parser
 
             IndexVariabelnDeklaration? reference = this.Deklaration;
 
-            if (reference is null)
+            if (reference is not null)
             {
-                if (this.TypeDefinition is not IIndexNode typeNode) return request.Index.CreateError(this);
+                container.VariabelnDeklarations.Add(reference);
 
-                typeNode.Indezieren(request);
-
-                IndexVariabelnReference? type = container.VariabelnReferences.LastOrDefault();
-                if (type is null) return request.Index.CreateError(this);
-
-                reference = new IndexVariabelnDeklaration(this, this.Token.Text, type);
-
-                if (this.GenericDefintion != null)
-                {
-                    reference.GenericDeklaration = this.GenericDefintion;
-                    this.GenericDefintion.Indezieren(request);
-                }
-
-                this.Deklaration = reference;
+                return true;
             }
+
+            if (this.TypeDefinition is not IIndexNode typeNode) return request.Index.CreateError(this);
+
+            typeNode.Indezieren(request);
+
+            IndexVariabelnReference? type = container.VariabelnReferences.LastOrDefault();
+            if (type is null) return request.Index.CreateError(this);
+
+            reference = new IndexVariabelnDeklaration(this, this.Token.Text, type);
+
+            if (this.GenericDefintion is not null)
+            {
+                reference.GenericDeklaration = this.GenericDefintion;
+                this.GenericDefintion.Indezieren(request);
+            }
+
+            reference.IsBorrowing = this.BorrowingToken is not null;
+            reference.IsMutable = this.IsMutable;
+
+            this.Deklaration = reference;
 
             container.VariabelnDeklarations.Add(reference);
 
@@ -198,6 +232,12 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
+            if (request.Compiler.ContainerMgmt.CurrentContainer is null) return false;
+            if (request.Compiler.ContainerMgmt.CurrentMethod is null) return false;
+
+            SSAVariableMap map = request.Compiler.ContainerMgmt.CurrentMethod.VarMapper[this.Token.Text];
+            request.Compiler.ContainerMgmt.CurrentContainer.Deklarations.Add(map);
+
             if (request.Mode != "set") return true;
             if (this.Deklaration is null) return false;
 

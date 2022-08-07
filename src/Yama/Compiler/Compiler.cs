@@ -527,10 +527,12 @@ namespace Yama.Compiler
 
             foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
             {
+                if (varibaleMap.Value.TryToClean) continue;
                 if (varibaleMap.Value.Reference is null) continue;
                 if (!parentVarMap.ContainsKey(varibaleMap.Key)) continue;
 
                 SSAVariableMap currentVarMap = parentVarMap[varibaleMap.Key];
+                //if (!currentVarMap.ArgumentsCalls.Any(t=>t.Reference is not null && t.Reference.Order > firstLine.Order) && !varibaleMap.Value.AllSets.Any(t=>t.Order > firstLine.Order)) continue;
                 if (currentVarMap.Reference is null) continue;
 
                 SSACompileLine phiLoop = currentVarMap.Reference;

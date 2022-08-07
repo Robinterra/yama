@@ -93,6 +93,12 @@ namespace Yama.Parser
             }
         }
 
+        public IdentifierToken? BorrowingToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -126,8 +132,12 @@ namespace Yama.Parser
             node.Token = request.Token;
             node.AllTokens.Add(request.Token);
 
-            node.RightToken = request.Parser.Peek ( request.Token, 1 );
-            if ( node.RightToken == null ) return new ParserError(request.Token, $"Expectet a word after the is keyword");
+            IdentifierToken? maybeBorrowingToken = request.Parser.Peek(request.Token, 1);
+            if (maybeBorrowingToken is null) return null;
+
+            IdentifierToken? patternToken = this.TryParseBorrwoing(request.Parser, maybeBorrowingToken, node);
+            if ( patternToken is null ) return new ParserError(request.Token, $"Expectet a word after the is keyword");
+            node.RightToken = patternToken;
 
             node.AllTokens.Add(node.RightToken);
             if ( !this.CheckHashValidTypeDefinition ( node.RightToken ) ) return new ParserError(request.Token, $"Expectet a word after the is keyword and not a '{node.RightToken.Text}'", node.RightToken);
@@ -140,6 +150,18 @@ namespace Yama.Parser
             node.AllTokens.Add(node.ReferenceDeklaration);
 
             return node;
+        }
+
+        private IdentifierToken? TryParseBorrwoing(Parser parser, IdentifierToken token, TypePatternMatching node)
+        {
+            if (token.Kind != IdentifierKind.Operator) return token;
+            if (token.Text != "&") return token;
+
+            node.BorrowingToken = token;
+            node.AllTokens.Add(token);
+
+            IdentifierToken? nextToken = parser.Peek(token, 1);
+            return nextToken;
         }
 
         private IParseTreeNode ParseNullChecking ( TypePatternMatching node )
@@ -178,6 +200,9 @@ namespace Yama.Parser
             IndexVariabelnDeklaration reference = new IndexVariabelnDeklaration(this, this.ReferenceDeklaration.Text, type);
             reference.Use = this;
             reference.Name = this.ReferenceDeklaration.Text;
+            reference.IsMutable = false;
+            reference.IsNullable = true;
+            reference.IsBorrowing = this.BorrowingToken is not null;
             container.VariabelnDeklarations.Add(reference);
             container.VariabelnReferences.Add(type);
             container.VariabelnReferences.Add(this.BooleascherReturn);
@@ -205,6 +230,12 @@ namespace Yama.Parser
             ReferenceCall call = new ReferenceCall();
             call.Token = this.ReferenceDeklaration;
             call.Reference = new IndexVariabelnReference(this, this.Deklaration.Name) { Deklaration = this.Deklaration, ParentUsesSet = this.BooleascherReturn.ThisUses };
+
+            CompileContainer? currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
+            if (currentMethod is null) throw new NullReferenceException();
+
+            SSAVariableMap currentKontext = currentMethod.VarMapper[this.LeftNode.Token.Text];
+            SSAVariableMap orgCurrentKontext = new SSAVariableMap(currentKontext);
             //compileReference.IsNullCheck = true;
             compileReference.Compile(request.Compiler, call, "set");
 
@@ -222,17 +253,29 @@ namespace Yama.Parser
             SSACompileLine compileLine = request.Compiler.GetLatestSSALine();
             compileLine.FlowTask = ProgramFlowTask.IsTypeChecking;
 
-            CompileContainer? currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
-            if (currentMethod is null) throw new NullReferenceException();
-
             SSAVariableMap? nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.LeftNode!.Token.Text];
             SSAVariableMap? nextKontextReference = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.ReferenceDeklaration!.Text];
+            SSAVariableMap currentKontextReference = currentMethod.VarMapper[this.ReferenceDeklaration.Text];
 
             if (nextKontextReference is not null && nextKontext is not null)
             {
-                nextKontext.Value = SSAVariableMap.LastValue.NotNull;
+                if (nextKontextReference.Kind == SSAVariableMap.VariableType.BorrowingReference)
+                {
+                    nextKontext.Value = SSAVariableMap.LastValue.NotNull;
+                }
+                if (nextKontextReference.Kind == SSAVariableMap.VariableType.OwnerReference)
+                {
+                    nextKontext.Kind = currentKontext.Kind;
+                    nextKontext.MutableState = currentKontext.MutableState;
+                    nextKontext.Value = currentKontext.Value;
+
+                    currentKontext.Kind = orgCurrentKontext.Kind;
+                    currentKontext.MutableState = orgCurrentKontext.MutableState;
+                    currentKontext.Value = orgCurrentKontext.Value;
+                }
                 nextKontextReference.Value = SSAVariableMap.LastValue.NotNull;
                 nextKontextReference.Reference = nextKontext.Reference;
+                currentKontextReference.Value = SSAVariableMap.LastValue.NotSet;
             }
 
             return request.Compiler.Definition.ParaClean();

@@ -173,27 +173,51 @@ namespace Yama.Parser
             return true;
         }
 
+        private SSAVariableMap? GetParameterVariableMap(bool isBorrowing, IndexVariabelnDeklaration vardek)
+        {
+            if (vardek.Type.Deklaration is not IndexKlassenDeklaration dk) return null;
+
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
+            if (dk.MemberModifier == ClassMemberModifiers.None)
+            {
+                kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
+
+                vardek.IsNullable = true;
+            }
+
+            SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);
+            map.MutableState = SSAVariableMap.VariableMutableState.Mutable;
+
+            return map;
+        }
+
         public bool Compile(RequestParserTreeCompile request)
         {
             if (this.LeftNode is not ICompileNode leftNode) return false;
+            if (this.Reference is null) return request.Compiler.AddError("error reference is null", this);
+            if (this.Reference.Deklaration is null) return request.Compiler.AddError("error deklaratrion is null", this);
+            IndexMethodDeklaration methodDeklaration = this.Reference.Deklaration;
 
             List<IParseTreeNode> copylist = this.ParametersNodes.ToArray().ToList();
             copylist.Reverse();
 
             //if (this.CompileCopy(copylist, request)) return true;
 
-            IParseTreeNode? dek = null;
-
             int parasCount = 0;
 
             foreach (IParseTreeNode par in copylist )
             {
-                dek = par;
-                if (dek is not ICompileNode compileNode) continue;
+                if (par is not ICompileNode compileNode) continue;
+
+                IndexVariabelnDeklaration varDek = methodDeklaration.Parameters[copylist.Count - parasCount - 1];
+
+                bool isBorrowing = false;
+                if (varDek.Use is VariabelDeklaration vd) isBorrowing = vd.BorrowingToken is not null;
 
                 compileNode.Compile(request);
 
                 CompilePushResult compilePushResult = new CompilePushResult();
+                compilePushResult.ParameterType = this.GetParameterVariableMap(isBorrowing, varDek);
                 compilePushResult.Compile(request.Compiler, null, "default");
 
                 parasCount++;

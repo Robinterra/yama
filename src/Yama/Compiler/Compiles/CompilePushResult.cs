@@ -45,8 +45,27 @@ namespace Yama.Compiler
         {
             get
             {
+                if (this.CleanMemoryUseErkenner is not null && this.CleanMemoryLocation is not null)
+                {
+                    int order = this.CleanMemoryUseErkenner.ArgumentsCalls.Max(t=>t.Calls.Max(t=>t.Order));
+
+                    return order < this.CleanMemoryLocation.Order;
+                }
+
                 return true;
             }
+        }
+
+        public SSACompileLine? CleanMemoryLocation
+        {
+            get;
+            set;
+        }
+
+        public SSAVariableMap? CleanMemoryUseErkenner
+        {
+            get;
+            set;
         }
 
         public List<string> PostAssemblyCommands
@@ -56,6 +75,12 @@ namespace Yama.Compiler
         } = new List<string>();
 
         public SSACompileLine? Line
+        {
+            get;
+            set;
+        }
+
+        public SSAVariableMap? ParameterType
         {
             get;
             set;
@@ -104,6 +129,8 @@ namespace Yama.Compiler
                 }
             }
 
+            if (!this.CheckParameterTypeInfos(this.Line.Arguments.FirstOrDefault(), this.ParameterType, compiler)) return false;
+
             if (mode == "copy")
             {
                 if ( line.Arguments.Count == 0 ) return false;
@@ -117,8 +144,35 @@ namespace Yama.Compiler
             return true;
         }
 
+        private bool CheckParameterTypeInfos(SSACompileArgument? sSACompileArgument, SSAVariableMap? parameterType, Compiler compiler)
+        {
+            if (sSACompileArgument is null) return true;
+            if (parameterType is null) return true;
+            if (sSACompileArgument.Variable is null) return true;
+
+            SSAVariableMap varaibleType = sSACompileArgument.Variable;
+            if (parameterType.MutableState == SSAVariableMap.VariableMutableState.NotMutable) return compiler.AddError("The Property/Vektor has no set Statement", parameterType.Deklaration.Use);
+            if (!varaibleType.IsNullable) return true;
+            if (!parameterType.IsNullable) return compiler.AddError($"It is not possible to put a '{varaibleType.Key}' ReferenceType to a non '{parameterType.Key}' Reference Parameter", parameterType.Deklaration.Use);
+
+            if (varaibleType.Kind == SSAVariableMap.VariableType.OwnerReference && parameterType.Kind == SSAVariableMap.VariableType.OwnerReference)
+            {
+                varaibleType.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
+                varaibleType.OrgMap.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+                varaibleType.OrgMap.Value = SSAVariableMap.LastValue.NeverCall;
+
+                return true;
+            }
+
+            if (varaibleType.Kind == SSAVariableMap.VariableType.BorrowingReference && parameterType.Kind == SSAVariableMap.VariableType.OwnerReference)
+                return compiler.AddError("You can not set a Borrowing variable to a owner variable", parameterType.Deklaration.Use);
+
+            return true;
+        }
+
         public bool InFileCompilen(Compiler compiler)
         {
+            if (!this.IsUsed) return true;
             if (this.Algo is null) return false;
 
             foreach (string str in this.AssemblyCommands)

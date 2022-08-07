@@ -11,7 +11,7 @@ pointIdentifion = identiefier.identiefier
 expressionIden = pointIdentifion | number | hexnumber | "true" | "false" | "null"
 
 asExpression = "as" identiefier
-isExpression = "is" (null | identiefier identiefier)
+isExpression = "is" (null | [&]identiefier identiefier)
 
 operationExpression = operator expression
 expression = [ "(" ] [ operator ] expressionIden [ asExpression | methodeCall | vektorCall ] [ operationExpression ] [ ")" ] [ asExpression ] [ operationExpression ]
@@ -23,7 +23,7 @@ vektorCall = "[" expression {, expression} "]" [ asExpression ]
 newStatement = "new" identiefier "(" expression {, expression} ")" [ asExpression ]
 assigment = "=" (expression | newStatement)
 
-variableDeklaration = identiefier identiefier
+variableDeklaration = [&]identiefier identiefier
 
 normalStatement = pointIdentifion ( methodeCall | assigment | vektorCall ) | variableDeklaration [ assigment ] | identiefier assigment
 returnStatement = "return" expression ";"
@@ -48,10 +48,10 @@ getsetContain = "{" [ get containerStatement ] [ set containerStatement ] "}"
 accessdefinition = "public" | "private"
 methodeZusatz = "static" | "copy"
 
-methodeDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier "(" { variableDeklaration [ "," ] } ")" containerStatement
-gobalvariableDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier ";"
-propertiesDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier getsetContain
-vektorDeklaration = [ accessdefinition ] [ methodeZusatz ] identiefier "[" { variableDeklaration [ "," ] } "]" getsetContain
+methodeDeklaration = [ accessdefinition ] [ methodeZusatz ] [&]identiefier identiefier "(" { variableDeklaration [ "," ] } ")" containerStatement
+gobalvariableDeklaration = [ accessdefinition ] [ methodeZusatz ] [&]identiefier identiefier ";"
+propertiesDeklaration = [ accessdefinition ] [ methodeZusatz ] [&]identiefier identiefier getsetContain
+vektorDeklaration = [ accessdefinition ] [ methodeZusatz ] [&]identiefier identiefier "[" { variableDeklaration [ "," ] } "]" getsetContain
 
 inclass = { methodeDeklaration | gobalvariableDeklaration | propertiesDeklaration | vektorDeklaration }
 inenum = { identiefier "=" number | hexnumber [,] }

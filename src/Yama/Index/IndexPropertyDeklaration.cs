@@ -63,7 +63,19 @@ namespace Yama.Index
             set;
         }
 
-        public IParseTreeNode Use
+        IParseTreeNode IParent.Use
+        {
+            get
+            {
+                return this.Use;
+            }
+            set
+            {
+                this.Use = (value as PropertyDeklaration)!;
+            }
+        }
+
+        public PropertyDeklaration Use
         {
             get;
             set;
@@ -128,7 +140,7 @@ namespace Yama.Index
 
         #region ctor
 
-        public IndexPropertyDeklaration ( IParseTreeNode use, string name, MethodeType methodeType, IndexVariabelnReference varTyp )
+        public IndexPropertyDeklaration ( PropertyDeklaration use, string name, MethodeType methodeType, IndexVariabelnReference varTyp )
         {
             this.ParentUsesSet = new();
             this.Type = varTyp;

@@ -107,24 +107,34 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.Statement is not ICompileNode compileNode)
-                return false;
+            if (this.Statement is not ICompileNode compileNode) return false;
 
             compileNode.Compile(request);
 
-            if (this.Statement is not null)
-            {
-                CompileMovReg movReg = new CompileMovReg();
-                movReg.Compile(request.Compiler, this);
-            }
+            CompileMovReg movReg = new CompileMovReg();
+            SSACompileLine? moveRegLine = movReg.Compile(request.Compiler, this);
+            if (moveRegLine is null) return false;
+
+            CompileCleanMemory cleanMemory = new CompileCleanMemory();
+            cleanMemory.Compile(request.Compiler, this);
+
+            request.Compiler.AssemblerSequence.Add(movReg);
+            request.Compiler.AddSSALine(moveRegLine);
 
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
             if (request.Compiler.ContainerMgmt.CurrentMethod is null) return true;
+            if (request.Compiler.ContainerMgmt.CurrentContainer is null) return true;
+
+            request.Compiler.ContainerMgmt.CurrentContainer.HasReturn = true;
 
             foreach (KeyValuePair<string, SSAVariableMap> varilabeMap in request.Compiler.ContainerMgmt.CurrentMethod.VarMapper)
             {
                 varilabeMap.Value.Reference = null;
+                if (varilabeMap.Value.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
+
+                varilabeMap.Value.Value = SSAVariableMap.LastValue.NeverCall;
+                varilabeMap.Value.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
             }
 
             return true;

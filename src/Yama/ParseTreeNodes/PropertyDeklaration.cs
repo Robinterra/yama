@@ -58,6 +58,12 @@ namespace Yama.Parser
             get;
         }
 
+        public IdentifierToken? BorrowingToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -163,6 +169,9 @@ namespace Yama.Parser
 
             token = this.MakeZusatzValid ( request.Parser, token, deklaration );
             if (token is null) return null;
+
+            token = this.TryParseBorrwoing(request.Parser, token, deklaration);
+            if (token is null) return null;
             if ( !this.CheckHashValidTypeDefinition ( token ) ) return null;
 
             deklaration.TypeDefinition = token;
@@ -182,6 +191,18 @@ namespace Yama.Parser
             deklaration.AllTokens.Add(token);
 
             return deklaration;
+        }
+
+        private IdentifierToken? TryParseBorrwoing(Parser parser, IdentifierToken token, PropertyDeklaration node)
+        {
+            if (token.Kind != IdentifierKind.Operator) return token;
+            if (token.Text != "&") return token;
+
+            node.BorrowingToken = token;
+            node.AllTokens.Add(token);
+
+            IdentifierToken? nextToken = parser.Peek(token, 1);
+            return nextToken;
         }
 
         public MethodeType GetMethodeType()

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Index;
 
 namespace Yama.Compiler
 {
@@ -9,12 +10,6 @@ namespace Yama.Compiler
         #region get/set
 
         public SSACompileLine? Reference
-        {
-            get;
-            set;
-        }
-
-        public SSAVariableMap? Variable
         {
             get;
             set;
@@ -32,6 +27,11 @@ namespace Yama.Compiler
             set;
         }
 
+        public SSAVariableMap? Variable
+        {
+            get;
+        }
+
         public ICompileRoot? Root
         {
             get;
@@ -44,6 +44,17 @@ namespace Yama.Compiler
             set;
         }
 
+        public IParent? IndexRef
+        {
+            get;
+            set;
+        }
+
+        public List<SSACompileLine> Calls
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -51,13 +62,16 @@ namespace Yama.Compiler
         public SSACompileArgument(SSACompileArgumentMode mode)
         {
             this.Mode = mode;
+            this.Calls = new List<SSACompileLine>();
         }
 
-        public SSACompileArgument(SSACompileLine line)
+        public SSACompileArgument(SSACompileLine line, SSAVariableMap? map = null)
         {
             this.Reference = line;
             this.Mode = SSACompileArgumentMode.Reference;
             this.Root = line.Owner;
+            if (map is not null) this.Variable = new SSAVariableMap(map);
+            this.Calls = new List<SSACompileLine>();
         }
 
         #endregion ctor

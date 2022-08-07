@@ -156,6 +156,37 @@ namespace Yama.Parser
             return true;
         }
 
+        private SSAVariableMap? GetParameterVariableMap()
+        {
+            if (this.LeftNode is not PointIdentifier pi) return null;
+            if (pi.RightNode is not ReferenceCall rc) return null;
+            if (rc.Reference is null) return null;
+
+            if (rc.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsd) return this.GetParameterVariableMap(pgsd.ReturnValue.Deklaration, pgsd.Use.BorrowingToken is not null, pgsd.ReturnValue, pgsd.Use.SetStatement is null);
+            if (rc.Reference.Deklaration is IndexVektorDeklaration pvd) return this.GetParameterVariableMap(pvd.ReturnValue.Deklaration, pvd.Use.BorrowingToken is not null, pvd.ReturnValue, pvd.Use.SetStatement is null);
+
+            return null;
+        }
+
+        private SSAVariableMap? GetParameterVariableMap(IParent? deklaration, bool isBorrowing, IndexVariabelnReference varref, bool isNotMutable)
+        {
+            if (deklaration is not IndexKlassenDeklaration dk) return null;
+
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
+            IndexVariabelnDeklaration vardek = new IndexVariabelnDeklaration(this, dk.Name, varref);
+            if (dk.MemberModifier == ClassMemberModifiers.None)
+            {
+                kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
+
+                vardek.IsNullable = true;
+            }
+
+            SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);
+            map.MutableState = isNotMutable ? SSAVariableMap.VariableMutableState.NotMutable : SSAVariableMap.VariableMutableState.Mutable;
+
+            return map;
+        }
+
         public bool Compile(RequestParserTreeCompile request)
         {
             if (this.LeftNode is not ICompileNode leftNode) return false;
@@ -169,6 +200,7 @@ namespace Yama.Parser
             if (request.Mode == "set")
             {
                 CompilePushResult compilePushResult = new CompilePushResult();
+                compilePushResult.ParameterType = this.GetParameterVariableMap();
                 compilePushResult.Compile(request.Compiler, null, "default");
 
                 parasCount++;
