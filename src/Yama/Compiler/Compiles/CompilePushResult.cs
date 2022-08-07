@@ -45,8 +45,27 @@ namespace Yama.Compiler
         {
             get
             {
+                if (this.CleanMemoryUseErkenner is not null && this.CleanMemoryLocation is not null)
+                {
+                    int order = this.CleanMemoryUseErkenner.ArgumentsCalls.Max(t=>t.Calls.Max(t=>t.Order));
+
+                    return order < this.CleanMemoryLocation.Order;
+                }
+
                 return true;
             }
+        }
+
+        public SSACompileLine? CleanMemoryLocation
+        {
+            get;
+            set;
+        }
+
+        public SSAVariableMap? CleanMemoryUseErkenner
+        {
+            get;
+            set;
         }
 
         public List<string> PostAssemblyCommands
@@ -153,6 +172,7 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (!this.IsUsed) return true;
             if (this.Algo is null) return false;
 
             foreach (string str in this.AssemblyCommands)

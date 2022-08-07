@@ -50,6 +50,11 @@ namespace Yama.Compiler
             set;
         }
 
+        public List<SSACompileLine> Calls
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -57,6 +62,7 @@ namespace Yama.Compiler
         public SSACompileArgument(SSACompileArgumentMode mode)
         {
             this.Mode = mode;
+            this.Calls = new List<SSACompileLine>();
         }
 
         public SSACompileArgument(SSACompileLine line, SSAVariableMap? map = null)
@@ -65,6 +71,7 @@ namespace Yama.Compiler
             this.Mode = SSACompileArgumentMode.Reference;
             this.Root = line.Owner;
             if (map is not null) this.Variable = new SSAVariableMap(map);
+            this.Calls = new List<SSACompileLine>();
         }
 
         #endregion ctor

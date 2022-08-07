@@ -49,11 +49,38 @@ namespace Yama.Compiler
             set;
         }
 
+        private bool isUsed = true;
+
         public bool IsUsed
+        {
+            get
+            {
+                if (this.CleanMemoryUseErkenner is not null && this.CleanMemoryLocation is not null)
+                {
+                    int order = this.CleanMemoryUseErkenner.ArgumentsCalls.Max(t=>t.Calls.Max(t=>t.Order));
+
+                    return order < this.CleanMemoryLocation.Order;
+                }
+
+                return this.isUsed;
+            }
+            set
+            {
+                this.isUsed = value;
+            }
+        }
+
+        public SSACompileLine? CleanMemoryLocation
         {
             get;
             set;
-        } = true;
+        }
+
+        public SSAVariableMap? CleanMemoryUseErkenner
+        {
+            get;
+            set;
+        }
 
         public List<string> PostAssemblyCommands
         {
@@ -240,7 +267,8 @@ namespace Yama.Compiler
             }
 
             SSACompileArgument? arg = lineset.Arguments.FirstOrDefault();
-            if (arg == null) return compiler.AddError("variable is not set", this.Node);
+            if (arg == null)
+                return compiler.AddError("variable is not set", this.Node);
             if (arg.Reference is null) return compiler.AddError("no reference", this.Node);
 
             compiler.ContainerMgmt.StackArguments.Push(new SSACompileArgument(arg.Reference));
@@ -430,15 +458,19 @@ namespace Yama.Compiler
             SSAVariableMap.LastValue lastValue = map.Value;
 
             if ( this.IsNullCheck ) lastValue = SSAVariableMap.LastValue.NotNull;
-            if ( lastValue == SSAVariableMap.LastValue.NotSet ) return compiler.AddError ( "variable is not set!", use );
+            if ( lastValue == SSAVariableMap.LastValue.NotSet )
+                return compiler.AddError ( "variable is not set!", use );
             if ( lastValue == SSAVariableMap.LastValue.NeverCall ) return compiler.AddError ( "variable is unaviable!", use );
             if ( lastValue == SSAVariableMap.LastValue.Null ) return compiler.AddError ( "variable is null", use );
             if ( lastValue == SSAVariableMap.LastValue.Unknown  ) return compiler.AddError ( "null checking for variable is missing", use );
 
-            if (map.Reference == null) return compiler.AddError("variable is not set!", deklaration.Use);
+            if (map.Reference == null)
+                return compiler.AddError("variable is not set!", deklaration.Use);
 
             SSACompileArgument arg = new SSACompileArgument(map.Reference, map);
             compiler.ContainerMgmt.StackArguments.Push(arg);
+
+            map.AddArg(arg);
 
             return true;
         }

@@ -9,6 +9,8 @@ namespace Yama.Compiler
 {
     public class SSAVariableMap
     {
+        private SSACompileLine? reference;
+        private LastValue value;
 
         #region get/set
 
@@ -32,8 +34,19 @@ namespace Yama.Compiler
         //Die Letzte Reference, bei dem die Variable gesetzt wurde
         public SSACompileLine? Reference
         {
-            get;
-            set;
+            get
+            {
+                return this.reference;
+            }
+            set
+            {
+                if (value is not null)
+                {
+                    this.First.TryToClean = false;
+                    this.TryToClean = false;
+                }
+                this.reference = value;
+            }
         }
 
         public bool IsNullable
@@ -46,8 +59,17 @@ namespace Yama.Compiler
 
         public LastValue Value
         {
-            get;
-            set;
+            get
+            {
+                return this.value;
+            }
+            set
+            {
+                this.First.TryToClean = false;
+                this.TryToClean = false;
+
+                this.value = value;
+            }
         }
 
         public List<IndexVariabelnReference> Calls
@@ -56,6 +78,11 @@ namespace Yama.Compiler
             {
                 return this.Deklaration.References;
             }
+        }
+
+        public List<SSACompileArgument> ArgumentsCalls
+        {
+            get;
         }
 
         public bool IsUsed
@@ -100,31 +127,47 @@ namespace Yama.Compiler
             get;
         }
 
+        public SSAVariableMap First
+        {
+            get;
+        }
+
+        public bool TryToClean
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
 
         public SSAVariableMap(string key, VariableType type, IndexVariabelnDeklaration dek)
         {
+            this.First = this;
             this.OrgMap = this;
             this.Key = key;
             this.Deklaration = dek;
             this.Kind = type;
             this.MutableState = VariableMutableState.NotMutable;
+            this.ArgumentsCalls = new List<SSACompileArgument>();
         }
 
         public SSAVariableMap(IndexVariabelnDeklaration dek)
         {
+            this.First = this;
             this.OrgMap = this;
             this.Key = dek.Name;
             this.Deklaration = dek;
             this.Value = LastValue.NotSet;
             this.Kind = this.GetVariableKind(dek);
             if (!dek.IsMutable) this.MutableState = VariableMutableState.NotMutable;
+            this.ArgumentsCalls = new List<SSACompileArgument>();
         }
 
         public SSAVariableMap(SSAVariableMap value)
         {
+            this.First = value.First;
             //this.AllSets.AddRange(value.AllSets);
             this.OrgMap = value;
             this.Key = value.Key;
@@ -133,11 +176,24 @@ namespace Yama.Compiler
             this.Value = value.Value;
             this.Kind = value.Kind;
             this.MutableState = value.MutableState;
+            this.ArgumentsCalls = value.ArgumentsCalls;
+            this.TryToClean = value.TryToClean;
         }
 
         #endregion ctor
 
         #region methods
+
+        public bool AddArg(SSACompileArgument arg)
+        {
+            this.TryToClean = false;
+            this.First.TryToClean = false;
+
+            this.ArgumentsCalls.Add(arg);
+
+            return true;
+        }
+
 
         private VariableType GetVariableKind(IndexVariabelnDeklaration dek)
         {

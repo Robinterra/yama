@@ -219,18 +219,30 @@ namespace Yama.Parser
 
             statementNode.Compile(request);
 
+            CompileCleanMemory cleanMemory = new CompileCleanMemory();
+            cleanMemory.Compile(request.Compiler, this);
+
             IEnumerable<KeyValuePair<string, SSAVariableMap>> variableMaps = request.Compiler.PopContainerAndReturnVariableMapperForIfs();
 
             if (this.ElseStatement is not null) jumpafterelse.Compile(request.Compiler, elsecontainer.Ende, request.Mode);
 
             ifcontainer.Ende.Compile(request.Compiler, this, request.Mode);
 
-            if (this.ElseStatement is not ICompileNode elseStatementNode) return compilePhi.Compile(request.Compiler, variableMaps, this);
+            if (this.ElseStatement is not ICompileNode elseStatementNode)
+            {
+                compilePhi.Compile(request.Compiler, variableMaps, this);
+
+                CompileCleanMemory cleanMemoryWithoutElse = new CompileCleanMemory();
+                return cleanMemoryWithoutElse.Compile(request.Compiler, this);
+            }
             if (this.ElseContainer is null) return true;
 
             request.Compiler.PushContainer(elsecontainer, this.ElseContainer.ThisUses);
 
             elseStatementNode.Compile(request);
+
+            CompileCleanMemory cleanMemoryElse = new CompileCleanMemory();
+            cleanMemoryElse.Compile(request.Compiler, this);
 
             IEnumerable<KeyValuePair<string, SSAVariableMap>> elseVariableMaps = request.Compiler.PopContainerAndReturnVariableMapperForIfs();
 
@@ -240,6 +252,9 @@ namespace Yama.Parser
 
             compilePhi = new CompilePhi();
             compilePhi.Compile(request.Compiler, elseVariableMaps, this.ElseStatement);
+
+            CompileCleanMemory cleanMemoryOnTheEnd= new CompileCleanMemory();
+            cleanMemoryOnTheEnd.Compile(request.Compiler, this);
 
             return true;
         }

@@ -98,6 +98,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public bool HasReturn
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region methods

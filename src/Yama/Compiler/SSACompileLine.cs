@@ -162,6 +162,8 @@ namespace Yama.Compiler
 
             this.Arguments.Add(arg);
 
+            arg.Calls.Add(this);
+
             if (arg.Mode != SSACompileArgumentMode.Reference) return true;
             if (arg.Reference is null) return false;
 

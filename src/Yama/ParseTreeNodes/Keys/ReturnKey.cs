@@ -124,10 +124,17 @@ namespace Yama.Parser
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
             if (request.Compiler.ContainerMgmt.CurrentMethod is null) return true;
+            if (request.Compiler.ContainerMgmt.CurrentContainer is null) return true;
+
+            request.Compiler.ContainerMgmt.CurrentContainer.HasReturn = true;
 
             foreach (KeyValuePair<string, SSAVariableMap> varilabeMap in request.Compiler.ContainerMgmt.CurrentMethod.VarMapper)
             {
                 varilabeMap.Value.Reference = null;
+                if (varilabeMap.Value.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
+
+                varilabeMap.Value.Value = SSAVariableMap.LastValue.NeverCall;
+                varilabeMap.Value.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
             }
 
             return true;
