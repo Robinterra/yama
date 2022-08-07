@@ -75,7 +75,7 @@ namespace Yama.Compiler
                 if (currentVarMap.Reference is not null) varLine.AddArgument(new SSACompileArgument(currentVarMap.Reference));
 
                 compiler.AddSSALine(varLine);
-                currentVarMap.Reference = varLine;
+                currentVarMap.reference = varLine;
             }
 
             return true;

@@ -9,7 +9,8 @@ namespace Yama.Compiler
 {
     public class SSAVariableMap
     {
-        private SSACompileLine? reference;
+        public SSACompileLine? reference;
+
         private LastValue value;
 
         #region get/set
@@ -171,9 +172,9 @@ namespace Yama.Compiler
             //this.AllSets.AddRange(value.AllSets);
             this.OrgMap = value;
             this.Key = value.Key;
-            this.Reference = value.Reference;
+            this.reference = value.Reference;
             this.Deklaration = value.Deklaration;
-            this.Value = value.Value;
+            this.value = value.Value;
             this.Kind = value.Kind;
             this.MutableState = value.MutableState;
             this.ArgumentsCalls = value.ArgumentsCalls;
