@@ -115,6 +115,19 @@ namespace Yama.Compiler
                     continue;
                 }
 
+                CompileSprungPunkt sprungPunkt = new CompileSprungPunkt();
+
+                if (map.Value == SSAVariableMap.LastValue.Unknown)
+                {
+                    map.OrgMap.Value = SSAVariableMap.LastValue.NotNull;
+
+                    CompileReferenceCall referenceCallNullCheck = new CompileReferenceCall();
+                    if (!referenceCallNullCheck.GetVariableCompile(compiler, map.Deklaration, returnKey)) continue;
+
+                    CompileJumpWithCondition jumpWithCondition = new CompileJumpWithCondition();
+                    jumpWithCondition.Compile(compiler, sprungPunkt, "isZero");
+                }
+
                 CompileReferenceCall referenceCall = new CompileReferenceCall();
                 if (!referenceCall.GetVariableCompile(compiler, map.Deklaration, returnKey)) continue;
 
@@ -131,6 +144,11 @@ namespace Yama.Compiler
 
                 CompileExecuteCall functionExecute = new CompileExecuteCall();
                 functionExecute.Compile(compiler, null);
+
+                if (map.Value == SSAVariableMap.LastValue.Unknown)
+                {
+                    sprungPunkt.Compile(compiler, returnKey);
+                }
             }
 
             return true;
