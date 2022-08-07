@@ -610,6 +610,9 @@ namespace Yama.Parser
             compilePopResult.Position = 0;
             compilePopResult.Compile(compiler, this.Deklaration.Parameters.FirstOrDefault(), "default");*/
 
+            CompileCleanMemory cleanMemory = new CompileCleanMemory();
+            cleanMemory.Compile(compiler, this, thisDek);
+
             CompileReferenceCall refCall = new CompileReferenceCall();
             refCall.CompileDek(compiler, thisDek, "default");
 

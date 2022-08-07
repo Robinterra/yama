@@ -171,6 +171,61 @@ namespace Yama.Compiler
             return true;
         }
 
+        public bool Compile(Compiler compiler, MethodeDeclarationNode declarationNode, IndexVariabelnDeklaration thisVar)
+        {
+            if (declarationNode.Deklaration is null) return true;
+
+            IndexKlassenDeklaration? klasse = declarationNode.Deklaration.Klasse;
+            if (klasse is null) return true;
+
+            foreach (IndexPropertyDeklaration propDek in klasse.IndexProperties)
+            {
+                if (propDek.Use.BorrowingToken is not null) continue;
+                if (propDek.Type.Deklaration is not IndexKlassenDeklaration ikd) continue;
+                if (ikd.MemberModifier != ClassMemberModifiers.None) continue;
+
+                IMethode? dector = ikd.Methods.FirstOrDefault();
+                if (dector is null)
+                {
+                    compiler.AddError($"type '{ikd.Name} has no dector", declarationNode);
+
+                    continue;
+                }
+
+                CompileSprungPunkt sprungPunkt = new CompileSprungPunkt();
+
+                CompileReferenceCall thisRef = new CompileReferenceCall();
+                if (!thisRef.GetVariableCompile(compiler, thisVar, declarationNode)) continue;
+
+                CompileReferenceCall referenceCallNullCheck = new CompileReferenceCall();
+                referenceCallNullCheck.Compile(compiler, new IndexVariabelnReference(declarationNode, propDek.Name) { Deklaration = propDek }, "point");
+                SSACompileArgument arg = compiler.ContainerMgmt.StackArguments.Peek();
+
+                CompileJumpWithCondition jumpWithCondition = new CompileJumpWithCondition();
+                jumpWithCondition.Compile(compiler, sprungPunkt, "isZero");
+
+                compiler.ContainerMgmt.StackArguments.Push(arg);
+                CompilePushResult compilePushResult = new CompilePushResult();
+                compilePushResult.Compile(compiler, null, "copy");
+
+                IndexVariabelnReference reference = new IndexVariabelnReference(declarationNode, "~");
+                reference.Deklaration = dector;
+
+                CompileReferenceCall compileReference = new CompileReferenceCall();
+                compileReference.CompilePoint0(compiler);
+
+                CompileReferenceCall operatorCall = new CompileReferenceCall();
+                operatorCall.Compile(compiler, reference, "funcref");
+
+                CompileExecuteCall functionExecute = new CompileExecuteCall();
+                functionExecute.Compile(compiler, null);
+
+                sprungPunkt.Compile(compiler, declarationNode);
+            }
+
+            return true;
+        }
+
         public bool Compile(Compiler compiler, WhileKey ifKey)
         {
             this.Node = ifKey;
