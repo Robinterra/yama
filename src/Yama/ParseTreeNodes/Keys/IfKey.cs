@@ -220,7 +220,7 @@ namespace Yama.Parser
             statementNode.Compile(request);
 
             CompileCleanMemory cleanMemory = new CompileCleanMemory();
-            cleanMemory.Compile(request.Compiler, this);
+            cleanMemory.Compile(request.Compiler, this, true);
 
             IEnumerable<KeyValuePair<string, SSAVariableMap>> variableMaps = request.Compiler.PopContainerAndReturnVariableMapperForIfs();
 
@@ -242,7 +242,7 @@ namespace Yama.Parser
             elseStatementNode.Compile(request);
 
             CompileCleanMemory cleanMemoryElse = new CompileCleanMemory();
-            cleanMemoryElse.Compile(request.Compiler, this);
+            cleanMemoryElse.Compile(request.Compiler, this, true);
 
             IEnumerable<KeyValuePair<string, SSAVariableMap>> elseVariableMaps = request.Compiler.PopContainerAndReturnVariableMapperForIfs();
 

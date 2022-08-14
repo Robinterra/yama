@@ -106,7 +106,7 @@ namespace Yama.Compiler
             return true;
         }
 
-        public bool Compile(Compiler compiler, IfKey ifKey)
+        public bool Compile(Compiler compiler, IfKey ifKey, bool isInIfStatementDefined = false)
         {
             this.Node = ifKey;
 
@@ -124,7 +124,8 @@ namespace Yama.Compiler
                 SSAVariableMap varmap = keyvarmap.Value;
                 if (varmap.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
                 if (varmap.Value != SSAVariableMap.LastValue.Unknown && varmap.Value != SSAVariableMap.LastValue.NotNull) continue;
-                if (varmap.TryToClean) continue;
+                if (varmap.First.TryToClean) continue;
+                if (isInIfStatementDefined && !currentContainer.Deklarations.Any(t=>t.Key == varmap.Key)) continue;
 
                 this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
             }
