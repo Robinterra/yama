@@ -79,7 +79,7 @@ namespace Yama.Compiler
 
         #region methods
 
-        public bool Compile(Compiler compiler, ReturnKey returnKey)
+        public bool Compile(Compiler compiler, ReturnKey returnKey, SSACompileLine?[] tryToCleans)
         {
             this.line.FlowTask = ProgramFlowTask.CleanMemoryReturn;
             this.Node = returnKey;
@@ -87,17 +87,17 @@ namespace Yama.Compiler
             if (compiler.ContainerMgmt.CurrentMethod is null) return false;
             CompileContainer currentMethode = compiler.ContainerMgmt.CurrentMethod;
 
+            int i = -1;
             foreach (KeyValuePair<string, SSAVariableMap> keyvarmap in currentMethode.VarMapper)
             {
+                i = i + 1;
                 SSAVariableMap varmap = keyvarmap.Value;
                 if (varmap.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
                 if (varmap.Value != SSAVariableMap.LastValue.Unknown && varmap.Value != SSAVariableMap.LastValue.NotNull) continue;
-                SSACompileLine? line = varmap.First.TryToClean;
+                tryToCleans[i] = varmap.First.TryToClean;
                 //if (varmap.TryToClean) continue;
 
                 this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
-
-                varmap.First.TryToClean = line;
             }
 
             if (!this.IsUsed) return true;

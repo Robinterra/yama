@@ -108,6 +108,8 @@ namespace Yama.Parser
         public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Statement is not ICompileNode compileNode) return false;
+            if (request.Compiler.ContainerMgmt.CurrentMethod is null) return true;
+            CompileContainer currentMethode = request.Compiler.ContainerMgmt.CurrentMethod;
 
             compileNode.Compile(request);
 
@@ -115,26 +117,31 @@ namespace Yama.Parser
             SSACompileLine? moveRegLine = movReg.Compile(request.Compiler, this);
             if (moveRegLine is null) return false;
 
+            SSACompileLine?[] tryToCleans = new SSACompileLine[currentMethode.VarMapper.Count];
+
             CompileCleanMemory cleanMemory = new CompileCleanMemory();
-            cleanMemory.Compile(request.Compiler, this);
+            cleanMemory.Compile(request.Compiler, this, tryToCleans);
 
             request.Compiler.AssemblerSequence.Add(movReg);
             request.Compiler.AddSSALine(moveRegLine);
 
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
-            if (request.Compiler.ContainerMgmt.CurrentMethod is null) return true;
             if (request.Compiler.ContainerMgmt.CurrentContainer is null) return true;
 
             request.Compiler.ContainerMgmt.CurrentContainer.HasReturn = true;
 
+            int i = -1;
             foreach (KeyValuePair<string, SSAVariableMap> varilabeMap in request.Compiler.ContainerMgmt.CurrentMethod.VarMapper)
             {
+                i = i + 1;
+
                 varilabeMap.Value.Reference = null;
                 if (varilabeMap.Value.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
 
                 varilabeMap.Value.Value = SSAVariableMap.LastValue.NeverCall;
                 varilabeMap.Value.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
+                varilabeMap.Value.First.TryToClean = tryToCleans[i];
             }
 
             return true;
