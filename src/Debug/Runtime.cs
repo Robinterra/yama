@@ -119,6 +119,14 @@ namespace Yama.Debug
 
         // -----------------------------------------------
 
+        public ICommand[] RunCommands
+        {
+            get;
+            set;
+        } = new ICommand[0x100];
+
+        // -----------------------------------------------
+
         public bool IsRun
         {
             get;
@@ -214,6 +222,11 @@ namespace Yama.Debug
             this.Commands.Add(new SubImediateCommand());
             this.Commands.Add(new SubRegisterCommand());
             this.Commands.Add(new MrsCommand());
+
+            foreach (ICommand command in this.Commands)
+            {
+                this.RunCommands[command.CommandId] = command;
+            }
         }
 
         // -----------------------------------------------
@@ -466,13 +479,15 @@ namespace Yama.Debug
 
             uint cmd = this.Command;
 
-            foreach (ICommand command in this.Commands)
+            ICommand? command = this.RunCommands[cmd];
+            if (command is null)
             {
-                if (command.CommandId != cmd) continue;
+                Console.Write("CMD: {0}, ", "UNKNOWN");
 
-                Console.Write("CMD: {0}, ", command.GetType().Name);
-                break;
+                return false;
             }
+
+            Console.Write("CMD: {0}, ", command.GetType().Name);
 
             return true;
         }
@@ -692,10 +707,10 @@ namespace Yama.Debug
 
             uint cmd = this.Command;
 
-            foreach (ICommand command in this.Commands)
-            {
-                if (command.CommandId != cmd) continue;
+            ICommand? command = this.RunCommands[cmd];
 
+            if (command is not null)
+            {
                 try
                 {
                     return command.Execute(this);
