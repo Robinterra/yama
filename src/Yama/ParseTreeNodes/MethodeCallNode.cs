@@ -209,7 +209,8 @@ namespace Yama.Parser
             {
                 if (par is not ICompileNode compileNode) continue;
 
-                IndexVariabelnDeklaration varDek = methodDeklaration.Parameters[copylist.Count - parasCount - 1];
+                int length = methodDeklaration.Parameters.Count;
+                IndexVariabelnDeklaration varDek = methodDeklaration.Parameters[length - parasCount - 1];
 
                 bool isBorrowing = false;
                 if (varDek.Use is VariabelDeklaration vd) isBorrowing = vd.BorrowingToken is not null;

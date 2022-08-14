@@ -225,22 +225,27 @@ namespace Yama.Parser
         public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Reference is null) return false;
+            if (this.Reference.Deklaration is not IndexMethodDeklaration dekCtor) return false;
 
             List<IParseTreeNode> copylist = this.Parameters;
             copylist.Reverse();
-
-            IParseTreeNode? dek = null;
 
             int parasCount = 0;
 
             foreach (IParseTreeNode par in copylist )
             {
-                dek = par;
-                if (dek is not ICompileNode compileNode) continue;
+                if (par is not ICompileNode compileNode) continue;
+
+                int length = dekCtor.Parameters.Count;
+                IndexVariabelnDeklaration varDek = dekCtor.Parameters[length - parasCount - 1];
+
+                bool isBorrowing = false;
+                if (varDek.Use is VariabelDeklaration vd) isBorrowing = vd.BorrowingToken is not null;
 
                 compileNode.Compile(request);
 
                 CompilePushResult compilePushResult = new CompilePushResult();
+                compilePushResult.ParameterType = this.GetParameterVariableMap(isBorrowing, varDek);
                 compilePushResult.Compile(request.Compiler, null, "default");
 
                 parasCount++;
@@ -257,5 +262,24 @@ namespace Yama.Parser
 
         #endregion methods
 
+        private SSAVariableMap? GetParameterVariableMap(bool isBorrowing, IndexVariabelnDeklaration vardek)
+        {
+            if (vardek.Type.Deklaration is not IndexKlassenDeklaration dk) return null;
+
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
+            if (dk.MemberModifier == ClassMemberModifiers.None)
+            {
+                kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
+
+                vardek.IsNullable = true;
+            }
+
+            SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);
+            map.MutableState = SSAVariableMap.VariableMutableState.Mutable;
+
+            return map;
+        }
+
     }
+
 }
