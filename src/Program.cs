@@ -105,7 +105,11 @@ namespace Yama
             {
                 if (command is SizeExpression) runtime.MemorySize = (uint) int.Parse(command.Value!.Replace("0x", string.Empty), System.Globalization.NumberStyles.HexNumber);
                 if (command is FileExpression && !isfirst) runtime.Arguments.Add(command.Value!);
-                if (command is FileExpression && isfirst) isfirst = false;
+                if (command is FileExpression && isfirst)
+                {
+                    runtime.Arguments.Add(command.Value!);
+                    isfirst = false;
+                }
             }
 
             return runtime.Execute();

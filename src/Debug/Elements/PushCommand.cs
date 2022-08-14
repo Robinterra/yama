@@ -23,10 +23,7 @@ namespace Yama.Debug
                 byte[] daten = System.BitConverter.GetBytes(runtime.Register[i]);
                 uint adresse = runtime.Register[13];
 
-                runtime.Memory[adresse] = daten[0];
-                runtime.Memory[adresse + 1] = daten[1];
-                runtime.Memory[adresse + 2] = daten[2];
-                runtime.Memory[adresse + 3] = daten[3];
+                Array.Copy(daten, 0, runtime.Memory, adresse, 4);
 
                 runtime.Register[13] -= 4;
             }

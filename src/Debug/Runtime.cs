@@ -375,10 +375,12 @@ namespace Yama.Debug
             this.Memory = new byte[this.MemorySize];
 
             Array.Copy(File.ReadAllBytes(this.Input.FullName), this.Memory, this.Input.Length);
-            uint length = this.MakeArguments();
 
             this.Register[15] = 0;
             this.Register[13] = this.MemorySize - 4;
+
+            uint length = this.MakeArguments();
+
             this.Register[12] = length;
 
             return true;
@@ -390,7 +392,7 @@ namespace Yama.Debug
 
             uint length = (uint)this.Input.Length;
             uint adresseArgumentsArray = length;
-            this.Register[1] = adresseArgumentsArray;
+            uint arrayPointAdress = adresseArgumentsArray;
             uint count = (uint)this.Arguments.Count;
             uint argumentAdresse = adresseArgumentsArray + 4 + count * 4;
             byte[] argTemp = BitConverter.GetBytes(count << 2);
@@ -416,6 +418,13 @@ namespace Yama.Debug
                 if (test != 0) size = (size ^ test) + 4;
                 argumentAdresse += size;
             }
+
+            byte[] daten = System.BitConverter.GetBytes(arrayPointAdress);
+            uint adresse = this.Register[13];
+
+            Array.Copy(daten, 0, this.Memory, adresse, 4);
+
+            this.Register[13] -= 4;
 
             return argumentAdresse;
         }
