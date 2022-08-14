@@ -527,7 +527,7 @@ namespace Yama.Compiler
 
             foreach (KeyValuePair<string, SSAVariableMap> varibaleMap in containerMaps)
             {
-                if (varibaleMap.Value.TryToClean) continue;
+                if (varibaleMap.Value.TryToClean is not null) continue;
                 if (varibaleMap.Value.Reference is null) continue;
                 if (!parentVarMap.ContainsKey(varibaleMap.Key)) continue;
 

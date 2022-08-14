@@ -57,9 +57,15 @@ namespace Yama.Compiler
             {
                 if (this.CleanMemoryUseErkenner is not null && this.CleanMemoryLocation is not null)
                 {
-                    int order = this.CleanMemoryUseErkenner.ArgumentsCalls.Max(t=>t.Calls.Max(t=>t.Order));
+                    if (this.CleanMemoryUseErkenner.First.TryToClean is null) return this.CleanMemoryLocation.FlowTask == ProgramFlowTask.CleanMemoryReturn;
 
-                    return order < this.CleanMemoryLocation.Order;
+                    if (this.CleanMemoryUseErkenner.First.TryToClean.Order == this.CleanMemoryLocation.Order) return true;
+
+                    return false;
+
+                    //int order = this.CleanMemoryUseErkenner.ArgumentsCalls.Max(t=>t.Calls.Max(t=>t.Order));
+
+                    //return order < this.CleanMemoryLocation.Order;
                 }
 
                 return this.isUsed;

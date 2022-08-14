@@ -40,6 +40,7 @@ namespace Yama.Compiler
         {
             if (this.Writer == null) return false;
             if (line.ReplaceLine != null) return true;
+            if (!line.Owner.IsUsed) return true;
 
             StringBuilder result = new StringBuilder();
 

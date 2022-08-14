@@ -81,6 +81,7 @@ namespace Yama.Compiler
 
         public bool Compile(Compiler compiler, ReturnKey returnKey)
         {
+            this.line.FlowTask = ProgramFlowTask.CleanMemoryReturn;
             this.Node = returnKey;
 
             if (compiler.ContainerMgmt.CurrentMethod is null) return false;
@@ -91,15 +92,17 @@ namespace Yama.Compiler
                 SSAVariableMap varmap = keyvarmap.Value;
                 if (varmap.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
                 if (varmap.Value != SSAVariableMap.LastValue.Unknown && varmap.Value != SSAVariableMap.LastValue.NotNull) continue;
-                if (varmap.First.TryToClean) continue;
-                if (varmap.TryToClean) continue;
+                SSACompileLine? line = varmap.First.TryToClean;
+                //if (varmap.TryToClean) continue;
 
                 this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
+
+                varmap.First.TryToClean = line;
             }
 
             if (!this.IsUsed) return true;
 
-            this.CallDectors(compiler, returnKey, true);
+            this.CallDectors(compiler, returnKey);
 
             compiler.AddSSALine(line);
 
@@ -124,7 +127,7 @@ namespace Yama.Compiler
                 SSAVariableMap varmap = keyvarmap.Value;
                 if (varmap.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
                 if (varmap.Value != SSAVariableMap.LastValue.Unknown && varmap.Value != SSAVariableMap.LastValue.NotNull) continue;
-                if (varmap.First.TryToClean) continue;
+                if (varmap.First.TryToClean is not null) continue;
                 if (isInIfStatementDefined && !currentContainer.Deklarations.Any(t=>t.Key == varmap.Key)) continue;
 
                 this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
@@ -157,7 +160,7 @@ namespace Yama.Compiler
                 SSAVariableMap varmap = keyvarmap.Value;
                 if (varmap.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
                 if (varmap.Value != SSAVariableMap.LastValue.Unknown && varmap.Value != SSAVariableMap.LastValue.NotNull) continue;
-                if (varmap.TryToClean) continue;
+                if (varmap.TryToClean is not null) continue;
                 if (!currentContainer.Deklarations.Any(t=>t.Key == varmap.Key)) continue;
 
                 this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
@@ -245,7 +248,7 @@ namespace Yama.Compiler
                 SSAVariableMap varmap = keyvarmap.Value;
                 if (varmap.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
                 if (varmap.Value != SSAVariableMap.LastValue.Unknown && varmap.Value != SSAVariableMap.LastValue.NotNull) continue;
-                if (varmap.TryToClean) continue;
+                if (varmap.TryToClean is not null) continue;
                 if (!currentContainer.Deklarations.Contains(varmap)) continue;
 
                 this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
@@ -335,8 +338,9 @@ namespace Yama.Compiler
                 //map.OrgMap.Kind = SSAVariableMap.VariableType.BorrowingReference;
                 if (!canBeDominated)
                 {
-                    map.OrgMap.First.TryToClean = true;
-                    map.OrgMap.TryToClean = true;
+                    if (this.line.FlowTask == ProgramFlowTask.CleanMemoryReturn) continue;
+                    map.OrgMap.First.TryToClean = this.line;
+                    map.OrgMap.TryToClean = this.line;
                 }
             }
 

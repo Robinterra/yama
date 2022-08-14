@@ -43,8 +43,8 @@ namespace Yama.Compiler
             {
                 if (value is not null)
                 {
-                    this.First.TryToClean = false;
-                    this.TryToClean = false;
+                    this.First.TryToClean = null;
+                    this.TryToClean = null;
                 }
                 this.reference = value;
             }
@@ -66,8 +66,8 @@ namespace Yama.Compiler
             }
             set
             {
-                this.First.TryToClean = false;
-                this.TryToClean = false;
+                this.First.TryToClean = null;
+                this.TryToClean = null;
 
                 this.value = value;
             }
@@ -133,7 +133,13 @@ namespace Yama.Compiler
             get;
         }
 
-        public bool TryToClean
+        /*public bool TryToClean
+        {
+            get;
+            set;
+        }*/
+
+        public SSACompileLine? TryToClean
         {
             get;
             set;
@@ -187,8 +193,8 @@ namespace Yama.Compiler
 
         public bool AddArg(SSACompileArgument arg)
         {
-            this.TryToClean = false;
-            this.First.TryToClean = false;
+            this.TryToClean = null;
+            this.First.TryToClean = null;
 
             this.ArgumentsCalls.Add(arg);
 
