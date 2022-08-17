@@ -117,6 +117,7 @@ namespace Yama.Compiler
             if (compiler.ContainerMgmt.CurrentContainer is null) return false;
             CompileContainer currentMethode = compiler.ContainerMgmt.CurrentMethod;
             CompileContainer currentContainer = compiler.ContainerMgmt.CurrentContainer;
+            CompileContainer? currentLoop = compiler.ContainerMgmt.CurrentLoop;
 
             if (currentContainer.HasReturn) return true;
             SSACompileLine? firstLine = currentContainer.Lines.FirstOrDefault();
@@ -129,6 +130,7 @@ namespace Yama.Compiler
                 if (varmap.Value != SSAVariableMap.LastValue.Unknown && varmap.Value != SSAVariableMap.LastValue.NotNull) continue;
                 if (varmap.First.TryToClean is not null) continue;
                 if (isInIfStatementDefined && !currentContainer.Deklarations.Any(t=>t.Key == varmap.Key)) continue;
+                if (currentLoop is not null && !currentContainer.Deklarations.Contains(varmap)) continue;
 
                 this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
             }
