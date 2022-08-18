@@ -11,10 +11,10 @@ namespace Yama.Assembler
             get;
         }
 
-        string Format
+        /*string Format
         {
             get;
-        }
+        }*/
 
         uint CommandId
         {

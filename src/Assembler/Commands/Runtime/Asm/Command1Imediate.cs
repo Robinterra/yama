@@ -16,7 +16,7 @@ namespace Yama.Assembler.Runtime
             get;
         }
 
-        public string Format
+        public IFormat Format
         {
             get;
         }
@@ -44,13 +44,17 @@ namespace Yama.Assembler.Runtime
             set;
         }
 
-        public uint Condition { get; set; }
+        public uint Condition
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
         #region ctor
 
-        public Command1Imediate(string key, string format, uint id, int size, uint condition = 0)
+        public Command1Imediate(string key, IFormat format, uint id, int size, uint condition = 0)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -79,9 +83,6 @@ namespace Yama.Assembler.Runtime
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
-            IFormat? format = request.Assembler.GetFormat(this.Format);
-            if (format is null) return false;
-
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.Arguments.Add(this.Condition);
@@ -89,7 +90,7 @@ namespace Yama.Assembler.Runtime
             assembleFormat.Arguments.Add(0);
             assembleFormat.Arguments.Add(Convert.ToUInt32(t.Argument1.Token.Value));
 
-            if (!format.Assemble(assembleFormat)) return false;
+            if (!Format.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new Command1Imediate(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());
