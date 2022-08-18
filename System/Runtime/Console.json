@@ -70,5 +70,85 @@
         ],
         "KeyPatterns": [
         ]
+    },
+    {
+        "Name": "arm-a32-linux",
+        "Algos": [
+            {
+                "Name": "Console",
+                "Mode": "Print",
+                "Description": "Print int",
+                "Keys": [
+
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "push {r0, r2}",
+                "mov r0, #1",
+                "mov r1, [SSAPOP[0]]",
+                "mov r2, #4",
+                "svc #0",
+                "pop {r0, r2}"
+                ]
+            },
+            {
+                "Name": "Console",
+                "Mode": "PrintText",
+                "Description": "Print Text",
+                "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "1"
+                        ]
+                      }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "push {r0, r2, r7}",
+                    "mov r0, #1",
+                    "mov r1, [SSAPOP[0]]",
+                    "ldr r2, [r1,#0]",
+                    "add r1, r1, #4",
+                    "mov r7, #4",
+                    "svc #0",
+                    "pop {r0, r2, r7}"
+                ]
+            },
+            {
+                "Name": "Console",
+                "Mode": "Read",
+                "Description": "Read int",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "mov r12, #2",
+                "exec r12"
+                ]
+            },
+            {
+                "Name": "Console",
+                "Mode": "ReadText",
+                "Description": "Read Text",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "mov r12, #5",
+                "exec r12"
+                ]
+            }
+       ],
+        "AdvancedKeyReplaces": [
+        ],
+        "KeyPatterns": [
+        ]
     }
 ]

@@ -1,0 +1,541 @@
+{
+    "Name": "arm-a32-linux",
+    "CalculationBytes": 4,
+    "AdressBytes": 4,
+    "WorkingRegisterStart": 3,
+    "PlaceToKeepRegisterStart": 1,
+    "WorkingRegisterLast": 10,
+    "PlaceToKeepRegisterLast": 2,
+    "FramePointer":11,
+    "ResultRegister":12,
+    "Algos": [
+      {
+        "Name": "ReferenceCall",
+        "Mode": "default",
+        "Description": "Der aufruf einer ganz normalen Variabel",
+        "Keys": [
+          {
+            "Name": "[VAR]",
+            "Values": [
+            ]
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "ldr [SSAPUSH],[VAR[0]]"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "point",
+        "Description": "Der aufruf eines Property einer Instance",
+        "Keys": [
+          {
+            "Name": "[PROPERTY]",
+            "Values": [
+            ]
+          },
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "ldr [SSAPUSH],[[SSAPOP[0]],[PROPERTY[0]]]"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "setpoint",
+        "Description": "Der setzen eines Property einer Instance",
+        "Keys": [
+          {
+            "Name": "[PROPERTY]",
+            "Values": [
+            ]
+          },
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "2"
+            ]
+          }
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "str [SSAPOP[1]],[[SSAPOP[0]],[PROPERTY[0]]]"
+        ]
+      },
+      {
+        "Name": "RefCallStack",
+        "Mode": "Set",
+        "Description": "Der setzen eines Property einer Instance",
+        "Keys": [
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "str [NAME],[r11,#[STACKVAR]]"
+        ]
+      },
+      {
+        "Name": "RefCallStack",
+        "Mode": "Get",
+        "Description": "Der setzen eines Property einer Instance",
+        "Keys": [
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "ldr [NAME],[r11,#[STACKVAR]]"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "methode",
+        "Description": "Der aufruf einer ganz normalen Methode",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "ldr [SSAPUSH], =[NAME]"
+        ]
+      },
+      {
+        "Name": "Data",
+        "Mode": "default",
+        "Description": "Datensatz",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          },
+          {
+            "Name": "[DATA]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          ".data [NAME]=[DATA]"
+        ]
+      },
+      {
+        "Name": "Data",
+        "Mode": "datalist",
+        "Description": "Datensatz",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          },
+          {
+            "Name": "[DATA]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          ".datalist [NAME]={[DATA]}"
+        ]
+      },
+      {
+        "Name": "ReferenceCall",
+        "Mode": "set",
+        "Description": "Kopieren einer variable bei bedarf",
+        "Keys": [
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "mov [SSAPUSH],[SSAPOP[0]]"
+        ]
+      },
+      {
+        "Name": "ExecuteCall",
+        "Mode": "default",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "blx [SSAPOP[0]]"
+        ]
+      },
+      
+      {
+        "Name": "ExecuteCall",
+        "Mode": "result",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "mov [SSAPUSH], r12"
+        ]
+      },
+      {
+        "Name": "PopResult",
+        "Mode": "default",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [
+          {
+            "Name": "[stackpos]",
+            "Values": [
+            ]
+          }
+        ],
+        "AssemblyCommands": [
+          "ldr [SSAPUSH], [r1, #[stackpos]]"
+        ]
+      },
+      {
+        "Name": "PushResult",
+        "Mode": "default",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "push { [SSAPOP[0]] }"
+        ]
+      },
+      {
+        "Name": "PushResult",
+        "Mode": "revoke",
+        "Description": "Aufruf einer Funktion",
+        "Keys": [
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "pop { [SSAPOP[0]] }"
+        ]
+      },
+      {
+        "Name": "FunktionsDeklaration",
+        "Mode": "default",
+        "Description": "Die Deklaration einer Funktion",
+        "Keys": [
+          {
+            "Name": "[NAME]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [
+          {
+            "Name": "[PUSHREG]",
+            "Values": null
+          },
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
+          },
+          {
+            "Name": "[stackpushcount]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "[NAME]:",
+          "push {[PUSHREG]lr}"
+        ]
+      },
+      {
+        "Name": "FunktionsDeklaration",
+        "Mode": "stackpushcount",
+        "Description": "Die Deklaration einer Funktion",
+        "Keys": [
+        ],
+        "PostKeys": [
+        ],
+        "AssemblyCommands": [
+          "add r1, sp, #[stackpushcount]"
+        ]
+      },
+      {
+        "Name": "FunktionsDeklaration",
+        "Mode": "virtuel",
+        "Description": "Die Deklaration einer Funktion",
+        "Keys": [
+        ],
+        "PostKeys": [
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "sub sp, sp, #[virtuelRegister]",
+          "mov r11,sp"
+        ]
+      },
+      {
+        "Name": "FunktionsEnde",
+        "Mode": "default",
+        "Description": "Das ende einer Funktion",
+        "Keys": [
+        ],
+        "PostKeys": [
+          {
+            "Name": "[POPREG]",
+            "Values": null
+          },
+          {
+            "Name": "[stackcount]",
+            "Values": null
+          },
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "pop {[POPREG]lr}",
+          "add sp, sp, #[stackcount]",
+          "bx lr"
+        ]
+      },
+      {
+        "Name": "FunktionsEnde",
+        "Mode": "virtuel",
+        "Description": "Das ende einer Funktion",
+        "Keys": [
+        ],
+        "PostKeys": [
+          {
+            "Name": "[virtuelRegister]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "add sp, sp, #[virtuelRegister]"
+        ]
+      },
+      {
+        "Name": "NumConst",
+        "Mode": "default",
+        "Description": "Die Konstante in das Register laden",
+        "Keys": [
+          {
+            "Name": "[NUMCONST]",
+            "Values": []
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "mov [SSAPUSH],#[NUMCONST[0]]"
+        ]
+      },
+      {
+        "Name": "MovReg",
+        "Mode": "default",
+        "Description": "Um den return einer einzelnen Variable zu ermöglichen",
+        "Keys": [
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "mov [SSAPUSH],[SSAPOP[0]]"
+        ]
+      },
+      {
+        "Name": "CompileHeader",
+        "Mode": "default",
+        "Description": "Das setzen des Headers, hier wird der Stack und der Heap initialisiert",
+        "Keys": [
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          ".syntax unified",
+          "mov r0, r12",
+          "mov r10,r0",
+          "ldr r11,=0x1",
+          "sub r12,sp,r10",
+          "str r11,[r10,#0]",
+          "str r12,[r10,#4]",
+          "ldr r12,=main",
+          "blx r12",
+          "mov r0, r12",
+          "mov r7, #1",
+          "svc #0"
+        ]
+      },
+      {
+        "Name": "JumpTo",
+        "Mode": "default",
+        "Description": "Springt zum ziel punkt",
+        "Keys": [
+          {
+            "Name": "[JUMPTO]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "b [JUMPTO]"
+        ]
+      },
+      {
+        "Name": "JumpWithCondition",
+        "Mode": "isZero",
+        "Description": "Springt zum ziel punkt wenn ist 0",
+        "Keys": [
+          {
+            "Name": "[JUMPTO]",
+            "Values": null
+          },
+          {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "1"
+            ]
+          }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "cmp [SSAPOP[0]], #0",
+          "beq [JUMPTO]"
+        ]
+      },
+      {
+        "Name": "SprungPunkt",
+        "Mode": "default",
+        "Description": "Das setzen eines sprungounktes",
+        "Keys": [],
+        "PostKeys": [],
+        "AssemblyCommands": [
+          "[NAME]:"
+        ]
+      }
+    ],
+    "ZuweisungsRegister": 0,
+    "AviableRegisters": [
+      "r0",
+      "r1",
+      "r2",
+      "r3",
+      "r4",
+      "r5",
+      "r6",
+      "r7",
+      "r8",
+      "r9",
+      "r10",
+      "r11",
+      "r12",
+      "sp",
+      "lr",
+      "pc"
+    ],
+    "AdvancedKeyReplaces": [
+    ],
+    "KeyPatterns": [
+      {
+        "Key": "[NUMCONST]",
+        "Pattern": "0x{0:X}"
+      },
+      {
+        "Key": "[PROPERTY]",
+        "Pattern": "#0x{0:X}"
+      },
+      {
+        "Key": "[VARCOUNT]",
+        "Pattern": "0x{0:X}"
+      },
+      {
+        "Key": "[VAR]",
+        "Pattern": "[sp,#{0}]"
+      },
+      {
+        "Key":"JUMPHELPER",
+        "Pattern":"JUMPHELPER_{0}"
+      },
+      {
+        "Key": "[POPREG]",
+        "Pattern": "{0},{1}"
+      },
+      {
+        "Key":"[PUSHREG]",
+        "Pattern":"{0},{1}"
+      }
+    ]
+  }
