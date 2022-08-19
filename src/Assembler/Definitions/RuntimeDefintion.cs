@@ -47,14 +47,14 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new Command3Register("lsr", format1, 0x59, 4));
             definition.Commands.Add(new Command3Register("lsl", format1, 0x5A, 4));
 
-            definition.Commands.Add(new Command1Register("bx", "Format1", 0x30, 4));
-            definition.Commands.Add(new Command1Register("blx", "Format1", 0x31, 4));
+            definition.Commands.Add(new Command1Register("bx", format1, 0x30, 4));
+            definition.Commands.Add(new Command1Register("blx", format1, 0x31, 4));
 
-            definition.Commands.Add(new Command1Register("exec", "Format1", 0xFF, 4));
+            definition.Commands.Add(new Command1Register("exec", format1, 0xFF, 4));
             //definition.Commands.Add(new Command1Register("end", "Format1", 0xFE, 4));
 
-            definition.Commands.Add(new Command2Register("mov", "Format1", 0x5E, 4));
-            definition.Commands.Add(new Command2Register("cmp", "Format1", 0x5F, 4));
+            definition.Commands.Add(new Command2Register("mov", format1, 0x5E, 4));
+            definition.Commands.Add(new Command2Register("cmp", format1, 0x5F, 4));
 
             return true;
         }
@@ -62,25 +62,26 @@ namespace Yama.Assembler.Definitions
         // -----------------------------------------------
         private bool RuntimeFormat2Def(AssemblerDefinition definition)
         {
-            definition.Formats.Add(new Format2());
+            Format2 format2 = new Format2();
+            definition.Formats.Add(format2);
 
-            definition.Commands.Add(new Command2Register1Imediate("add", "Format2", 0x10, 4));
-            definition.Commands.Add(new Command2Register1Imediate("adc", "Format2", 0x11, 4));
-            definition.Commands.Add(new Command2Register1Imediate("sub", "Format2", 0x12, 4));
-            definition.Commands.Add(new Command2Register1Imediate("sbc", "Format2", 0x13, 4));
-            definition.Commands.Add(new Command2Register1Imediate("mul", "Format2", 0x14, 4));
-            definition.Commands.Add(new Command2Register1Imediate("div", "Format2", 0x15, 4));
-            definition.Commands.Add(new Command2Register1Imediate("and", "Format2", 0x16, 4));
-            definition.Commands.Add(new Command2Register1Imediate("eor", "Format2", 0x17, 4));
-            definition.Commands.Add(new Command2Register1Imediate("orr", "Format2", 0x18, 4));
-            definition.Commands.Add(new Command2Register1Imediate("lsr", "Format2", 0x19, 4));
-            definition.Commands.Add(new Command2Register1Imediate("lsl", "Format2", 0x1A, 4));
+            definition.Commands.Add(new Command2Register1Imediate("add", format2, 0x10, 4));
+            definition.Commands.Add(new Command2Register1Imediate("adc", format2, 0x11, 4));
+            definition.Commands.Add(new Command2Register1Imediate("sub", format2, 0x12, 4));
+            definition.Commands.Add(new Command2Register1Imediate("sbc", format2, 0x13, 4));
+            definition.Commands.Add(new Command2Register1Imediate("mul", format2, 0x14, 4));
+            definition.Commands.Add(new Command2Register1Imediate("div", format2, 0x15, 4));
+            definition.Commands.Add(new Command2Register1Imediate("and", format2, 0x16, 4));
+            definition.Commands.Add(new Command2Register1Imediate("eor", format2, 0x17, 4));
+            definition.Commands.Add(new Command2Register1Imediate("orr", format2, 0x18, 4));
+            definition.Commands.Add(new Command2Register1Imediate("lsr", format2, 0x19, 4));
+            definition.Commands.Add(new Command2Register1Imediate("lsl", format2, 0x1A, 4));
 
-            definition.Commands.Add(new Command1Register1Container("ldr", "Format2", 0x1B, 4, 15, 4));
-            definition.Commands.Add(new Command1Register1Container("str", "Format2", 0x1C, 4, 15, 4));
+            definition.Commands.Add(new Command1Register1Container("ldr", format2, 0x1B, 4, 15, 4));
+            definition.Commands.Add(new Command1Register1Container("str", format2, 0x1C, 4, 15, 4));
 
-            definition.Commands.Add(new Command1RegisterJumpPoint("ldr", "Format2", 0x1B, 8, 0xF));
-            definition.Commands.Add(new Command1RegisterConst("ldr", "Format2", 0x1B, 8, 0xF));
+            definition.Commands.Add(new Command1RegisterJumpPoint("ldr", format2, 0x1B, 8, 0xF));
+            definition.Commands.Add(new Command1RegisterConst("ldr", format2, 0x1B, 8, 0xF));
 
             return true;
         }
@@ -90,21 +91,21 @@ namespace Yama.Assembler.Definitions
             Format3 format3 = new Format3();
             definition.Formats.Add(format3);
 
-            definition.Commands.Add(new Command1Imediate("mov", format3, 0x2E, 4));
-            definition.Commands.Add(new Command1Imediate("cmp", format3, 0x2F, 4));
+            definition.Commands.Add(new Command1Imediate("mov", format3, 0x2E, 4, 0xFFFF));
+            definition.Commands.Add(new Command1Imediate("cmp", format3, 0x2F, 4, 0xFFFF));
 
-            definition.Commands.Add(new CommandF3List("push", "Format3", 0x40, 4, 15));
-            definition.Commands.Add(new CommandF3List("pop", "Format3", 0x41, 4, 15));
+            definition.Commands.Add(new CommandF3List("push", format3, 0x40, 4, 15));
+            definition.Commands.Add(new CommandF3List("pop", format3, 0x41, 4, 15));
 
-            definition.Commands.Add(new Command1Register("mrs", "Format3", 0x42, 4));
+            definition.Commands.Add(new Command1Register("mrs", format3, 0x42, 4));
 
-            definition.Commands.Add(new CommandJumpPoint("b", "Format3", 0x32, 4, 0x1FFFF, 0));
-            definition.Commands.Add(new CommandJumpPoint("beq", "Format3", 0x32, 4, 0x1FFFF, 1));
-            definition.Commands.Add(new CommandJumpPoint("bne", "Format3", 0x32, 4, 0x1FFFF, 2));
-            definition.Commands.Add(new CommandJumpPoint("bgt", "Format3", 0x32, 4, 0x1FFFF, 3));
-            definition.Commands.Add(new CommandJumpPoint("bge", "Format3", 0x32, 4, 0x1FFFF, 4));
-            definition.Commands.Add(new CommandJumpPoint("blt", "Format3", 0x32, 4, 0x1FFFF, 5));
-            definition.Commands.Add(new CommandJumpPoint("ble", "Format3", 0x32, 4, 0x1FFFF, 6));
+            definition.Commands.Add(new CommandJumpPoint("b", format3, 0x32, 4, 0x1FFFF, 0));
+            definition.Commands.Add(new CommandJumpPoint("beq", format3, 0x32, 4, 0x1FFFF, 1));
+            definition.Commands.Add(new CommandJumpPoint("bne", format3, 0x32, 4, 0x1FFFF, 2));
+            definition.Commands.Add(new CommandJumpPoint("bgt", format3, 0x32, 4, 0x1FFFF, 3));
+            definition.Commands.Add(new CommandJumpPoint("bge", format3, 0x32, 4, 0x1FFFF, 4));
+            definition.Commands.Add(new CommandJumpPoint("blt", format3, 0x32, 4, 0x1FFFF, 5));
+            definition.Commands.Add(new CommandJumpPoint("ble", format3, 0x32, 4, 0x1FFFF, 6));
 
             definition.Commands.Add(new CommandData());
             definition.Commands.Add(new CommandDataList(4));

@@ -16,7 +16,7 @@ namespace Yama.Assembler.Runtime
             get;
         }
 
-        public string Format
+        public IFormat Format
         {
             get;
         }
@@ -52,7 +52,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command1RegisterJumpPoint(string key, string format, uint id, int size, uint condition = 0)
+        public Command1RegisterJumpPoint(string key, IFormat format, uint id, int size, uint condition = 0)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -81,17 +81,13 @@ namespace Yama.Assembler.Runtime
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
-            IFormat? format = request.Assembler.GetFormat(this.Format);
-            if (format is null) return false;
-
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(this.Condition);
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister("pc"));
-            assembleFormat.Arguments.Add(0);
+            assembleFormat.Condition = this.Condition;
+            assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
+            assembleFormat.RegisterInputLeft = request.GetRegister("pc");
 
-            if (!format.Assemble(assembleFormat)) return false;
+            if (!Format.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new Command1RegisterJumpPoint(this, request.Node, assembleFormat.Result));
 

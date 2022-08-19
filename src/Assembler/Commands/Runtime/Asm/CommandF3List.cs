@@ -16,7 +16,7 @@ namespace Yama.Assembler.Runtime
             get;
         }
 
-        public string Format
+        public IFormat Format
         {
             get;
         }
@@ -47,7 +47,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public CommandF3List(string key, string format, uint id, int size, int max)
+        public CommandF3List(string key, IFormat format, uint id, int size, int max)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -74,9 +74,6 @@ namespace Yama.Assembler.Runtime
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
             if (!(request.Node is CommandWithList t)) return false;
 
-            IFormat? format = request.Assembler.GetFormat(this.Format);
-            if (format is null) return false;
-
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
 
@@ -88,12 +85,10 @@ namespace Yama.Assembler.Runtime
                 registerlist |= (uint) 1 << (int)request.Assembler.GetRegister(token.Text);
             }
 
-            assembleFormat.Arguments.Add(0);
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister("sp"));
-            assembleFormat.Arguments.Add(0);
-            assembleFormat.Arguments.Add(registerlist);
+            assembleFormat.RegisterDestionation = request.GetRegister("sp");
+            assembleFormat.Immediate = registerlist;
 
-            if (!format.Assemble(assembleFormat)) return false;
+            if (!Format.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new CommandF3List(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());

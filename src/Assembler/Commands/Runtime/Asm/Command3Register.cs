@@ -78,10 +78,10 @@ namespace Yama.Assembler.Runtime
 
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(0);
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument1.Token.Text));
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument2.Token.Text));
+            assembleFormat.Condition = 0;
+            assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
+            assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
+            assembleFormat.RegisterInputRight = request.GetRegister(t.Argument2.Token.Text);
 
             if (!Format.Assemble(assembleFormat)) return false;
 

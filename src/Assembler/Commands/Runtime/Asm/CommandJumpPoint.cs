@@ -16,7 +16,7 @@ namespace Yama.Assembler.Runtime
             get;
         }
 
-        public string Format
+        public IFormat Format
         {
             get;
         }
@@ -52,7 +52,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public CommandJumpPoint(string key, string format, uint id, int size, uint max, uint condition = 0)
+        public CommandJumpPoint(string key, IFormat format, uint id, int size, uint max, uint condition = 0)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -100,17 +100,12 @@ namespace Yama.Assembler.Runtime
                 if (target < smaleentity) return false;
             }
 
-            IFormat? format = request.Assembler.GetFormat(this.Format);
-            if (format is null) return false;
-
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(this.Condition);
-            assembleFormat.Arguments.Add(0);
-            assembleFormat.Arguments.Add(0);
-            assembleFormat.Arguments.Add(target >> 2);
+            assembleFormat.Condition = this.Condition;
+            assembleFormat.Immediate = target >> 2;
 
-            if (!format.Assemble(assembleFormat)) return false;
+            if (!Format.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new CommandJumpPoint(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());

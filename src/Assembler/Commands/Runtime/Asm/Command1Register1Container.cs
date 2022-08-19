@@ -16,7 +16,7 @@ namespace Yama.Assembler.Runtime
             get;
         }
 
-        public string Format
+        public IFormat Format
         {
             get;
         }
@@ -50,7 +50,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command1Register1Container(string key, string format, uint id, int size, int maxregister, uint teiler, bool issptwo = false)
+        public Command1Register1Container(string key, IFormat format, uint id, int size, int maxregister, uint teiler, bool issptwo = false)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -84,18 +84,13 @@ namespace Yama.Assembler.Runtime
             if (s.Number is null) return false;
             if (Convert.ToUInt32(s.Number.Value) % this.Teiler != 0) return false;
 
-            IFormat? format = request.Assembler.GetFormat(this.Format);
-            if (format is null) return false;
-
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(0);
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(s.Token.Text));
-            assembleFormat.Arguments.Add(Convert.ToUInt32(s.Number.Value) / this.Teiler);
+            assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
+            assembleFormat.RegisterInputLeft = request.GetRegister(s.Token.Text);
+            assembleFormat.Immediate = Convert.ToUInt32(s.Number.Value) / this.Teiler;
 
-            if (!format.Assemble(assembleFormat))
-                return false;
+            if (!Format.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new Command1Register1Container(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());

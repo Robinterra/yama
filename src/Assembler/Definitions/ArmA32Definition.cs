@@ -45,11 +45,8 @@ namespace Yama.Assembler.Definitions
             ArmAFormat3 format3 = new ArmAFormat3();
             definition.Formats.Add(format3);
 
-            ArmAFormat3 format4 = new ArmAFormat3();
-            definition.Formats.Add(format4);
-
-            definition.Commands.Add(new Command1Imediate("mov", format3, 0x30, 4));
-            definition.Commands.Add(new Command1Imediate("cmp", format4, 0x35, 4));
+            definition.Commands.Add(new Command1Imediate("mov", format3, 0x3A, 4, 0xFFF));
+            definition.Commands.Add(new Command1Imediate("cmp", format3, 0x35, 4, 0xFFF, true));
         }
 
         private bool GenerateRegister(AssemblerDefinition definition)
