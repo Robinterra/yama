@@ -21,14 +21,39 @@ namespace Yama.Assembler.Definitions
             assembler.Definition.ProgramCounterIncress = 4;
             assembler.Definition.CommandEntitySize = 4;
 
-            this.T3ImmediateDefinitionen ( assembler.Definition );
             this.T3RegisterDefinitionen ( assembler.Definition );
             //this.T3asrDefinition ( assembler.Definition );
             //this.T1RegisterDefinition ( assembler.Definition );
-            //this.BranchesDefinitionen ( assembler.Definition );
+            ArmAFormat2 format2 = this.BranchesDefinitionen ( assembler.Definition );
+            this.T3ImmediateDefinitionen ( assembler.Definition, format2 );
             this.GenerateRegister ( assembler.Definition );
 
             return assembler;
+        }
+
+        private ArmAFormat2 BranchesDefinitionen(AssemblerDefinition definition)
+        {
+            ArmAFormat2 format2 = new ArmAFormat2(this);
+            definition.Formats.Add(format2);
+
+            ArmAFormat4 format4 = new ArmAFormat4(this);
+            definition.Formats.Add(format4);
+
+            definition.Commands.Add(new Command1Register("blx", format4, 0x12, 4, sonder: 3));
+            definition.Commands.Add(new Command1Register("bx", format4, 0x12, 4, sonder: 1));
+
+            definition.Commands.Add(new CommandJumpPoint("b", format2, 0xA, 4, 0xFFFFFF, ConditionMode.Always));
+            definition.Commands.Add(new CommandJumpPoint("beq", format2, 0xA, 4, 0xFFFFFF, ConditionMode.Equal));
+            definition.Commands.Add(new CommandJumpPoint("bne", format2, 0xA, 4, 0xFFFFFF, ConditionMode.NotEqual));
+            definition.Commands.Add(new CommandJumpPoint("bgt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThan));
+            definition.Commands.Add(new CommandJumpPoint("bge", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThanOrEqual));
+            definition.Commands.Add(new CommandJumpPoint("blt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedLessThan));
+            definition.Commands.Add(new CommandJumpPoint("ble", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThanOrEqual));
+
+            definition.Commands.Add(new CommandData());
+            definition.Commands.Add(new CommandDataList(4));
+
+            return format2;
         }
 
         private void T3RegisterDefinitionen(AssemblerDefinition definition)
@@ -36,12 +61,15 @@ namespace Yama.Assembler.Definitions
             ArmAFormat1 format1 = new ArmAFormat1(this);
             definition.Formats.Add(format1);
 
+            definition.Commands.Add(new Command2Register("cmp", format1, 0x15, 4, true));
+
             definition.Commands.Add(new Command3Register("adc", format1, 0x0A, 4));
             definition.Commands.Add(new Command3Register("add", format1, 0x08, 4));
             definition.Commands.Add(new Command3Register("and", format1, 0x00, 4));
+            definition.Commands.Add(new Command3Register("eor", format1, 0x02, 4));
         }
 
-        private void T3ImmediateDefinitionen(AssemblerDefinition definition)
+        private void T3ImmediateDefinitionen(AssemblerDefinition definition, ArmAFormat2 format2)
         {
             ArmAFormat3 format3 = new ArmAFormat3(this);
             definition.Formats.Add(format3);
@@ -49,8 +77,15 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new Command1Imediate("mov", format3, 0x3A, 4, 0xFFF));
             definition.Commands.Add(new Command1Imediate("cmp", format3, 0x35, 4, 0xFFF, true));
 
+            definition.Commands.Add(new Command2Register1Imediate("adc", format3, 0x2A, 4));
             definition.Commands.Add(new Command2Register1Imediate("add", format3, 0x28, 4));
             definition.Commands.Add(new Command2Register1Imediate("and", format3, 0x20, 4));
+            definition.Commands.Add(new Command2Register1Imediate("eor", format3, 0x22, 4));
+
+            definition.Commands.Add(new Command1Register1Container("ldr", format3, 0x51, 4, 15, 1));
+
+            definition.Commands.Add(new ArmLdrJumpPoint("ldr", format3, 0x51, format2, 0xa, 12));
+            definition.Commands.Add(new ArmLdrConst("ldr", format3, 0x51, format2, 0xa, 12));
         }
 
         private bool GenerateRegister(AssemblerDefinition definition)

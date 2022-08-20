@@ -8,6 +8,7 @@ namespace Yama.Assembler.Runtime
 {
     public class Command2Register : ICommand
     {
+        private bool IsCmp;
 
         #region get/set
 
@@ -47,13 +48,14 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command2Register(string key, IFormat format, uint id, int size)
+        public Command2Register(string key, IFormat format, uint id, int size, bool iscmp = false)
         {
             this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
+            this.IsCmp = iscmp;
         }
 
         public Command2Register(Command2Register t, IParseTreeNode node, List<byte> bytes)
@@ -78,8 +80,16 @@ namespace Yama.Assembler.Runtime
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.Arguments.Add(0);
-            assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
-            assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
+            if (!this.IsCmp)
+            {
+                assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
+                assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
+            }
+            else
+            {
+                assembleFormat.RegisterInputRight = request.GetRegister(t.Argument1.Token.Text);
+                assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument0.Token.Text);
+            }
 
             if (!Format.Assemble(assembleFormat)) return false;
 

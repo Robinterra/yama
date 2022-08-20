@@ -53,6 +53,11 @@ namespace Yama.Assembler
         } = new List<byte>();
         public bool Sonder { get; set; }
         public bool Sonder2 { get; set; }
+
+        public RequestAssembleFormat()
+        {
+            this.Condition = ConditionMode.Always;
+        }
     }
 
     public enum ConditionMode
