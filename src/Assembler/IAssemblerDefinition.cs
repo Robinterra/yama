@@ -11,6 +11,7 @@ namespace Yama.Assembler
 
         Assembler SetupDefinition(Assembler assembler);
 
+        uint GetCondition(ConditionMode condition);
     }
 
 }

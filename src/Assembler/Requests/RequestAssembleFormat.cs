@@ -22,7 +22,7 @@ namespace Yama.Assembler
             set;
         }
 
-        public uint Condition
+        public ConditionMode Condition
         {
             get;
             set;
@@ -53,6 +53,24 @@ namespace Yama.Assembler
         } = new List<byte>();
         public bool Sonder { get; set; }
         public bool Sonder2 { get; set; }
+    }
+
+    public enum ConditionMode
+    {
+        None,
+        Never,
+        Equal,
+        NotEqual,
+        UnsignedLessThan,
+        UnsignedLessThanOrEqual,
+        UnsignedGreaterThanOrEqual,
+        UnsignedGreaterThan,
+        SignedGreaterThanOrEqual,
+        SignedLessThan,
+        SignedGreaterThan,
+        SignedLessThanOrEqual,
+        Always,
+        SkipNext
     }
 
     public enum ArgumentMode

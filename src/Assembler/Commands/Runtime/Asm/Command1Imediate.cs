@@ -49,7 +49,7 @@ namespace Yama.Assembler.Runtime
             set;
         }
 
-        public uint Condition
+        public ConditionMode Condition
         {
             get;
             set;
@@ -59,7 +59,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command1Imediate(string key, IFormat format, uint id, int size, int maxsize, bool iscmp = false, uint condition = 0)
+        public Command1Imediate(string key, IFormat format, uint id, int size, int maxsize, bool iscmp = false, ConditionMode condition = ConditionMode.Always)
         {
             this.Node = new ParserError();
             this.Key = key;

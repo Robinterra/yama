@@ -37,7 +37,7 @@ namespace Yama.Assembler.Runtime
             set;
         }
         public uint Maximum { get; private set; }
-        public uint Condition
+        public ConditionMode Condition
         {
             get;
             set;
@@ -52,7 +52,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public CommandJumpPoint(string key, IFormat format, uint id, int size, uint max, uint condition = 0)
+        public CommandJumpPoint(string key, IFormat format, uint id, int size, uint max, ConditionMode condition = ConditionMode.Always)
         {
             this.Node = new ParserError();
             this.Key = key;

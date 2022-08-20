@@ -176,6 +176,10 @@ namespace Yama.Assembler.Definitions
             return assembler;
         }
 
+        public uint GetCondition(ConditionMode condition)
+        {
+            return 0;
+        }
     }
 
 }

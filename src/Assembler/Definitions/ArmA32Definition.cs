@@ -33,20 +33,24 @@ namespace Yama.Assembler.Definitions
 
         private void T3RegisterDefinitionen(AssemblerDefinition definition)
         {
-            ArmAFormat1 format1 = new ArmAFormat1();
+            ArmAFormat1 format1 = new ArmAFormat1(this);
             definition.Formats.Add(format1);
 
+            definition.Commands.Add(new Command3Register("adc", format1, 0x0A, 4));
             definition.Commands.Add(new Command3Register("add", format1, 0x08, 4));
             definition.Commands.Add(new Command3Register("and", format1, 0x00, 4));
         }
 
         private void T3ImmediateDefinitionen(AssemblerDefinition definition)
         {
-            ArmAFormat3 format3 = new ArmAFormat3();
+            ArmAFormat3 format3 = new ArmAFormat3(this);
             definition.Formats.Add(format3);
 
             definition.Commands.Add(new Command1Imediate("mov", format3, 0x3A, 4, 0xFFF));
             definition.Commands.Add(new Command1Imediate("cmp", format3, 0x35, 4, 0xFFF, true));
+
+            definition.Commands.Add(new Command2Register1Imediate("add", format3, 0x28, 4));
+            definition.Commands.Add(new Command2Register1Imediate("and", format3, 0x20, 4));
         }
 
         private bool GenerateRegister(AssemblerDefinition definition)
@@ -61,6 +65,27 @@ namespace Yama.Assembler.Definitions
             definition.Registers.Add(new Register("pc", 15));
 
             return true;
+        }
+
+        public uint GetCondition(ConditionMode condition)
+        {
+            if (condition == ConditionMode.Always) return 0xe;
+            if (condition == ConditionMode.Equal) return 0x0;
+            if (condition == ConditionMode.NotEqual) return 0x1;
+            if (condition == ConditionMode.UnsignedGreaterThanOrEqual) return 0x2;
+            if (condition == ConditionMode.UnsignedLessThan) return 0x3;
+            //if (condition == ConditionMode.UnsignedLessThan) return 0x4; Nagative
+            //if (condition == ConditionMode.UnsignedLessThan) return 0x5; Positive or zero
+            //if (condition == ConditionMode.UnsignedLessThan) return 0x6; overflow
+            //if (condition == ConditionMode.UnsignedLessThan) return 0x7; no overflow
+            if (condition == ConditionMode.UnsignedGreaterThan) return 0x8;
+            if (condition == ConditionMode.UnsignedLessThanOrEqual) return 0x9;
+            if (condition == ConditionMode.SignedGreaterThanOrEqual) return 0xa;
+            if (condition == ConditionMode.SignedLessThan) return 0xb;
+            if (condition == ConditionMode.SignedGreaterThan) return 0xc;
+            if (condition == ConditionMode.SignedLessThanOrEqual) return 0xd;
+
+            return 0;
         }
 
         // -----------------------------------------------

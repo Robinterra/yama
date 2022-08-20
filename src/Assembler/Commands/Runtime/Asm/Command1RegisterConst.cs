@@ -37,7 +37,7 @@ namespace Yama.Assembler.Runtime
             get;
             set;
         }
-        public uint Condition
+        public ConditionMode Condition
         {
             get;
             set;
@@ -52,7 +52,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command1RegisterConst(string key, IFormat format, uint id, int size, uint condition = 0)
+        public Command1RegisterConst(string key, IFormat format, uint id, int size, ConditionMode condition = ConditionMode.Always)
         {
             this.Node = new ParserError();
             this.Key = key;

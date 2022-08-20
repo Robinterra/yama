@@ -15,6 +15,20 @@ namespace Yama.Assembler.Definitions
             }
         }
 
+        public uint GetCondition(ConditionMode condition)
+        {
+            if (condition == ConditionMode.Always) return 0;
+            if (condition == ConditionMode.Equal) return 1;
+            if (condition == ConditionMode.NotEqual) return 2;
+            if (condition == ConditionMode.UnsignedGreaterThan) return 3;
+            if (condition == ConditionMode.UnsignedGreaterThanOrEqual) return 4;
+            if (condition == ConditionMode.UnsignedLessThan) return 5;
+            if (condition == ConditionMode.UnsignedLessThanOrEqual) return 6;
+            if (condition == ConditionMode.SkipNext) return 0xf;
+
+            return 0;
+        }
+
         public Assembler SetupDefinition(Assembler assembler)
         {
             assembler.DataAddition = 4;
@@ -32,7 +46,7 @@ namespace Yama.Assembler.Definitions
 
         private bool RuntimeFormat1Def(AssemblerDefinition definition)
         {
-            Format1 format1 = new Format1();
+            Format1 format1 = new Format1(this);
             definition.Formats.Add(format1);
 
             definition.Commands.Add(new Command3Register("add", format1, 0x50, 4));
@@ -62,7 +76,7 @@ namespace Yama.Assembler.Definitions
         // -----------------------------------------------
         private bool RuntimeFormat2Def(AssemblerDefinition definition)
         {
-            Format2 format2 = new Format2();
+            Format2 format2 = new Format2(this);
             definition.Formats.Add(format2);
 
             definition.Commands.Add(new Command2Register1Imediate("add", format2, 0x10, 4));
@@ -80,15 +94,15 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new Command1Register1Container("ldr", format2, 0x1B, 4, 15, 4));
             definition.Commands.Add(new Command1Register1Container("str", format2, 0x1C, 4, 15, 4));
 
-            definition.Commands.Add(new Command1RegisterJumpPoint("ldr", format2, 0x1B, 8, 0xF));
-            definition.Commands.Add(new Command1RegisterConst("ldr", format2, 0x1B, 8, 0xF));
+            definition.Commands.Add(new Command1RegisterJumpPoint("ldr", format2, 0x1B, 8, ConditionMode.SkipNext));
+            definition.Commands.Add(new Command1RegisterConst("ldr", format2, 0x1B, 8, ConditionMode.SkipNext));
 
             return true;
         }
         // -----------------------------------------------
         private bool RuntimeFormat3Def(AssemblerDefinition definition)
         {
-            Format3 format3 = new Format3();
+            Format3 format3 = new Format3(this);
             definition.Formats.Add(format3);
 
             definition.Commands.Add(new Command1Imediate("mov", format3, 0x2E, 4, 0xFFFF));
@@ -99,13 +113,13 @@ namespace Yama.Assembler.Definitions
 
             definition.Commands.Add(new Command1Register("mrs", format3, 0x42, 4));
 
-            definition.Commands.Add(new CommandJumpPoint("b", format3, 0x32, 4, 0x1FFFF, 0));
-            definition.Commands.Add(new CommandJumpPoint("beq", format3, 0x32, 4, 0x1FFFF, 1));
-            definition.Commands.Add(new CommandJumpPoint("bne", format3, 0x32, 4, 0x1FFFF, 2));
-            definition.Commands.Add(new CommandJumpPoint("bgt", format3, 0x32, 4, 0x1FFFF, 3));
-            definition.Commands.Add(new CommandJumpPoint("bge", format3, 0x32, 4, 0x1FFFF, 4));
-            definition.Commands.Add(new CommandJumpPoint("blt", format3, 0x32, 4, 0x1FFFF, 5));
-            definition.Commands.Add(new CommandJumpPoint("ble", format3, 0x32, 4, 0x1FFFF, 6));
+            definition.Commands.Add(new CommandJumpPoint("b", format3, 0x32, 4, 0x1FFFF, ConditionMode.Always));
+            definition.Commands.Add(new CommandJumpPoint("beq", format3, 0x32, 4, 0x1FFFF, ConditionMode.Equal));
+            definition.Commands.Add(new CommandJumpPoint("bne", format3, 0x32, 4, 0x1FFFF, ConditionMode.NotEqual));
+            definition.Commands.Add(new CommandJumpPoint("bgt", format3, 0x32, 4, 0x1FFFF, ConditionMode.UnsignedGreaterThan));
+            definition.Commands.Add(new CommandJumpPoint("bge", format3, 0x32, 4, 0x1FFFF, ConditionMode.UnsignedGreaterThanOrEqual));
+            definition.Commands.Add(new CommandJumpPoint("blt", format3, 0x32, 4, 0x1FFFF, ConditionMode.UnsignedLessThan));
+            definition.Commands.Add(new CommandJumpPoint("ble", format3, 0x32, 4, 0x1FFFF, ConditionMode.UnsignedLessThanOrEqual));
 
             definition.Commands.Add(new CommandData());
             definition.Commands.Add(new CommandDataList(4));

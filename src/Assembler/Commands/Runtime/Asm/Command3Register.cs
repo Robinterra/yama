@@ -78,7 +78,7 @@ namespace Yama.Assembler.Runtime
 
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Condition = 0;
+            assembleFormat.Condition = ConditionMode.Always;
             assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
             assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
             assembleFormat.RegisterInputRight = request.GetRegister(t.Argument2.Token.Text);
