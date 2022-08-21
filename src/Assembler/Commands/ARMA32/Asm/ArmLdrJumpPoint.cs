@@ -90,9 +90,11 @@ namespace Yama.Assembler.Runtime
             assembleFormat.RegisterInputLeft = request.GetRegister("pc");
             if (!Format.Assemble(assembleFormat)) return false;
 
+            request.Stream.Write(assembleFormat.Result.ToArray());
+
             assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.bId;
-            assembleFormat.Immediate = 1;
+            assembleFormat.Immediate = 0;
             if (!bformat.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new ArmLdrJumpPoint(this, request.Node, assembleFormat.Result));
@@ -100,7 +102,7 @@ namespace Yama.Assembler.Runtime
             JumpPointMapper? map = request.Assembler.GetJumpPoint(t.Argument1.Token.Text);
             if (map == null) return false;
 
-            byte[] tmp = BitConverter.GetBytes ( map.Adresse - 4 );
+            byte[] tmp = BitConverter.GetBytes ( map.Adresse );
             assembleFormat.Result.Add ( tmp[0] );
             assembleFormat.Result.Add ( tmp[1] );
             assembleFormat.Result.Add ( tmp[2] );

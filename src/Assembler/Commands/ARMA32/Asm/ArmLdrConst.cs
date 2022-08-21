@@ -90,9 +90,11 @@ namespace Yama.Assembler.Runtime
             assembleFormat.RegisterInputLeft = request.GetRegister("pc");
             if (!Format.Assemble(assembleFormat)) return false;
 
+            request.Stream.Write(assembleFormat.Result.ToArray());
+
             assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.bId;
-            assembleFormat.Immediate = 1;
+            assembleFormat.Immediate = 0;
             if (!bformat.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new ArmLdrConst(this, request.Node, assembleFormat.Result));

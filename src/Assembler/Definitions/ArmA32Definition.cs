@@ -16,10 +16,11 @@ namespace Yama.Assembler.Definitions
 
         public Assembler SetupDefinition(Assembler assembler)
         {
-            assembler.DataAddition = 4;
+            assembler.DataAddition = 0;
             assembler.Definition = new AssemblerDefinition();
             assembler.Definition.ProgramCounterIncress = 4;
             assembler.Definition.CommandEntitySize = 4;
+            assembler.osHeader = ProjectConfig.Project.OSHeader.LinuxArm;
 
             this.T3RegisterDefinitionen ( assembler.Definition );
             //this.T3asrDefinition ( assembler.Definition );
@@ -108,11 +109,11 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new Command2Register1Imediate("orr", format3, 0x38, 4));
             definition.Commands.Add(new Command2Register1Imediate("sub", format3, 0x24, 4));
 
-            definition.Commands.Add(new Command1Register1Container("ldr", format3, 0x51, 4, 15, 1));
+            definition.Commands.Add(new Command1Register1Container("ldr", format3, 0x59, 4, 15, 1));
             definition.Commands.Add(new Command1Register1Container("str", format3, 0x50, 4, 15, 1));
 
-            definition.Commands.Add(new ArmLdrJumpPoint("ldr", format3, 0x51, format2, 0xa, 12));
-            definition.Commands.Add(new ArmLdrConst("ldr", format3, 0x51, format2, 0xa, 12));
+            definition.Commands.Add(new ArmLdrJumpPoint("ldr", format3, 0x59, format2, 0xa, 12));
+            definition.Commands.Add(new ArmLdrConst("ldr", format3, 0x59, format2, 0xa, 12));
 
             definition.Commands.Add(new CommandF3List("push", format7, 0x92, 4, 15));
             definition.Commands.Add(new CommandF3List("pop", format7, 0x8B, 4, 15));

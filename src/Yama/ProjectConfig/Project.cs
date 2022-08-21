@@ -111,6 +111,14 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
+        public OSHeader OsHeader
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -134,6 +142,12 @@ namespace Yama.ProjectConfig
         #endregion ctor
 
         // -----------------------------------------------
+
+        public enum OSHeader
+        {
+            None,
+            LinuxArm
+        }
 
     }
 }
