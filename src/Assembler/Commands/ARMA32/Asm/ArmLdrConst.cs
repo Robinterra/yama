@@ -82,7 +82,7 @@ namespace Yama.Assembler.Runtime
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
             if (!(request.Node is CommandWith2ArgsNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
-            if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
+            if (t.Argument1.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
@@ -113,8 +113,7 @@ namespace Yama.Assembler.Runtime
             if (request.Node.Token.Text.ToLower() != this.Key.ToLower()) return false;
             if (!(request.Node is CommandWith2ArgsNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
-            if (t.Argument1 is SquareArgumentNode s) return false;
-            if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
+            if (t.Argument1.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
             return true;
         }

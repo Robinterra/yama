@@ -555,7 +555,7 @@ namespace Yama.Compiler.Definition
 
             if (query.Value is not int position) return null;
 
-            if (this.Name == "arm-t32") position -= 1;
+            if (this.Name!.Contains("arm-")) position -= 1;
             if (keyPattern.Pattern is null) return null;
 
             return string.Format( keyPattern.Pattern, (position) * this.AdressBytes );
