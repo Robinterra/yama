@@ -82,7 +82,7 @@ namespace Yama.Assembler
             stream.Write(BitConverter.GetBytes((uint)startAdress));//p_vaddr
             stream.Write(BitConverter.GetBytes((uint)startAdress));//p_paddr
             stream.Write(BitConverter.GetBytes((uint)programSize - startAdress));//p_filesz (uint)programSize - startAdress
-            stream.Write(BitConverter.GetBytes((uint)programSize - startAdress));//p_memsz
+            stream.Write(BitConverter.GetBytes((uint)programSize));//p_memsz
             stream.Write(BitConverter.GetBytes((uint)P_Flags.PF_R | (uint)P_Flags.PF_X | (uint) P_Flags.PF_W));//p_flags
             stream.Write(BitConverter.GetBytes((uint)startAdress));//p_align
 

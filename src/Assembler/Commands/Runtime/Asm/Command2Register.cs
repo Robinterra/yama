@@ -91,8 +91,8 @@ namespace Yama.Assembler.Runtime
             }
             if (this.Rm == RegisterMode.Left_Right)
             {
-                assembleFormat.RegisterInputRight = request.GetRegister(t.Argument1.Token.Text);
-                assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument0.Token.Text);
+                assembleFormat.RegisterInputRight = request.GetRegister(t.Argument0.Token.Text);
+                assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
             }
 
             if (!Format.Assemble(assembleFormat)) return false;

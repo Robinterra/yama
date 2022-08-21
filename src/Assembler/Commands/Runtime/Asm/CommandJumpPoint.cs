@@ -42,6 +42,9 @@ namespace Yama.Assembler.Runtime
             get;
             set;
         }
+
+        private bool IsArm;
+
         public IParseTreeNode Node
         {
             get;
@@ -52,7 +55,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public CommandJumpPoint(string key, IFormat format, uint id, int size, uint max, ConditionMode condition = ConditionMode.Always)
+        public CommandJumpPoint(string key, IFormat format, uint id, int size, uint max, ConditionMode condition = ConditionMode.Always, bool isarm = false)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -61,6 +64,7 @@ namespace Yama.Assembler.Runtime
             this.Size = size;
             this.Maximum = max;
             this.Condition = condition;
+            this.IsArm = isarm;
         }
 
         public CommandJumpPoint(CommandJumpPoint t, IParseTreeNode node, List<byte> bytes)
@@ -89,6 +93,7 @@ namespace Yama.Assembler.Runtime
             if (map == null) return false;
 
             uint target = request.Assembler.BuildJumpSkipper(request.Position, map.Adresse, (uint)this.Size, true);
+            if (this.IsArm) target -= 4;
 
             if ((target & 0x80000000) != 0x80000000)
             {

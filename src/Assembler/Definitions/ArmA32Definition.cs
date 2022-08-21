@@ -43,13 +43,13 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new Command1Register("blx", format4, 0x12, 4, sonder: 3));
             definition.Commands.Add(new Command1Register("bx", format4, 0x12, 4, sonder: 1));
 
-            definition.Commands.Add(new CommandJumpPoint("b", format2, 0xA, 4, 0xFFFFFF, ConditionMode.Always));
-            definition.Commands.Add(new CommandJumpPoint("beq", format2, 0xA, 4, 0xFFFFFF, ConditionMode.Equal));
-            definition.Commands.Add(new CommandJumpPoint("bne", format2, 0xA, 4, 0xFFFFFF, ConditionMode.NotEqual));
-            definition.Commands.Add(new CommandJumpPoint("bgt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThan));
-            definition.Commands.Add(new CommandJumpPoint("bge", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThanOrEqual));
-            definition.Commands.Add(new CommandJumpPoint("blt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedLessThan));
-            definition.Commands.Add(new CommandJumpPoint("ble", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThanOrEqual));
+            definition.Commands.Add(new CommandJumpPoint("b", format2, 0xA, 4, 0xFFFFFF, ConditionMode.Always, true));
+            definition.Commands.Add(new CommandJumpPoint("beq", format2, 0xA, 4, 0xFFFFFF, ConditionMode.Equal, true));
+            definition.Commands.Add(new CommandJumpPoint("bne", format2, 0xA, 4, 0xFFFFFF, ConditionMode.NotEqual, true));
+            definition.Commands.Add(new CommandJumpPoint("bgt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThan, true));
+            definition.Commands.Add(new CommandJumpPoint("bge", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThanOrEqual, true));
+            definition.Commands.Add(new CommandJumpPoint("blt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedLessThan, true));
+            definition.Commands.Add(new CommandJumpPoint("ble", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThanOrEqual, true));
 
             definition.Commands.Add(new CommandImediate("svc", format2, 0xf, 4, 0xfffff));
 
@@ -110,7 +110,7 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new Command2Register1Imediate("sub", format3, 0x24, 4));
 
             definition.Commands.Add(new Command1Register1Container("ldr", format3, 0x59, 4, 15, 1));
-            definition.Commands.Add(new Command1Register1Container("str", format3, 0x50, 4, 15, 1));
+            definition.Commands.Add(new Command1Register1Container("str", format3, 0x58, 4, 15, 1));
 
             definition.Commands.Add(new ArmLdrJumpPoint("ldr", format3, 0x59, format2, 0xa, 12));
             definition.Commands.Add(new ArmLdrConst("ldr", format3, 0x59, format2, 0xa, 12));

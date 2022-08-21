@@ -359,8 +359,6 @@ namespace Yama.Assembler
                 startposition += (uint)assmblepair.Size;
             }
 
-            if (Stream is not null) Stream.Write(new byte[0xffff]);
-
             return this.Errors.Count == 0;
         }
 
