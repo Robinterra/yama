@@ -50,6 +50,8 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new CommandJumpPoint("blt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedLessThan));
             definition.Commands.Add(new CommandJumpPoint("ble", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThanOrEqual));
 
+            definition.Commands.Add(new CommandImediate("svc", format2, 0xf, 4, 0xfffff));
+
             definition.Commands.Add(new CommandData());
             definition.Commands.Add(new CommandDataList(4));
 
@@ -61,18 +63,40 @@ namespace Yama.Assembler.Definitions
             ArmAFormat1 format1 = new ArmAFormat1(this);
             definition.Formats.Add(format1);
 
-            definition.Commands.Add(new Command2Register("cmp", format1, 0x15, 4, true));
+            ArmAFormat5 format5 = new ArmAFormat5(this);
+            definition.Formats.Add(format5);
+
+            ArmAFormat6 format6 = new ArmAFormat6(this);
+            definition.Formats.Add(format6);
+
+            definition.Commands.Add(new Command2Register("cmp", format1, 0x15, 4, Command2Register.RegisterMode.Left_Right));
 
             definition.Commands.Add(new Command3Register("adc", format1, 0x0A, 4));
             definition.Commands.Add(new Command3Register("add", format1, 0x08, 4));
             definition.Commands.Add(new Command3Register("and", format1, 0x00, 4));
             definition.Commands.Add(new Command3Register("eor", format1, 0x02, 4));
+            definition.Commands.Add(new Command3Register("orr", format1, 0x18, 4));
+            definition.Commands.Add(new Command3Register("sub", format1, 0x04, 4));
+
+            definition.Commands.Add(new Command3Register("mul", format6, 0x00, 4, stype: 9));
+
+            definition.Commands.Add(new Command2Register1Imediate("lsl", format1, 0x1A, 4, true));
+            definition.Commands.Add(new Command2Register1Imediate("lsr", format1, 0x1A, 4, true, stype: 2));
+            definition.Commands.Add(new Command3Register("lsl", format5, 0x1A, 4, stype: 1));
+            definition.Commands.Add(new Command3Register("lsr", format5, 0x1A, 4, stype: 3));
+
+            definition.Commands.Add(new Command2Register("mov", format1, 0x1A, 4, Command2Register.RegisterMode.Destitination_Right));
+
+            definition.Commands.Add(new Command1Register("mrs", format1, 0x10, 4, registerLeft: 0xf));
         }
 
         private void T3ImmediateDefinitionen(AssemblerDefinition definition, ArmAFormat2 format2)
         {
             ArmAFormat3 format3 = new ArmAFormat3(this);
             definition.Formats.Add(format3);
+
+            ArmAFormat7 format7 = new ArmAFormat7(this);
+            definition.Formats.Add(format7);
 
             definition.Commands.Add(new Command1Imediate("mov", format3, 0x3A, 4, 0xFFF));
             definition.Commands.Add(new Command1Imediate("cmp", format3, 0x35, 4, 0xFFF, true));
@@ -81,11 +105,17 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new Command2Register1Imediate("add", format3, 0x28, 4));
             definition.Commands.Add(new Command2Register1Imediate("and", format3, 0x20, 4));
             definition.Commands.Add(new Command2Register1Imediate("eor", format3, 0x22, 4));
+            definition.Commands.Add(new Command2Register1Imediate("orr", format3, 0x38, 4));
+            definition.Commands.Add(new Command2Register1Imediate("sub", format3, 0x24, 4));
 
             definition.Commands.Add(new Command1Register1Container("ldr", format3, 0x51, 4, 15, 1));
+            definition.Commands.Add(new Command1Register1Container("str", format3, 0x50, 4, 15, 1));
 
             definition.Commands.Add(new ArmLdrJumpPoint("ldr", format3, 0x51, format2, 0xa, 12));
             definition.Commands.Add(new ArmLdrConst("ldr", format3, 0x51, format2, 0xa, 12));
+
+            definition.Commands.Add(new CommandF3List("push", format7, 0x92, 4, 15));
+            definition.Commands.Add(new CommandF3List("pop", format7, 0x8B, 4, 15));
         }
 
         private bool GenerateRegister(AssemblerDefinition definition)

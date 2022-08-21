@@ -46,6 +46,12 @@ namespace Yama.Assembler
             set;
         }
 
+        public uint Stype
+        {
+            get;
+            set;
+        }
+
         public List<byte> Result
         {
             get;

@@ -37,6 +37,10 @@ namespace Yama.Assembler.Runtime
             get;
             set;
         }
+
+        private bool switchRegister;
+        private uint Stype;
+
         public IParseTreeNode Node
         {
             get;
@@ -47,13 +51,15 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command2Register1Imediate(string key, IFormat format, uint id, int size)
+        public Command2Register1Imediate(string key, IFormat format, uint id, int size, bool switchRegister = false, uint stype = 0)
         {
             this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
+            this.switchRegister = switchRegister;
+            this.Stype = stype;
         }
 
         public Command2Register1Imediate(Command2Register1Imediate t, IParseTreeNode node, List<byte> bytes)
@@ -79,7 +85,13 @@ namespace Yama.Assembler.Runtime
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
-            assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
+            assembleFormat.Stype = this.Stype;
+
+            if (this.switchRegister)
+                assembleFormat.RegisterInputRight = request.GetRegister(t.Argument1.Token.Text);
+            else
+                assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
+
             assembleFormat.Immediate = Convert.ToUInt32(t.Argument2.Token.Value);
 
             if (!Format.Assemble(assembleFormat)) return false;

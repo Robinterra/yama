@@ -8,7 +8,7 @@ namespace Yama.Assembler.Runtime
 {
     public class Command2Register : ICommand
     {
-        private bool IsCmp;
+        private RegisterMode Rm;
 
         #region get/set
 
@@ -48,14 +48,14 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command2Register(string key, IFormat format, uint id, int size, bool iscmp = false)
+        public Command2Register(string key, IFormat format, uint id, int size, RegisterMode rm = RegisterMode.Destitination_Left)
         {
             this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
-            this.IsCmp = iscmp;
+            this.Rm = rm;
         }
 
         public Command2Register(Command2Register t, IParseTreeNode node, List<byte> bytes)
@@ -79,13 +79,17 @@ namespace Yama.Assembler.Runtime
 
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(0);
-            if (!this.IsCmp)
+            if (this.Rm == RegisterMode.Destitination_Left)
             {
                 assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
                 assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
             }
-            else
+            if (this.Rm == RegisterMode.Destitination_Right)
+            {
+                assembleFormat.RegisterInputRight = request.GetRegister(t.Argument1.Token.Text);
+                assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
+            }
+            if (this.Rm == RegisterMode.Left_Right)
             {
                 assembleFormat.RegisterInputRight = request.GetRegister(t.Argument1.Token.Text);
                 assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument0.Token.Text);
@@ -113,5 +117,13 @@ namespace Yama.Assembler.Runtime
         {
             throw new NotImplementedException();
         }
+
+        public enum RegisterMode
+        {
+            Destitination_Right,
+            Destitination_Left,
+            Left_Right
+        }
+
     }
 }

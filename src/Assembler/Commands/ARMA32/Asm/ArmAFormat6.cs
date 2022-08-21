@@ -2,7 +2,7 @@ using System;
 
 namespace Yama.Assembler.ARMA32
 {
-    public class ArmAFormat1 : IFormat
+    public class ArmAFormat6 : IFormat
     {
         private IAssemblerDefinition definition;
 
@@ -10,11 +10,11 @@ namespace Yama.Assembler.ARMA32
         {
             get
             {
-                return "Format1";
+                return "Format6";
             }
         }
 
-        public ArmAFormat1(IAssemblerDefinition assemblerDefinition)
+        public ArmAFormat6(IAssemblerDefinition assemblerDefinition)
         {
             this.definition = assemblerDefinition;
         }
@@ -27,11 +27,10 @@ namespace Yama.Assembler.ARMA32
 
             uint firstFragment = ( condition << 28 ) & 0xF0000000;
             firstFragment |= ( request.Command << 20 ) & 0x0FF00000;
-            firstFragment |= ( request.RegisterInputLeft << 16 ) & 0x000F0000;
-            firstFragment |= ( request.RegisterDestionation << 12) & 0x0000F000;
-            firstFragment |= ( request.Immediate << 7) & 0x00000F80;
-            firstFragment |= ( request.Stype << 4) & 0x00000070;
-            firstFragment |= ( request.RegisterInputRight ) & 0x0000000F;
+            firstFragment |= ( request.RegisterDestionation << 16 ) & 0x000F0000;
+            firstFragment |= ( request.RegisterInputRight << 8) & 0x00000F00;
+            firstFragment |= ( request.Stype << 4) & 0x000000F0;
+            firstFragment |= ( request.RegisterInputLeft ) & 0x0000000F;
 
             byte[] tmp = BitConverter.GetBytes ( firstFragment );
             request.Result.Add ( tmp[0] );

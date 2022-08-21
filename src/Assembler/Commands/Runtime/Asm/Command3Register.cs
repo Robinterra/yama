@@ -37,6 +37,9 @@ namespace Yama.Assembler.Runtime
             get;
             set;
         }
+
+        private uint stype;
+
         public IParseTreeNode Node
         {
             get;
@@ -47,13 +50,14 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command3Register(string key, IFormat format, uint id, int size)
+        public Command3Register(string key, IFormat format, uint id, int size, uint stype = 0)
         {
             this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
+            this.stype = stype;
         }
 
         public Command3Register(Command3Register t, IParseTreeNode node, List<byte> bytes)
@@ -81,6 +85,7 @@ namespace Yama.Assembler.Runtime
             assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
             assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
             assembleFormat.RegisterInputRight = request.GetRegister(t.Argument2.Token.Text);
+            assembleFormat.Stype = stype;
 
             if (!Format.Assemble(assembleFormat)) return false;
 

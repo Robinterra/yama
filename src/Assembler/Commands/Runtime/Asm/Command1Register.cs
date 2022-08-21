@@ -44,6 +44,7 @@ namespace Yama.Assembler.Runtime
         }
 
         private uint Sonder;
+        private uint RegisterLeft;
 
         public IParseTreeNode Node
         {
@@ -55,7 +56,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command1Register(string key, IFormat format, uint id, int size, ConditionMode condition = ConditionMode.Always, uint sonder = 0)
+        public Command1Register(string key, IFormat format, uint id, int size, ConditionMode condition = ConditionMode.Always, uint sonder = 0, uint registerLeft = 0)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -64,6 +65,7 @@ namespace Yama.Assembler.Runtime
             this.Size = size;
             this.Condition = condition;
             this.Sonder = sonder;
+            this.RegisterLeft = registerLeft;
         }
 
         public Command1Register(Command1Register t, IParseTreeNode node, List<byte> bytes)
@@ -88,6 +90,7 @@ namespace Yama.Assembler.Runtime
             assembleFormat.Command = this.CommandId;
             assembleFormat.Condition = this.Condition;
             assembleFormat.RegisterDestionation = request.Assembler.GetRegister(t.Argument0.Token.Text);
+            assembleFormat.RegisterInputLeft = this.RegisterLeft;
             assembleFormat.Immediate = this.Sonder;
 
             if (!Format.Assemble(assembleFormat)) return false;
