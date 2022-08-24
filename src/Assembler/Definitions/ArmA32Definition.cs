@@ -54,7 +54,7 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new CommandImediate("svc", format2, 0xf, 4, 0xfffff));
 
             definition.Commands.Add(new CommandData());
-            definition.Commands.Add(new CommandDataList(4));
+            definition.Commands.Add(new CommandDataList(0));
 
             return format2;
         }
