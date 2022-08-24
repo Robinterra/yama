@@ -104,6 +104,7 @@ namespace Yama.ProjectConfig
             if (definition.Definition == null) return false;
 
             definition.StartPosition = (uint)project.Skip;
+            definition.OSHeader = project.OsHeader;
 
             if ( !string.IsNullOrEmpty ( project.StartNamespace ) ) definition.StartNamespace = project.StartNamespace;
 
@@ -308,6 +309,7 @@ namespace Yama.ProjectConfig
             parserLayer.ParserMembers.Add(new AssemblerOutputNode());
             parserLayer.ParserMembers.Add(new OptimizeNode());
             parserLayer.ParserMembers.Add(new SkipNode());
+            parserLayer.ParserMembers.Add(new OSHeaderNode());
             parserLayer.ParserMembers.Add ( new PackageGroupNode ( packagelayer ) );
 
             return parserLayer;

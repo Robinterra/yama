@@ -161,13 +161,16 @@ namespace Yama
         private static bool Assemble ( List<ICommandLine> commands, OutputController outputController )
         {
             Definitionen def = new Definitionen();
-            Assembler.Assembler? assembler = new Assembler.Assembler(outputController);
+            Assembler.Assembler? assembler = new Assembler.Assembler(outputController, Project.OSHeader.None);
             RequestAssemble request = new RequestAssemble();
             if (Program.yama == null) Program.yama = new LanguageDefinition();
 
             foreach ( ICommandLine command in commands )
             {
-                if (command is DefinitionExpression) assembler = def.GenerateAssembler ( assembler, command.Value! );
+                if (command is DefinitionExpression)
+                {
+                    assembler = def.GenerateAssembler ( assembler, command.Value! );
+                }
                 if (command is FileExpression) request.InputFile = new FileInfo ( command.Value! );
                 if (command is SkipExpression && assembler is not null) assembler.Position = Program.ParseSkipExpressionHex(command.Value!, outputController);
                 if (command is OutputFileExpression)

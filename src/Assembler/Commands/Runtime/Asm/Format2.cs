@@ -4,6 +4,8 @@ namespace Yama.Assembler.Runtime
 {
     public class Format2 : IFormat
     {
+        private IAssemblerDefinition definition;
+
         public string Name
         {
             get
@@ -12,16 +14,22 @@ namespace Yama.Assembler.Runtime
             }
         }
 
+        public Format2(IAssemblerDefinition assemblerDefinition)
+        {
+            this.definition = assemblerDefinition;
+        }
+
+
         // https://developer.arm.com/docs/ddi0597/h/base-instructions-alphabetic-order/adc-adcs-immediate-add-with-carry-immediate
         public bool Assemble(RequestAssembleFormat request)
         {
-            if (request.Arguments.Count != 4) return false;
+            uint condition = definition.GetCondition(request.Condition);
 
             uint firstFragment = ( request.Command << 24 ) & 0xFF000000;
-            firstFragment |= ( request.Arguments[0] << 20 ) & 0x00F00000;
-            firstFragment |= ( request.Arguments[1] << 16 ) & 0x000F0000;
-            firstFragment |= ( request.Arguments[2] << 12) & 0x0000F000;
-            firstFragment |= ( request.Arguments[3] ) & 0x00000FFF;
+            firstFragment |= ( condition << 20 ) & 0x00F00000;
+            firstFragment |= ( request.RegisterDestionation << 16 ) & 0x000F0000;
+            firstFragment |= ( request.RegisterInputLeft << 12) & 0x0000F000;
+            firstFragment |= ( request.Immediate ) & 0x00000FFF;
 
             byte[] tmp = BitConverter.GetBytes ( firstFragment );
             request.Result.Add ( tmp[0] );

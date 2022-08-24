@@ -16,7 +16,7 @@ namespace Yama.Assembler.Runtime
             get;
         }
 
-        public string Format
+        public IFormat Format
         {
             get;
         }
@@ -37,6 +37,11 @@ namespace Yama.Assembler.Runtime
             get;
             set;
         }
+        public int MaxSize { get; }
+        public bool IsCmp
+        {
+            get;
+        }
 
         public IParseTreeNode Node
         {
@@ -44,19 +49,25 @@ namespace Yama.Assembler.Runtime
             set;
         }
 
-        public uint Condition { get; set; }
+        public ConditionMode Condition
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
         #region ctor
 
-        public Command1Imediate(string key, string format, uint id, int size, uint condition = 0)
+        public Command1Imediate(string key, IFormat format, uint id, int size, int maxsize, bool iscmp = false, ConditionMode condition = ConditionMode.Always)
         {
             this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
+            this.MaxSize = maxsize;
+            this.IsCmp = iscmp;
             this.Condition = condition;
         }
 
@@ -79,17 +90,17 @@ namespace Yama.Assembler.Runtime
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
 
-            IFormat? format = request.Assembler.GetFormat(this.Format);
-            if (format is null) return false;
-
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(this.Condition);
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
-            assembleFormat.Arguments.Add(0);
-            assembleFormat.Arguments.Add(Convert.ToUInt32(t.Argument1.Token.Value));
+            assembleFormat.Condition = this.Condition;
+            if (!this.IsCmp)
+                assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
+            else
+                assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument0.Token.Text);
 
-            if (!format.Assemble(assembleFormat)) return false;
+            assembleFormat.Immediate = Convert.ToUInt32(t.Argument1.Token.Value);
+
+            if (!Format.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new Command1Imediate(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());
@@ -103,6 +114,9 @@ namespace Yama.Assembler.Runtime
             if (!(request.Node is CommandWith2ArgsNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.NumberToken) return false;
+
+            uint valueOfImmediate = Convert.ToUInt32(t.Argument1.Token.Value);
+            if (valueOfImmediate > this.MaxSize) return false;
 
             return true;
         }

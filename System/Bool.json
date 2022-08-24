@@ -63,5 +63,34 @@
                 ]
             }
         ]
-    }
+    },
+    {
+      "Name": "arm-a32-linux",
+      "Algos": [
+          {
+              "Name": "BoolOperations",
+              "Mode": "Negate",
+              "Description": "Negate",
+              "Keys": [
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "1"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+              "cmp [SSAPOP[0]], #0x0",
+              "mrs [SSAPUSH]",
+              "and [SSAPUSH], [SSAPUSH], #0x4"
+              ]
+          }
+      ]
+  }
 ]

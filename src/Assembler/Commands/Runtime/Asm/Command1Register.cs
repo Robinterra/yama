@@ -16,7 +16,7 @@ namespace Yama.Assembler.Runtime
             get;
         }
 
-        public string Format
+        public IFormat Format
         {
             get;
         }
@@ -37,11 +37,15 @@ namespace Yama.Assembler.Runtime
             get;
             set;
         }
-        public uint Condition
+        public ConditionMode Condition
         {
             get;
             set;
         }
+
+        private uint Sonder;
+        private uint RegisterLeft;
+
         public IParseTreeNode Node
         {
             get;
@@ -52,7 +56,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command1Register(string key, string format, uint id, int size, uint condition = 0)
+        public Command1Register(string key, IFormat format, uint id, int size, ConditionMode condition = ConditionMode.Always, uint sonder = 0, uint registerLeft = 0)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -60,6 +64,8 @@ namespace Yama.Assembler.Runtime
             this.CommandId = id;
             this.Size = size;
             this.Condition = condition;
+            this.Sonder = sonder;
+            this.RegisterLeft = registerLeft;
         }
 
         public Command1Register(Command1Register t, IParseTreeNode node, List<byte> bytes)
@@ -80,17 +86,14 @@ namespace Yama.Assembler.Runtime
             if (!(request.Node is CommandWith1ArgNode t)) return false;
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
-            IFormat? format = request.Assembler.GetFormat(this.Format);
-            if (format is null) return false;
-
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(this.Condition);
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
-            assembleFormat.Arguments.Add(0);
-            assembleFormat.Arguments.Add(0);
+            assembleFormat.Condition = this.Condition;
+            assembleFormat.RegisterDestionation = request.Assembler.GetRegister(t.Argument0.Token.Text);
+            assembleFormat.RegisterInputLeft = this.RegisterLeft;
+            assembleFormat.Immediate = this.Sonder;
 
-            if (!format.Assemble(assembleFormat)) return false;
+            if (!Format.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new Command1Register(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());

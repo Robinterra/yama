@@ -9,6 +9,7 @@ using Yama.InformationOutput;
 using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
 using Yama.Parser;
+using Yama.ProjectConfig;
 
 namespace Yama.Assembler
 {
@@ -106,6 +107,8 @@ namespace Yama.Assembler
             get;
         }
 
+        public Project.OSHeader osHeader;
+
         // -----------------------------------------------
 
         #endregion get/set
@@ -116,9 +119,10 @@ namespace Yama.Assembler
 
         // -----------------------------------------------
 
-        public Assembler(OutputController outputController)
+        public Assembler(OutputController outputController, ProjectConfig.Project.OSHeader oSHeader)
         {
             this.Output = outputController;
+            this.osHeader = oSHeader;
         }
 
         // -----------------------------------------------
@@ -316,6 +320,12 @@ namespace Yama.Assembler
 
         private bool IdentifyAndAssemble()
         {
+            LinuxElfHeader.EI_Class eiClass = LinuxElfHeader.EI_Class.ELFCLASS32;
+            LinuxElfHeader.E_Machine machine = LinuxElfHeader.E_Machine.EM_ARM;
+
+            LinuxElfHeader linuxElfHeader = new LinuxElfHeader(eiClass, machine);
+
+            if (this.osHeader == Project.OSHeader.LinuxArm) this.Position += linuxElfHeader.Size;
             uint startposition = this.Position;
 
             List<CommandCompilerMap> maptranslate = new List<CommandCompilerMap>();
@@ -336,6 +346,10 @@ namespace Yama.Assembler
 
             if (this.Errors.Count != 0) return false;
 
+            this.Mappen("THE_END", this.Position + 8);
+
+            this.CreateOsHeader(linuxElfHeader, this.osHeader, startposition);
+
             foreach (CommandCompilerMap assmblepair in maptranslate)
             {
                 startposition += assmblepair.Skip;
@@ -346,6 +360,16 @@ namespace Yama.Assembler
             }
 
             return this.Errors.Count == 0;
+        }
+
+        private uint CreateOsHeader(LinuxElfHeader linuxElfHeader, Project.OSHeader osHeader, uint startposition)
+        {
+            if (this.Stream is null) return startposition;
+            if (this.osHeader != Project.OSHeader.LinuxArm) return startposition;
+
+            uint size = linuxElfHeader.StreamData(this.Stream, startposition, this.Position);
+
+            return size;
         }
 
         // -----------------------------------------------

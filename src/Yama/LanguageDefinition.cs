@@ -6,6 +6,7 @@ using Yama.InformationOutput;
 using Yama.InformationOutput.Nodes;
 using Yama.Lexer;
 using Yama.Parser;
+using Yama.ProjectConfig;
 
 namespace Yama
 {
@@ -150,6 +151,14 @@ namespace Yama
         {
             get;
         } = new OutputController();
+
+        // -----------------------------------------------
+
+        public Project.OSHeader OSHeader
+        {
+            get;
+            set;
+        }
 
         // -----------------------------------------------
 
@@ -690,7 +699,7 @@ namespace Yama
             if (def == "avr") return true;
             if (def is null) return false;
 
-            Assembler.Assembler assembler = new Assembler.Assembler(this.Output);
+            Assembler.Assembler assembler = new Assembler.Assembler(this.Output, this.OSHeader);
             Assembler.Definitionen definitionen = new Assembler.Definitionen();
             definitionen.GenerateAssembler(assembler, def);
             assembler.Position = this.StartPosition;

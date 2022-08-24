@@ -8,6 +8,7 @@ namespace Yama.Assembler.Runtime
 {
     public class Command2Register : ICommand
     {
+        private RegisterMode Rm;
 
         #region get/set
 
@@ -16,7 +17,7 @@ namespace Yama.Assembler.Runtime
             get;
         }
 
-        public string Format
+        public IFormat Format
         {
             get;
         }
@@ -47,13 +48,14 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public Command2Register(string key, string format, uint id, int size)
+        public Command2Register(string key, IFormat format, uint id, int size, RegisterMode rm = RegisterMode.Destitination_Left)
         {
             this.Node = new ParserError();
             this.Key = key;
             this.Format = format;
             this.CommandId = id;
             this.Size = size;
+            this.Rm = rm;
         }
 
         public Command2Register(Command2Register t, IParseTreeNode node, List<byte> bytes)
@@ -75,17 +77,25 @@ namespace Yama.Assembler.Runtime
             if (t.Argument0.Token.Kind != Lexer.IdentifierKind.Word) return false;
             if (t.Argument1.Token.Kind != Lexer.IdentifierKind.Word) return false;
 
-            IFormat? format = request.Assembler.GetFormat(this.Format);
-            if (format is null) return false;
-
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
-            assembleFormat.Arguments.Add(0);
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument0.Token.Text));
-            assembleFormat.Arguments.Add(request.Assembler.GetRegister(t.Argument1.Token.Text));
-            assembleFormat.Arguments.Add(0);
+            if (this.Rm == RegisterMode.Destitination_Left)
+            {
+                assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
+                assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
+            }
+            if (this.Rm == RegisterMode.Destitination_Right)
+            {
+                assembleFormat.RegisterInputRight = request.GetRegister(t.Argument1.Token.Text);
+                assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
+            }
+            if (this.Rm == RegisterMode.Left_Right)
+            {
+                assembleFormat.RegisterInputRight = request.GetRegister(t.Argument0.Token.Text);
+                assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
+            }
 
-            if (!format.Assemble(assembleFormat)) return false;
+            if (!Format.Assemble(assembleFormat)) return false;
 
             if (request.WithMapper) request.Result.Add(new Command2Register(this, request.Node, assembleFormat.Result));
             request.Stream.Write(assembleFormat.Result.ToArray());
@@ -107,5 +117,13 @@ namespace Yama.Assembler.Runtime
         {
             throw new NotImplementedException();
         }
+
+        public enum RegisterMode
+        {
+            Destitination_Right,
+            Destitination_Left,
+            Left_Right
+        }
+
     }
 }

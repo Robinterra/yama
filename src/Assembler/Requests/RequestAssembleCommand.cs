@@ -60,5 +60,14 @@ namespace Yama.Assembler
 
         #endregion ctor
 
+        #region methods
+
+        public uint GetRegister(string name)
+        {
+            return this.Assembler.GetRegister(name);
+        }
+
+        #endregion methods
+
     }
 }
