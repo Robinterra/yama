@@ -1,0 +1,68 @@
+namespace "System.Gpio"
+{
+    using "System";
+    using "System.IO";
+
+    public class GpioController
+    {
+
+        // -----------------------------------------------
+
+        #region vars
+
+        // -----------------------------------------------
+
+        public IGpioService gpioService;
+
+        // -----------------------------------------------
+
+        #endregion vars
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public this new ( IGpioService gpioService )
+        {
+            this.gpioService = gpioService;
+
+            gpioService.Setup();
+
+            return this;
+        }
+
+        // -----------------------------------------------
+
+        public this ~ (  )
+        {
+
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
+        public GpioPin OpenPin ( int pin, int mode )
+        {
+            GpioPin result = new GpioPin(this.gpioService, pin, mode);
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
+
+    }
+
+}

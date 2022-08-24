@@ -1,0 +1,81 @@
+namespace "System.Gpio"
+{
+    using "System";
+    using "System.IO";
+
+    public class GpioPin
+    {
+
+        // -----------------------------------------------
+
+        #region vars
+
+        // -----------------------------------------------
+
+        public IGpioService gpioService;
+        public int pin;
+
+        // -----------------------------------------------
+
+        #endregion vars
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public this new ( IGpioService service, int pin, int mode )
+        {
+            this.gpioService = service;
+            this.pin = pin;
+
+            service.InitPort(pin, mode);
+
+            return this;
+        }
+
+        // -----------------------------------------------
+
+        public this ~ (  )
+        {
+
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
+        public bool Read (  )
+        {
+            return this.gpioService.Read ( this.pin );
+        }
+
+        // -----------------------------------------------
+
+        public bool ChangeMode ( int mode )
+        {
+            return this.gpioService.InitPort ( this.pin, mode );
+        }
+
+        // -----------------------------------------------
+
+        public bool Write ( int value )
+        {
+            return this.gpioService.Write ( this.pin, value );
+        }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
+
+    }
+}

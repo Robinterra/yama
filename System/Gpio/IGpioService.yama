@@ -1,0 +1,126 @@
+namespace "System.Gpio"
+{
+    using "System";
+    using "System.IO";
+
+    public class IGpioService
+    {
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public this new (  )
+        {
+            return this;
+        }
+
+        // -----------------------------------------------
+
+        public this ~ (  )
+        {
+
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
+        public bool Setup()
+        {
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        public bool InitPort ( int pin, int mode )
+        {
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        public bool SetPullUpPullDown ( int pin, int mode )
+        {
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        public bool SetSpeed ( int pin, int mode )
+        {
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        public bool SetOutputType ( int pin, int mode )
+        {
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        public bool Read ( int pin )
+        {
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        public bool Write ( int pin, int value )
+        {
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
+
+    }
+
+    public enum PinSpeedMode
+    {
+        Low = 0x0,
+        Medium = 0x1,
+        Fast = 0x2,
+        High = 0x3
+    }
+
+    public enum PinPullUpDownMode
+    {
+        None = 0x0,
+        PullUp = 0x1,
+        PullDown = 0x2
+    }
+
+    public enum PinOutputType
+    {
+        PushPull = 0x0,
+        OpenDrain = 0x1
+    }
+
+    public enum PinValue
+    {
+        Low = 0x0,
+        High = 0x1
+    }
+
+    public enum PinMode
+    {
+        Read = 0x0,
+        Write = 0x1,
+        Alternative = 0x2,
+        Analog = 0x3
+    }
+}
