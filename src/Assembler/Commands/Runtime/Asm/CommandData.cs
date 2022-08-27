@@ -160,7 +160,7 @@ namespace Yama.Assembler.Runtime
 
             this.Size = data.Length + 4;
             int temp = this.Size & 0x3;
-            if (temp > 0) this.Size = this.Size + 4;
+            if (temp >= 0) this.Size = this.Size + 4;
             this.Size = this.Size ^ temp;
 
             request.IsData = true;
