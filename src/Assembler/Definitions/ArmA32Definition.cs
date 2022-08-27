@@ -80,6 +80,7 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new Command3Register("sub", format1, 0x04, 4));
 
             definition.Commands.Add(new Command3Register("mul", format6, 0x00, 4, stype: 9));
+            definition.Commands.Add(new Command3Register("div", format6, 0x73, 4, stype: 1));
 
             definition.Commands.Add(new Command2Register1Imediate("lsl", format1, 0x1A, 4, true));
             definition.Commands.Add(new Command2Register1Imediate("lsr", format1, 0x1A, 4, true, stype: 2));

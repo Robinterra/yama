@@ -31,6 +31,7 @@ namespace Yama.Assembler.ARMA32
             firstFragment |= ( request.RegisterInputRight << 8) & 0x00000F00;
             firstFragment |= ( request.Stype << 4) & 0x000000F0;
             firstFragment |= ( request.RegisterInputLeft ) & 0x0000000F;
+            if (request.Stype == 1) firstFragment |= 0xf << 12;
 
             byte[] tmp = BitConverter.GetBytes ( firstFragment );
             request.Result.Add ( tmp[0] );
