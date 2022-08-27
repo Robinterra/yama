@@ -1468,28 +1468,29 @@
               ]
           },
           {
-              "Name": "IntCompare",
-              "Mode": "Equals",
-              "Description": "Equals",
-              "Keys": [
-                    {
-                      "Name": "[SSAPOP]",
-                      "Values": [
-                        "2"
-                      ]
-                    },
-                    {
-                      "Name": "[SSAPUSH]",
-                      "Values": [
-                      ]
-                    }
-              ],
-              "PostKeys": [],
-              "AssemblyCommands": [
-                  "cmp [SSAPOP[1]], [SSAPOP[0]]",
-                  "mrs [SSAPUSH]",
-                  "and [SSAPUSH], [SSAPUSH], #0x4"
-              ]
+            "Name": "IntCompare",
+            "Mode": "Equals",
+            "Description": "Equals",
+            "Keys": [
+                {
+                    "Name": "[SSAPOP]",
+                    "Values": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "Name": "[SSAPUSH]",
+                    "Values": [
+                    ]
+                  }
+            ],
+            "PostKeys": [],
+            "AssemblyCommands": [
+              "cmp [SSAPOP[1]], [SSAPOP[0]]",
+              "mrs [SSAPUSH]",
+              "lsr [SSAPUSH], [SSAPUSH], #0x1E",
+              "and [SSAPUSH], [SSAPUSH], #0x1"
+            ]
           },
           {
               "Name": "IntCompare",

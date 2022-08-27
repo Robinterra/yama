@@ -54,7 +54,7 @@ namespace "System.Gpio"
 
         // -----------------------------------------------
 
-        public bool Read (  )
+        public int Read (  )
         {
             return this.gpioService.Read ( this.pin );
         }
