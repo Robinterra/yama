@@ -25,6 +25,26 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        public static int OpenFile(string filename)
+        {
+            int fileId = #defalgo Exec,OpenFile:;
+
+            return fileId;
+        }
+
+        // -----------------------------------------------
+
+        public static int Mmap2(int fileId, int adresse)
+        {
+            int virtuelAdress = #defalgo Exec,Mmap2:;
+
+            return virtuelAdress;
+        }
+
+
+        // -----------------------------------------------
+
+
         /**
          * Print int
          */

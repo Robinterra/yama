@@ -84,10 +84,10 @@ namespace Yama.Assembler.Runtime
 
             this.Size = data.Length + 4;
             int temp = this.Size & 0x3;
-            if (temp > 0) this.Size = this.Size + 4;
+            if (temp >= 0) this.Size = this.Size + 4;
             this.Size = this.Size ^ temp;
 
-            for (int i = 0; i < 4 - (temp == 0 ? 4 : temp); i++)
+            for (int i = 0; i < 4 - (temp == 0 ? 0 : temp); i++)
             {
                 datenstring = datenstring + "\0";
             }

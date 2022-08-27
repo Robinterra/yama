@@ -12,7 +12,7 @@ namespace "System.Gpio"
 
         // -----------------------------------------------
 
-        public IGpioService gpioService;
+        public &IGpioService gpioService;
         public int pin;
 
         // -----------------------------------------------
@@ -25,8 +25,10 @@ namespace "System.Gpio"
 
         // -----------------------------------------------
 
-        public this new ( IGpioService service, int pin, int mode )
+        public this new ( &IGpioService service, int pin, int mode )
         {
+            if (service is null) return this;
+
             this.gpioService = service;
             this.pin = pin;
 

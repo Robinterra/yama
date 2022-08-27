@@ -137,5 +137,69 @@
         ],
         "KeyPatterns": [
         ]
+    },
+    {
+        "Name": "arm-a32-linux",
+        "Algos": [
+            {
+                "Name": "Wait",
+                "Mode": "microsecond",
+                "Description": "Wait one microsecond",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                ]
+            },
+            {
+                "Name": "Wait",
+                "Mode": "second",
+                "Description": "Wait one second",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "ldr r12, =0xBEBC200",
+                    "[JUMPTO[0]]:",
+                    "sub r12, r12, #1",
+                    "cmp r12, #0",
+                    "bne [JUMPTO[0]]"
+                ]
+            },
+            {
+                "Name": "Wait",
+                "Mode": "milisecond",
+                "Description": "Wait one milisecond",
+                "Keys": [
+                    {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                    }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "ldi r24, 0x6c",
+                    "ldi r25, 0x7",
+                    "[JUMPTO[0]]:",
+                    "sbiw r24, 1",
+                    "movw r22,r24",
+                    "or r22,r23",
+                    "tst r22",
+                    "brne [JUMPTO[0]]"
+                ]
+            }
+       ],
+        "AdvancedKeyReplaces": [
+        ],
+        "KeyPatterns": [
+        ]
     }
 ]

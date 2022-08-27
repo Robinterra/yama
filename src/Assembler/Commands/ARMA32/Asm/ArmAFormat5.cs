@@ -27,9 +27,9 @@ namespace Yama.Assembler.ARMA32
 
             uint firstFragment = ( condition << 28 ) & 0xF0000000;
             firstFragment |= ( request.Command << 20 ) & 0x0FF00000;
-            firstFragment |= ( request.RegisterInputRight << 16 ) & 0x00000F00;
-            firstFragment |= ( request.RegisterDestionation << 12) & 0x0000F000;
-            firstFragment |= ( request.Stype << 7) & 0x000000F0;
+            firstFragment |= ( request.RegisterDestionation << 12 ) & 0x0000F000;
+            firstFragment |= ( request.RegisterInputRight << 8) & 0x00000F00;
+            firstFragment |= ( request.Stype << 4) & 0x000000F0;
             firstFragment |= ( request.RegisterInputLeft ) & 0x0000000F;
 
             byte[] tmp = BitConverter.GetBytes ( firstFragment );

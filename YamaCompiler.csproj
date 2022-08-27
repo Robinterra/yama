@@ -26,6 +26,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="System\Gpio\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="System\Collections\*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

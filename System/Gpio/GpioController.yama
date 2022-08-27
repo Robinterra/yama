@@ -26,9 +26,10 @@ namespace "System.Gpio"
 
         public this new ( IGpioService gpioService )
         {
+            if (gpioService is null) return this;
             this.gpioService = gpioService;
 
-            gpioService.Setup();
+            this.gpioService.Setup();
 
             return this;
         }

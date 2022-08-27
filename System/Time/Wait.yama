@@ -19,13 +19,15 @@ namespace "System.Time"
          */
         public static bool InSeconds ( int seconds )
         {
+            int subtract = seconds + 0;
+
             while ( true )
             {
                 #defalgo Wait,second:
 
-                seconds = seconds - 1;
+                subtract = subtract - 1;
 
-                if ( seconds ) continue;
+                if ( subtract ) continue;
 
                 return true;
             }

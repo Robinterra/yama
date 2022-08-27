@@ -979,8 +979,9 @@ namespace Yama.Compiler.Definition
 
             if (correctDefinition == null)
             {
-                if (this.Compiler != null) return this.Compiler.AddError("Keine Extensionserweiterung für diese Definition verfügbar.");
-                else return false;
+                return true;
+                //if (this.Compiler != null) return this.Compiler.AddError("Keine Extensionserweiterung für diese Definition verfügbar.");
+                //else return false;
             }
 
             if (this.KeyPatterns is null) this.KeyPatterns = new List<GenericDefinitionKeyPattern>();
