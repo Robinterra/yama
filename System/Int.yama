@@ -300,6 +300,23 @@ namespace "System"
 
         // -----------------------------------------------
 
+        /**
+        * Modulus
+        *
+        * @param[in] a (int) The left Child of the Operator
+        * @param[in] b (int) The rigth Child of the Operator
+        *
+        * @return (int) Result
+        */
+        public operator int %(int a, int b)
+        {
+            int result = a / b * a;
+
+            return a - result;
+        }
+
+        // -----------------------------------------------
+
         #endregion arimetics
 
         // -----------------------------------------------
