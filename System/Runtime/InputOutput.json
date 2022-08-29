@@ -192,15 +192,15 @@
         ],
         "PostKeys": [],
         "AssemblyCommands": [
-        "push { r0 }",
-        "sub sp, sp, #0xc",
-        "mov r4, [SSAPOP[1]]",
-        "mov r0, #0",
-        "mov r1, sp",
+        "push { r0, r7 }",
+        "sub sp, sp, #0x10",
+        "mov r0, sp",
+        "mov r1, #0",
+        "mov r7, #78",
         "svc #0",
         "ldr [SSAPUSH], [sp]",
-        "add sp, sp, #0xc",
-        "pop { r0 }"
+        "add sp, sp, #0x10",
+        "pop { r0, r7 }"
         ]
     },
           {

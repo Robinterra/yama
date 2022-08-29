@@ -310,7 +310,7 @@ namespace "System"
         */
         public operator int %(int a, int b)
         {
-            int result = a / b * a;
+            int result = (a / b) * b;
 
             return a - result;
         }

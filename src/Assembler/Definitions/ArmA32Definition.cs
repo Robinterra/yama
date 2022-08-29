@@ -100,9 +100,9 @@ namespace Yama.Assembler.Definitions
             ArmAFormat7 format7 = new ArmAFormat7(this);
             definition.Formats.Add(format7);
 
-            definition.Commands.Add(new Command1Imediate("mov", format3, 0x3A, 4, 0xFFF));
+            definition.Commands.Add(new Command1Imediate("mov", format3, 0x3A, 4, 0xFF));
             definition.Commands.Add(new ArmLdrConst("mov", format3, 0x59, format2, 0xa, 12));
-            definition.Commands.Add(new Command1Imediate("cmp", format3, 0x35, 4, 0xFFF, true));
+            definition.Commands.Add(new Command1Imediate("cmp", format3, 0x35, 4, 0xFF, true));
 
             definition.Commands.Add(new Command2Register1Imediate("adc", format3, 0x2A, 4));
             definition.Commands.Add(new Command2Register1Imediate("add", format3, 0x28, 4));
