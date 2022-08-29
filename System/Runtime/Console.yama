@@ -35,6 +35,14 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        public static bool PrintLine ( string input )
+        {
+            Console.Print ( input );
+            Console.Print ( "\n" );
+        }
+
+        // -----------------------------------------------
+
         /**
          * Read int
          */

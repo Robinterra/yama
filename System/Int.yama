@@ -325,7 +325,7 @@ namespace "System"
 
         // -----------------------------------------------
 
-        public string ToString()
+        public String ToString()
         {
             int length = 1;
             int number = this as int;
@@ -356,7 +356,7 @@ namespace "System"
                 result.Data[i] = adder + segment;
             }
 
-            return result;
+            return new String(result);
         }
 
         // -----------------------------------------------

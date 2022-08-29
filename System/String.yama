@@ -79,12 +79,33 @@ namespace "System"
             set {}
         }
 
+        #endregion ctor
+    }
+
+    public class String
+    {
+
+        public string Content;
+
+        #region ctor
+
+        public this new(string content)
+        {
+            this.Content = content;
+        }
+
         public this ~()
         {
+            string content = this.Content;
+            if (content is null) return null;
 
+            MemoryManager.Free(content as int);
+
+            return null;
         }
 
         #endregion ctor
+
     }
 
 }
