@@ -179,6 +179,30 @@
           "pop { r0, r2, r5, r7 }"
           ]
       },
+      {
+        "Name": "Exec",
+        "Mode": "Time",
+        "Description": "Get Epoch Time",
+        "Keys": [
+              {
+                "Name": "[SSAPUSH]",
+                "Values": [
+                ]
+              }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+        "push { r0 }",
+        "sub sp, sp, #0xc",
+        "mov r4, [SSAPOP[1]]",
+        "mov r0, #0",
+        "mov r1, sp",
+        "svc #0",
+        "ldr [SSAPUSH], [sp]",
+        "add sp, sp, #0xc",
+        "pop { r0 }"
+        ]
+    },
           {
               "Name": "Exec",
               "Mode": "CallTwoArg",

@@ -44,6 +44,14 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        public static DateTime Time()
+        {
+            int epochTime = #defalgo Exec,Time:;
+
+            return epochTime as DateTime;
+        }
+
+        // -----------------------------------------------
 
         /**
          * Print int

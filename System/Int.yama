@@ -325,6 +325,42 @@ namespace "System"
 
         // -----------------------------------------------
 
+        public string ToString()
+        {
+            int length = 1;
+            int number = this as int;
+            number = number + 0;
+
+            for (int count = 0; count != 8; count = count + 1)
+            {
+                int sheep = count << 2;
+                int current = number >> sheep;
+
+                if (current is null) break;
+                if (count is null) continue;
+                length = length + 1;
+            }
+
+            string result = string.New[length];
+
+            for (int i = 0; length != 0; i = i + 1)
+            {
+                length = length - 1;
+
+                int sheep = length << 2;
+                int current = number >> sheep;
+
+                int adder = 0x30;
+                int segment = current & 0xf;
+                if (segment > 9) adder = 0x57;
+                result.Data[i] = adder + segment;
+            }
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
     }
 }
 

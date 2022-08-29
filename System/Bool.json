@@ -88,7 +88,8 @@
               "AssemblyCommands": [
               "cmp [SSAPOP[0]], #0x0",
               "mrs [SSAPUSH]",
-              "and [SSAPUSH], [SSAPUSH], #0x4"
+              "lsr [SSAPUSH], [SSAPUSH], #0x1E",
+              "and [SSAPUSH], [SSAPUSH], #0x1"
               ]
           }
       ]

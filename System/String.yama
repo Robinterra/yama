@@ -10,5 +10,81 @@ namespace "System"
         public int Length;
 
         #endregion vars
+
+        #region get/set
+
+        public int Data[int index]
+        {
+            get
+            {
+                if (index > this.Length) return 1;
+
+                int clean = 4 + index + this as int;
+                int bits = clean & 0x3;
+
+                int address = clean ^ bits;
+                Pointer pointer = address as Pointer;
+
+                bits = index & 0x3;
+
+                clean = pointer.Value;
+                clean = clean >> (bits << 0x3);
+
+                return clean & 0xFF;
+            }
+            set
+            {
+                if (index > this.Length) return 0;
+
+                value = value & 0xff;
+
+                int clean = 4 + index + this as int;
+                int bits = clean & 0x3;
+                int address = clean ^ bits;
+                Pointer pointer = address as Pointer;
+
+                bits = bits << 0x3;
+                value = value << bits;
+                bits = 0xff << bits;
+
+                pointer.Value = bits ^ (pointer.Value | bits);
+                pointer.Value = pointer.Value | value;
+            }
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public static string New[int size]
+        {
+            get
+            {
+                int sizeOnDisk = size + 4;
+                if (sizeOnDisk & 0x3)
+                {
+                    sizeOnDisk = sizeOnDisk | 0x3;
+                    sizeOnDisk = 4 + (sizeOnDisk ^ 0x3);
+                }
+                else
+                {
+                    sizeOnDisk = sizeOnDisk + 4;
+                }
+
+                string str = (MemoryManager.Malloc ( sizeOnDisk )) as string;
+                str.Length = size;
+
+                return str;
+            }
+            set {}
+        }
+
+        public this ~()
+        {
+
+        }
+
+        #endregion ctor
     }
+
 }

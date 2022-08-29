@@ -1,0 +1,22 @@
+namespace "System"
+{
+
+    using "System";
+
+    public primitive class DateTime
+    {
+
+        public int Hour
+        {
+            get
+            {
+                int epochTime = this as int;
+
+                int secondsPastThisDay = epochTime % 86400;
+
+                return secondsPastThisDay / 3600;
+            }
+        }
+
+    }
+}

@@ -49,7 +49,7 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new CommandJumpPoint("bgt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThan, true));
             definition.Commands.Add(new CommandJumpPoint("bge", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThanOrEqual, true));
             definition.Commands.Add(new CommandJumpPoint("blt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedLessThan, true));
-            definition.Commands.Add(new CommandJumpPoint("ble", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedGreaterThanOrEqual, true));
+            definition.Commands.Add(new CommandJumpPoint("ble", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedLessThanOrEqual, true));
 
             definition.Commands.Add(new CommandImediate("svc", format2, 0xf, 4, 0xfffff));
 
