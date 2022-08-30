@@ -92,5 +92,15 @@ namespace "System.Collections"
         }
 
         #endregion ctor
+
+        public static bool Copy(ByteArray destination, ByteArray source, int des_start, int src_start int length)
+        {
+            for (int i = 0; i < length; i = i + 1)
+            {
+                destination.Data[i + des_start] = source.Data[i + src_start];
+            }
+
+            return true;
+        }
     }
 }

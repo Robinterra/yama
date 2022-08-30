@@ -259,7 +259,7 @@ namespace Yama.Parser
 
             this.OperatorCall.Compile(compiler, this.Reference, "methode");
 
-            this.FunctionExecute.Compile(compiler, null, mode);
+            this.FunctionExecute.Compile(compiler, this, mode);
 
             return true;
         }

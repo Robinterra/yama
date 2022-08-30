@@ -80,6 +80,21 @@ namespace "System"
         }
 
         #endregion ctor
+
+        #region operators
+
+        public operator String +(string a, string b)
+        {
+            int size = a.Length + b.Length;
+            string newString = string.New[size];
+
+            ByteArray.Copy(newString as ByteArray, a as ByteArray, 0, 0, a.Length);
+            ByteArray.Copy(newString as ByteArray, b as ByteArray, a.Length, 0, b.Length);
+
+            return new String(newString);
+        }
+
+        #endregion operators
     }
 
     public class String

@@ -333,6 +333,14 @@ namespace Yama.Compiler
                 }
             }
 
+            if (map.Reference.Owner.Node is Operator2Childs op2c && op2c.Reference?.Deklaration is not null)
+            {
+                if (op2c.Reference.Deklaration.Use is MethodeDeclarationNode mdn && mdn.NullableToken is null)
+                {
+                    map.Value = SSAVariableMap.LastValue.NotNull;
+                }
+            }
+
             if (arg.IndexRef is IndexPropertyDeklaration ipd)
             {
                 if (ipd.Use.BorrowingToken is not null)
