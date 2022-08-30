@@ -95,6 +95,15 @@ namespace "System"
         }
 
         #endregion operators
+
+        public static String Concat(string a, string b, string c)
+        {
+            String cat1 = a + b;
+            String result = cat1.Content + c;
+
+            return result;
+        }
+
     }
 
     public class String
