@@ -244,7 +244,17 @@ namespace Yama.Parser
                     if (klu.Zusatz == MethodeType.Static) return true;
             }
 
-            return leftNode.Compile(new RequestParserTreeCompile(compiler, mode == "point" ? mode : "default"));
+            if (compiler.ContainerMgmt.CurrentMethod is null) return false;
+            CompileContainer currentMethod = compiler.ContainerMgmt.CurrentMethod;
+
+            bool nullError = currentMethod.NullCallsCanProduceErrors;
+            currentMethod.NullCallsCanProduceErrors = true;
+
+            bool isok = leftNode.Compile(new RequestParserTreeCompile(compiler, mode == "point" ? mode : "default"));
+
+            currentMethod.NullCallsCanProduceErrors = nullError;
+
+            return isok;
         }
 
         private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexMethodDeklaration methdek)

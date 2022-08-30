@@ -100,10 +100,11 @@ namespace Yama.Compiler
             map.Reference = line;
             this.Line = line;
 
-            if ( map.IsNullable )
+            if ( map.IsReference )
             {
                 map.Value = SSAVariableMap.LastValue.Unknown;
                 if ( map.Reference.Owner is CompileNumConst ) map.Value = SSAVariableMap.LastValue.Null;
+                if (map.Deklaration.Use is VariabelDeklaration vd && vd.NullableToken is null) map.Value = SSAVariableMap.LastValue.NotNull;
             }
             else map.Value = SSAVariableMap.LastValue.NotNull;
 

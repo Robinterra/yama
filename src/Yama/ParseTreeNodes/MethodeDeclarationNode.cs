@@ -125,6 +125,12 @@ namespace Yama.Parser
             set;
         }
 
+        public IdentifierToken? NullableToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -258,6 +264,9 @@ namespace Yama.Parser
             deklaration.TypeDefinition = token;
             deklaration.AllTokens.Add(token);
 
+            token = this.TryParseNullable(request.Parser, token, deklaration);
+            if (token is null) return null;
+
             if ( !this.CheckSonderRegleung ( deklaration.TypeDefinition ) ) token = request.Parser.Peek ( token, 1 );
             if (token is null) return null;
 
@@ -303,6 +312,19 @@ namespace Yama.Parser
 
             IdentifierToken? nextToken = parser.Peek(token, 1);
             return nextToken;
+        }
+
+        private IdentifierToken? TryParseNullable(Parser parser, IdentifierToken token, MethodeDeclarationNode node)
+        {
+            IdentifierToken? nullable = parser.Peek(token, 1);
+            if (nullable is null) return token;
+            if (nullable.Kind != IdentifierKind.Operator) return token;
+            if (nullable.Text != "?") return token;
+
+            node.NullableToken = nullable;
+            node.AllTokens.Add(nullable);
+
+            return nullable;
         }
 
         private bool CheckSonderRegleung(IdentifierToken typeDefinition)
@@ -482,7 +504,10 @@ namespace Yama.Parser
             this.CompileContainer.Ende = new CompileSprungPunkt();
             this.CompileContainer.Ende.Node = this;
 
-            this.CompileReturnType(this.CompileContainer, this.Deklaration.ReturnValue.Deklaration, this.BorrowingToken is not null, this.Deklaration.ReturnValue );
+            bool isnullable = this.NullableToken is not null;
+            if (this.Deklaration.Type == MethodeType.DeCtor) isnullable = true;
+
+            this.CompileReturnType(this.CompileContainer, this.Deklaration.ReturnValue.Deklaration, isnullable, this.BorrowingToken is not null, this.Deklaration.ReturnValue );
 
             request.Compiler.BeginNewMethode(this.RegisterInUse, this.CompileContainer, c.IndexContainer.ThisUses);
 
@@ -512,7 +537,7 @@ namespace Yama.Parser
             return this.CompileNormalFunktion(request.Compiler, request.Mode, count);
         }
 
-        private void CompileReturnType(CompileContainer compileContainer, IParent? deklaration, bool isBorrowing, IndexVariabelnReference varref)
+        private void CompileReturnType(CompileContainer compileContainer, IParent? deklaration, bool isNullable, bool isBorrowing, IndexVariabelnReference varref)
         {
             if (deklaration is not IndexKlassenDeklaration dk) return;
 
@@ -522,7 +547,8 @@ namespace Yama.Parser
             {
                 kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
 
-                vardek.IsNullable = true;
+                vardek.IsReference = true;
+                vardek.IsNullable = isNullable;
             }
 
             SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);

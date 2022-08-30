@@ -93,6 +93,14 @@ namespace Yama.Index
 
         // -----------------------------------------------
 
+        public bool IsReference
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         public bool IsNullable
         {
             get;
@@ -219,7 +227,7 @@ namespace Yama.Index
                 return true;
             }
 
-            this.IsNullable = true;
+            this.IsReference = true;
 
             return true;
         }

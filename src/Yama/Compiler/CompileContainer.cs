@@ -104,6 +104,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public bool NullCallsCanProduceErrors
+        {
+            get;
+            set;
+        } = false;
+
         public List<SSAVariableMap> Deklarations
         {
             get;

@@ -283,7 +283,7 @@ namespace Yama.Compiler
                 if (map.Reference != null) map.AllSets.Add(arg.Reference);
                 map.Reference = arg.Reference;
 
-                if ( map.IsNullable )
+                if ( map.IsReference )
                 {
                     if (!this.SetVariableByReferenceCheck(compiler, arg, map, node)) return false;
                 }
@@ -306,7 +306,7 @@ namespace Yama.Compiler
             if (map.Reference != null) map.AllSets.Add(lineset);
             map.Reference = lineset;
 
-            if ( map.IsNullable )
+            if ( map.IsReference )
             {
                 if (!this.SetVariableByReferenceCheck(compiler, arg, map, node)) return false;
             }
@@ -325,6 +325,14 @@ namespace Yama.Compiler
             if (map.Reference.Owner.Node is NewKey) map.Value = SSAVariableMap.LastValue.NotNull;
             //if (this.IsNullCheck) map.Value = SSAVariableMap.LastValue.NotNull;
 
+            if (map.Reference.Owner.Node is MethodeCallNode mk && mk.Reference?.Deklaration is not null)
+            {
+                if (mk.Reference.Deklaration.Use is MethodeDeclarationNode mdn && mdn.NullableToken is null)
+                {
+                    map.Value = SSAVariableMap.LastValue.NotNull;
+                }
+            }
+
             if (arg.IndexRef is IndexPropertyDeklaration ipd)
             {
                 if (ipd.Use.BorrowingToken is not null)
@@ -340,6 +348,10 @@ namespace Yama.Compiler
                 new CompileNumConst().Compile(compiler, new Number { Token = new Lexer.IdentifierToken() { Value = 0 } });
                 compiler.ContainerMgmt.StackArguments.Push(arg.Reference.Arguments.First());
                 new CompileReferenceCall().Compile(compiler, rc, "setpoint");
+            }
+            if (arg.Reference is not null)
+            {
+                if (arg.Reference.Owner is CompileNumConst) map.Value = SSAVariableMap.LastValue.Null;
             }
             if (arg.Variable is null) return true;
 
@@ -457,8 +469,9 @@ namespace Yama.Compiler
         public bool GetVariableCompile(Compiler compiler, IndexVariabelnDeklaration deklaration, IParseTreeNode use)
         {
             if (compiler.ContainerMgmt.CurrentMethod is null) return compiler.AddError("no method found", deklaration.Use);
-            if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(deklaration.Name)) return compiler.AddError("variable not in varmapper", deklaration.Use);
 
+            CompileContainer currentMethode = compiler.ContainerMgmt.CurrentMethod;
+            if (!currentMethode.VarMapper.ContainsKey(deklaration.Name)) return compiler.AddError("variable not in varmapper", deklaration.Use);
             SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[deklaration.Name];
             this.VariableMap = map;
 
@@ -468,8 +481,8 @@ namespace Yama.Compiler
             if ( lastValue == SSAVariableMap.LastValue.NotSet )
                 return compiler.AddError ( "variable is not set!", use );
             if ( lastValue == SSAVariableMap.LastValue.NeverCall ) return compiler.AddError ( "variable is unaviable!", use );
-            if ( lastValue == SSAVariableMap.LastValue.Null ) return compiler.AddError ( "variable is null", use );
-            if ( lastValue == SSAVariableMap.LastValue.Unknown  ) return compiler.AddError ( "null checking for variable is missing", use );
+            if ( lastValue == SSAVariableMap.LastValue.Null && currentMethode.NullCallsCanProduceErrors) return compiler.AddError ( "variable is null", use );
+            if ( lastValue == SSAVariableMap.LastValue.Unknown && currentMethode.NullCallsCanProduceErrors) return compiler.AddError ( "null checking for variable is missing", use );
 
             if (map.Reference == null)
                 return compiler.AddError("variable is not set!", deklaration.Use);

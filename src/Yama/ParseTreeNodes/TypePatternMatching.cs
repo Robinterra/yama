@@ -201,7 +201,7 @@ namespace Yama.Parser
             reference.Use = this;
             reference.Name = this.ReferenceDeklaration.Text;
             reference.IsMutable = false;
-            reference.IsNullable = true;
+            reference.IsReference = true;
             reference.IsBorrowing = this.BorrowingToken is not null;
             container.VariabelnDeklarations.Add(reference);
             container.VariabelnReferences.Add(type);

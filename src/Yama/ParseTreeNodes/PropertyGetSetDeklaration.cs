@@ -338,7 +338,7 @@ namespace Yama.Parser
             {
                 kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
 
-                vardek.IsNullable = true;
+                vardek.IsReference = true;
             }
 
             SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);

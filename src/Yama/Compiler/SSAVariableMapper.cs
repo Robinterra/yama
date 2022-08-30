@@ -50,11 +50,11 @@ namespace Yama.Compiler
             }
         }
 
-        public bool IsNullable
+        public bool IsReference
         {
             get
             {
-                return this.Deklaration.IsNullable;
+                return this.Deklaration.IsReference;
             }
         }
 
@@ -204,7 +204,7 @@ namespace Yama.Compiler
 
         private VariableType GetVariableKind(IndexVariabelnDeklaration dek)
         {
-            if (!dek.IsNullable) return VariableType.Primitive;
+            if (!dek.IsReference) return VariableType.Primitive;
             if (dek.IsBorrowing) return VariableType.BorrowingReference;
 
             return VariableType.OwnerReference;

@@ -173,7 +173,7 @@ namespace Yama.Parser
             return true;
         }
 
-        private SSAVariableMap? GetParameterVariableMap(bool isBorrowing, IndexVariabelnDeklaration vardek)
+        private SSAVariableMap? GetParameterVariableMap(bool isBorrowing, IndexVariabelnDeklaration vardek, bool isNullable)
         {
             if (vardek.Type.Deklaration is not IndexKlassenDeklaration dk) return null;
 
@@ -182,7 +182,8 @@ namespace Yama.Parser
             {
                 kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
 
-                vardek.IsNullable = true;
+                vardek.IsReference = true;
+                vardek.IsNullable = isNullable;
             }
 
             SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);
@@ -213,18 +214,32 @@ namespace Yama.Parser
                 IndexVariabelnDeklaration varDek = methodDeklaration.Parameters[length - parasCount - 1];
 
                 bool isBorrowing = false;
-                if (varDek.Use is VariabelDeklaration vd) isBorrowing = vd.BorrowingToken is not null;
+                bool isNullable = false;
+                if (varDek.Use is VariabelDeklaration vd)
+                {
+                    isBorrowing = vd.BorrowingToken is not null;
+                    isNullable = vd.NullableToken is not null;
+                }
 
                 compileNode.Compile(request);
 
                 CompilePushResult compilePushResult = new CompilePushResult();
-                compilePushResult.ParameterType = this.GetParameterVariableMap(isBorrowing, varDek);
+                compilePushResult.ParameterType = this.GetParameterVariableMap(isBorrowing, varDek, isNullable);
                 compilePushResult.Compile(request.Compiler, null, "default");
 
                 parasCount++;
             }
 
+            if (request.Compiler.ContainerMgmt.CurrentMethod is null) return false;
+            CompileContainer currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
+
+            bool nullError = currentMethod.NullCallsCanProduceErrors;
+            currentMethod.NullCallsCanProduceErrors = true;
+
             leftNode.Compile(new RequestParserTreeCompile(request.Compiler, "methode"));
+
+            currentMethod.NullCallsCanProduceErrors = nullError;
+
             if (this.LeftNode is not PointIdentifier op) return false;
 
             if (op.IsANonStatic) parasCount++;
@@ -236,7 +251,7 @@ namespace Yama.Parser
                 usePara.Compile(compiler, null);
             }*/
 
-            this.FunctionExecute.Compile(request.Compiler, null, request.Mode);
+            this.FunctionExecute.Compile(request.Compiler, this, request.Mode);
 
             return true;
         }

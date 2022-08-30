@@ -155,12 +155,23 @@ namespace Yama.Compiler
         {
             if (sSACompileArgument is null) return true;
             if (parameterType is null) return true;
+
+            if (sSACompileArgument.Reference is not null)
+            {
+                if (sSACompileArgument.Reference.Owner is CompileNumConst && parameterType.Deklaration.IsReference && !parameterType.Deklaration.IsNullable) return compiler.AddError($"It is not possible to put null value to a non nullable", parameterType.Deklaration.Use);
+            }
+
             if (sSACompileArgument.Variable is null) return true;
 
             SSAVariableMap varaibleType = sSACompileArgument.Variable;
             if (parameterType.MutableState == SSAVariableMap.VariableMutableState.NotMutable) return compiler.AddError("The Property/Vektor has no set Statement", parameterType.Deklaration.Use);
-            if (!varaibleType.IsNullable) return true;
-            if (!parameterType.IsNullable) return compiler.AddError($"It is not possible to put a '{varaibleType.Key}' ReferenceType to a non '{parameterType.Key}' Reference Parameter", parameterType.Deklaration.Use);
+            if (!varaibleType.IsReference) return true;
+            if (!parameterType.IsReference) return compiler.AddError($"It is not possible to put a '{varaibleType.Key}' ReferenceType to a non '{parameterType.Key}' Reference Parameter", parameterType.Deklaration.Use);
+
+            if (!parameterType.Deklaration.IsNullable)
+            {
+                if (varaibleType.Value != SSAVariableMap.LastValue.NotNull) return compiler.AddError($"It is not possible to put '{varaibleType.Key}' Variable that is not check for null", parameterType.Deklaration.Use);
+            }
 
             if (varaibleType.Kind == SSAVariableMap.VariableType.OwnerReference && parameterType.Kind == SSAVariableMap.VariableType.OwnerReference)
             {

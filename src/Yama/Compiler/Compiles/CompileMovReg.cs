@@ -116,12 +116,32 @@ namespace Yama.Compiler
 
             SSACompileArgument? arg = line.Arguments.FirstOrDefault();
             if (arg is null) return line;
-            if (arg.Variable is null) return line;
-
             CompileContainer? currentMethode = compiler.ContainerMgmt.CurrentMethod;
             if (currentMethode is null) return line;
             if (currentMethode.ReturnType is null) return line;
-            if (!currentMethode.ReturnType.IsNullable) return line;
+            if (!currentMethode.ReturnType.IsReference) return line;
+
+            if (arg.Reference is not null)
+            {
+                if (arg.Reference.Owner is CompileNumConst && !currentMethode.ReturnType.Deklaration.IsNullable && currentMethode.ReturnType.Deklaration.IsReference)
+                {
+                    compiler.AddError($"can not return null, Returntype is not nullable", node);
+
+                    return null;
+                }
+            }
+            if (arg.Variable is null) return line;
+
+            if (!currentMethode.ReturnType.Deklaration.IsNullable)
+            {
+                if (arg.Variable.Value != SSAVariableMap.LastValue.NotNull)
+                {
+                    compiler.AddError($"can not return null '{arg.Variable.Key}', Returntype is not nullable", node);
+
+                    return null;
+                }
+            }
+
             if (currentMethode.ReturnType.Kind == SSAVariableMap.VariableType.BorrowingReference && arg.Variable.Kind == SSAVariableMap.VariableType.OwnerReference)
             {
                 compiler.AddError($"can not borrowing from variable '{arg.Variable.Key}', variable will be clear after leaving the scope", node);

@@ -178,7 +178,7 @@ namespace Yama.Parser
             {
                 kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
 
-                vardek.IsNullable = true;
+                vardek.IsReference = true;
             }
 
             SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);
@@ -222,7 +222,16 @@ namespace Yama.Parser
             string modeCall = "vektorcall";
             if (request.Mode == "set") modeCall = "setvektorcall";
 
+            if (request.Compiler.ContainerMgmt.CurrentMethod is null) return false;
+            CompileContainer currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
+
+            bool nullError = currentMethod.NullCallsCanProduceErrors;
+            currentMethod.NullCallsCanProduceErrors = true;
+
             leftNode.Compile(new RequestParserTreeCompile(request.Compiler, modeCall));
+
+            currentMethod.NullCallsCanProduceErrors = nullError;
+
             if (this.LeftNode is not PointIdentifier op) return false;
 
             if (op.IsANonStatic) parasCount++;

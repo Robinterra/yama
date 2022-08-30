@@ -88,6 +88,12 @@ namespace Yama.Parser
             set;
         }
 
+        public IdentifierToken? NullableToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -158,7 +164,10 @@ namespace Yama.Parser
 
             if (!IsInMethodeDeklaration) return node;
 
-            IdentifierToken? optionalComma = request.Parser.Peek ( variableNameToken, 1 );
+            IdentifierToken? optionalNullable = this.TryParseNullable(variableNameToken, node, request.Parser);
+            if (optionalNullable is null) return node;
+
+            IdentifierToken? optionalComma = request.Parser.Peek (optionalNullable, 1 );
             if (optionalComma is null) return node;
             if (optionalComma.Kind != IdentifierKind.Comma) return node;
 
@@ -166,6 +175,19 @@ namespace Yama.Parser
             node.Ende = optionalComma;
 
             return node;
+        }
+
+        private IdentifierToken? TryParseNullable(IdentifierToken variableNameToken, VariabelDeklaration node, Parser parser)
+        {
+            IdentifierToken? optionalNullable = parser.Peek(variableNameToken, 1);
+            if (optionalNullable is null) return null;
+            if (optionalNullable.Kind != IdentifierKind.Operator) return variableNameToken;
+            if (optionalNullable.Text != "?") return variableNameToken;
+
+            node.NullableToken = optionalNullable;
+            node.AllTokens.Add (optionalNullable);
+
+            return optionalNullable;
         }
 
         private IdentifierToken? TryParseBorrwoing(RequestParserTreeParser request, VariabelDeklaration node)
