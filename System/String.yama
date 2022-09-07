@@ -94,6 +94,42 @@ namespace "System"
             return new String(newString);
         }
 
+        public operator bool ==(string a, string b)
+        {
+            int length = a.Length;
+            if (length != b.Length) return false;
+
+
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int valueA = a.Data[i];
+                int valueB = b.Data[i];
+                if (valueA != valueB) return false;
+            }
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public operator bool !=(string a, string b)
+        {
+            int length = a.Length;
+            if (length != b.Length) return true;
+
+
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int valueA = a.Data[i];
+                int valueB = b.Data[i];
+                if (valueA != valueB) return true;
+            }
+
+            return false;
+        }
+
+        // -----------------------------------------------
+
         #endregion operators
 
         public static String Concat(string a, string b, string c)
