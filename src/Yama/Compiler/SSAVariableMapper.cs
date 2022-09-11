@@ -133,11 +133,21 @@ namespace Yama.Compiler
             get;
         }
 
-        /*public bool TryToClean
+        public IndexKlassenDeklaration? IsStruct
         {
             get;
             set;
-        }*/
+        }
+
+        public int StructPropCount
+        {
+            get
+            {
+                if (this.IsStruct is null) return 0;
+
+                return this.IsStruct.IndexProperties.Count;
+            }
+        }
 
         public SSACompileLine? TryToClean
         {
@@ -158,6 +168,13 @@ namespace Yama.Compiler
             this.Kind = type;
             this.MutableState = VariableMutableState.NotMutable;
             this.ArgumentsCalls = new List<SSACompileArgument>();
+
+            if (dek.Type.Deklaration is not IndexKlassenDeklaration ikd) return;
+            if (ikd.MemberModifier != ClassMemberModifiers.Struct) return;
+
+            this.Value = LastValue.NotNull;
+            this.Kind = VariableType.StackValue;
+            this.IsStruct = ikd;
         }
 
         public SSAVariableMap(IndexVariabelnDeklaration dek)
@@ -170,6 +187,13 @@ namespace Yama.Compiler
             this.Kind = this.GetVariableKind(dek);
             if (!dek.IsMutable) this.MutableState = VariableMutableState.NotMutable;
             this.ArgumentsCalls = new List<SSACompileArgument>();
+
+            if (dek.Type.Deklaration is not IndexKlassenDeklaration ikd) return;
+            if (ikd.MemberModifier != ClassMemberModifiers.Struct) return;
+
+            this.Value = LastValue.NotNull;
+            this.Kind = VariableType.StackValue;
+            this.IsStruct = ikd;
         }
 
         public SSAVariableMap(SSAVariableMap value)
@@ -185,6 +209,7 @@ namespace Yama.Compiler
             this.MutableState = value.MutableState;
             this.ArgumentsCalls = value.ArgumentsCalls;
             this.TryToClean = value.TryToClean;
+            this.IsStruct = value.IsStruct;
         }
 
         #endregion ctor
@@ -204,7 +229,7 @@ namespace Yama.Compiler
 
         private VariableType GetVariableKind(IndexVariabelnDeklaration dek)
         {
-            if (!dek.IsReference) return VariableType.Primitive;
+            if (!dek.IsReference) return VariableType.StackValue;
             if (dek.IsBorrowing) return VariableType.BorrowingReference;
 
             return VariableType.OwnerReference;
@@ -226,7 +251,7 @@ namespace Yama.Compiler
 
         public enum VariableType
         {
-            Primitive, //ByValue
+            StackValue, //ByValue
             OwnerReference, //ByReference
             BorrowingReference //ByReference
         }

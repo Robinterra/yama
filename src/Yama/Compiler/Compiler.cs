@@ -249,6 +249,15 @@ namespace Yama.Compiler
             container.Ende = compileContainer.Ende;
             this.PushContainer(container, null);
 
+            foreach (KeyValuePair<string, SSAVariableMap> map in compileContainer.VarMapper)
+            {
+                if (map.Value.IsStruct is null) continue;
+                if (!map.Value.Deklaration.IsMutable) continue;
+                if (map.Value.Key == "Result" && compileContainer.ReturnType?.IsStruct is not null) continue;
+
+                compileContainer.VarStructs.Add(map.Value);
+            }
+
             return true;
         }
 
@@ -452,11 +461,13 @@ namespace Yama.Compiler
             {
                 if (!(parent is IndexVariabelnDeklaration dek)) continue;
                 if (this.ContainerMgmt.CurrentMethod is null) continue;
-                if (this.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(dek.Name)) continue;
+
+                string name = dek.Name == "return" ? "Result" : dek.Name;
+                if (this.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(name)) continue;
 
                 SSAVariableMap map = new SSAVariableMap(dek);
 
-                this.ContainerMgmt.CurrentMethod.VarMapper.Add(dek.Name, map);
+                this.ContainerMgmt.CurrentMethod.VarMapper.Add(name, map);
             }
 
             return true;

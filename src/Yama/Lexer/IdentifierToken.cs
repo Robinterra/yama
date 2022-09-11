@@ -233,6 +233,8 @@ namespace Yama.Lexer
         Hash,
         Gleich,
         Primitive,
+        Struct,
+        Let,
     }
 }
 

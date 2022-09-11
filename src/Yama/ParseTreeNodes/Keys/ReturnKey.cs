@@ -111,7 +111,9 @@ namespace Yama.Parser
             if (request.Compiler.ContainerMgmt.CurrentMethod is null) return true;
             CompileContainer currentMethode = request.Compiler.ContainerMgmt.CurrentMethod;
 
+            this.LefNodeIsStruct(currentMethode.ReturnType, request);
             compileNode.Compile(request);
+            request.StructLeftNode = null;
 
             CompileMovReg movReg = new CompileMovReg();
             SSACompileLine? moveRegLine = movReg.Compile(request.Compiler, this);
@@ -143,6 +145,18 @@ namespace Yama.Parser
                 varilabeMap.Value.MutableState = SSAVariableMap.VariableMutableState.NotMutable;
                 varilabeMap.Value.First.TryToClean = tryToCleans[i];
             }
+
+            return true;
+        }
+
+        private bool LefNodeIsStruct(SSAVariableMap? returnValue, RequestParserTreeCompile request)
+        {
+            if (returnValue is null) return false;
+            if (returnValue.Deklaration.Type.Deklaration is not IndexKlassenDeklaration ikd) return false;
+            if (ikd.MemberModifier != ClassMemberModifiers.Struct) return false;
+
+            IndexVariabelnDeklaration dek = new IndexVariabelnDeklaration(this, returnValue.Key, new IndexVariabelnReference(this, returnValue.Key) { Deklaration = ikd });
+            request.StructLeftNode = dek;
 
             return true;
         }

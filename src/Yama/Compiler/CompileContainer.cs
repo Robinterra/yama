@@ -115,6 +115,11 @@ namespace Yama.Compiler
             get;
         } = new List<SSAVariableMap>();
 
+        public List<SSAVariableMap> VarStructs
+        {
+            get;
+        } = new List<SSAVariableMap>();
+
         #endregion get/set
 
         #region methods

@@ -238,7 +238,7 @@ namespace Yama.Compiler
             return true;
         }
 
-        private bool SetVariableCompile(Compiler compiler, IndexVariabelnDeklaration node)
+        public bool SetVariableCompile(Compiler compiler, IndexVariabelnDeklaration node)
         {
             if (node.Use == null) return compiler.AddError("Darf nicht null sein");
 

@@ -531,6 +531,19 @@ namespace Yama.Parser
                 bool v = this.BaseCompile(request.Compiler);
             }
 
+            int structLocation = 0;
+            foreach (SSAVariableMap map in this.CompileContainer.VarStructs)
+            {
+                CompileStructAllocation allocation = new CompileStructAllocation();
+                allocation.MethodenContainer = this.CompileContainer;
+                allocation.Position = structLocation;
+                allocation.Compile(request.Compiler, map.Deklaration);
+
+                //CompileReferenceCall referenceCall = new CompileReferenceCall();
+                //referenceCall.SetVariableCompile(request.Compiler, map.Deklaration);
+                structLocation++;
+            }
+
             if (this.Deklaration.Type == MethodeType.Ctor) this.CompileCtor(request.Compiler, request.Mode);
             if (this.Deklaration.Type == MethodeType.DeCtor) this.CompileDeCtor(request.Compiler, request.Mode);
 
@@ -540,9 +553,10 @@ namespace Yama.Parser
         private void CompileReturnType(CompileContainer compileContainer, IParent? deklaration, bool isNullable, bool isBorrowing, IndexVariabelnReference varref)
         {
             if (deklaration is not IndexKlassenDeklaration dk) return;
+            if (this.Deklaration is null) return;
 
-            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
-            IndexVariabelnDeklaration vardek = new IndexVariabelnDeklaration(this, dk.Name, varref);
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.StackValue;
+            IndexVariabelnDeklaration vardek = new IndexVariabelnDeklaration(this, "return", varref);
             if (dk.MemberModifier == ClassMemberModifiers.None)
             {
                 kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
@@ -552,8 +566,11 @@ namespace Yama.Parser
             }
 
             SSAVariableMap map = new SSAVariableMap(dk.Name, kind, vardek);
-
             compileContainer.ReturnType = map;
+
+            if (map.IsStruct is null) return;
+
+            this.Deklaration.Parameters.Add(vardek);
         }
 
         private bool MakeOneArgument(IndexVariabelnDeklaration node, Compiler.Compiler compiler, int count)
@@ -716,6 +733,7 @@ namespace Yama.Parser
             this.CompileContainer.Ende.Compile(compiler, this, "default");
 
             this.FunktionsEndeCompile.ArgsCount = count;
+            this.FunktionsEndeCompile.Structs = this.CompileContainer.VarStructs;
             this.FunktionsEndeCompile.Compile(compiler, this, mode);
 
             this.VariabelCounter = compiler.Definition.VariabelCounter;

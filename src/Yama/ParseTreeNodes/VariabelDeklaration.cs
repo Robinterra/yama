@@ -254,6 +254,7 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
+            if (request.StructDefiniton) return true;
             if (request.Compiler.ContainerMgmt.CurrentContainer is null) return false;
             if (request.Compiler.ContainerMgmt.CurrentMethod is null) return false;
 

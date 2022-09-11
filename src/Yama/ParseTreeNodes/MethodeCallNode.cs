@@ -177,7 +177,7 @@ namespace Yama.Parser
         {
             if (vardek.Type.Deklaration is not IndexKlassenDeklaration dk) return null;
 
-            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.StackValue;
             if (dk.MemberModifier == ClassMemberModifiers.None)
             {
                 kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;
@@ -206,12 +206,15 @@ namespace Yama.Parser
 
             int parasCount = 0;
 
+            int lengthOfParameters = this.StructResult(request, methodDeklaration);
+            if (lengthOfParameters == -2) return false;
+            if (lengthOfParameters == -1) return request.Compiler.AddError("the method is returning a struct, please assigment the return value to a variable", this);
+
             foreach (IParseTreeNode par in copylist )
             {
                 if (par is not ICompileNode compileNode) continue;
 
-                int length = methodDeklaration.Parameters.Count;
-                IndexVariabelnDeklaration varDek = methodDeklaration.Parameters[length - parasCount - 1];
+                IndexVariabelnDeklaration varDek = methodDeklaration.Parameters[lengthOfParameters - parasCount - 1];
 
                 bool isBorrowing = false;
                 bool isNullable = false;
@@ -254,6 +257,36 @@ namespace Yama.Parser
             this.FunctionExecute.Compile(request.Compiler, this, request.Mode);
 
             return true;
+        }
+
+        private int StructResult(RequestParserTreeCompile request, IndexMethodDeklaration methodDeklaration)
+        {
+            int res = methodDeklaration.Parameters.Count;
+
+            if (methodDeklaration.ReturnValue.Deklaration is IndexKlassenDeklaration ikd)
+            {
+                if (ikd.MemberModifier == ClassMemberModifiers.Struct) res = -1;
+            }
+
+            if (request.StructLeftNode is null) return res;
+            if (res != -1)
+            {
+                request.Compiler.AddError("The method is not given a struct back", this);
+                return -2;
+            }
+
+            res = methodDeklaration.Parameters.Count;
+
+            CompileReferenceCall call = new CompileReferenceCall();
+            call.GetVariableCompile(request.Compiler, request.StructLeftNode, this);
+
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.ParameterType = this.GetParameterVariableMap(false, request.StructLeftNode, false);
+            compilePushResult.Compile(request.Compiler, null, "default");
+
+            if (!methodDeklaration.Parameters.Any(t=>t.Name == "return")) return res;
+
+            return res - 1;
         }
 
         /*private bool CompileCopy(List<IParseTreeNode> copylist, RequestParserTreeCompile request)

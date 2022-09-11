@@ -82,6 +82,26 @@
         ]
       },
       {
+        "Name": "StructAllocation",
+        "Mode": "default",
+        "Description": "Die Zuweisung der structs",
+        "Keys": [
+          {
+            "Name": "[SSAPUSH]",
+            "Values": null
+          }
+        ],
+        "PostKeys": [
+          {
+            "Name": "[structlocation]",
+            "Values": null
+          }
+        ],
+        "AssemblyCommands": [
+          "add [SSAPUSH], sp, #[structlocation]"
+        ]
+      },
+      {
         "Name": "RefCallStack",
         "Mode": "Set",
         "Description": "Der setzen eines Property einer Instance",

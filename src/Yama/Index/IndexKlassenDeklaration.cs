@@ -414,7 +414,8 @@ namespace Yama.Index
 
         None,
         Static,
-        Primitive
+        Primitive,
+        Struct
 
     }
 }
