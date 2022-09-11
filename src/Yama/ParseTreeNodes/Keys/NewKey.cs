@@ -271,7 +271,7 @@ namespace Yama.Parser
         {
             if (vardek.Type.Deklaration is not IndexKlassenDeklaration dk) return null;
 
-            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.StackValue;
             if (dk.MemberModifier == ClassMemberModifiers.None)
             {
                 kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;

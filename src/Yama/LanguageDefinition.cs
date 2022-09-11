@@ -214,6 +214,7 @@ namespace Yama
 
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new KlassenDeklaration ( inclassLayer ));
+            layer.ParserMembers.Add(new StructDeklaration ( inclassLayer ));
             layer.ParserMembers.Add(new EnumDeklaration ( inenumLayer ));
             layer.ParserMembers.Add(new UsingKey (  ));
             layer.ParserMembers.Add(new NormalExpression (  ) );
@@ -294,6 +295,7 @@ namespace Yama
         {
             ParserLayer layer = new ParserLayer("incontainerStatement");
 
+            layer.ParserMembers.Add ( new LetKey ( expressionLayer ) );
             layer.ParserMembers.Add(new Container ( IdentifierKind.BeginContainer, IdentifierKind.CloseContainer ));
             layer.ParserMembers.Add(new ConditionalCompilationNode (  ));
             layer.ParserMembers.Add ( new IfKey ( expressionLayer, layer ) );
@@ -539,7 +541,9 @@ namespace Yama
             rules.Add ( new KeyWord ( "base", IdentifierKind.Base ) );
             rules.Add ( new KeyWord ( "sizeof", IdentifierKind.Sizeof ) );
             rules.Add ( new KeyWord ( "using", IdentifierKind.Using ) );
+            rules.Add ( new KeyWord ( "let", IdentifierKind.Let ) );
             rules.Add ( new KeyWord ( "namespace", IdentifierKind.Namespace ) );
+            rules.Add ( new KeyWord ( "struct", IdentifierKind.Struct ) );
             rules.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit ( false ), new Underscore (  ) } ) );
 
             return rules;

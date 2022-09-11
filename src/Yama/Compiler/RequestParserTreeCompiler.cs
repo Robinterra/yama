@@ -1,3 +1,6 @@
+using Yama.Index;
+using Yama.Parser;
+
 namespace Yama.Compiler
 {
     public class RequestParserTreeCompile
@@ -17,6 +20,18 @@ namespace Yama.Compiler
             set;
         }
 
+        public bool StructDefiniton
+        {
+            get;
+            set;
+        }
+
+        public IndexVariabelnDeklaration? StructLeftNode
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -31,6 +46,13 @@ namespace Yama.Compiler
         {
             this.Compiler = compiler;
             this.Mode = mode;
+        }
+
+        public RequestParserTreeCompile(Compiler compiler, string mode, bool structDef)
+        {
+            this.Compiler = compiler;
+            this.Mode = mode;
+            this.StructDefiniton = structDef;
         }
 
         #endregion ctor

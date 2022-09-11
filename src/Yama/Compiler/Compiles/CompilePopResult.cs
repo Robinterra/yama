@@ -88,9 +88,11 @@ namespace Yama.Compiler
             this.Node = node.Use;
             compiler.AssemblerSequence.Add(this);
 
+            string name = node.Name == "return" ? "Result" : node.Name;
             if (compiler.ContainerMgmt.CurrentMethod is null) return compiler.AddError("no current method found", node.Use);
-            if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(node.Name)) return compiler.AddError("Variable not found in mapper", node.Use);
-            SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[node.Name];
+            if (!compiler.ContainerMgmt.CurrentMethod.VarMapper.ContainsKey(name))
+                return compiler.AddError("Variable not found in mapper", node.Use);
+            SSAVariableMap map = compiler.ContainerMgmt.CurrentMethod.VarMapper[name];
 
             this.Algo = compiler.GetAlgo(this.AlgoName, "default");
             if (this.Algo == null) return false;

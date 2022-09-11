@@ -172,7 +172,7 @@ namespace Yama.Parser
         {
             if (deklaration is not IndexKlassenDeklaration dk) return null;
 
-            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.Primitive;
+            SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.StackValue;
             IndexVariabelnDeklaration vardek = new IndexVariabelnDeklaration(this, dk.Name, varref);
             if (dk.MemberModifier == ClassMemberModifiers.None)
             {

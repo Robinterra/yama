@@ -335,6 +335,11 @@ namespace Yama.Compiler
                 //if (fd.HasArguments) container.RegistersUses.Add(gd.GetRegister(1));
             }
 
+            if (this.Owner is CompileStructAllocation sa)
+            {
+                sa.VirtuellRegister = allocater.VirtuellRegister;
+            }
+
             if (this.Owner is CompileFunktionsEnde fe)
             {
                 fe.VirtuellRegister = allocater.VirtuellRegister;

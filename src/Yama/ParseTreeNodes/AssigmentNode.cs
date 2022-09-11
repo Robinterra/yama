@@ -118,9 +118,46 @@ namespace Yama.Parser
             if (this.ChildNode is not ICompileNode rightNode) return false;
             if (this.LeftNode is not ICompileNode leftnode) return false;
 
+            this.LefNodeIsStruct(leftnode, rightNode, request);
+
             rightNode.Compile(request);
 
+            if (request.StructLeftNode is not null)
+            {
+                request.StructLeftNode = null;
+
+                return true;
+            }
+
             return leftnode.Compile(new RequestParserTreeCompile ( request.Compiler, "set" ));
+        }
+
+        private bool LefNodeIsStruct(ICompileNode leftnode, ICompileNode rightNode, RequestParserTreeCompile request)
+        {
+            if (leftnode is VariabelDeklaration vd)
+            {
+                if (vd.Deklaration is not null)
+                {
+                    if (vd.Deklaration.Type.Deklaration is IndexKlassenDeklaration kdi)
+                    {
+                        if (kdi.MemberModifier == ClassMemberModifiers.Struct)
+                        {
+                            request.StructLeftNode = vd.Deklaration;
+
+                            return true;
+                        }
+                    }
+                }
+            }
+            if (leftnode is not ReferenceCall rc) return false;
+            if (rc.Reference is null) return false;
+            if (rc.Reference.Deklaration is not IndexVariabelnDeklaration ivd) return false;
+            if (ivd.Type.Deklaration is not IndexKlassenDeklaration ikd) return false;
+            if (ikd.MemberModifier != ClassMemberModifiers.Struct) return false;
+
+            request.StructLeftNode = ivd;
+
+            return true;
         }
 
         #endregion methods

@@ -117,8 +117,12 @@ namespace Yama.Index
                 if (this.NameInText == "main") return "main";
 
                 StringBuilder build = new StringBuilder();
+                int count = 0;
                 foreach (IndexVariabelnDeklaration dek in this.Parameters)
                 {
+                    if (dek.Name == "return" && dek.Type == this.ReturnValue) continue;
+                    count++;
+
                     build.AppendFormat("_{0}", dek.Type.Name);
                 }
 
@@ -126,7 +130,7 @@ namespace Yama.Index
                 string klassenName = "NULL";
                 if (this.Klasse is not null) klassenName = this.Klasse.Name;
 
-                return string.Format(pattern, klassenName, this.NameInText, this.Parameters.Count, build.ToString());
+                return string.Format(pattern, klassenName, this.NameInText, count, build.ToString());
             }
         }
 
@@ -220,9 +224,21 @@ namespace Yama.Index
             if (this.ThisUses.GetIndex is null) return false;
             this.ThisUses.GetIndex.CurrentMethode = this;
 
+            this.ReturnValueIsAStruct(this.ThisUses);
+
             this.Container.Mappen(this.ThisUses);
 
             return this.IsMapped = true;
+        }
+
+        private bool ReturnValueIsAStruct(ValidUses thisUses)
+        {
+            if (this.ReturnValue.Deklaration is not IndexKlassenDeklaration ikd) return false;
+            if (ikd.MemberModifier != ClassMemberModifiers.Struct) return false;
+
+            thisUses.Add(new IndexVariabelnDeklaration(this.Use, "Result", this.ReturnValue));
+
+            return true;
         }
 
         public bool PreMappen(ValidUses uses)

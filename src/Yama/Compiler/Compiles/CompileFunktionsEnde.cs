@@ -102,6 +102,11 @@ namespace Yama.Compiler
             get;
             set;
         }
+        public List<SSAVariableMap> Structs
+        {
+            get;
+            set;
+        } = new List<SSAVariableMap>();
 
         #endregion get/set
 
@@ -269,19 +274,14 @@ namespace Yama.Compiler
 
             Dictionary<string, string> postreplaces = new Dictionary<string, string>();
 
-            int varcount = 0;
-            if (this.MethodNode != null) varcount = this.MethodNode.VariabelCounter;
-            if (this.SetNode != null) varcount = this.SetNode.SetVariabelCounter;
-            if (this.GetNode != null) varcount = this.GetNode.GetVariabelCounter;
-            if (this.PSetNode != null) varcount = this.PSetNode.SetVariabelCounter;
-            if (this.PGetNode != null) varcount = this.PGetNode.GetVariabelCounter;
-
             List<string>? registerInUse = null;
             if (this.MethodNode != null) registerInUse = this.MethodNode.RegisterInUse;
             if (this.SetNode != null) registerInUse = this.SetNode.SetRegisterInUse;
             if (this.GetNode != null) registerInUse = this.GetNode.GetRegisterInUse;
             if (this.PSetNode != null) registerInUse = this.PSetNode.SetRegisterInUse;
             if (this.PGetNode != null) registerInUse = this.PGetNode.GetRegisterInUse;
+
+            int structsSize = this.Structs.Sum(t=>t.StructPropCount);
 
             foreach (AlgoKeyCall key in this.Algo.PostKeys)
             {
@@ -291,7 +291,7 @@ namespace Yama.Compiler
                 query.Key = key;
                 query.Value = registerInUse;
                 if (key.Name == "[stackcount]") query.Value = this.ArgsCount;
-                if (key.Name == "[virtuelRegister]") query.Value = this.VirtuellRegister.Count;
+                if (key.Name == "[virtuelRegister]") query.Value = this.VirtuellRegister.Count + structsSize;
 
                 string? value = compiler.Definition.PostKeyReplace(query);
                 if (value is null) return compiler.AddError("postkeyreplace konnte nicht ermittelt werden", this.Node);
@@ -299,7 +299,7 @@ namespace Yama.Compiler
                 postreplaces.Add(key.Name, value);
             }
 
-            if (this.VirtuellRegister.Count != 0) this.MakeVirtuelAdvnced(compiler, postreplaces);;
+            if (this.VirtuellRegister.Count + structsSize != 0) this.MakeVirtuelAdvnced(compiler, postreplaces);;
 
             for (int i = 0; i < this.Algo.AssemblyCommands.Count; i++)
             {

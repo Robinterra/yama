@@ -30,6 +30,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public CompileContainer? MethodenContainer
+        {
+            get;
+            set;
+        }
+
         public Dictionary<string, string> PrimaryKeys
         {
             get;
@@ -168,6 +174,7 @@ namespace Yama.Compiler
             if (node.Deklaration is null) return false;
 
             this.Node = node;
+            this.MethodenContainer = node.CompileContainer;
             this.HasArguments = node.Deklaration.Parameters.Count != 0;
             compiler.AssemblerSequence.Add(this);
 
@@ -269,7 +276,7 @@ namespace Yama.Compiler
         {
             if (this.Algo is null) return false;
             if (this.HasArguments) this.MakeArgumentsSPAdd(compiler);
-            if (this.VirtuellRegister.Count != 0) this.MakeVirtuelAdvnced(compiler);
+            if (this.VirtuellRegister.Count != 0 || this.MethodenContainer?.VarStructs.Count != 0) this.MakeVirtuelAdvnced(compiler);
 
             foreach (string str in this.AssemblyCommands)
             {
@@ -278,19 +285,15 @@ namespace Yama.Compiler
 
             Dictionary<string, string> postreplaces = new Dictionary<string, string>();
 
-            int varcount = 0;
-            if (this.MethodNode != null) varcount = this.MethodNode.VariabelCounter;
-            if (this.SetNode != null) varcount = this.SetNode.SetVariabelCounter;
-            if (this.GetNode != null) varcount = this.GetNode.GetVariabelCounter;
-            if (this.PSetNode != null) varcount = this.PSetNode.SetVariabelCounter;
-            if (this.PGetNode != null) varcount = this.PGetNode.GetVariabelCounter;
-
             List<string>? registerInUse = null;
             if (this.MethodNode != null) registerInUse = this.MethodNode.RegisterInUse;
             if (this.SetNode != null) registerInUse = this.SetNode.SetRegisterInUse;
             if (this.GetNode != null) registerInUse = this.GetNode.GetRegisterInUse;
             if (this.PSetNode != null) registerInUse = this.PSetNode.SetRegisterInUse;
             if (this.PGetNode != null) registerInUse = this.PGetNode.GetRegisterInUse;
+
+            int structsSize = 0;
+            if (this.MethodenContainer is not null) structsSize = this.MethodenContainer.VarStructs.Sum(t=>t.StructPropCount);
 
             foreach (AlgoKeyCall key in this.Algo.PostKeys)
             {
@@ -299,8 +302,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = new DefaultRegisterQuery();
                 query.Key = key;
                 query.Value = registerInUse;
-                if (key.Name == "[VARCOUNT]") query.Value = varcount;
-                if (key.Name == "[virtuelRegister]") query.Value = this.VirtuellRegister.Count;
+                if (key.Name == "[virtuelRegister]") query.Value = this.VirtuellRegister.Count + structsSize;
 
                 string? value = compiler.Definition.PostKeyReplace(query);
                 if (value is null) continue;

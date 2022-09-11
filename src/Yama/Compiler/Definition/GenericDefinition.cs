@@ -516,10 +516,37 @@ namespace Yama.Compiler.Definition
             if (query.Key.Name == "[stackcount]") return this.StackCountQuery(query);
             if (query.Key.Name == "[virtuelRegister]") return this.StackCountQuery(query);
             if (query.Key.Name == "[stackpushcount]") return this.StackPushCount(query);
+            if (query.Key.Name == "[structlocation]") return this.Structlocation(query);
 
             this.Compiler!.AddError("Post Key not supported");
 
             return null;
+        }
+
+        private string? Structlocation(IRegisterQuery query)
+        {
+            if (this.KeyPatterns is null) return null;
+            if (query.Key is null) return null;
+
+            GenericDefinitionKeyPattern? keyPattern = this.KeyPatterns.FirstOrDefault(t=>t.Key == "[VARCOUNT]");
+            if (keyPattern == null) { this.Compiler!.AddError(string.Format("Missing Keypattern {0}", query.Key.Name)); return null; }
+
+            if (query.Value is not CompileStructAllocation sa) return null;
+            if (sa.MethodenContainer is null) return null;
+            if (keyPattern.Pattern is null) return null;
+
+            int entityCount = sa.VirtuellRegister.Count;
+            if (this.Name == "runtime") entityCount += 1;
+            int i = 0;
+            foreach (SSAVariableMap map in sa.MethodenContainer.VarStructs)
+            {
+                if (i == sa.Position) break;
+
+                entityCount += map.StructPropCount;
+                i++;
+            }
+
+            return string.Format( keyPattern.Pattern, entityCount * this.AdressBytes );
         }
 
         private string? StackPushCount(IRegisterQuery query)
