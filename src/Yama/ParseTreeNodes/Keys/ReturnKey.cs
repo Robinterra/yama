@@ -87,8 +87,8 @@ namespace Yama.Parser
             if (node is not IContainer con) return null;
 
             IdentifierToken? semikolon = request.Parser.Peek(con.Ende, 1);
-            if (semikolon is null) return null;
-            if (semikolon.Kind != IdentifierKind.EndOfCommand) return null;
+            if (semikolon is null) return new ParserError(request.Token, "Expectet ; on the end of the Return", result.GetAllChilds);
+            if (semikolon.Kind != IdentifierKind.EndOfCommand) return new ParserError(request.Token, "Expectet ; on the end of the Return", result.GetAllChilds, semikolon);
             result.AllTokens.Add(semikolon);
             result.Ende = semikolon;
 

@@ -344,6 +344,7 @@ namespace Yama.Parser
         private IParseTreeNode? GetNodeFromToken ( IdentifierToken token )
         {
             if (token.ParentNode == null) return token.Node;
+            //if (token.Node == token.ParentNode) return null;
             //if (token.ParentNode.Token == token) return token.Node;
 
             return this.GetNodeFromToken ( token.ParentNode.Token );
