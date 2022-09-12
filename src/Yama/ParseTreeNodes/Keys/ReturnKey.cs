@@ -124,6 +124,9 @@ namespace Yama.Parser
             CompileCleanMemory cleanMemory = new CompileCleanMemory();
             cleanMemory.Compile(request.Compiler, this, tryToCleans);
 
+            CompileCleanMemory cleanMemoryStruct = new CompileCleanMemory();
+            cleanMemoryStruct.CompileCleanStructs(request.Compiler, this, currentMethode.VarStructs);
+
             request.Compiler.AssemblerSequence.Add(movReg);
             request.Compiler.AddSSALine(moveRegLine);
 
@@ -137,6 +140,7 @@ namespace Yama.Parser
             foreach (KeyValuePair<string, SSAVariableMap> varilabeMap in request.Compiler.ContainerMgmt.CurrentMethod.VarMapper)
             {
                 i = i + 1;
+                if (varilabeMap.Value.IsStruct is not null) continue;
 
                 varilabeMap.Value.Reference = null;
                 if (varilabeMap.Value.Kind != SSAVariableMap.VariableType.OwnerReference) continue;
@@ -155,7 +159,7 @@ namespace Yama.Parser
             if (returnValue.Deklaration.Type.Deklaration is not IndexKlassenDeklaration ikd) return false;
             if (ikd.MemberModifier != ClassMemberModifiers.Struct) return false;
 
-            IndexVariabelnDeklaration dek = new IndexVariabelnDeklaration(this, returnValue.Key, new IndexVariabelnReference(this, returnValue.Key) { Deklaration = ikd });
+            IndexVariabelnDeklaration dek = new IndexVariabelnDeklaration(this, "Result", new IndexVariabelnReference(this, returnValue.Key) { Deklaration = ikd });
             request.StructLeftNode = dek;
 
             return true;

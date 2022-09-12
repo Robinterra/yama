@@ -254,6 +254,7 @@ namespace Yama.Compiler
                 if (map.Value.IsStruct is null) continue;
                 if (!map.Value.Deklaration.IsMutable) continue;
                 if (map.Value.Key == "Result" && compileContainer.ReturnType?.IsStruct is not null) continue;
+                if (map.Value.Key == "this") continue;
 
                 compileContainer.VarStructs.Add(map.Value);
             }

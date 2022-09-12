@@ -577,6 +577,7 @@ namespace Yama.Parser
         {
             if (this.Deklaration is null) return false;
             if (this.Deklaration.Type == MethodeType.Ctor) if (node.Name == "this") return false;
+            if (this.Deklaration.Type == MethodeType.DeCtor && node.Name == "return") return false;
 
             CompilePopResult compilePopResult = new CompilePopResult();
             compilePopResult.Position = count;
@@ -655,6 +656,8 @@ namespace Yama.Parser
 
             CompileCleanMemory cleanMemory = new CompileCleanMemory();
             cleanMemory.Compile(compiler, this, thisDek);
+
+            if (this.Deklaration.Klasse?.MemberModifier == ClassMemberModifiers.Struct) return compiler.Definition.ParaClean();
 
             CompileReferenceCall refCall = new CompileReferenceCall();
             refCall.CompileDek(compiler, thisDek, "default");

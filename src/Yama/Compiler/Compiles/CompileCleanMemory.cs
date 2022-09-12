@@ -275,7 +275,7 @@ namespace Yama.Compiler
 
                     continue;
                 }
-                IMethode? dector = ikd.Methods.FirstOrDefault();
+                IMethode? dector = ikd.DeCtors.FirstOrDefault();
                 if (dector is null)
                 {
                     compiler.AddError($"type '{ikd.Name} has no dector", node);
@@ -349,8 +349,70 @@ namespace Yama.Compiler
             return true;
         }
 
+        private bool CallDectorsStruct(Compiler compiler, IParseTreeNode node)
+        {
+            foreach (SSAVariableMap map in this.OwnerVarsToClear)
+            {
+                if (map.Deklaration.Type.Deklaration is not IndexKlassenDeklaration ikd)
+                {
+                    compiler.AddError($"type of variable {map.Key} Unknown", node);
+
+                    continue;
+                }
+                IMethode? dector = ikd.DeCtors.FirstOrDefault();
+                if (dector is null)
+                {
+                    compiler.AddError($"type '{ikd.Name} has no dector", node);
+
+                    continue;
+                }
+
+                CompileReferenceCall referenceCall = new CompileReferenceCall();
+                if (!referenceCall.GetVariableCompile(compiler, map.Deklaration, node)) continue;
+
+                CompilePushResult compilePushResult = new CompilePushResult();
+                compilePushResult.Compile(compiler, null, "copy");
+
+                IndexVariabelnReference reference = new IndexVariabelnReference(node, "~");
+                reference.Deklaration = dector;
+
+                CompileReferenceCall operatorCall = new CompileReferenceCall();
+                operatorCall.Compile(compiler, reference, "methode");
+
+                CompileExecuteCall functionExecute = new CompileExecuteCall();
+                functionExecute.Compile(compiler, null);
+
+            }
+
+            return true;
+        }
+
         public bool InFileCompilen(Compiler compiler)
         {
+            return true;
+        }
+
+        public bool CompileCleanStructs(Compiler compiler, ReturnKey methodeDeclarationNode, List<SSAVariableMap> varStructs)
+        {
+            if (varStructs.Count == 0) return true;
+
+            this.line.FlowTask = ProgramFlowTask.CleanMemoryReturn;
+            this.Node = methodeDeclarationNode;
+
+            if (compiler.ContainerMgmt.CurrentMethod is null) return false;
+            CompileContainer currentMethode = compiler.ContainerMgmt.CurrentMethod;
+
+            foreach (SSAVariableMap varmap in varStructs)
+            {
+                this.OwnerVarsToClear.Add(new SSAVariableMap(varmap));
+            }
+
+            if (!this.IsUsed) return true;
+
+            this.CallDectorsStruct(compiler, methodeDeclarationNode);
+
+            compiler.AddSSALine(line);
+
             return true;
         }
 
