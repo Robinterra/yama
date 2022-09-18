@@ -21,7 +21,7 @@ methodeCall = [ genericCall ] "(" expression {, expression} ")" [ asExpression ]
 vektorCall = "[" expression {, expression} "]" [ asExpression ]
 
 newStatement = "new" identiefier "(" expression {, expression} ")" [ asExpression ]
-typeofStatement = "typeof" "(" identiefier ")"
+typeofStatement = "typeof" "<" identiefier ">"
 assigment = "=" (expression | newStatement | typeofStatement)
 
 variableDeklaration = [&]identiefier identiefier

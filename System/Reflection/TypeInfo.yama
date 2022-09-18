@@ -1,0 +1,21 @@
+namespace "System.Reflection"
+{
+
+    public primitive class TypeInfo
+    {
+
+        public int TypeId;
+
+        public string Name;
+
+        public int EmptyCtor;
+
+
+        public object GetNewInstance()
+        {
+
+        }
+
+    }
+
+}
