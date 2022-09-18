@@ -529,6 +529,8 @@ namespace Yama
             rules.Add ( new KeyWord ( "ulong", IdentifierKind.UInt64Bit ) );
             rules.Add ( new KeyWord ( "ref", IdentifierKind.Ref ) );
             rules.Add ( new KeyWord ( "is", IdentifierKind.Is ) );
+            rules.Add ( new KeyWord ( "isnot", IdentifierKind.IsNot ) );
+            rules.Add ( new KeyWord ( "typeof", IdentifierKind.Typeof ) );
             rules.Add ( new KeyWord ( "in", IdentifierKind.In ) );
             rules.Add ( new KeyWord ( "as", IdentifierKind.As ) );
             rules.Add ( new KeyWord ( "if", IdentifierKind.If ) );

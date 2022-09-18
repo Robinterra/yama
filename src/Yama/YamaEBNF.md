@@ -11,7 +11,7 @@ pointIdentifion = identiefier.identiefier
 expressionIden = pointIdentifion | number | hexnumber | "true" | "false" | "null"
 
 asExpression = "as" identiefier
-isExpression = "is" (null | [&]identiefier identiefier)
+isExpression = ("is"|"isnot") (null | [&]identiefier identiefier)
 
 operationExpression = operator expression
 expression = [ "(" ] [ operator ] expressionIden [ asExpression | methodeCall | vektorCall ] [ operationExpression ] [ ")" ] [ asExpression ] [ operationExpression ]
@@ -21,11 +21,12 @@ methodeCall = [ genericCall ] "(" expression {, expression} ")" [ asExpression ]
 vektorCall = "[" expression {, expression} "]" [ asExpression ]
 
 newStatement = "new" identiefier "(" expression {, expression} ")" [ asExpression ]
-assigment = "=" (expression | newStatement)
+typeofStatement = "typeof" "(" identiefier ")"
+assigment = "=" (expression | newStatement | typeofStatement)
 
 variableDeklaration = [&]identiefier identiefier
 
-normalStatement = pointIdentifion ( methodeCall | assigment | vektorCall ) | variableDeklaration [ assigment ] | identiefier assigment
+normalStatement = (pointIdentifion ( methodeCall | assigment | vektorCall ) | variableDeklaration [ assigment ] | identiefier assigment) ";"
 returnStatement = "return" expression ";"
 
 statementInLoop = statementInMehtode | continue | break
@@ -57,9 +58,10 @@ inclass = { methodeDeklaration | gobalvariableDeklaration | propertiesDeklaratio
 inenum = { identiefier "=" number | hexnumber [,] }
 
 classDeklaration = accessdefinition "class" identiefier "{" inclass "}"
+structDeklaration = accessdefinition "struct" identiefier "{" inclass "}"
 EnumDeklaration = accessdefinition "enum" identiefier "{" inenum "}"
 usingUse = "using" string ";"
 
-innamespace = { classDeklaration | enumDeklaration | usingUse }
+innamespace = { classDeklaration | enumDeklaration | usingUse | structDeklaration }
 
 namespaceDeklaration = "namespace" string "{" innamespace "}"

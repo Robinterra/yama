@@ -126,7 +126,7 @@ namespace Yama.Parser
 
         public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
-            if ( request.Token.Kind != IdentifierKind.Is ) return null;
+            if ( request.Token.Kind != IdentifierKind.Is && request.Token.Kind != IdentifierKind.IsNot ) return null;
 
             TypePatternMatching node = new TypePatternMatching ( this.Prio );
             node.Token = request.Token;
@@ -178,7 +178,8 @@ namespace Yama.Parser
 
             leftNode.Indezieren(request);
 
-            IndexVariabelnReference equalsReference = new IndexVariabelnReference(this, "==");
+            string operation = this.Token.Kind == IdentifierKind.Is ? "==" : "!=";
+            IndexVariabelnReference equalsReference = new IndexVariabelnReference(this, operation);
             this.EqualsReference = equalsReference;
 
             IndexVariabelnReference varref = new IndexVariabelnReference(this, "int");
@@ -276,6 +277,24 @@ namespace Yama.Parser
                 nextKontextReference.Value = SSAVariableMap.LastValue.NotNull;
                 nextKontextReference.Reference = nextKontext.Reference;
                 currentKontextReference.Value = SSAVariableMap.LastValue.NotSet;
+
+                if (this.Token.Kind == IdentifierKind.IsNot)
+                {
+                    SSAVariableMap.LastValue tmp = currentKontext.Value;
+                    SSAVariableMap.VariableMutableState tmpmut = currentKontext.MutableState;
+                    SSAVariableMap.VariableType tmpType = currentKontext.Kind;
+
+                    currentKontext.Value = nextKontext.Value;
+                    currentKontext.MutableState = nextKontext.MutableState;
+                    currentKontext.Kind = nextKontext.Kind;
+
+                    nextKontext.Value = tmp;
+                    nextKontext.MutableState = tmpmut;
+                    nextKontext.Kind = tmpType;
+
+                    currentKontextReference.Value = nextKontext.Value;
+                    nextKontextReference.Value = SSAVariableMap.LastValue.NotSet;
+                }
             }
 
             return request.Compiler.Definition.ParaClean();
@@ -305,8 +324,8 @@ namespace Yama.Parser
             SSAVariableMap currentKontext = currentMethod.VarMapper[this.LeftNode!.Token.Text];
             SSAVariableMap? nextKontext = currentMethod.NextContext is null ? null : currentMethod.NextContext[this.LeftNode!.Token.Text];
 
-            currentKontext.Value = SSAVariableMap.LastValue.NotNull;
-            if (nextKontext is not null) nextKontext.Value = SSAVariableMap.LastValue.Null;
+            currentKontext.Value = this.Token.Kind == IdentifierKind.Is ? SSAVariableMap.LastValue.NotNull : SSAVariableMap.LastValue.Null;
+            if (nextKontext is not null) nextKontext.Value = this.Token.Kind == IdentifierKind.Is ? SSAVariableMap.LastValue.Null : SSAVariableMap.LastValue.NotNull;
 
             return request.Compiler.Definition.ParaClean();
         }

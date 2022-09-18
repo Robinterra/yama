@@ -220,7 +220,8 @@ namespace Yama.Parser
             if (callConvertToken.Kind != IdentifierKind.As
             && callConvertToken.Kind != IdentifierKind.OpenBracket
             && callConvertToken.Kind != IdentifierKind.OpenSquareBracket
-            && callConvertToken.Kind != IdentifierKind.Is) return callConvertToken;
+            && callConvertToken.Kind != IdentifierKind.Is
+            && callConvertToken.Kind != IdentifierKind.IsNot) return callConvertToken;
 
             IParseTreeNode? callNode = request.Parser.ParseCleanToken(callConvertToken, this.expressionCallLayer, true);
             if (callNode is not IParentNode parentNode) return null;
