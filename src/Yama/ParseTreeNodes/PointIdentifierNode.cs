@@ -284,7 +284,7 @@ namespace Yama.Parser
             if (methdek.Type == MethodeType.PropertyStaticGetSet) return true;
 
             CompilePushResult compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(compiler, null, "copy");
+            compilePushResult.Compile(compiler, null);
 
             return true;
         }

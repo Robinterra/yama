@@ -1,0 +1,35 @@
+namespace "System.Reflection"
+{
+
+    public primitive class PropertyInfo
+    {
+
+        public string Name;
+
+        public int Position;
+
+        public int TypeArt;
+
+        public TypeInfo Type;
+
+        public bool SetValue(object instance, int value)
+        {
+            return true;
+        }
+
+        public int GetValue(object instance)
+        {
+            return 0;
+        }
+
+    }
+
+    public enum TypeArten
+    {
+        Int = 0x0,
+        String = 0x1,
+        Bool = 0x2,
+        Object = 0x3
+    }
+
+}

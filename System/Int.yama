@@ -325,6 +325,32 @@ namespace "System"
 
         // -----------------------------------------------
 
+        public static IntParseResult Parse(string value)
+        {
+            int result = 0;
+            int length = value.Length;
+
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int zeichen = value.Data[(length - i) - 1];
+                if (zeichen < 0x30) return IntParseResult.Failed();
+                if (zeichen > 0x39 & zeichen < 0x61) return IntParseResult.Failed();
+                if (zeichen > 0x66) return IntParseResult.Failed();
+
+                int subtract = 0x30;
+                if (zeichen > 0x60) subtract = 0x57;
+
+                int current = zeichen - subtract;
+                int movabel = 4 * i;
+                current =  current << movabel;
+                result = result + current;
+            }
+
+            return IntParseResult.Ok(result);
+        }
+
+        // -----------------------------------------------
+
         public String ToString()
         {
             int length = 1;
@@ -360,6 +386,35 @@ namespace "System"
         }
 
         // -----------------------------------------------
+
+    }
+
+    public struct IntParseResult
+    {
+
+        public bool IsSuccess;
+
+        public int Result;
+
+        public static IntParseResult Ok(int result)
+        {
+            Result.IsSuccess = true;
+            Result.Result = result;
+
+            return Result;
+        }
+
+        public static IntParseResult Failed()
+        {
+            Result.IsSuccess = false;
+
+            return Result;
+        }
+
+        public this ~()
+        {
+
+        }
 
     }
 }

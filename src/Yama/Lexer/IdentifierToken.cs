@@ -235,6 +235,8 @@ namespace Yama.Lexer
         Primitive,
         Struct,
         Let,
+        IsNot,
+        Typeof,
     }
 }
 
