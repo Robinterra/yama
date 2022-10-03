@@ -6,7 +6,7 @@ namespace Yama.Assembler
 
         #region get/set
 
-        byte[] EI_NIDENT = new byte[]
+        public byte[] EI_NIDENT = new byte[]
         {
             0x7f,//EI_MAG0
             0x45,//EI_MAG1
@@ -26,19 +26,35 @@ namespace Yama.Assembler
             0
         };
 
-        E_Type Type //Half
+        public E_Type Type //Half
         {
             get;
             set;
         }
 
-        E_Machine Machine //Half
+        public E_Machine Machine //Half
         {
             get;
             set;
         }
 
-        public uint Size;
+        public List<ElfProgramHeader> ProgramHeaders
+        {
+            get;
+        }
+
+        public List<ElfSectionHeader> SectionHeaders
+        {
+            get;
+        }
+
+        public uint Size
+        {
+            get
+            {
+                return (uint)this.EI_NIDENT.Length + 0x24 + (uint)this.ProgramHeaders.Count * ElfProgramHeader.Size + 0xc;
+            }
+        }
 
         #endregion get/set
 
@@ -47,9 +63,10 @@ namespace Yama.Assembler
         public LinuxElfHeader(EI_Class eiClass, E_Machine eMachine)
         {
             this.EI_NIDENT[4] = (byte)eiClass;
+            this.ProgramHeaders = new List<ElfProgramHeader>();
+            this.SectionHeaders = new List<ElfSectionHeader>();
             this.Type = E_Type.ET_EXEC;
             this.Machine = eMachine;
-            this.Size = 0x60;
         }
 
         #endregion ctor
@@ -66,25 +83,21 @@ namespace Yama.Assembler
             stream.Write(BitConverter.GetBytes((ushort)this.Machine));
             stream.Write(BitConverter.GetBytes((uint)1));//e_version
             stream.Write(BitConverter.GetBytes((uint)size | startAdress));//e_entry
-            stream.Write(BitConverter.GetBytes((uint)0x34));//e_phoff
-            stream.Write(BitConverter.GetBytes((uint)size | startAdress | 0xc));//e_shoff
+            stream.Write(BitConverter.GetBytes((uint)this.EI_NIDENT.Length + 0x24));//e_phoff
+            stream.Write(BitConverter.GetBytes((uint)this.SectionHeaders.Count));//e_shoff, bei falschen größen hier, kann das programm nicht mit gängigen reverse tools gelesen werden
             stream.Write(BitConverter.GetBytes((uint)E_Flags.EF_MIR_NICHT_BEKANNT | (uint)E_Flags.EF_SPARC_SUN_US1));
-            stream.Write(BitConverter.GetBytes((ushort)0x34));//e_ehsize
-            stream.Write(BitConverter.GetBytes((ushort)0x20));//e_phentsize
-            stream.Write(BitConverter.GetBytes((ushort)0x01));//e_phnum
-            stream.Write(BitConverter.GetBytes((ushort)0x28));//e_shentsize
-            stream.Write(BitConverter.GetBytes((ushort)0x04));//e_shnum
+            stream.Write(BitConverter.GetBytes((ushort)(this.EI_NIDENT.Length + 0x24)));//e_ehsize
+            stream.Write(BitConverter.GetBytes((ushort)ElfProgramHeader.Size));//e_phentsize
+            stream.Write(BitConverter.GetBytes((ushort)this.ProgramHeaders.Count));//e_phnum
+            stream.Write(BitConverter.GetBytes((ushort)ElfSectionHeader.Size));//e_shentsize
+            stream.Write(BitConverter.GetBytes((ushort)this.SectionHeaders.Count));//e_shnum
             stream.Write(BitConverter.GetBytes((ushort)0x03));//e_shstrndx
 
             //phent Program Header Table
-            stream.Write(BitConverter.GetBytes((uint)0x1));//p_type
-            stream.Write(BitConverter.GetBytes((uint)0x0));//p_offset
-            stream.Write(BitConverter.GetBytes((uint)startAdress));//p_vaddr
-            stream.Write(BitConverter.GetBytes((uint)startAdress));//p_paddr
-            stream.Write(BitConverter.GetBytes((uint)programSize - startAdress));//p_filesz (uint)programSize - startAdress
-            stream.Write(BitConverter.GetBytes((uint)programSize));//p_memsz
-            stream.Write(BitConverter.GetBytes((uint)P_Flags.PF_R | (uint)P_Flags.PF_X | (uint) P_Flags.PF_W));//p_flags
-            stream.Write(BitConverter.GetBytes((uint)startAdress));//p_align
+            foreach (ElfProgramHeader ph in this.ProgramHeaders)
+            {
+                ph.StreamData(stream);
+            }
 
             stream.Write(new byte[0xc]);
 
@@ -157,6 +170,102 @@ namespace Yama.Assembler
             FUTURE_0,
             EM_860,
             EM_ARM = 40
+        }
+
+    }
+
+    public class ElfSectionHeader
+    {
+
+
+        public const ushort Size = 0x28;
+
+        #region get/set
+
+        #endregion get/set
+
+        #region ctor
+
+        public ElfSectionHeader()
+        {
+
+        }
+
+        #endregion ctor
+
+    }
+
+    public class ElfProgramHeader
+    {
+
+        public const ushort Size = 0x20;
+
+        #region get/set
+
+        public P_Types Type
+        {
+            get;
+            set;
+        }
+
+        public uint VAddresse
+        {
+            get;
+            set;
+        }
+
+        public uint PAddresse
+        {
+            get;
+            set;
+        }
+
+        public uint FileSize
+        {
+            get;
+            set;
+        }
+
+        public uint MemorySize
+        {
+            get;
+            set;
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public ElfProgramHeader()
+        {
+            this.Type = P_Types.PT_LOAD;
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        public uint StreamData(Stream stream)
+        {
+            stream.Write(BitConverter.GetBytes((uint)this.Type));//p_type
+            stream.Write(BitConverter.GetBytes((uint)0x0));//p_offset
+            stream.Write(BitConverter.GetBytes(this.VAddresse));//p_vaddr
+            stream.Write(BitConverter.GetBytes(this.PAddresse));//p_paddr
+            stream.Write(BitConverter.GetBytes(this.FileSize));//p_filesz (uint)programSize - startAdress
+            stream.Write(BitConverter.GetBytes(this.MemorySize));//p_memsz
+            stream.Write(BitConverter.GetBytes((uint)P_Flags.PF_R | (uint)P_Flags.PF_X | (uint) P_Flags.PF_W));//p_flags
+            stream.Write(BitConverter.GetBytes((uint)this.PAddresse));//p_align
+
+            return Size;
+        }
+
+        #endregion methods
+
+        public enum P_Types
+        {
+            PT_NULL = 0,
+            PT_LOAD = 1,
+            PT_DYNAMIC = 2,
         }
 
         public enum P_Flags

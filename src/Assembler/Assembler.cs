@@ -324,6 +324,8 @@ namespace Yama.Assembler
             LinuxElfHeader.E_Machine machine = LinuxElfHeader.E_Machine.EM_ARM;
 
             LinuxElfHeader linuxElfHeader = new LinuxElfHeader(eiClass, machine);
+            ElfProgramHeader programHeader = new ElfProgramHeader();
+            linuxElfHeader.ProgramHeaders.Add(programHeader);
 
             if (this.osHeader == Project.OSHeader.LinuxArm) this.Position += linuxElfHeader.Size;
             uint startposition = this.Position;
@@ -348,7 +350,7 @@ namespace Yama.Assembler
 
             this.Mappen("THE_END", this.Position + 8);
 
-            this.CreateOsHeader(linuxElfHeader, this.osHeader, startposition);
+            this.CreateOsHeader(linuxElfHeader, this.osHeader, startposition, programHeader);
 
             foreach (CommandCompilerMap assmblepair in maptranslate)
             {
@@ -362,10 +364,16 @@ namespace Yama.Assembler
             return this.Errors.Count == 0;
         }
 
-        private uint CreateOsHeader(LinuxElfHeader linuxElfHeader, Project.OSHeader osHeader, uint startposition)
+        private uint CreateOsHeader(LinuxElfHeader linuxElfHeader, Project.OSHeader osHeader, uint startposition, ElfProgramHeader programHeader)
         {
             if (this.Stream is null) return startposition;
             if (this.osHeader != Project.OSHeader.LinuxArm) return startposition;
+
+            programHeader.VAddresse = startposition;
+            programHeader.PAddresse = startposition;
+            programHeader.MemorySize = this.Position;
+            programHeader.FileSize = (uint)this.Position - startposition;
+
 
             uint size = linuxElfHeader.StreamData(this.Stream, startposition, this.Position);
 
