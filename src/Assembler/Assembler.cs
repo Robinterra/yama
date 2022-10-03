@@ -374,7 +374,7 @@ namespace Yama.Assembler
             programHeader.VAddresse = realStart;
             programHeader.PAddresse = realStart;
             programHeader.MemorySize = this.Position;
-            programHeader.FileSize = (uint)this.Position - startposition;
+            programHeader.FileSize = (uint)this.Position - realStart;
             programHeader.PAlign = realStart;
 
             uint size = linuxElfHeader.StreamData(this.Stream, startposition, this.Position);
