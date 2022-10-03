@@ -369,11 +369,13 @@ namespace Yama.Assembler
             if (this.Stream is null) return startposition;
             if (this.osHeader != Project.OSHeader.LinuxArm) return startposition;
 
-            programHeader.VAddresse = startposition;
-            programHeader.PAddresse = startposition;
+            uint realStart = startposition - linuxElfHeader.Size;
+
+            programHeader.VAddresse = realStart;
+            programHeader.PAddresse = realStart;
             programHeader.MemorySize = this.Position;
             programHeader.FileSize = (uint)this.Position - startposition;
-
+            programHeader.PAlign = realStart;
 
             uint size = linuxElfHeader.StreamData(this.Stream, startposition, this.Position);
 

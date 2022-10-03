@@ -76,7 +76,6 @@ namespace Yama.Assembler
         public uint StreamData(Stream stream, uint startAdress, uint programSize)
         {
             uint size = this.Size;
-            startAdress -= size;
 
             stream.Write(this.EI_NIDENT);
             stream.Write(BitConverter.GetBytes((ushort)this.Type));
@@ -232,6 +231,12 @@ namespace Yama.Assembler
             set;
         }
 
+        public uint PAlign
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -254,7 +259,7 @@ namespace Yama.Assembler
             stream.Write(BitConverter.GetBytes(this.FileSize));//p_filesz (uint)programSize - startAdress
             stream.Write(BitConverter.GetBytes(this.MemorySize));//p_memsz
             stream.Write(BitConverter.GetBytes((uint)P_Flags.PF_R | (uint)P_Flags.PF_X | (uint) P_Flags.PF_W));//p_flags
-            stream.Write(BitConverter.GetBytes((uint)this.PAddresse));//p_align
+            stream.Write(BitConverter.GetBytes((uint)this.PAlign));//p_align
 
             return Size;
         }
