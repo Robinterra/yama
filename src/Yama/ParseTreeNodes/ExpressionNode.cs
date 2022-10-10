@@ -196,13 +196,13 @@ namespace Yama.Parser
 
             request.Parser.SetChild(opNode, childNode);
 
-            Operator2Childs newParent = CleanUpOperation2Childs(opNode, childNode, request);
+            Operator2Childs newParent = this.CleanUpOperation2Childs(opNode, request);
             node.ChildNode = newParent;
 
             return request.Parser.Peek(newParent.Ende, 1);
         }
 
-        private Operator2Childs CleanUpOperation2Childs(Operator2Childs opNode, IParseTreeNode childNode, RequestParserTreeParser request)
+        private Operator2Childs CleanUpOperation2Childs(Operator2Childs opNode, RequestParserTreeParser request)
         {
             if (opNode.RightNode is not Operator2Childs rightNode) return opNode;
             if (rightNode.Prio > opNode.Prio) return opNode;
@@ -210,7 +210,8 @@ namespace Yama.Parser
             opNode.RightNode = rightNode.LeftNode;
             if (opNode.RightNode is not null) opNode.RightNode.Token.ParentNode = opNode;
 
-            request.Parser.SetChild(rightNode, opNode);
+            Operator2Childs childNode = this.CleanUpOperation2Childs(opNode, request);
+            request.Parser.SetChild(rightNode, childNode);
 
             return rightNode;
         }
