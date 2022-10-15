@@ -4,17 +4,36 @@ namespace "System.Reflection"
     public primitive class TypeInfo
     {
 
+        #region vars
+
         public int TypeId;
 
         public string Name;
 
         public int EmptyCtor;
 
+        public int PropertiesCount;
+
+        #endregion vars
+
+        public PropertyInfo Properties[int position]
+        {
+            get
+            {
+                if (position >= this.PropertiesCount) return null;
+
+                return null;
+            }
+        }
+
+        #region methods
 
         public object GetNewInstance()
         {
 
         }
+
+        #endregion methods
 
     }
 

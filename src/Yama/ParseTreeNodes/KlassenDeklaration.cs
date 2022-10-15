@@ -12,7 +12,13 @@ namespace Yama.Parser
 
         #region get/set
 
-        public CompileData compile
+        public CompileData VirtualClassData
+        {
+            get;
+            set;
+        } = new CompileData();
+
+        public CompileData ReflectionClassData
         {
             get;
             set;
@@ -317,7 +323,7 @@ namespace Yama.Parser
 
             foreach (IMethode m in this.Deklaration.Methods)
             {
-                if (this.Deklaration.IsMethodsReferenceMode) this.AddAssemblyName(compile, m);
+                if (this.Deklaration.IsMethodsReferenceMode) this.AddAssemblyName(this.VirtualClassData, m);
                 if (m.Klasse is null) return false;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
@@ -328,6 +334,7 @@ namespace Yama.Parser
             foreach (IndexPropertyDeklaration m in this.Deklaration.IndexProperties)
             {
                 if (m.Klasse is null) continue;
+                //if (this.Deklaration.IsMethodsReferenceMode) this.AddPropteryToRefelection
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;

@@ -350,10 +350,10 @@ namespace Yama.Compiler
                 if (k.Deklaration is null) continue;
                 if (!k.Deklaration.IsMethodsReferenceMode) continue;
 
-                k.Deklaration.DataRef = k.compile;
-                k.compile.Data = new DataObject();
-                k.compile.Data.Mode = DataMode.JumpPointListe;
-                k.compile.Compile(this, k, "datalist");
+                k.Deklaration.DataRef = k.VirtualClassData;
+                k.VirtualClassData.Data = new DataObject();
+                k.VirtualClassData.Data.Mode = DataMode.JumpPointListe;
+                k.VirtualClassData.Compile(this, k, "datalist");
             }
 
             return this.Errors.Count == 0;

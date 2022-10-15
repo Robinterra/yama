@@ -177,6 +177,12 @@ namespace Yama.Index
             set;
         }
 
+        public CompileData? ReflectionData
+        {
+            get;
+            set;
+        }
+
         public GenericCall? GenericDeklaration
         {
             get;
