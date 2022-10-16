@@ -77,9 +77,7 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
-            CompileData compile = new CompileData();
-            compile.Data = new DataObject();
-            compile.Data.Mode = DataMode.Text;
+            CompileData compile = new CompileData(DataMode.Text);
             compile.Data.Text = this.Token.Text;
             compile.Compile(request.Compiler, this);
 

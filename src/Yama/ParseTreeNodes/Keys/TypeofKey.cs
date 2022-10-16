@@ -114,6 +114,14 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
+            Compiler.Compiler compiler = request.Compiler;
+
+            if (this.TypeRef is null) return true;
+            if (this.TypeRef.Deklaration is not IndexKlassenDeklaration ikd) return true;
+            if (ikd.ReflectionData is null) return compiler.AddError($"The Class '{ikd.Name}' is not Reflectionable", this);
+
+            CompileReferenceCall referenceCall = new CompileReferenceCall();
+            referenceCall.CompileData(compiler, this, ikd.ReflectionData.JumpPointName!);
 
             return true;
         }

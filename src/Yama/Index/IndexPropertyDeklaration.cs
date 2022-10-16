@@ -136,6 +136,27 @@ namespace Yama.Index
             set;
         }
 
+        public int Position
+        {
+            get
+            {
+                int result = 0;
+                if (this.Klasse is null) return -1;
+                if (this.Klasse.IsMethodsReferenceMode) result++;
+
+                foreach (IndexPropertyDeklaration property in this.Klasse.IndexProperties)
+                {
+                    result += 1;
+                    if (property != this) continue;
+                    result -= 1;
+
+                    return result;
+                }
+
+                return -1;
+            }
+        }
+
         #endregion get/set
 
         #region ctor

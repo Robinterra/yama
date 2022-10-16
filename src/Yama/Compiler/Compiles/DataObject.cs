@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
+using Yama.Index;
+using Yama.Parser;
 
 namespace Yama.Compiler
 {
@@ -18,6 +20,12 @@ namespace Yama.Compiler
             set;
         }
 
+        public RefelectionData? Refelection
+        {
+            get;
+            set;
+        }
+
         public int IntValue
         {
             get;
@@ -28,6 +36,12 @@ namespace Yama.Compiler
         {
             get;
             set;
+        }
+
+        public DataObject(DataMode mode, string? text = null)
+        {
+            if (text is not null) this.Text = $"\"{text}\"";
+            this.Mode = mode;
         }
 
         public string? GetData()
@@ -49,6 +63,144 @@ namespace Yama.Compiler
             return builder.ToString();
         }
 
+        public class RefelectionData
+        {
+
+            #region get/set
+
+            public string Name
+            {
+                get;
+            }
+
+            public CompileData NameData
+            {
+                get;
+            }
+
+            public CompileData? VirtuelClassData
+            {
+                get;
+                set;
+            }
+
+            public IndexMethodDeklaration? EmptyCtor
+            {
+                get;
+                set;
+            }
+
+            public List<ReflectionProperty> Properties
+            {
+                get;
+            }
+
+            #endregion get/set
+
+            #region ctor
+
+            public RefelectionData(string name)
+            {
+                this.Name = name;
+                this.Properties = new List<ReflectionProperty>();
+                this.NameData = new CompileData(DataMode.Text, name);
+            }
+
+            #endregion ctor
+
+            #region methods
+
+            public bool Compile(Compiler compiler, IParseTreeNode parent)
+            {
+                this.NameData.Compile(compiler, parent);
+
+                foreach (ReflectionProperty property in this.Properties)
+                {
+                    property.Compile(compiler, parent);
+                }
+
+                return true;
+            }
+
+            public bool AddProperty(IndexPropertyDeklaration property)
+            {
+                this.Properties.Add(new ReflectionProperty(property));
+
+                return true;
+            }
+
+            #endregion methods
+
+        }
+
+        public class ReflectionProperty
+        {
+
+            #region get/set
+
+            public string Name
+            {
+                get;
+            }
+
+            public int Position
+            {
+                get;
+            }
+
+            public int TypeArt
+            {
+                get;
+            }
+
+            public CompileData NameData
+            {
+                get;
+            }
+
+            public CompileData? ClassData
+            {
+                get;
+            }
+
+            #endregion get/set
+
+            #region ctor
+
+            public ReflectionProperty(IndexPropertyDeklaration property)
+            {
+                this.Name = property.Name;
+                this.NameData = new CompileData(DataMode.Text, this.Name);
+                this.Position = property.Position;
+                this.TypeArt = this.GetTypeArt(property);
+
+                if (this.TypeArt != 3) return;
+                if (property.Klasse is null) return;
+                this.ClassData = property.Klasse.ReflectionData;
+            }
+
+            #endregion ctor
+
+            public bool Compile(Compiler compiler, IParseTreeNode parent)
+            {
+                this.NameData.Compile(compiler, parent);
+
+                return true;
+            }
+
+            private int GetTypeArt(IndexPropertyDeklaration property)
+            {
+                if (property.Klasse is null) return 0;
+                if (property.Klasse.Name == "int") return 0;
+                if (property.Klasse.Name == "string") return 1;
+                if (property.Klasse.Name == "bool") return 2;
+                if (property.Klasse.IsMethodsReferenceMode) return 3;
+
+                return 0;
+            }
+
+        }
+
     }
 
     public enum DataMode
@@ -56,6 +208,7 @@ namespace Yama.Compiler
         None,
         Text,
         JumpPointListe,
-        Int
+        Int,
+        Reflection
     }
 }

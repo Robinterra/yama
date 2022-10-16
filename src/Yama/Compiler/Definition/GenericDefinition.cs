@@ -622,9 +622,7 @@ namespace Yama.Compiler.Definition
             int duration = query.Key.Values.Count >= 1 ? Convert.ToInt32(query.Key.Values[0]) : 1;
             int bytes = query.Key.Values.Count >= 2 ? Convert.ToInt32(query.Key.Values[1]) : this.AdressBytes;
 
-            int counter = 0;
-
-            if (!(query.Value is IndexPropertyDeklaration dek)) return null;
+            if (query.Value is not IndexPropertyDeklaration dek) return null;
 
             if (dek.Zusatz == MethodeType.Static)
             {
@@ -633,31 +631,19 @@ namespace Yama.Compiler.Definition
 
                 return result;
             }
-            if (dek.Klasse is null) return null;
 
-            if (dek.Klasse.IsMethodsReferenceMode) counter += 1;
+            int counter = dek.Position;
+            if (counter == -1) return null;
 
-            foreach (IParent a in dek.Klasse.IndexProperties)
+            counter = counter * bytes;
+
+            for (int i = 0; i < duration; i++ )
             {
-                if (!(a is IndexPropertyDeklaration vardek)) continue;
-
-                counter++;
-
-                if (a.Name != dek.Name) continue;
-
-                counter = counter - 1;
-                counter = counter * bytes;
-
-                for (int i = 0; i < duration; i++ )
-                {
-                    if (keyPattern.Pattern is null) return null;
-                    result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i) );
-                }
-
-                return  result;
+                if (keyPattern.Pattern is null) return null;
+                result.Add( string.Format(keypattern, i), string.Format(keyPattern.Pattern, counter + i) );
             }
 
-            return null;
+            return  result;
         }
 
         // -----------------------------------------------

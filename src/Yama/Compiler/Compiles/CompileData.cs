@@ -37,8 +37,7 @@ namespace Yama.Compiler
         public DataObject Data
         {
             get;
-            set;
-        } = new DataObject();
+        }
 
         public List<string> AssemblyCommands
         {
@@ -74,16 +73,16 @@ namespace Yama.Compiler
 
         #endregion get/set
 
-        #region methods
+        #region ctor
 
-        public bool Add(Compiler compiler, ICompileRoot call)
+        public CompileData(DataMode mode, string? text = null)
         {
-            if (string.IsNullOrEmpty(this.JumpPointName)) this.JumpPointName = compiler.Definition.GenerateJumpPointName();
-
-            this.Calls.Add(call);
-
-            return true;
+            this.Data = new DataObject(mode, text);
         }
+
+        #endregion ctor
+
+        #region methods
 
         public bool Compile(Compiler compiler, IParseTreeNode parent, string mode = "default")
         {
@@ -94,6 +93,10 @@ namespace Yama.Compiler
             if (this.Algo == null) return false;
 
             if (string.IsNullOrEmpty(this.JumpPointName)) this.JumpPointName = compiler.Definition.GenerateJumpPointName();
+            if (this.Data.Mode != DataMode.Reflection) return true;
+            if (this.Data.Refelection is null) return true;
+
+            this.Data.Refelection.Compile(compiler, parent);
 
             return true;
         }

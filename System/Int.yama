@@ -334,7 +334,7 @@ namespace "System"
             {
                 int zeichen = value.Data[(length - i) - 1];
                 if (zeichen < 0x30) return IntParseResult.Failed();
-                if (zeichen > 0x39 & zeichen < 0x61) return IntParseResult.Failed();
+                if ((zeichen > 0x39) & (zeichen < 0x61)) return IntParseResult.Failed();
                 if (zeichen > 0x66) return IntParseResult.Failed();
 
                 int subtract = 0x30;
