@@ -249,8 +249,7 @@ namespace Yama.Parser
                 if (node is SetKey sk) deklaration.SetStatement = sk;
             }
 
-            if (deklaration.GetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a get statement", deklaration.AllTokens.ToArray());
-            if (deklaration.SetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a set statement", deklaration.AllTokens.ToArray());
+            if (deklaration.GetStatement is null && deklaration.SetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a  minimum a get or set statement", deklaration.AllTokens.ToArray());
 
             return deklaration;
         }
@@ -279,8 +278,6 @@ namespace Yama.Parser
         public bool Indezieren(RequestParserTreeIndezieren request)
         {
             if (request.Parent is not IndexKlassenDeklaration klasse) return request.Index.CreateError(this);
-            if (this.GetStatement is null) return request.Index.CreateError(this);
-            if (this.SetStatement is null) return request.Index.CreateError(this);
             if (this.TypeDefinition is null) return request.Index.CreateError(this);
 
             IndexVektorDeklaration deklaration = new IndexVektorDeklaration(this, this.Token.Text, this.GetReturnValueIndex(klasse, this.TypeDefinition));
@@ -292,8 +289,8 @@ namespace Yama.Parser
 
             deklaration.Type = this.GetMethodeType();
 
-            this.GetStatement.Indezieren(new RequestParserTreeIndezieren ( request.Index, deklaration ));
-            this.SetStatement.Indezieren(new RequestParserTreeIndezieren ( request.Index, deklaration ));
+            if (this.GetStatement is not null) this.GetStatement.Indezieren(new RequestParserTreeIndezieren ( request.Index, deklaration ));
+            if (this.SetStatement is not null) this.SetStatement.Indezieren(new RequestParserTreeIndezieren ( request.Index, deklaration ));
 
             VariabelDeklaration? dek = null;
 
@@ -306,13 +303,21 @@ namespace Yama.Parser
                 if (par is VariabelDeklaration t) dek = t;
 
                 if (dek is null) { request.Index.CreateError(this, "A Index error by the parameters of this method"); continue; }
-                if (!dek.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration.SetContainer))) continue;
-                if (dek.Deklaration is null) return request.Index.CreateError(this);
+                if (deklaration.SetContainer is not null)
+                {
+                    if (!dek.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration.SetContainer))) continue;
+                    if (dek.Deklaration is null) return request.Index.CreateError(this);
+                    deklaration.Parameters.Add(dek.Deklaration);
 
-                deklaration.Parameters.Add(dek.Deklaration);
+                    if (dek.Token.Text == this.InValue) continue;
+                    if (deklaration.GetContainer is not null) dek.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration.GetContainer));
+                    continue;
+                }
+                if (deklaration.GetContainer is null) continue;
 
-                if (dek.Token.Text == this.InValue) continue;
                 if (!dek.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration.GetContainer))) continue;
+                if (dek.Deklaration is null) return request.Index.CreateError(this);
+                deklaration.Parameters.Add(dek.Deklaration);
             }
 
             IndexVariabelnDeklaration invaluesdek = new IndexVariabelnDeklaration(this, this.InValue, deklaration.ReturnValue);

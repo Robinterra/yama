@@ -12,12 +12,6 @@ namespace Yama.Parser
 
         #region get/set
 
-        public CompileData compile
-        {
-            get;
-            set;
-        } = new CompileData();
-
         public IndexKlassenDeklaration? Deklaration
         {
             get;

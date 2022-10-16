@@ -15,14 +15,12 @@ namespace Yama.Parser
         public CompileData VirtualClassData
         {
             get;
-            set;
-        } = new CompileData();
+        } = new CompileData(DataMode.JumpPointListe);
 
         public CompileData ReflectionClassData
         {
             get;
-            set;
-        } = new CompileData();
+        } = new CompileData(DataMode.Reflection);
 
         public IndexKlassenDeklaration? Deklaration
         {
@@ -334,7 +332,7 @@ namespace Yama.Parser
             foreach (IndexPropertyDeklaration m in this.Deklaration.IndexProperties)
             {
                 if (m.Klasse is null) continue;
-                //if (this.Deklaration.IsMethodsReferenceMode) this.AddPropteryToRefelection
+                if (this.Deklaration.IsMethodsReferenceMode) this.AddPropteryToRefelection(m);
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;
@@ -353,6 +351,7 @@ namespace Yama.Parser
             foreach (IndexMethodDeklaration m in this.Deklaration.Ctors)
             {
                 if (m.Klasse is null) return false;
+                if (m.Parameters.Count == 0 && this.ReflectionClassData.Data.Refelection is not null) this.ReflectionClassData.Data.Refelection.EmptyCtor = m;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;
@@ -367,6 +366,15 @@ namespace Yama.Parser
                 if (m.Use is not ICompileNode compileNode) continue;
                 compileNode.Compile(request);
             }*/
+
+            return true;
+        }
+
+        private bool AddPropteryToRefelection(IndexPropertyDeklaration m)
+        {
+            if (this.ReflectionClassData.Data.Refelection is null) return true;
+
+            this.ReflectionClassData.Data.Refelection.AddProperty(m);
 
             return true;
         }

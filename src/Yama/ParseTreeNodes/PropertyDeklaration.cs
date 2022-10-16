@@ -266,10 +266,8 @@ namespace Yama.Parser
             if (this.Deklaration is null) return false;
             if (this.Deklaration.Zusatz != MethodeType.Static) return true;
 
-            CompileData compile = new CompileData();
+            CompileData compile = new CompileData(DataMode.Int);
             compile.JumpPointName = this.Deklaration.AssemblyName;
-            compile.Data = new DataObject();
-            compile.Data.Mode = DataMode.Int;
             compile.Compile(request.Compiler, this);
 
             return true;

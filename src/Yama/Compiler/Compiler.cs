@@ -351,9 +351,11 @@ namespace Yama.Compiler
                 if (!k.Deklaration.IsMethodsReferenceMode) continue;
 
                 k.Deklaration.DataRef = k.VirtualClassData;
-                k.VirtualClassData.Data = new DataObject();
-                k.VirtualClassData.Data.Mode = DataMode.JumpPointListe;
                 k.VirtualClassData.Compile(this, k, "datalist");
+
+                k.Deklaration.ReflectionData = k.ReflectionClassData;
+                k.ReflectionClassData.Data.Refelection = new DataObject.RefelectionData(k.Deklaration.Name);
+                k.ReflectionClassData.Compile(this, k, "datalist");
             }
 
             return this.Errors.Count == 0;
