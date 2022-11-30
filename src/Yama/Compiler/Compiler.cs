@@ -298,11 +298,13 @@ namespace Yama.Compiler
 
             this.Header.Compile(this, this.MainFunction);
 
-            if (!this.GenerateInheritanceDataStructure(nodes)) return false;
+            if (!this.PrepareInheritanceDataStructure(nodes)) return false;
 
             RequestParserTreeCompile request = new RequestParserTreeCompile(this);
 
             if (!this.GenerateIRCode(nodes, request)) return false;
+
+            if (!this.GenerateInheritanceDataStructure(nodes)) return false;
 
             if (!this.OptimizeIRCode()) return false;
 
@@ -342,7 +344,7 @@ namespace Yama.Compiler
             return this.Errors.Count == 0;
         }
 
-        private bool GenerateInheritanceDataStructure(IEnumerable<ICompileNode> nodes)
+        private bool PrepareInheritanceDataStructure(IEnumerable<ICompileNode> nodes)
         {
             foreach (ICompileNode node in nodes)
             {
@@ -351,10 +353,26 @@ namespace Yama.Compiler
                 if (!k.Deklaration.IsMethodsReferenceMode) continue;
 
                 k.Deklaration.DataRef = k.VirtualClassData;
-                k.VirtualClassData.Compile(this, k, "datalist");
+                k.VirtualClassData.PreparationJumpPoint(this);
 
                 k.Deklaration.ReflectionData = k.ReflectionClassData;
                 k.ReflectionClassData.Data.Refelection = new DataObject.RefelectionData(k.Deklaration.Name);
+                k.ReflectionClassData.PreparationJumpPoint(this);
+            }
+
+            return this.Errors.Count == 0;
+        }
+
+        private bool GenerateInheritanceDataStructure(IEnumerable<ICompileNode> nodes)
+        {
+            foreach (ICompileNode node in nodes)
+            {
+                if (node is not KlassenDeklaration k) continue;
+                if (k.Deklaration is null) continue;
+                if (!k.Deklaration.IsMethodsReferenceMode) continue;
+                if (k.ReflectionClassData.Data.Refelection is null) continue;
+
+                k.VirtualClassData.Compile(this, k, "datalist");
                 k.ReflectionClassData.Compile(this, k, "datalist");
             }
 

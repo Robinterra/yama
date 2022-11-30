@@ -84,6 +84,13 @@ namespace Yama.Compiler
 
         #region methods
 
+        public bool PreparationJumpPoint(Compiler compiler)
+        {
+            if (string.IsNullOrEmpty(this.JumpPointName)) this.JumpPointName = compiler.Definition.GenerateJumpPointName();
+
+            return true;
+        }
+
         public bool Compile(Compiler compiler, IParseTreeNode parent, string mode = "default")
         {
             this.Node = parent;
