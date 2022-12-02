@@ -48,6 +48,7 @@ namespace Yama.Compiler
         {
             if (this.Mode == DataMode.Int) return string.Format("0x{0:x}", this.IntValue);
             if (this.Mode == DataMode.Text) return this.Text;
+            if (this.Mode == DataMode.Reflection && this.Refelection is not null) return this.Refelection.GetData();
             if (this.Mode != DataMode.JumpPointListe) return null;
 
             StringBuilder builder = new StringBuilder();
@@ -129,6 +130,27 @@ namespace Yama.Compiler
                 return true;
             }
 
+            public string? GetData()
+            {
+                if (this.VirtuelClassData is null) return null;
+                if (this.EmptyCtor is null) return null;
+
+                StringBuilder builder = new StringBuilder();
+                builder.Append($"{this.VirtuelClassData.JumpPointName},");
+                builder.Append($"{this.NameData.JumpPointName},");
+                builder.Append($"{this.EmptyCtor.AssemblyName}");
+
+                int count = 1;
+                foreach (ReflectionProperty refelectionData in this.Properties)
+                {
+                    refelectionData.GetData(builder, count);
+
+                    count = count + 1;
+                }
+
+                return builder.ToString();
+            }
+
             #endregion methods
 
         }
@@ -169,14 +191,17 @@ namespace Yama.Compiler
 
             public ReflectionProperty(IndexPropertyDeklaration property)
             {
+
                 this.Name = property.Name;
                 this.NameData = new CompileData(DataMode.Text, this.Name);
                 this.Position = property.Position;
-                this.TypeArt = this.GetTypeArt(property);
+
+                if (property.Type is null) return;
+                if (property.Type.Deklaration is not IndexKlassenDeklaration ikd) return;
+                this.TypeArt = this.GetTypeArt(ikd);
 
                 if (this.TypeArt != 3) return;
-                if (property.Klasse is null) return;
-                this.ClassData = property.Klasse.ReflectionData;
+                this.ClassData = ikd.ReflectionData;
             }
 
             #endregion ctor
@@ -188,17 +213,25 @@ namespace Yama.Compiler
                 return true;
             }
 
-            private int GetTypeArt(IndexPropertyDeklaration property)
+            private int GetTypeArt(IndexKlassenDeklaration klasse)
             {
-                if (property.Klasse is null) return 0;
-                if (property.Klasse.Name == "int") return 0;
-                if (property.Klasse.Name == "string") return 1;
-                if (property.Klasse.Name == "bool") return 2;
-                if (property.Klasse.IsMethodsReferenceMode) return 3;
+                if (klasse.Name == "int") return 0;
+                if (klasse.Name == "string") return 1;
+                if (klasse.Name == "bool") return 2;
+                if (klasse.IsMethodsReferenceMode) return 3;
 
                 return 0;
             }
 
+            public bool GetData(StringBuilder builder, int count)
+            {
+                builder.Append($",{this.NameData.JumpPointName}");
+                builder.Append($",{this.Position}");
+                builder.Append($",{this.TypeArt}");
+                builder.Append(this.ClassData is null ? ",0" : $",{this.ClassData.JumpPointName}");
+
+                return true;
+            }
         }
 
     }

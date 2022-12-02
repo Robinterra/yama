@@ -94,7 +94,7 @@ namespace Yama.Assembler.ARMT32
             IdentifierToken? tokem = parser.Peek(token, 1);
             if (tokem is null) return false;
 
-            while (tokem.Kind == IdentifierKind.Word)
+            while (tokem.Kind == IdentifierKind.Word || tokem.Kind == IdentifierKind.NumberToken)
             {
                 deklaration.Arguments.Add(tokem);
                 deklaration.AllTokens.Add(tokem);

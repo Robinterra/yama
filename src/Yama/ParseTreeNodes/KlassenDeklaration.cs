@@ -300,6 +300,7 @@ namespace Yama.Parser
         public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Deklaration is null) return false;
+            if (this.ReflectionClassData.Data.Refelection is not null) this.ReflectionClassData.Data.Refelection.VirtuelClassData = this.VirtualClassData;
 
             foreach (IMethode m in this.Deklaration.StaticMethods)
             {
@@ -351,7 +352,7 @@ namespace Yama.Parser
             foreach (IndexMethodDeklaration m in this.Deklaration.Ctors)
             {
                 if (m.Klasse is null) return false;
-                if (m.Parameters.Count == 0 && this.ReflectionClassData.Data.Refelection is not null) this.ReflectionClassData.Data.Refelection.EmptyCtor = m;
+                if (m.Parameters.Count == 1 && this.ReflectionClassData.Data.Refelection is not null) this.ReflectionClassData.Data.Refelection.EmptyCtor = m;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;

@@ -30,7 +30,11 @@ namespace "System.Reflection"
 
         public object GetNewInstance()
         {
+            //object instance = this.EmptyCtor();
 
+            //return instance;
+
+            return null;
         }
 
         #endregion methods
