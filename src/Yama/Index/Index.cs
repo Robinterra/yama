@@ -9,6 +9,7 @@ namespace Yama.Index
 {
     public class Index
     {
+        private IndexKlassenDeklaration? IntKlasse;
 
         #region get/set
 
@@ -199,7 +200,6 @@ namespace Yama.Index
 
         public string GetTypeName(IndexVariabelnReference reference)
         {
-            if (reference == null) return string.Empty;
             if (reference.IsPointIdentifier && reference.ParentCall != null) return this.GetTypeName(reference.ParentCall, reference);
 
             if (reference.Deklaration is IndexKlassenDeklaration t) return t.Name;
@@ -211,6 +211,52 @@ namespace Yama.Index
             if (reference.Deklaration is IndexEnumEntryDeklaration) return "int";
 
             return string.Empty;
+        }
+
+        public IParent? GetIndexType(IndexVariabelnReference reference)
+        {
+            if (reference.IsPointIdentifier && reference.ParentCall != null) return this.GetIndexType(reference.ParentCall, reference);
+
+            if (reference.Deklaration is IndexKlassenDeklaration t) return t;
+            if (reference.Deklaration is IndexVariabelnDeklaration vd) return vd.Type.Deklaration;
+            if (reference.Deklaration is IndexPropertyGetSetDeklaration pgsd) return pgsd.ReturnValue.Deklaration;
+            if (reference.Deklaration is IndexVektorDeklaration ved) return ved.ReturnValue.Deklaration;
+            if (reference.Deklaration is IndexPropertyDeklaration pd) return pd.Type.Deklaration;
+            if (reference.Deklaration is IndexEnumEntryDeklaration) return this.IntKlasse;
+            if (reference.Deklaration is IndexMethodDeklaration md)
+            {
+                if (reference.IsMethodCalled) return md.ReturnValue.Deklaration;
+
+                return md;
+            }
+            if (reference.Deklaration is IndexDelegateDeklaration idd)
+            {
+                if (reference.IsMethodCalled) return idd.ReturnValue.Deklaration;
+
+                return idd;
+            }
+
+            return reference.Deklaration;
+        }
+
+        public IParent? GetIndexType(IndexVariabelnReference reference, IndexVariabelnReference parent)
+        {
+            IParent? typeName = this.GetIndexType(reference);
+            if (typeName is IndexDelegateDeklaration idd)
+            {
+                if (reference.IsMethodCalled) return idd.ReturnValue.Deklaration;
+
+                return idd;
+            }
+
+            if (parent.ClassGenericDefinition is null) return typeName;
+            if (parent.GenericDeklaration is null) return typeName;
+            if (typeName is null) return typeName;
+
+            if (typeName.Name != parent.ClassGenericDefinition.Token.Text) return typeName;
+            if (parent.GenericDeklaration.Reference is null) return null;
+
+            return parent.GenericDeklaration.Reference.Deklaration;
         }
 
         public string GetTypeName(IndexVariabelnReference reference, IndexVariabelnReference parent)
@@ -229,6 +275,8 @@ namespace Yama.Index
         private bool Mappen()
         {
 
+            this.RootValidUses.Add(new IndexDelegateDeklaration("Func", this.RootValidUses));
+
             foreach (IndexEnumDeklaration klasse in this.RegisterEnums)
             {
                 this.RootValidUses.Add(klasse);
@@ -236,6 +284,8 @@ namespace Yama.Index
 
             foreach (IndexKlassenDeklaration klasse in this.Register)
             {
+                if (klasse.Name == "int") this.IntKlasse = klasse;
+
                 this.RootValidUses.Add(klasse);
             }
 
@@ -316,6 +366,8 @@ namespace Yama.Index
 
             return false;
         }
+
+
 
         #endregion methods
 

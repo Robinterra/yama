@@ -128,6 +128,21 @@ namespace Yama.Index
             set;
         }
 
+        private bool isMethodCalled;
+        public bool IsMethodCalled
+        {
+            get
+            {
+                return this.isMethodCalled;
+            }
+            set
+            {
+                this.isMethodCalled = value;
+                if (this.ParentCall is null) return;
+                this.ParentCall.IsMethodCalled = value;
+            }
+        }
+
         private bool? isownerinUser;
 
         #endregion get/set
@@ -268,6 +283,9 @@ namespace Yama.Index
                 return parentCall.ParentUsesSet.GetIndex.CreateError(this.Use, "no defintion in index found / property dek");
             }
             this.Deklaration = dek;
+
+            this.ClassGenericDefinition = parentCall.GenericDeklaration;
+            this.GenericDeklaration = pd.GenericDeklaration;
 
             if (this.ParentCall != null) this.ParentCall.Mappen(this);
 
@@ -432,7 +450,7 @@ namespace Yama.Index
                 if (t.Deklaration is IndexMethodDeklaration mdu) { mdu.References.Add(this); continue; }
             }
 
-            if (this.Deklaration is IndexKlassenDeklaration kd) { kd.References.Add(this); return true; }
+            if (this.Deklaration is IndexKlassenDeklaration kd) return kd.AddReference(this);
             if (this.Deklaration is IndexMethodDeklaration md) { md.References.Add(this); return true; }
             if (this.Deklaration is IndexPropertyDeklaration pd) { pd.References.Add(this); return true; }
             if (this.Deklaration is IndexVariabelnDeklaration) return true;
@@ -440,8 +458,19 @@ namespace Yama.Index
             if (this.Deklaration is IndexEnumEntryDeklaration eed) { eed.References.Add(this); return true; }
             if (this.Deklaration is IndexVektorDeklaration ivd) { ivd.References.Add(this); return true; }
             if (this.Deklaration is IndexPropertyGetSetDeklaration pgsd) { pgsd.References.Add(this); return true; }
+            if (this.Deklaration is IndexDelegateDeklaration idd) return this.CreateDelegateDeklaration(idd);
 
             return uses.GetIndex.CreateError(this.Use, "no support type definition");
+        }
+
+        private bool CreateDelegateDeklaration(IndexDelegateDeklaration idd)
+        {
+            IndexDelegateDeklaration newDelegate = new IndexDelegateDeklaration(idd.Name, idd.ThisUses);
+            newDelegate.GenericDeklaration = this.GenericDeklaration;
+            this.Deklaration = newDelegate;
+            newDelegate.References.Add(this);
+
+            return true;
         }
 
         private bool VariableDeklarationMappen(IndexVariabelnDeklaration vd)

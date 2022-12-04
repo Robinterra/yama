@@ -10,7 +10,7 @@ namespace "System.Reflection"
 
         public string Name;
 
-        public int EmptyCtor;
+        public Func<object> EmptyCtor;
 
         public int PropertiesCount;
 
@@ -30,7 +30,9 @@ namespace "System.Reflection"
 
         public object GetNewInstance()
         {
+            object result = this.EmptyCtor();
 
+            return result;
         }
 
         #endregion methods

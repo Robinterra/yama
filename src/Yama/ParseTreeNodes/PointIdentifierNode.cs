@@ -161,8 +161,10 @@ namespace Yama.Parser
             return true;
         }
 
-        public bool Compile(RequestParserTreeCompile request)
+        public bool Compile(RequestParserTreeCompile requestParam)
         {
+            RequestParserTreeCompile request = requestParam;
+
             if (this.RightNode is not ICompileNode rightNode) return false;
 
             if (this.RightNode is ReferenceCall rct)
@@ -184,10 +186,9 @@ namespace Yama.Parser
                 if (rctu.Reference.Deklaration is IndexPropertyGetSetDeklaration pgsdek)
                     this.CompileNonStaticCall(request.Compiler, request.Mode, pgsdek);
 
+                if (rctu.Reference.Deklaration is IndexMethodDeklaration dek) request = new RequestParserTreeCompile(request.Compiler, "methode");
 
-                if (rctu.Reference.Deklaration is IndexMethodDeklaration dek) request.Mode = "methode";
-
-                if (rctu.Reference.Deklaration is IndexVektorDeklaration vdek) request.Mode = request.Mode == "point" || request.Mode == "vektorcall" ? "vektorcall" : "setvektorcall";
+                if (rctu.Reference.Deklaration is IndexVektorDeklaration vdek) request = new RequestParserTreeCompile(request.Compiler, request.Mode == "point" || request.Mode == "vektorcall" ? "vektorcall" : "setvektorcall");
             }
 
             string moderesult = "point";
@@ -202,6 +203,7 @@ namespace Yama.Parser
                     if (rc.Reference is null) return false;
 
                     if (rc.Reference.Deklaration is IndexMethodDeklaration dek) this.CompileNonStaticCall(request.Compiler, "default", dek);
+                    else moderesult = this.CompileDelegateHandle(rc, rc.Reference, request);
                 }
             }
 
@@ -267,6 +269,16 @@ namespace Yama.Parser
             compilePushResult.Compile(compiler, null, "copy");
 
             return true;
+        }
+
+        private string CompileDelegateHandle(ReferenceCall rc, IndexVariabelnReference reference, RequestParserTreeCompile request)
+        {
+            if (reference.Deklaration is IndexPropertyDeklaration ipd)
+            {
+                if (ipd.Type.Deklaration is IndexDelegateDeklaration) return "point";
+            }
+
+            return "methode";
         }
 
         private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexVektorDeklaration methdek)

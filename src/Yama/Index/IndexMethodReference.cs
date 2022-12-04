@@ -59,6 +59,12 @@ namespace Yama.Index
             set;
         }
 
+        public IndexDelegateDeklaration? DeklarationDelegate
+        {
+            get;
+            private set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -80,12 +86,20 @@ namespace Yama.Index
             //if (this.CallRef.ParentCall == null) return false;
 
             IndexVariabelnReference functionRef = this.GetParentCall(this.CallRef);
-            if (functionRef == null) return false;
-            if (!(functionRef.Deklaration is IndexMethodDeklaration imd)) return false;
+            if (functionRef.Deklaration is IndexPropertyDeklaration ipd) functionRef = ipd.Type;
+            if (functionRef.Deklaration is IndexDelegateDeklaration idd) return this.FindDelegate(idd);
+            if (functionRef.Deklaration is not IndexMethodDeklaration imd) return false;
 
             if (functionRef.OverloadMethods != null) return this.OverrideMethodsDeklaration(functionRef, imd);
 
             this.Deklaration = imd;
+
+            return true;
+        }
+
+        private bool FindDelegate(IndexDelegateDeklaration idd)
+        {
+            this.DeklarationDelegate = idd;
 
             return true;
         }

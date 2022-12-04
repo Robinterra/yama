@@ -88,6 +88,12 @@ namespace Yama.Assembler.Runtime
 
             foreach (Lexer.IdentifierToken token in t.Arguments)
             {
+                if (token.Kind == Lexer.IdentifierKind.NumberToken)
+                {
+                    daten.AddRange(BitConverter.GetBytes((int)token.Value!));
+                    continue;
+                }
+
                 JumpPointMapper? map = request.Assembler.GetJumpPoint(token.Text);
                 uint target = 4;
                 if (map != null) target = map.Adresse;

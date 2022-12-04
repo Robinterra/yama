@@ -333,6 +333,11 @@ namespace Yama.Compiler
                 }
             }
 
+            if (map.Reference.Owner.Node is MethodeCallNode mkt && mkt.Reference?.DeklarationDelegate is not null)
+            {
+                if (!mkt.Reference.DeklarationDelegate.IsNullable) map.Value = SSAVariableMap.LastValue.NotNull;
+            }
+
             if (map.Reference.Owner.Node is Operator2Childs op2c && op2c.Reference?.Deklaration is not null)
             {
                 if (op2c.Reference.Deklaration.Use is MethodeDeclarationNode mdn && mdn.NullableToken is null)
