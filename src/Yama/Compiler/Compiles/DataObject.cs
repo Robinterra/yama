@@ -138,7 +138,8 @@ namespace Yama.Compiler
                 StringBuilder builder = new StringBuilder();
                 builder.Append($"{this.VirtuelClassData.JumpPointName},");
                 builder.Append($"{this.NameData.JumpPointName},");
-                builder.Append($"{this.EmptyCtor.AssemblyName}");
+                builder.Append($"{this.EmptyCtor.AssemblyName},");
+                builder.Append($"{this.Properties.Count}");
 
                 int count = 1;
                 foreach (ReflectionProperty refelectionData in this.Properties)
