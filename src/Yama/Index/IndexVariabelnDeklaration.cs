@@ -173,6 +173,7 @@ namespace Yama.Index
 
             if (this.Name == "invalue") return this.VariableIsInValueKeyword (uses, nameing);
 
+            this.Type.GenericDeklaration = this.GenericDeklaration;
             this.Type.Mappen(uses);
             if ( this.Type.Deklaration is IndexKlassenDeklaration kd ) return this.TypeIsKlassenDeklaration ( kd, uses.GetIndex );
 

@@ -412,6 +412,19 @@ namespace Yama.Index
             return true;
         }
 
+        public bool AddReference(IndexVariabelnReference indexVariabelnReference)
+        {
+            this.References.Add(indexVariabelnReference);
+            if (indexVariabelnReference.Use is not TypeofKey tk) return true;
+
+            foreach (IndexMethodDeklaration imd in this.Ctors)
+            {
+                imd.References.Add(indexVariabelnReference);
+            }
+
+            return true;
+        }
+
         #endregion methods
     }
 

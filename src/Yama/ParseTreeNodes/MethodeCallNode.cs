@@ -165,6 +165,7 @@ namespace Yama.Parser
             IndexVariabelnReference? callRef = container.VariabelnReferences.LastOrDefault();
             if (callRef is null) return request.Index.CreateError(this);
 
+            callRef.IsMethodCalled = true;
             methodReference.CallRef = callRef;
             this.Reference = methodReference;
 
@@ -196,6 +197,7 @@ namespace Yama.Parser
         {
             if (this.LeftNode is not ICompileNode leftNode) return false;
             if (this.Reference is null) return request.Compiler.AddError("error reference is null", this);
+            if (this.Reference.DeklarationDelegate is not null) return this.Compile(request, this.Reference, this.Reference.DeklarationDelegate, leftNode);
             if (this.Reference.Deklaration is null) return request.Compiler.AddError("error deklaratrion is null", this);
             IndexMethodDeklaration methodDeklaration = this.Reference.Deklaration;
 
@@ -257,6 +259,98 @@ namespace Yama.Parser
             this.FunctionExecute.Compile(request.Compiler, this, request.Mode);
 
             return true;
+        }
+
+        private bool Compile(RequestParserTreeCompile request, IndexMethodReference reference, IndexDelegateDeklaration deklarationDelegate, ICompileNode leftNode)
+        {
+            List<IParseTreeNode> copylist = this.ParametersNodes.ToArray().ToList();
+            copylist.Reverse();
+
+            //if (this.CompileCopy(copylist, request)) return true;
+
+            int parasCount = 0;
+
+            int lengthOfParameters = this.StructResult(request, deklarationDelegate);
+            if (lengthOfParameters == -2) return false;
+            if (lengthOfParameters == -1) return request.Compiler.AddError("the method is returning a struct, please assigment the return value to a variable", this);
+
+            foreach (IParseTreeNode par in copylist )
+            {
+                if (par is not ICompileNode compileNode) continue;
+
+                IndexVariabelnDeklaration varDek = deklarationDelegate.Parameters[lengthOfParameters - parasCount - 1];
+
+                bool isBorrowing = false;
+                bool isNullable = false;
+                if (varDek.Use is VariabelDeklaration vd)
+                {
+                    isBorrowing = vd.BorrowingToken is not null;
+                    isNullable = vd.NullableToken is not null;
+                }
+
+                compileNode.Compile(request);
+
+                CompilePushResult compilePushResult = new CompilePushResult();
+                compilePushResult.ParameterType = this.GetParameterVariableMap(isBorrowing, varDek, isNullable);
+                compilePushResult.Compile(request.Compiler, null, "default");
+
+                parasCount++;
+            }
+
+            if (request.Compiler.ContainerMgmt.CurrentMethod is null) return false;
+            CompileContainer currentMethod = request.Compiler.ContainerMgmt.CurrentMethod;
+
+            bool nullError = currentMethod.NullCallsCanProduceErrors;
+            currentMethod.NullCallsCanProduceErrors = true;
+
+            leftNode.Compile(new RequestParserTreeCompile(request.Compiler, "methode"));
+
+            currentMethod.NullCallsCanProduceErrors = nullError;
+
+            if (this.LeftNode is not PointIdentifier op) return false;
+
+            if (op.IsANonStatic) parasCount++;
+
+            /*for (int i = 0; i < parasCount; i++)
+            {
+                CompileUsePara usePara = new CompileUsePara();
+
+                usePara.Compile(compiler, null);
+            }*/
+
+            this.FunctionExecute.Compile(request.Compiler, this, request.Mode);
+
+            return true;
+        }
+
+        private int StructResult(RequestParserTreeCompile request, IndexDelegateDeklaration methodDeklaration)
+        {
+            int res = methodDeklaration.Parameters.Count;
+
+            if (methodDeklaration.ReturnValue.Deklaration is IndexKlassenDeklaration ikd)
+            {
+                if (ikd.MemberModifier == ClassMemberModifiers.Struct) res = -1;
+            }
+
+            if (request.StructLeftNode is null) return res;
+            if (res != -1)
+            {
+                request.Compiler.AddError("The method is not given a struct back", this);
+                return -2;
+            }
+
+            res = methodDeklaration.Parameters.Count;
+
+            CompileReferenceCall call = new CompileReferenceCall();
+            call.GetVariableCompile(request.Compiler, request.StructLeftNode, this);
+
+            CompilePushResult compilePushResult = new CompilePushResult();
+            compilePushResult.ParameterType = this.GetParameterVariableMap(false, request.StructLeftNode, false);
+            compilePushResult.Compile(request.Compiler, null, "default");
+
+            if (!methodDeklaration.Parameters.Any(t=>t.Name == "return")) return res;
+
+            return res - 1;
         }
 
         private int StructResult(RequestParserTreeCompile request, IndexMethodDeklaration methodDeklaration)

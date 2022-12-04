@@ -162,7 +162,7 @@ namespace Yama.Parser
             node.TypeDefinition = request.Parser.TryToParse ( callRule, typeToken );
             if ( node.TypeDefinition is null ) return null;
 
-            if (!IsInMethodeDeklaration) return node;
+            if (!this.IsInMethodeDeklaration) return node;
 
             IdentifierToken? optionalNullable = this.TryParseNullable(variableNameToken, node, request.Parser);
             if (optionalNullable is null) return node;
@@ -240,6 +240,8 @@ namespace Yama.Parser
             {
                 reference.GenericDeklaration = this.GenericDefintion;
                 this.GenericDefintion.Indezieren(request);
+                container.VariabelnReferences.Remove(type);
+                container.VariabelnReferences.Add(type);
             }
 
             reference.IsBorrowing = this.BorrowingToken is not null;

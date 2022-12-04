@@ -35,13 +35,33 @@ namespace Yama.Index
         {
             if (this.LeftRef == null) return true;
 
-            string leftName = request.Index.GetTypeName(this.LeftRef);
-            string rightName = request.Index.GetTypeName(this.RightRef);
+            IParent? leftHost = request.Index.GetIndexType(this.LeftRef);
+            IParent? rightHost = request.Index.GetIndexType(this.RightRef);
+            if (leftHost is null) return false;
+            if (rightHost is null) return false;
 
-            if ( leftName == rightName ) return true;
-            if ( request.Index.ExistTypeInheritanceHistory ( leftName, this.RightRef ) ) return true;
+            if (leftHost is IndexDelegateDeklaration idd) return this.CheckDelegate(idd, rightHost, request);
 
-            request.Index.CreateError(this.LeftRef == null ? this.RightRef.Use : this.LeftRef.Use, string.Format("Set Value has not correct type, expectet: {0}, currently: {1}", leftName, rightName));
+            //string leftName = request.Index.GetTypeName(this.LeftRef);
+            //string rightName = request.Index.GetTypeName(this.RightRef);
+
+            if ( leftHost.Name == rightHost.Name ) return true;
+            if ( request.Index.ExistTypeInheritanceHistory ( leftHost.Name, this.RightRef ) ) return true;
+
+            request.Index.CreateError(this.LeftRef == null ? this.RightRef.Use : this.LeftRef.Use, string.Format("Set Value has not correct type, expectet: {0}, currently: {1}", leftHost.Name, rightHost.Name));
+             rightHost = request.Index.GetIndexType(this.RightRef);
+
+            return false;
+        }
+
+        private bool CheckDelegate(IndexDelegateDeklaration idd, IParent rightHost, RequestTypeSafety request)
+        {
+            if (rightHost is not IndexMethodDeklaration imd) return false;
+            if (idd.GenericDeklaration is null) return false;
+
+            if (idd.GenericDeklaration.Token.Text == imd.ReturnValue.Name) return true;
+
+            request.Index.CreateError(this.LeftRef == null ? this.RightRef.Use : this.LeftRef.Use, string.Format("Set Value has not correct type, expectet: {0}, currently: {1}", idd.Name, rightHost.Name));
 
             return false;
         }

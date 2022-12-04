@@ -17,7 +17,6 @@ namespace Yama.Compiler
         public string Mode
         {
             get;
-            set;
         }
 
         public bool StructDefiniton

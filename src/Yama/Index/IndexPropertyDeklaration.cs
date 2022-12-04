@@ -51,7 +51,7 @@ namespace Yama.Index
             set;
         }
 
-        public IndexContainer? GetContainer
+        public IndexContainer GetContainer
         {
             get;
             set;
@@ -157,6 +157,12 @@ namespace Yama.Index
             }
         }
 
+        public GenericCall? GenericDeklaration
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -168,6 +174,7 @@ namespace Yama.Index
             this.Zusatz = methodeType;
             this.Use = use;
             this.Name = name;
+            this.GetContainer = new IndexContainer(use, "contianer");
             this.References = new List<IndexVariabelnReference>();
         }
 
@@ -181,6 +188,7 @@ namespace Yama.Index
 
             this.ParentUsesSet = uses;
 
+            this.Type.GenericDeklaration = this.GenericDeklaration;
             this.Type.Mappen(uses);
 
             return true;
@@ -191,7 +199,7 @@ namespace Yama.Index
             if (this.IsMapped) return false;
 
             //this.SetContainer.Mappen(this.ThisUses);
-            //this.GetContainer.Mappen(this.ThisUses);
+            this.GetContainer.Mappen(this.ThisUses);
 
             return this.IsMapped = true;
         }

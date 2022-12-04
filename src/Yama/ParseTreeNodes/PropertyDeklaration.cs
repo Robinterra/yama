@@ -4,6 +4,7 @@ using Yama.Index;
 using System.Linq;
 using System;
 using Yama.Compiler;
+using Yama.Parser.Request;
 
 namespace Yama.Parser
 {
@@ -49,8 +50,16 @@ namespace Yama.Parser
             {
                 List<IParseTreeNode> result = new List<IParseTreeNode> (  );
 
+                if (this.GenericDefintion is not null) result.Add(this.GenericDefintion);
+
                 return result;
             }
+        }
+
+        public GenericCall? GenericDefintion
+        {
+            get;
+            set;
         }
 
         public List<IdentifierToken> AllTokens
@@ -160,7 +169,7 @@ namespace Yama.Parser
             return parser.Peek(token, 1);
         }
 
-        public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
+        public IParseTreeNode? Parse ( RequestParserTreeParser request )
         {
             PropertyDeklaration deklaration = new PropertyDeklaration(this.layer);
 
@@ -179,6 +188,9 @@ namespace Yama.Parser
 
             token = request.Parser.Peek ( token, 1 );
             if (token is null) return null;
+
+            token = this.TryParseGeneric(request, deklaration, token);
+            if (token is null) return null;
             if ( !this.CheckHashValidName ( token ) ) return null;
 
             deklaration.Token = token;
@@ -191,6 +203,18 @@ namespace Yama.Parser
             deklaration.AllTokens.Add(token);
 
             return deklaration;
+        }
+
+        private IdentifierToken? TryParseGeneric(RequestParserTreeParser request, PropertyDeklaration deklaration, IdentifierToken token)
+        {
+            GenericCall genericRule = request.Parser.GetRule<GenericCall>();
+
+            GenericCall? genericCall = request.Parser.TryToParse(genericRule, token);
+            if (genericCall is null) return token;
+
+            deklaration.GenericDefintion = genericCall;
+
+            return request.Parser.Peek(genericCall.Ende, 1);
         }
 
         private IdentifierToken? TryParseBorrwoing(Parser parser, IdentifierToken token, PropertyDeklaration node)
@@ -231,6 +255,12 @@ namespace Yama.Parser
             if (this.ZusatzDefinition != null)
             {
                 if (this.ZusatzDefinition.Kind == IdentifierKind.Static) deklaration.Zusatz = MethodeType.Static;
+            }
+
+            if (this.GenericDefintion is not null)
+            {
+                deklaration.GenericDeklaration = this.GenericDefintion;
+                this.GenericDefintion.Indezieren(new RequestParserTreeIndezieren(request.Index, deklaration.GetContainer));
             }
 
             AccessModify access = AccessModify.Private;
