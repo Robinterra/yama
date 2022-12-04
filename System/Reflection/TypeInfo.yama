@@ -22,7 +22,10 @@ namespace "System.Reflection"
             {
                 if (position >= this.PropertiesCount) return null;
 
-                return null;
+                int pos = position << 4;
+                int adresse = 16 + this as int;
+
+                return adresse + pos;
             }
         }
 

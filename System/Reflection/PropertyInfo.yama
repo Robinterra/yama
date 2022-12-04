@@ -12,14 +12,25 @@ namespace "System.Reflection"
 
         public TypeInfo Type;
 
-        public bool SetValue(object instance, int value)
+        public bool SetValue(&object instance, int value)
         {
+            int pos = this.Position << 2;
+            int adresse = pos + instance as int;
+
+            Pointer pointer = adresse as Pointer;
+            pointer.Value = value;
+
             return true;
         }
 
-        public int GetValue(object instance)
+        public int GetValue(&object instance)
         {
-            return 0;
+            int pos = this.Position << 2;
+            int adresse = pos + instance as int;
+
+            Pointer pointer = adresse as Pointer;
+
+            return pointer.Value;
         }
 
     }
