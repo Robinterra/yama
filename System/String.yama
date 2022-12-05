@@ -142,6 +142,170 @@ namespace "System"
 
     }
 
+    public struct RefString
+    {
+        #region vars
+
+        public string Source;
+        public int Start;
+        public int Length;
+
+        #endregion vars
+
+        #region get/set
+
+        public int Data[int index]
+        {
+            get
+            {
+                if (index > this.Length) return 1;
+
+                int start = this.Start;
+                int targetIndex = index + start;
+                string source = this.Source;
+                int result = source.Data[targetIndex];
+
+                return result;
+            }
+            set
+            {
+                if (index > this.Length) return 0;
+
+                int start = this.Start;
+                int targetIndex = index + start;
+
+                string source = this.Source;
+                source.Data[targetIndex] = value;
+            }
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public this ~()
+        {
+            return null;
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        // -----------------------------------------------
+
+        public static RefString Pack(string source)
+        {
+            Result.Source = source;
+            Result.Start = 0;
+            Result.Length = source.Length;
+
+            return Result;
+        }
+
+        // -----------------------------------------------
+
+        public RefString Substring(int start, int length)
+        {
+            Result.Source = this.Source;
+            Result.Start = this.Start + start;
+            Result.Length = length;
+
+            return Result;
+        }
+
+        // -----------------------------------------------
+
+        public String ToString()
+        {
+            int size = this.Length;
+            string newString = string.New[size];
+
+            string a = this.Source;
+            int start = this.Start;
+            ByteArray.Copy(newString as ByteArray, a as ByteArray, 0, start, size);
+
+            return new String(newString);
+        }
+
+        // -----------------------------------------------
+
+        public bool Equals(string b)
+        {
+            int length = this.Length;
+            if (length != b.Length) return false;
+
+
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int valueA = this.Data[i];
+                int valueB = b.Data[i];
+                if (valueA != valueB) return false;
+            }
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public bool NotEquals(string b)
+        {
+            int length = this.Length;
+            if (length != b.Length) return true;
+
+
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int valueA = this.Data[i];
+                int valueB = b.Data[i];
+                if (valueA != valueB) return true;
+            }
+
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        public bool Equals(RefString b)
+        {
+            int length = this.Length;
+            if (length != b.Length) return false;
+
+
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int valueA = this.Data[i];
+                int valueB = b.Data[i];
+                if (valueA != valueB) return false;
+            }
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public bool NotEquals(RefString b)
+        {
+            int length = this.Length;
+            if (length != b.Length) return true;
+
+
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int valueA = this.Data[i];
+                int valueB = b.Data[i];
+                if (valueA != valueB) return true;
+            }
+
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+    }
+
     public class String
     {
 
