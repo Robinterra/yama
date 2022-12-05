@@ -1,0 +1,64 @@
+namespace "System"
+{
+
+    public primitive class char
+    {
+
+        public bool IsEquals(string data, int position)
+        {
+            int a = data.Data[position];
+
+            return a == this;
+        }
+
+        public bool IsNotEquals(string data, int position)
+        {
+            int a = data.Data[position];
+
+            return a != this;
+        }
+
+        public bool IsEquals(RefString data, int position)
+        {
+            int a = data.Data[position];
+
+            return a == this;
+        }
+
+        public bool IsNotEquals(RefString data, int position)
+        {
+            int a = data.Data[position];
+
+            return a != this;
+        }
+
+        public bool IsLetter()
+        {
+            int a = this as int;
+
+            if (a < 0x41) return false;
+            if (a < 0x5b) return true;
+            if (a < 0x61) return false;
+
+            return a < 0x7b;
+        }
+
+        public bool IsNumber()
+        {
+            int a = this as int;
+
+            if (a < 0x30) return false;
+
+            return a < 0x3a;
+        }
+
+        public bool IsWhitespace()
+        {
+            int a = this as int;
+
+            return a < 0x21;
+        }
+
+    }
+
+}

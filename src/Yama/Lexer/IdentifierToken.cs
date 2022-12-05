@@ -237,6 +237,7 @@ namespace Yama.Lexer
         Let,
         IsNot,
         Typeof,
+        CharText,
     }
 }
 

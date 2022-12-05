@@ -15,10 +15,7 @@ namespace Yama.Lexer
 
         public IdentifierKind Kind
         {
-            get
-            {
-                return IdentifierKind.Text;
-            }
+            get;
         }
 
         // -----------------------------------------------
@@ -47,6 +44,13 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
+        public int MaxLength
+        {
+            get;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -55,11 +59,13 @@ namespace Yama.Lexer
 
         // -----------------------------------------------
 
-        public Text ( ZeichenKette begin, ZeichenKette ende, Escaper? escape )
+        public Text ( ZeichenKette begin, ZeichenKette ende, Escaper? escape, IdentifierKind identifier = IdentifierKind.Text, int maxLength = int.MaxValue )
         {
             this.Begin = begin;
             this.Ende = ende;
             this.Escape = escape;
+            this.Kind = identifier;
+            this.MaxLength = maxLength;
         }
 
         // -----------------------------------------------
@@ -76,13 +82,20 @@ namespace Yama.Lexer
         {
             if ( this.Begin.CheckChar ( lexer ) != TokenState.Complete ) return TokenState.Cancel;
 
+            int count = 0;
             while ( true )
             {
-                if ( this.Ende.CheckChar ( lexer ) == TokenState.Complete ) return TokenState.Complete;
+                if ( this.Ende.CheckChar ( lexer ) == TokenState.Complete )
+                {
+                    if (this.MaxLength == int.MaxValue) return TokenState.Complete;
+
+                    return this.MaxLength >= count ? TokenState.Complete : TokenState.SyntaxError;
+                }
 
                 if ( this.Escape != null && this.Escape.CheckChar ( lexer ) == TokenState.Complete ) continue;
 
                 lexer.NextByte (  );
+                count += 1;
 
                 if ( lexer.CurrentByte == 0 ) return TokenState.SyntaxError;
             }

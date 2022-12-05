@@ -344,6 +344,7 @@ namespace Yama
             ParserLayer layer = new ParserLayer("ExpressionIdenLayer");
 
             layer.ParserMembers.Add ( new TextParser ( 1 ) );
+            layer.ParserMembers.Add ( new CharTextParserNode ( 1 ) );
             layer.ParserMembers.Add ( new NullKey (  ) );
             layer.ParserMembers.Add ( new Number ( 1 ) );
             layer.ParserMembers.Add ( new TrueFalseKey ( 1 ) );
@@ -497,8 +498,7 @@ namespace Yama
             rules.Add ( new Punctuation ( new ZeichenKette ( ":" ), IdentifierKind.DoublePoint ) );
             rules.Add ( new Punctuation ( new ZeichenKette ( ";" ), IdentifierKind.EndOfCommand ) );
             rules.Add ( new Text ( new ZeichenKette ( "\"" ), new ZeichenKette ( "\"" ), escape ) );
-            rules.Add ( new Text ( new ZeichenKette ( "\'" ), new ZeichenKette ( "\'" ), escape ) );
-            rules.Add ( new KeyWord ( "char", IdentifierKind.Char ) );
+            rules.Add ( new Text ( new ZeichenKette ( "\'" ), new ZeichenKette ( "\'" ), escape, IdentifierKind.CharText, 1) );
             rules.Add ( new KeyWord ( "byte", IdentifierKind.Byte ) );
             rules.Add ( new KeyWord ( "set", IdentifierKind.Set ) );
             rules.Add ( new KeyWord ( "get", IdentifierKind.Get ) );
