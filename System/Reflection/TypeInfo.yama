@@ -38,6 +38,21 @@ namespace "System.Reflection"
             return result;
         }
 
+        public PropertyInfo? Find(RefString findName)
+        {
+            int length = this.PropertiesCount;
+            for (int i = 0; i < length; i = i + 1)
+            {
+                PropertyInfo result = this.Properties[i];
+
+                if (findName.NotEquals(result.Name)) continue;
+
+                return result;
+            }
+
+            return null;
+        }
+
         #endregion methods
 
     }
