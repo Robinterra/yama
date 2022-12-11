@@ -216,7 +216,9 @@ namespace Yama.Parser
             {
                 if (par is not ICompileNode compileNode) continue;
 
-                IndexVariabelnDeklaration varDek = methodDeklaration.Parameters[lengthOfParameters - parasCount - 1];
+                int q = lengthOfParameters - parasCount - 1;
+                if (q < 0) return request.Compiler.AddError("this method call is not allowed, save the result in a variable", this);
+                IndexVariabelnDeklaration varDek = methodDeklaration.Parameters[q];
 
                 bool isBorrowing = false;
                 bool isNullable = false;

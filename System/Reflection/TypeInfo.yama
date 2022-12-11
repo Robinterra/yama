@@ -45,9 +45,8 @@ namespace "System.Reflection"
             {
                 PropertyInfo result = this.Properties[i];
 
-                if (findName.NotEquals(result.Name)) continue;
-
-                return result;
+                bool isfound = findName.Equals(result.Name);
+                if (isfound) return result;
             }
 
             return null;

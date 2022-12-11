@@ -253,7 +253,6 @@ namespace "System"
             int length = this.Length;
             if (length != b.Length) return true;
 
-
             for (int i = 0; i < length; i = i + 1)
             {
                 int valueA = this.Data[i];
