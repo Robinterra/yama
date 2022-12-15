@@ -44,11 +44,11 @@ namespace Yama.Compiler
             this.Mode = mode;
         }
 
-        public string? GetData()
+        public string? GetData(Compiler compiler)
         {
             if (this.Mode == DataMode.Int) return string.Format("0x{0:x}", this.IntValue);
             if (this.Mode == DataMode.Text) return this.Text;
-            if (this.Mode == DataMode.Reflection && this.Refelection is not null) return this.Refelection.GetData();
+            if (this.Mode == DataMode.Reflection && this.Refelection is not null) return this.Refelection.GetData(compiler);
             if (this.Mode != DataMode.JumpPointListe) return null;
 
             StringBuilder builder = new StringBuilder();
@@ -130,10 +130,14 @@ namespace Yama.Compiler
                 return true;
             }
 
-            public string? GetData()
+            public string? GetData(Compiler compiler)
             {
                 if (this.VirtuelClassData is null) return null;
-                if (this.EmptyCtor is null) return null;
+                if (this.EmptyCtor is null) 
+                {
+                    //compiler.AddError("Expectet a Empty Ctor", this.VirtuelClassData.Node);
+                    return null;
+                }
 
                 StringBuilder builder = new StringBuilder();
                 builder.Append($"{this.VirtuelClassData.JumpPointName},");
