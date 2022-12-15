@@ -278,6 +278,8 @@ namespace Yama.Compiler
                 IMethode? dector = ikd.DeCtors.FirstOrDefault();
                 if (dector is null)
                 {
+                    if (ikd.IsGeneric) continue;
+
                     compiler.AddError($"type '{ikd.Name} has no dector", node);
 
                     continue;

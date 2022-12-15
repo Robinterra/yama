@@ -218,6 +218,7 @@ namespace Yama.Compiler
             {
                 if (klasse.Name == "int") return 0;
                 if (klasse.Name == "String") return 1;
+                if (klasse.Name == "List") return 4;
                 if (klasse.Name == "bool") return 2;
                 if (klasse.IsMethodsReferenceMode) return 3;
 

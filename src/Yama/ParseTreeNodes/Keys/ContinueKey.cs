@@ -97,6 +97,7 @@ namespace Yama.Parser
                 if (varMap.Value.Reference is null) continue;
 
                 varMap.Value.LoopBranchReferencesForPhis.Add(varMap.Value.Reference);
+                if (varMap.Value.Value == SSAVariableMap.LastValue.Null) varMap.Value.Reference = null;
             }
 
             this.JumpTo.Compile(request.Compiler, null, request.Mode);

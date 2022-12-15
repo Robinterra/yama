@@ -15,7 +15,7 @@ namespace "System.Collections"
 
         #region get/set
 
-        public TItem? Data[int pos]
+        public &TItem? Data[int pos]
         {
             get
             {
@@ -45,13 +45,29 @@ namespace "System.Collections"
 
         public this ~()
         {
+            int length = this.Length;
             Array array = this.array;
+            for (int i = 0; i < length; i = i + 1)
+            {
+                object obj = (array.Data[i]) as object;
+                if (obj is null) continue;
+
+                obj = ~obj;
+            }
+
             array = ~array;
         }
 
         #endregion ctor
 
         #region methods
+
+        public &TItem? Get(int pos)
+        {
+            if (pos >= this.Length) return null;
+
+            return this.array.Data[pos];
+        }
 
         public bool Add(TItem item)
         {
@@ -63,8 +79,8 @@ namespace "System.Collections"
 
             if (this.Length == arraySize) this.Grow();
 
-            array.Data[orgLength] = (item) as int;
-
+            int value = (item) as int;
+            array.Data[orgLength] = value;
 
             return true;
         }

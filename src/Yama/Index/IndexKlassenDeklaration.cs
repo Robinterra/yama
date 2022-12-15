@@ -242,7 +242,7 @@ namespace Yama.Index
             IndexKlassenDeklaration dekThisVar = new (this.GenericDeklaration, this.GenericDeklaration.Token.Text);
             dekThisVar.ParentUsesSet = this.thisUses;
             dekThisVar.IsGeneric = true;
-            dekThisVar.MemberModifier = ClassMemberModifiers.Primitive;
+            dekThisVar.MemberModifier = ClassMemberModifiers.None;
 
             dekList.Add(dekThisVar);
 

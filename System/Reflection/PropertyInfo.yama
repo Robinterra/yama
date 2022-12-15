@@ -40,7 +40,8 @@ namespace "System.Reflection"
         Int = 0x0,
         String = 0x1,
         Bool = 0x2,
-        Object = 0x3
+        Object = 0x3,
+        List = 0x4
     }
 
 }
