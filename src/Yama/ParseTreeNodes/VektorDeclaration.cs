@@ -117,6 +117,12 @@ namespace Yama.Parser
             set;
         }
 
+        public IdentifierToken? NullableToken
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
@@ -208,6 +214,9 @@ namespace Yama.Parser
             deklaration.TypeDefinition = token;
             deklaration.AllTokens.Add(token);
 
+            token = this.TryParseNullable(request.Parser, token, deklaration);
+            if (token is null) return null;
+
             token = request.Parser.Peek ( token, 1 );
             if (token is null) return null;
 
@@ -252,6 +261,19 @@ namespace Yama.Parser
             if (deklaration.GetStatement is null && deklaration.SetStatement is null) return new ParserError(deklaration.Token, "The Property need to have a  minimum a get or set statement", deklaration.AllTokens.ToArray());
 
             return deklaration;
+        }
+
+        private IdentifierToken? TryParseNullable(Parser parser, IdentifierToken token, VektorDeclaration node)
+        {
+            IdentifierToken? nullable = parser.Peek(token, 1);
+            if (nullable is null) return token;
+            if (nullable.Kind != IdentifierKind.Operator) return token;
+            if (nullable.Text != "?") return token;
+
+            node.NullableToken = nullable;
+            node.AllTokens.Add(nullable);
+
+            return nullable;
         }
 
         private IdentifierToken? TryParseBorrwoing(Parser parser, IdentifierToken token, VektorDeclaration node)
@@ -380,6 +402,7 @@ namespace Yama.Parser
 
             SSAVariableMap.VariableType kind = SSAVariableMap.VariableType.StackValue;
             IndexVariabelnDeklaration vardek = new IndexVariabelnDeklaration(this, dk.Name, varref);
+            vardek.IsNullable = this.NullableToken is not null;
             if (dk.MemberModifier == ClassMemberModifiers.None)
             {
                 kind = isBorrowing ? SSAVariableMap.VariableType.BorrowingReference : SSAVariableMap.VariableType.OwnerReference;

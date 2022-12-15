@@ -1,0 +1,90 @@
+namespace "System.Collections"
+{
+    using "System";
+    using "System.IO";
+
+    public class List<TItem>
+    {
+
+        #region vars
+
+        private Array array;
+        public int Length;
+
+        #endregion vars
+
+        #region get/set
+
+        public TItem? Data[int pos]
+        {
+            get
+            {
+                if (pos >= this.Length) return null;
+
+                return this.array.Data[pos];
+            }
+            set
+            {
+                if (pos >= this.Length) return null;
+
+                this.array.Data[pos] = (value) as int;
+            }
+        }
+
+        #endregion get/set
+
+        #region ctor
+
+        public this new()
+        {
+            this.Length = 0;
+            this.array = Array.New[16];
+
+            return this;
+        }
+
+        public this ~()
+        {
+            Array array = this.array;
+            array = ~array;
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        public bool Add(TItem item)
+        {
+            int orgLength = this.Length;
+            this.Length = orgLength + 1;
+
+            Array array = this.array;
+            int arraySize = array.size >> 2;
+
+            if (this.Length == arraySize) this.Grow();
+
+            array.Data[orgLength] = (item) as int;
+
+
+            return true;
+        }
+
+        private bool Grow()
+        {
+            Array orgarray = this.array;
+
+            int newSize = orgarray.Size + 16;
+            Array newArray = Array.New[newSize];
+
+            Array.Copy(newArray, orgarray, 0, 0, orgarray.Size);
+            this.array = newArray;
+
+            orgarray = ~orgarray;
+
+            return true;
+        }
+
+        #endregion methods
+    }
+
+}

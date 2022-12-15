@@ -145,7 +145,7 @@ namespace Yama.Parser
 
         public bool Indezieren(RequestParserTreeIndezieren request)
         {
-            //if (request.Parent is IndexKlassenDeklaration idk) return this.IndezKlassenGeneric(request, idk);
+            if (request.Parent is IndexKlassenDeklaration idk) return this.IndezKlassenGeneric(request, idk);
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
             IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
