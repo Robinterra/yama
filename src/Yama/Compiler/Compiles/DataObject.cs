@@ -205,6 +205,15 @@ namespace Yama.Compiler
                 if (property.Type.Deklaration is not IndexKlassenDeklaration ikd) return;
                 this.TypeArt = this.GetTypeArt(ikd);
 
+                if (this.TypeArt == 4 && property.GenericDeklaration is not null)
+                {
+                    if (property.GenericDeklaration.Reference is null) return;
+                    if (property.GenericDeklaration.Reference.Deklaration is not IndexKlassenDeklaration gdk) return;
+
+                    this.ClassData = gdk.ReflectionData;
+
+                    return;
+                }
                 if (this.TypeArt != 3) return;
                 this.ClassData = ikd.ReflectionData;
             }
