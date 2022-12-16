@@ -81,7 +81,7 @@ namespace "System.Collections"
             return item;
         }
 
-        public bool Add(TItem item)
+        public bool Add(TItem item?)
         {
             int orgLength = this.Length;
             this.Length = orgLength + 1;
