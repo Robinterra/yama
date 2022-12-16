@@ -15,7 +15,7 @@ namespace "System.Collections"
 
         #region get/set
 
-        public &TItem? Data[int pos]
+        /*public &TItem? Data[int pos]
         {
             get
             {
@@ -29,7 +29,7 @@ namespace "System.Collections"
 
                 this.array.Data[pos] = (value) as int;
             }
-        }
+        }*/
 
         #endregion get/set
 
@@ -69,6 +69,18 @@ namespace "System.Collections"
             return this.array.Data[pos];
         }
 
+        public TItem? GetOwner(int pos)
+        {
+            if (pos >= this.Length) return null;
+
+            TItem item = (this.array.Data[pos]) as TItem;
+            if (item is null) return null;
+
+            this.Remove(item);
+
+            return item;
+        }
+
         public bool Add(TItem item)
         {
             int orgLength = this.Length;
@@ -83,6 +95,51 @@ namespace "System.Collections"
             array.Data[orgLength] = value;
 
             return true;
+        }
+
+        public int AtPosition(TItem item)
+        {
+            int length = this.Length;
+            Array array = this.array;
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int existPointer = array.Data[i];
+                if (existPointer == item) return i;
+            }
+
+            return -1;
+        }
+
+        public bool Contains(TItem item)
+        {
+            int length = this.Length;
+            Array array = this.array;
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int existPointer = array.Data[i];
+                if (existPointer == item) return true;
+            }
+
+            return false;
+        }
+
+        public bool Remove(TItem item)
+        {
+            int length = this.Length;
+            Array array = this.array;
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int existPointer = array.Data[i];
+                if (existPointer != item) continue;
+
+                int newStart = i + 1;
+                Array.Copy(array, array, i, newStart, length - newStart);
+                this.Length = length - 1;
+
+                return true;
+            }
+
+            return false;
         }
 
         private bool Grow()

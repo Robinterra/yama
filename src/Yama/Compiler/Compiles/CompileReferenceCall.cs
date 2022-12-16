@@ -327,9 +327,17 @@ namespace Yama.Compiler
 
             if (map.Reference.Owner.Node is MethodeCallNode mk && mk.Reference?.Deklaration is not null)
             {
-                if (mk.Reference.Deklaration.Use is MethodeDeclarationNode mdn && mdn.NullableToken is null)
+                if (mk.Reference.Deklaration.Use is MethodeDeclarationNode mdn)
                 {
-                    map.Value = SSAVariableMap.LastValue.NotNull;
+                    if (mdn.NullableToken is null) map.Value = SSAVariableMap.LastValue.NotNull;
+
+                    if (mdn.BorrowingToken is not null)
+                    {
+                        if (map.Kind == SSAVariableMap.VariableType.BorrowingReference) return true;
+                        return compiler.AddError("a borrwoing return value can not set to a owner variable", mk);
+                    }
+
+                    if (map.Kind == SSAVariableMap.VariableType.BorrowingReference) return compiler.AddError("a owner return value can not set to a borrwoing variable", mk);
                 }
             }
 
@@ -351,7 +359,7 @@ namespace Yama.Compiler
                 if (ipd.Use.BorrowingToken is not null)
                 {
                     if (map.Kind == SSAVariableMap.VariableType.BorrowingReference) return true;
-                    return compiler.AddError("a global borrwoing variable can not set to a owner variable", ipd.Use);
+                    return compiler.AddError("a global borrwoing variable can not set to a owner variable", arg.Reference is null ? map.Deklaration.Use : arg.Reference.Owner.Node);
                 }
                 if (map.Kind != SSAVariableMap.VariableType.OwnerReference) return true;
                 if (arg.Reference is null) return compiler.AddError("CompileReferenceCall.cs: darf nicht null sein");
