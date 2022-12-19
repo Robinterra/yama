@@ -162,6 +162,14 @@ namespace Yama
 
         // -----------------------------------------------
 
+        public bool ReflectionActive
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -359,7 +367,7 @@ namespace Yama
         {
 
             expressionLayer.ParserMembers.Add ( new NewKey ( expressionLayer ) );
-            expressionLayer.ParserMembers.Add(new TypeofKey());
+            expressionLayer.ParserMembers.Add(new TypeofKey(this.ReflectionActive));
             expressionLayer.ParserMembers.Add(new ConditionalCompilationNode (  ));
             expressionLayer.ParserMembers.Add(new ExpressionNode(expressionIdenLayer, expressionCallLayer, operationLayer));
 
@@ -736,7 +744,7 @@ namespace Yama
         {
             if (this.Definition == null) return false;
 
-            Compiler.Compiler compiler = new Compiler.Compiler(this.Definition, this.Defines);
+            Compiler.Compiler compiler = new Compiler.Compiler(this.Definition, this.Defines, this.ReflectionActive);
             compiler.OptimizeLevel = this.OptimizeLevel;
             compiler.OutputFile = this.OutputAssemblerFile;
             compiler.MainFunction = main;

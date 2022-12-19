@@ -105,6 +105,7 @@ namespace Yama.ProjectConfig
 
             definition.StartPosition = (uint)project.Skip;
             definition.OSHeader = project.OsHeader;
+            definition.ReflectionActive = project.ReflectionActive;
 
             if ( !string.IsNullOrEmpty ( project.StartNamespace ) ) definition.StartNamespace = project.StartNamespace;
 
@@ -269,6 +270,8 @@ namespace Yama.ProjectConfig
             rules.Add ( new Whitespaces (  ) );
             rules.Add ( new Text ( new ZeichenKette ( "\"" ), new ZeichenKette ( "\"" ), escape ) );
             rules.Add ( new Text ( new ZeichenKette ( "\'" ), new ZeichenKette ( "\'" ), escape ) );
+            rules.Add(new KeyWord("true", IdentifierKind.True));
+            rules.Add(new KeyWord("false", IdentifierKind.False));
             rules.Add ( new Words ( new List<ILexerToken> () { new HigherAlpabet (  ), new LowerAlpabet (  ), new Digit (  ), new Underscore (  ), new Punctuation( new ZeichenKette("."), IdentifierKind.Point) } ) );
 
             return rules;
@@ -310,6 +313,7 @@ namespace Yama.ProjectConfig
             parserLayer.ParserMembers.Add(new OptimizeNode());
             parserLayer.ParserMembers.Add(new SkipNode());
             parserLayer.ParserMembers.Add(new OSHeaderNode());
+            parserLayer.ParserMembers.Add(new ReflectionActiveNode());
             parserLayer.ParserMembers.Add ( new PackageGroupNode ( packagelayer ) );
 
             return parserLayer;

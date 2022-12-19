@@ -15,6 +15,8 @@ namespace Yama.Compiler
     public class Compiler
     {
 
+        private bool reflectionActive;
+
         #region get/set
 
         public CompileHeader Header
@@ -131,10 +133,11 @@ namespace Yama.Compiler
 
         #region ctor
 
-        public Compiler(IProcessorDefinition definition, List<string> defines)
+        public Compiler(IProcessorDefinition definition, List<string> defines, bool reflectionActive)
         {
             this.Defines = defines;
             this.Definition = definition;
+            this.reflectionActive = reflectionActive;
         }
 
         #endregion ctor
@@ -373,7 +376,7 @@ namespace Yama.Compiler
                 if (k.ReflectionClassData.Data.Refelection is null) continue;
 
                 k.VirtualClassData.Compile(this, k, "datalist");
-                k.ReflectionClassData.Compile(this, k, "datalist");
+                if (this.reflectionActive) k.ReflectionClassData.Compile(this, k, "datalist");
             }
 
             return this.Errors.Count == 0;

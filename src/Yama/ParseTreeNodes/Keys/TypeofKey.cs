@@ -17,6 +17,8 @@ namespace Yama.Parser
             set;
         }
 
+        private bool reflectionActive;
+
         public IdentifierToken Token
         {
             get;
@@ -54,8 +56,9 @@ namespace Yama.Parser
 
         #region ctor
 
-        public TypeofKey ()
+        public TypeofKey (bool reflectionActive)
         {
+            this.reflectionActive = reflectionActive;
             this.Token = new();
             this.Ende = new();
             this.TypeToken = new();
@@ -69,12 +72,13 @@ namespace Yama.Parser
         public IParseTreeNode? Parse ( Request.RequestParserTreeParser request )
         {
             if ( request.Token.Kind != IdentifierKind.Typeof ) return null;
+            if (!this.reflectionActive) return new ParserError(request.Token, "Reflection is not activated, please add to your yproj file 'ReflectionActive:true' to active reflection");
 
             IdentifierToken? openBrackettoken = request.Parser.Peek ( request.Token, 1 );
             if (openBrackettoken is null) return new ParserError(request.Token, $"Expectet a open Bracket '<' after a 'typeof' Keyword {request.Token.Kind}");
             if ( openBrackettoken.Kind != IdentifierKind.Operator && openBrackettoken.Text == "<" ) return new ParserError(openBrackettoken, $"Expectet a open Bracket '<' after Keyword 'typeof' and not a {openBrackettoken.Kind}", request.Token);
 
-            TypeofKey key = new TypeofKey ();
+            TypeofKey key = new TypeofKey (this.reflectionActive);
             key.Token = request.Token;
             key.AllTokens.Add(request.Token);
             key.AllTokens.Add(openBrackettoken);
