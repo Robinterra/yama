@@ -254,9 +254,11 @@ namespace Yama.Index
             if (typeName is null) return typeName;
 
             if (typeName.Name != parent.ClassGenericDefinition.Token.Text) return typeName;
-            if (parent.GenericDeklaration.Reference is null) return null;
 
-            return parent.GenericDeklaration.Reference.Deklaration;
+            IndexVariabelnReference? gefRef = parent.GenericDeklaration.References.FirstOrDefault(t=>t.Name == typeName.Name);
+            if (gefRef is null) return null;
+
+            return gefRef.Deklaration;
         }
 
         public string GetTypeName(IndexVariabelnReference reference, IndexVariabelnReference parent)

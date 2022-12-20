@@ -282,13 +282,8 @@ namespace Yama.Parser
 
                 IndexVariabelnDeklaration varDek = deklarationDelegate.Parameters[lengthOfParameters - parasCount - 1];
 
-                bool isBorrowing = false;
-                bool isNullable = false;
-                if (varDek.Use is VariabelDeklaration vd)
-                {
-                    isBorrowing = vd.BorrowingToken is not null;
-                    isNullable = vd.NullableToken is not null;
-                }
+                bool isBorrowing = varDek.IsBorrowing;
+                bool isNullable = varDek.IsNullable;
 
                 compileNode.Compile(request);
 
@@ -309,9 +304,9 @@ namespace Yama.Parser
 
             currentMethod.NullCallsCanProduceErrors = nullError;
 
-            if (this.LeftNode is not PointIdentifier op) return false;
+            //if (this.LeftNode is not PointIdentifier op) return false;
 
-            if (op.IsANonStatic) parasCount++;
+            //if (op.IsANonStatic) parasCount++;
 
             /*for (int i = 0; i < parasCount; i++)
             {

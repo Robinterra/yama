@@ -59,11 +59,13 @@ namespace Yama.Index
             if (rightHost is not IndexMethodDeklaration imd) return false;
             if (idd.GenericDeklaration is null) return false;
 
-            if (idd.GenericDeklaration.Token.Text == imd.ReturnValue.Name) return true;
+            IndexVariabelnReference? returnType = idd.GenericDeklaration.References.FirstOrDefault();
+            if (returnType is null) return false;
+            if (returnType.Name != imd.ReturnValue.Name) return request.Index.CreateError(this.LeftRef == null ? this.RightRef.Use : this.LeftRef.Use, string.Format("Set Value has not correct type, expectet: {0}, currently: {1}", idd.Name, rightHost.Name));
 
-            request.Index.CreateError(this.LeftRef == null ? this.RightRef.Use : this.LeftRef.Use, string.Format("Set Value has not correct type, expectet: {0}, currently: {1}", idd.Name, rightHost.Name));
+            //TODO: Parameter checken
 
-            return false;
+            return true;
         }
 
         #endregion methods

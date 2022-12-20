@@ -81,6 +81,19 @@ namespace "System.Collections"
             return item;
         }
 
+        public &TItem? Find(Func<bool, TItem> preDelg)
+        {
+            int length = this.Length;
+            for (int i = 0; i < length; i = i + 1)
+            {
+                &TItem data = this.Get(i);
+                if (data is null) continue;
+                if (preDelg(data)) return data;
+            }
+
+            return null;
+        }
+
         public bool Add(TItem item?)
         {
             int orgLength = this.Length;

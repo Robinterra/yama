@@ -1,3 +1,4 @@
+using Yama.Lexer;
 using Yama.Parser;
 
 namespace Yama.Index
@@ -5,6 +6,8 @@ namespace Yama.Index
 
     public class IndexDelegateDeklaration : IParent
     {
+
+        private GenericCall? genericCall;
 
         #region get/set
 
@@ -44,8 +47,29 @@ namespace Yama.Index
 
         public GenericCall? GenericDeklaration
         {
-            get;
-            set;
+            get
+            {
+                return this.genericCall;
+            }
+            set
+            {
+                this.genericCall = value;
+                if (value is null) return;
+
+                bool isfirst = true;
+                foreach (IndexVariabelnReference parme in value.References)
+                {
+                    if (isfirst)
+                    {
+                        isfirst = false;
+                        continue;
+                    }
+
+                    IndexVariabelnDeklaration ivd = new IndexVariabelnDeklaration(value, "", parme);
+                    ivd.IsBorrowing = true;
+                    this.Parameters.Add(ivd);
+                }
+            }
         }
 
         public bool IsNullable
@@ -68,7 +92,7 @@ namespace Yama.Index
         {
             get
             {
-                return this.GenericDeklaration!.Reference!;
+                return this.GenericDeklaration!.References.FirstOrDefault()!;
             }
         }
 
@@ -83,7 +107,7 @@ namespace Yama.Index
             this.ThisUses = uses;
             this.ParentUsesSet = uses;
             this.References = new List<IndexVariabelnReference>();
-            this.Parameters = new List<IndexVariabelnDeklaration>();
+            this.Parameters = new();
             //this.ReturnValue = returnValue;
         }
 

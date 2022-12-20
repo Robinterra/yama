@@ -88,6 +88,7 @@ namespace Yama.Index
             IndexVariabelnReference functionRef = this.GetParentCall(this.CallRef);
             if (functionRef.Deklaration is IndexPropertyDeklaration ipd) functionRef = ipd.Type;
             if (functionRef.Deklaration is IndexDelegateDeklaration idd) return this.FindDelegate(idd);
+            if (functionRef.Deklaration is IndexVariabelnDeklaration ivd) return this.CheckVarDek(ivd);
             if (functionRef.Deklaration is not IndexMethodDeklaration imd) return false;
 
             if (functionRef.OverloadMethods != null) return this.OverrideMethodsDeklaration(functionRef, imd);
@@ -95,6 +96,13 @@ namespace Yama.Index
             this.Deklaration = imd;
 
             return true;
+        }
+
+        private bool CheckVarDek(IndexVariabelnDeklaration ivd)
+        {
+            if (ivd.Type.Deklaration is IndexDelegateDeklaration idd) return this.FindDelegate(idd);
+
+            return false;
         }
 
         private bool FindDelegate(IndexDelegateDeklaration idd)

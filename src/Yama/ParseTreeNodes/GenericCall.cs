@@ -56,10 +56,14 @@ namespace Yama.Parser
             set;
         }
 
-        public IndexVariabelnReference? Reference
+        public List<IndexVariabelnReference> References
         {
             get;
-            set;
+        }
+
+        public List<IdentifierToken> GenericIdentifiers
+        {
+            get;
         }
 
         public List<IdentifierToken> AllTokens
@@ -73,8 +77,10 @@ namespace Yama.Parser
 
         public GenericCall (  )
         {
+            this.References = new();
             this.Token = new();
             this.AllTokens = new List<IdentifierToken> ();
+            this.GenericIdentifiers = new List<IdentifierToken>();
         }
 
         #endregion ctor
@@ -93,16 +99,26 @@ namespace Yama.Parser
 
             IdentifierToken? token = request.Parser.Peek(request.Token, 1);
             if (token is null) return null;
-            if (!this.ValidNameTokenKind(token.Kind)) return null;
+            while (token.Text != ">")
+            {
+                if (!this.ValidNameTokenKind(token.Kind)) return null;
 
-            genericCall.Token = token;
-            genericCall.AllTokens.Add(token);
+                genericCall.Token = token;
+                genericCall.GenericIdentifiers.Add(token);
+                genericCall.AllTokens.Add(token);
 
-            token = request.Parser.Peek(token, 1);
+                token = request.Parser.Peek(token, 1);
 
-            token = this.TryGetGenericInheritance ( genericCall, request, token );
+                token = this.TryGetGenericInheritance ( genericCall, request, token );
+                if (token is null) return null;
 
-            if (token is null) return null;
+                if (token.Kind != IdentifierKind.Comma) continue;
+                genericCall.AllTokens.Add(token);
+
+                token = request.Parser.Peek(token, 1);
+                if (token is null) return null;
+            }
+
             if (token.Kind != IdentifierKind.Operator) return null;
             if (token.Text != ">") return null;
 
@@ -148,9 +164,12 @@ namespace Yama.Parser
             if (request.Parent is IndexKlassenDeklaration idk) return this.IndezKlassenGeneric(request, idk);
             if (request.Parent is not IndexContainer container) return request.Index.CreateError(this);
 
-            IndexVariabelnReference reference = new IndexVariabelnReference(this, this.Token.Text);
-            container.VariabelnReferences.Add(reference);
-            this.Reference = reference;
+            foreach (IdentifierToken token in this.GenericIdentifiers)
+            {
+                IndexVariabelnReference reference = new IndexVariabelnReference(this, token.Text);
+                container.VariabelnReferences.Add(reference);
+                this.References.Add(reference);
+            }
 
             return true;
         }

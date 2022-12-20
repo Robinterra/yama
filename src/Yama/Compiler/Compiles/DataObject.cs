@@ -207,8 +207,9 @@ namespace Yama.Compiler
 
                 if (this.TypeArt == 4 && property.GenericDeklaration is not null)
                 {
-                    if (property.GenericDeklaration.Reference is null) return;
-                    if (property.GenericDeklaration.Reference.Deklaration is not IndexKlassenDeklaration gdk) return;
+                    IndexVariabelnReference? listType = property.GenericDeklaration.References.FirstOrDefault();
+                    if (listType is null) return;
+                    if (listType.Deklaration is not IndexKlassenDeklaration gdk) return;
 
                     this.ClassData = gdk.ReflectionData;
 

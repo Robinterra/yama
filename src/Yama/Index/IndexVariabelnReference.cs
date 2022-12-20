@@ -378,10 +378,11 @@ namespace Yama.Index
             if (parentCall.RefCombination.GenericDeklaration == null) return kd;
             if (parentCall.RefCombination.ClassGenericDefinition == null) return kd;
 
-            if (parentCall.RefCombination.ClassGenericDefinition.Token.Text != kd.Name) return kd;
+            int index = parentCall.RefCombination.ClassGenericDefinition.GenericIdentifiers.FindIndex(t=>t.Text == kd.Name);
+            if (index == -1) return kd;
 
-            if (parentCall.RefCombination.GenericDeklaration.Reference is null) return kd;
-            if (parentCall.RefCombination.GenericDeklaration.Reference.Deklaration is not IndexKlassenDeklaration kdg) return kd;
+            IndexVariabelnReference genRef = parentCall.RefCombination.GenericDeklaration.References[index];
+            if (genRef.Deklaration is not IndexKlassenDeklaration kdg) return kd;
 
             return kdg;
         }
@@ -475,6 +476,16 @@ namespace Yama.Index
 
         private bool VariableDeklarationMappen(IndexVariabelnDeklaration vd)
         {
+            if (vd.Type.Deklaration is IndexDelegateDeklaration idd)
+            {
+                this.GenericDeklaration = idd.GenericDeklaration;
+                this.ClassGenericDefinition = idd.GenericDeklaration;
+
+                vd.References.Add(this);
+
+                return true;
+            }
+
             if (vd.Type.Deklaration is not IndexKlassenDeklaration kdd)
             {
                 if (this.ParentUsesSet.GetIndex is null) return false;

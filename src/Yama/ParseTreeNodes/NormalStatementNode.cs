@@ -69,6 +69,7 @@ namespace Yama.Parser
 
             IParseTreeNode? node = request.Parser.ParseCleanToken(request.Token, this.identifierStatementLayer, false);
             if (node is null) return null;
+            if (node is ParserError) return node;
 
             IdentifierToken? ende = request.Token;
             if (node is IContainer container) ende = container.Ende;
