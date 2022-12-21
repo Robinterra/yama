@@ -63,7 +63,8 @@ namespace Yama.Index
                     if (this.MethodCall.GenericDeklaration.Token.Text == request.Index.GetTypeName(this.TypeUse)) return true;
                 }
             }
-            
+
+            if (this.TypeUse.Use is NullKey) return true;
             if (this.ParaDeclaration.Type.Name == request.Index.GetTypeName(this.TypeUse)) return true;
 
             IParseTreeNode errorNode = this.MethodCall.ParentCall == null ? this.MethodCall.Use : this.MethodCall.ParentCall.Use;

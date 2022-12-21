@@ -94,6 +94,23 @@ namespace "System.Collections"
             return null;
         }
 
+        /*public List<TItem> Where(Func<bool, TItem> preDelg)
+        {
+            List<TItem> result = new List<TItem>();
+            int length = this.Length;
+            for (int i = 0; i < length; i = i + 1)
+            {
+                &TItem data = this.Get(i);
+                if (data is null) continue;
+                if (!preDelg(data)) continue;
+
+                TItem ownerData = this.GetOwner(i);
+                result.Add(ownerData);
+            }
+
+            return result;
+        }*/
+
         public bool Add(TItem item?)
         {
             int orgLength = this.Length;
