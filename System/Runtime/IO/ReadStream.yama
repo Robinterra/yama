@@ -4,7 +4,7 @@ namespace "System.Runtime.IO"
     using "System.IO";
     using "System.Collections";
 
-    public class ReadStream : Stream
+    /*public class FileReadStream : Stream
     {
 
         // -----------------------------------------------
@@ -55,10 +55,10 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
-        public ByteArray ReadNextBytes(int size)
-        {
-            return InputOutput.ExecWith2Args ( 7, this.filestream_id, size, 6 );
-        }
+        //public ByteArray ReadNextBytes(int size)
+        //{
+        //    return InputOutput.ExecWith2Args ( 7, this.filestream_id, size, 6 );
+        //}
 
         // -----------------------------------------------
 
@@ -66,7 +66,7 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
-    }
+    }*/
 }
 
 // --[EOF]--

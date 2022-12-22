@@ -4,7 +4,7 @@ namespace "System.Runtime.IO"
     using "System.IO";
     using "System.Collections";
 
-    public class WriteStream : Stream
+    /*public class FileWriteStream : Stream
     {
 
         // -----------------------------------------------
@@ -34,6 +34,7 @@ namespace "System.Runtime.IO"
             //this.filepath = filepath;
 
             this.filestream_id = InputOutput.ExecWith1Arg ( 9, filepath as int, 6 );
+            this.buffer = ByteArray.New[0x180];
 
             return this;
         }
@@ -55,9 +56,19 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
-        public bool WriteNextBytes(ByteArray array)
+        public bool Flush()
         {
-            return InputOutput.ExecWith2Args ( 10, this.filestream_id, array as int, 6 );
+            if (this.BufferLength == 0) return false;
+
+            ByteArray buffer = this.buffer;
+            int orgLength = buffer.Length;
+            buffer.Length = this.BufferLength;
+
+            InputOutput.ExecWith2Args ( 10, this.filestream_id, buffer as int, 6 );
+
+            buffer.Length = orgLength;
+
+            return true;
         }
 
         // -----------------------------------------------
@@ -66,7 +77,7 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
-    }
+    }*/
 }
 
 // --[EOF]--

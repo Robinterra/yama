@@ -13,6 +13,16 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
+        private ByteArray buffer;
+        public bool IsReadable;
+        public bool IsSeekable;
+        public int RealPosition;
+        public int RealReadedLength;
+        public int BufferPosition;
+        public int BufferLength;
+
+        // -----------------------------------------------
+
         #endregion vars
 
         // -----------------------------------------------
@@ -21,9 +31,18 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
+        public this new()
+        {
+            this.buffer = ByteArray.New[0x180];
+
+            return this;
+        }
+
+        // -----------------------------------------------
+
         public this ~ (  )
         {
-
+            this.buffer = ~this.buffer;
         }
 
         // -----------------------------------------------
@@ -36,16 +55,78 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
-        public bool WriteNextBytes(ByteArray array)
+        public bool Flush()
         {
-            return 0;
+            return false;
         }
 
         // -----------------------------------------------
 
-        public ByteArray ReadNextBytes(int size)
+        public bool Write(ByteArray input)
         {
-            return 0;
+            int bufferCounter = this.BufferPosition;
+
+            ByteArray buffer = this.buffer;
+            for (int iCounter = 0; iCounter < input.Length; iCounter = iCounter + 1)
+            {
+                if (bufferCounter >= buffer.Length)
+                {
+                    this.Flush();
+                    bufferCounter = 0;
+                    this.BufferLength = 0;
+                }
+
+                int data = input.Data[iCounter];
+                buffer.Data[bufferCounter] = data;
+                bufferCounter = bufferCounter + 1;
+            }
+
+            this.BufferPosition = bufferCounter;
+            this.BufferLength = bufferCounter;
+
+            return true;
+        }
+
+        // -----------------------------------------------
+
+        public bool Write(RefString input)
+        {
+            int bufferCounter = this.BufferPosition;
+
+            ByteArray buffer = this.buffer;
+            for (int iCounter = 0; iCounter < input.Length; iCounter = iCounter + 1)
+            {
+                if (bufferCounter >= buffer.Length)
+                {
+                    this.Flush();
+                    bufferCounter = 0;
+                    this.BufferLength = 0;
+                }
+
+                int data = input.Data[iCounter];
+                buffer.Data[bufferCounter] = data;
+                bufferCounter = bufferCounter + 1;
+            }
+
+            this.BufferPosition = bufferCounter;
+            this.BufferLength = bufferCounter;
+
+            return true;
+        }
+
+
+        // -----------------------------------------------
+
+        public bool Seek(int position)
+        {
+            return false;
+        }
+
+        // -----------------------------------------------
+
+        public bool ReadNext()
+        {
+            return false;
         }
 
         // -----------------------------------------------
