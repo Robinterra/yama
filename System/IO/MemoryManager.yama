@@ -37,7 +37,7 @@ namespace "System.IO"
 
                 if (#defalgo Malloc,IsBlockInUse: = currentadress) continue;
 
-                if (size <= currentBlockSize) break;
+                if ((size + #defalgo Malloc,HeaderSize:) <= currentBlockSize) break;
 
                 if (#defalgo Malloc,IsBlockEnde: = currentadress) return null;
             }
@@ -55,13 +55,18 @@ namespace "System.IO"
 
             int dataAdress = currentadress + #defalgo Malloc,HeaderSize:;
 
-            if (nextBlockState == 0) return dataAdress;
-
             int nextAdress = dataAdress + size;
 
             int sizeAndHeaderSize = size + #defalgo Malloc,HeaderSize:;
 
             int notReservedSize = currentBlockSize - sizeAndHeaderSize;
+
+            if (nextBlockState == 0)
+            {
+                MemoryManager.CreateBlock ( nextAdress, 0, notReservedSize );
+
+                return dataAdress;
+            }
 
             MemoryManager.CreateBlock ( nextAdress, 1, notReservedSize );
 

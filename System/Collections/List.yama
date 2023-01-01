@@ -10,6 +10,7 @@ namespace "System.Collections"
 
         private Array array;
         public int Length;
+        private bool isPrimitiv;
 
         #endregion vars
 
@@ -39,6 +40,7 @@ namespace "System.Collections"
         {
             this.Length = 0;
             this.array = Array.New[16];
+            this.isPrimitiv = false;
 
             return this;
         }
@@ -47,12 +49,16 @@ namespace "System.Collections"
         {
             int length = this.Length;
             Array array = this.array;
-            for (int i = 0; i < length; i = i + 1)
-            {
-                object obj = (array.Data[i]) as object;
-                if (obj is null) continue;
 
-                obj = ~obj;
+            if (!this.isPrimitiv)
+            {
+                for (int i = 0; i < length; i = i + 1)
+                {
+                    object obj = (array.Data[i]) as object;
+                    if (obj is null) continue;
+
+                    obj = ~obj;
+                }
             }
 
             array = ~array;
@@ -122,6 +128,7 @@ namespace "System.Collections"
             if (this.Length == arraySize) this.Grow();
 
             int value = (item) as int;
+            array = this.array;
             array.Data[orgLength] = value;
 
             return true;
@@ -176,10 +183,12 @@ namespace "System.Collections"
         {
             Array orgarray = this.array;
 
-            int newSize = orgarray.Size + 16;
+            int orgSize = orgarray.Size;
+            int newSize = orgSize + 16;
+
             Array newArray = Array.New[newSize];
 
-            Array.Copy(newArray, orgarray, 0, 0, orgarray.Size);
+            Array.Copy(newArray, orgarray, 0, 0, orgSize);
             this.array = newArray;
 
             orgarray = ~orgarray;
