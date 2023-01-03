@@ -19,6 +19,7 @@ namespace "System.Runtime.IO"
         public int ReadPosition;
         public int RealPosition;
         public int BufferLength;
+        private bool unflushedChanges;
 
         // -----------------------------------------------
 
@@ -78,6 +79,8 @@ namespace "System.Runtime.IO"
                 int data = input.Data[iCounter];
                 buffer.Data[bufferCounter] = data;
                 bufferCounter = bufferCounter + 1;
+
+                this.unflushedChanges = true;
             }
 
             this.BufferLength = bufferCounter;
@@ -104,6 +107,8 @@ namespace "System.Runtime.IO"
                 int data = input.Data[iCounter];
                 buffer.Data[bufferCounter] = data;
                 bufferCounter = bufferCounter + 1;
+
+                this.unflushedChanges = true;
             }
 
             this.BufferLength = bufferCounter;
@@ -115,7 +120,8 @@ namespace "System.Runtime.IO"
 
         public ByteArray? ReadUntil(Func<bool, Stream> preDelg)
         {
-            InternalStreamReadUntil result = InternalStreamReadUntil.Init(this.ReadPosition, this);
+            &Stream stream = (this) as Stream;
+            InternalStreamReadUntil result = InternalStreamReadUntil.Init(this.ReadPosition, stream);
 
             while (this.ReadNextByteUntil(result))
             {

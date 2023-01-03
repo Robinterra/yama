@@ -10,6 +10,7 @@ namespace "System.Runtime.IO"
         #region vars
 
         private ByteArray memory;
+        private bool borrowedStream;
 
         #endregion vars
 
@@ -21,16 +22,24 @@ namespace "System.Runtime.IO"
             this.memory = (null) as ByteArray;
             this.IsReadable = true;
             this.IsSeekable = true;
+            this.borrowedStream = true;
             this.RealPosition = 0;
             this.ReadPosition = 0;
             this.BufferLength = 0;
+            this.unflushedChanges = false;
 
             return this;
         }
 
         public this ~()
         {
+            this.buffer = ~this.buffer;
 
+            if (this.borrowedStream) return null;
+
+            this.memory = ~this.memory;
+
+            return null;
         }
 
         #endregion ctor
@@ -40,12 +49,15 @@ namespace "System.Runtime.IO"
         public bool Flush()
         {
             ByteArray oldMemory = this.memory;
+            this.unflushedChanges = false;
             if (oldMemory is null)
             {
                 ByteArray mem = ByteArray.New[this.BufferLength];
                 ByteArray.Copy(mem, this.buffer, 0, 0, this.BufferLength);
+                this.RealPosition = this.BufferLength;
                 this.BufferLength = 0;
                 this.memory = mem;
+                this.borrowedStream = false;
 
                 return true;
             }
@@ -57,6 +69,7 @@ namespace "System.Runtime.IO"
             oldMemory = ~oldMemory;
 
             this.memory = newMemory;
+            this.RealPosition = this.RealPosition + this.BufferLength;
             this.BufferLength = 0;
 
             return true;
@@ -77,6 +90,20 @@ namespace "System.Runtime.IO"
             this.BufferLength = readLength;
             this.RealPosition = this.RealPosition + readLength;
             this.ReadPosition = 0;
+
+            return true;
+        }
+
+        public bool Seek(int position)
+        {
+            if (this.unflushedChanges) this.Flush();
+
+            ByteArray memory = this.memory;
+            if (memory is null) return false;
+            if (position >= memory.Size) return false;
+
+            this.RealPosition = position;
+            this.BufferLength = 0;
 
             return true;
         }
