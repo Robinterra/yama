@@ -100,22 +100,25 @@ namespace "System.Collections"
             return null;
         }
 
-        /*public List<TItem> Where(Func<bool, TItem> preDelg)
+        public List Where(Func<bool, TItem> preDelg)
         {
             List<TItem> result = new List<TItem>();
+            result.isPrimitiv = true;
             int length = this.Length;
             for (int i = 0; i < length; i = i + 1)
             {
                 &TItem data = this.Get(i);
                 if (data is null) continue;
-                if (!preDelg(data)) continue;
+                bool isok = (preDelg(data)) as bool;
+                if (!isok) continue;
 
-                TItem ownerData = this.GetOwner(i);
-                result.Add(ownerData);
+                //TItem ownerData = this.GetOwner(i);
+                //result.Add(ownerData);
+                result.Add(data);
             }
 
             return result;
-        }*/
+        }
 
         public bool Add(TItem item?)
         {

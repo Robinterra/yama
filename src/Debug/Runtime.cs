@@ -250,12 +250,19 @@ namespace Yama.Debug
 
             if (this.IsDebug) this.DebugReader();
 
+
+            uint lastAdresse = 0;
             while (this.IsRun)
             {
-                this.MakeCommand();
+                if (!this.MakeCommand())
+                {
+                    this.Register[15] = lastAdresse;
+                    if (!this.WriteError("wrong command value", true)) return false;
+                }
 
                 if (this.IsDebug) this.DebugEvent();
 
+                lastAdresse = this.Register[15];
                 if (!this.RunCommand()) if (!this.WriteError("error orrcurd", true)) return false;
 
                 if (this.CurrentInterupt != 0) this.InteruptPahse();
@@ -692,6 +699,8 @@ namespace Yama.Debug
         private bool MakeCommand()
         {
             uint adresse = this.Register[15];
+            if (adresse > this.Memory.Length) return false;
+
             byte three = this.Memory[adresse];
             byte two = this.Memory[adresse + 1];
             byte one = this.Memory[adresse + 2];

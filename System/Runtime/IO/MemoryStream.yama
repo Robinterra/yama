@@ -1,0 +1,97 @@
+namespace "System.Runtime.IO"
+{
+    using "System";
+    using "System.IO";
+    using "System.Collections";
+
+    public class MemoryStream : Stream
+    {
+
+        #region vars
+
+        private ByteArray memory;
+
+        #endregion vars
+
+        #region ctor
+
+        public this new()
+        {
+            this.buffer = ByteArray.New[0x180];
+            this.memory = (null) as ByteArray;
+            this.IsReadable = true;
+            this.IsSeekable = true;
+            this.RealPosition = 0;
+            this.ReadPosition = 0;
+            this.BufferLength = 0;
+
+            return this;
+        }
+
+        public this ~()
+        {
+
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        public bool Flush()
+        {
+            ByteArray oldMemory = this.memory;
+            if (oldMemory is null)
+            {
+                ByteArray mem = ByteArray.New[this.BufferLength];
+                ByteArray.Copy(mem, this.buffer, 0, 0, this.BufferLength);
+                this.BufferLength = 0;
+                this.memory = mem;
+
+                return true;
+            }
+
+            ByteArray newMemory = ByteArray.New[oldMemory.Size + this.BufferLength];
+
+            ByteArray.Copy(newMemory, oldMemory, 0, 0, oldMemory.Size);
+            ByteArray.Copy(newMemory, this.buffer, oldMemory.Size, 0, this.BufferLength);
+            oldMemory = ~oldMemory;
+
+            this.memory = newMemory;
+            this.BufferLength = 0;
+
+            return true;
+        }
+
+        public bool ReadNext()
+        {
+            ByteArray memory = this.memory;
+            if (memory is null) return true;
+
+            ByteArray buffer = this.buffer;
+            if (buffer is null) return false;
+
+            int readLength = memory.Size - this.RealPosition;
+            if (readLength > 0x180) readLength = 0x180;
+
+            ByteArray.Copy(buffer, memory, 0, this.RealPosition, readLength);
+            this.BufferLength = readLength;
+            this.RealPosition = this.RealPosition + readLength;
+            this.ReadPosition = 0;
+
+            return true;
+        }
+
+        public RefString ToRefString()
+        {
+            ByteArray memory = this.memory;
+            Result.Source = (memory) as string;
+            Result.Start = 0;
+            Result.Length = memory.Size;
+
+            return Result;
+        }
+
+        #endregion methods
+
+    }
+}

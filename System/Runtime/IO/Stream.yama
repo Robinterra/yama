@@ -16,9 +16,8 @@ namespace "System.Runtime.IO"
         private ByteArray buffer;
         public bool IsReadable;
         public bool IsSeekable;
+        public int ReadPosition;
         public int RealPosition;
-        public int RealReadedLength;
-        public int BufferPosition;
         public int BufferLength;
 
         // -----------------------------------------------
@@ -64,16 +63,16 @@ namespace "System.Runtime.IO"
 
         public bool Write(ByteArray input)
         {
-            int bufferCounter = this.BufferPosition;
+            int bufferCounter = this.BufferLength;
 
             ByteArray buffer = this.buffer;
-            for (int iCounter = 0; iCounter < input.Length; iCounter = iCounter + 1)
+            for (int iCounter = 0; iCounter < input.Size; iCounter = iCounter + 1)
             {
-                if (bufferCounter >= buffer.Length)
+                if (bufferCounter >= buffer.Size)
                 {
+                    this.BufferLength = bufferCounter - 1;
                     this.Flush();
                     bufferCounter = 0;
-                    this.BufferLength = 0;
                 }
 
                 int data = input.Data[iCounter];
@@ -81,7 +80,6 @@ namespace "System.Runtime.IO"
                 bufferCounter = bufferCounter + 1;
             }
 
-            this.BufferPosition = bufferCounter;
             this.BufferLength = bufferCounter;
 
             return true;
@@ -91,16 +89,16 @@ namespace "System.Runtime.IO"
 
         public bool Write(RefString input)
         {
-            int bufferCounter = this.BufferPosition;
+            int bufferCounter = this.BufferLength;
 
             ByteArray buffer = this.buffer;
             for (int iCounter = 0; iCounter < input.Length; iCounter = iCounter + 1)
             {
-                if (bufferCounter >= buffer.Length)
+                if (bufferCounter >= buffer.Size)
                 {
+                    this.BufferLength = bufferCounter - 1;
                     this.Flush();
                     bufferCounter = 0;
-                    this.BufferLength = 0;
                 }
 
                 int data = input.Data[iCounter];
@@ -108,12 +106,74 @@ namespace "System.Runtime.IO"
                 bufferCounter = bufferCounter + 1;
             }
 
-            this.BufferPosition = bufferCounter;
             this.BufferLength = bufferCounter;
 
             return true;
         }
 
+        // -----------------------------------------------
+
+        public ByteArray? ReadUntil(Func<bool, Stream> preDelg)
+        {
+            InternalStreamReadUntil result = InternalStreamReadUntil.Init(this.ReadPosition, this);
+
+            while (this.ReadNextByteUntil(result))
+            {
+                if (preDelg(result)) continue;
+
+                int length = this.ReadPosition - result.lastReadedPosition;
+                result.Append(this.buffer, result.lastReadedPosition, length);
+
+                return result.Daten;
+            }
+
+            ByteArray array = result.Daten;
+            if (array is null) return null;
+
+            Func<bool, Stream> holder = preDelg;
+            array = ~array;
+
+            return null;
+        }
+
+        // -----------------------------------------------
+
+        private bool ReadNextByteUntil(InternalStreamReadUntil result)
+        {
+            this.ReadPosition = this.ReadPosition + 1;
+            if (this.ReadPosition < this.BufferLength) return true;
+            if (this.BufferLength == 0) return this.ReadNext();
+
+            int lastReadedPosition = result.lastReadedPosition;
+
+            result.Append(this.buffer, lastReadedPosition, this.BufferLength - lastReadedPosition);
+
+            result.lastReadedPosition = 0;
+
+            return this.ReadNext();
+        }
+
+        // -----------------------------------------------
+
+        public bool ReadNextByte()
+        {
+            this.ReadPosition = this.ReadPosition + 1;
+            if (this.ReadPosition < this.BufferLength) return true;
+
+            return this.ReadNext();
+        }
+
+        // -----------------------------------------------
+
+        public int ReadCurrentByte()
+        {
+            int readPos = this.ReadPosition;
+
+            ByteArray buffer = this.buffer;
+            int result = buffer.Data[readPos];
+
+            return result;
+        }
 
         // -----------------------------------------------
 
@@ -134,6 +194,61 @@ namespace "System.Runtime.IO"
         #endregion methods
 
         // -----------------------------------------------
+
+    }
+
+    public struct InternalStreamReadUntil
+    {
+        public ByteArray Daten;
+        public int State;
+        public &Stream Stream;
+        private int lastReadedPosition;
+
+        public this ~()
+        {
+
+        }
+
+        public static InternalStreamReadUntil Init(int readPos, &Stream stream)
+        {
+            Result.Daten = (null) as ByteArray;
+            Result.lastReadedPosition = readPos;
+            Result.State = 0;
+            Result.Stream = stream;
+
+            return Result;
+        }
+
+        public bool Append(ByteArray buffer, int start, int length)
+        {
+            ByteArray daten = this.Daten;
+            int startOnDaten = 0;
+
+            if (daten is null)
+            {
+                daten = ByteArray.New[length];
+            }
+            else
+            {
+                daten = this.CreateNewDaten(daten, length);
+            }
+
+            ByteArray.Copy(daten, buffer, startOnDaten, start, length);
+            this.Daten = daten;
+
+            return true;
+        }
+
+        public ByteArray CreateNewDaten(ByteArray daten, int appendSize)
+        {
+            ByteArray newDaten = ByteArray.New[daten.Size + appendSize];
+
+            ByteArray.Copy(newDaten, daten, 0, 0, daten.Size);
+
+            ByteArray holding = ~daten;
+
+            return newDaten;
+        }
 
     }
 }
