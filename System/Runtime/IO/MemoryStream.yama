@@ -110,6 +110,8 @@ namespace "System.Runtime.IO"
 
         public RefString ToRefString()
         {
+            if (this.unflushedChanges) this.Flush();
+
             ByteArray memory = this.memory;
             Result.Source = (memory) as string;
             Result.Start = 0;
