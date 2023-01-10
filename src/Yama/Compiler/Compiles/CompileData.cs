@@ -51,11 +51,17 @@ namespace Yama.Compiler
             set;
         }
 
+        private bool? remember = null;
         public bool IsUsed
         {
             get
             {
-                return true;
+                if (this.UseHandler is null) return true;
+                if (this.remember is not null) return (bool)this.remember;
+
+                this.remember = this.UseHandler.IsInUse(20);
+
+                return (bool)this.remember;
             }
         }
 
@@ -70,6 +76,12 @@ namespace Yama.Compiler
             get;
             set;
         } = new List<string>();
+
+        public IndexMethodDeklaration? UseHandler
+        {
+            get;
+            set;
+        }
 
         #endregion get/set
 
@@ -110,6 +122,8 @@ namespace Yama.Compiler
 
         public bool InFileCompilen(Compiler compiler)
         {
+            if (!this.IsUsed) return true;
+
             foreach (string str in this.AssemblyCommands)
             {
                 compiler.AddLine(new RequestAddLine(this, str, false));

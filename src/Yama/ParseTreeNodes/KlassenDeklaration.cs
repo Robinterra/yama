@@ -300,6 +300,11 @@ namespace Yama.Parser
         public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Deklaration is null) return false;
+            if (this.Deklaration.IsMethodsReferenceMode)
+            {
+                this.VirtualClassData.UseHandler = this.Deklaration.Ctors.FirstOrDefault();
+                if (!this.VirtualClassData.IsUsed) return true;
+            }
             if (this.ReflectionClassData.Data.Refelection is not null) this.ReflectionClassData.Data.Refelection.VirtuelClassData = this.VirtualClassData;
 
             foreach (IMethode m in this.Deklaration.StaticMethods)

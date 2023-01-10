@@ -610,7 +610,14 @@ namespace Yama.Parser
         public bool CanCompile(Compiler.Compiler compiler)
         {
             if (this.Deklaration is null) return false;
-            if (this.Deklaration.Type == MethodeType.DeCtor) return true;
+            if (this.Deklaration.Type == MethodeType.DeCtor)
+            {
+                if (this.Deklaration.Klasse is not null)
+                {
+                    if (this.Deklaration.Klasse.InheritanceBase is not null) return true;
+                    if (this.Deklaration.Klasse.MemberModifier == ClassMemberModifiers.Struct) return true;
+                }
+            }
 
             if (this.AccessDefinition != null)
             {
