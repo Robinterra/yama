@@ -229,6 +229,13 @@ namespace Yama.Compiler
             if (map is null)
                 return compiler.AddError("Register Allocater can not found reference in Register", this.Owner.Node);
 
+            if (this.FlowTask == ProgramFlowTask.IsReturnChild)
+            {
+                this.Owner.PrimaryKeys.Add("[SSAPUSH]", genericDefinition.GetRegister(genericDefinition.ResultRegister));
+
+                return true;
+            }
+
             this.Owner.PrimaryKeys.Add("[SSAPUSH]", map.Name);
 
             if (map.Type == RegisterType.Stack) this.HandleVirtuellSetRegister(container, genericDefinition, compiler, map);

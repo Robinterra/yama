@@ -489,8 +489,11 @@ namespace Yama.Parser
             return compiler.PopContainer();
         }*/
 
+        private bool isCompile;
         public bool Compile(RequestParserTreeCompile request)
         {
+            if (this.isCompile) return true;
+            this.isCompile = true;
             if (!this.CanCompile(request.Compiler)) return true;
             if (this.Statement is not Container c) return false;
             if (c.IndexContainer is null) return false;

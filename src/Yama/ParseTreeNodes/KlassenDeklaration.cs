@@ -310,7 +310,7 @@ namespace Yama.Parser
             foreach (IMethode m in this.Deklaration.StaticMethods)
             {
                 if (m.Klasse is null) return false;
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
+                //if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;
                 compileNode.Compile(request);
@@ -319,7 +319,7 @@ namespace Yama.Parser
             foreach (IndexMethodDeklaration m in this.Deklaration.Operators)
             {
                 if (m.Klasse is null) return false;
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
+                //if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;
                 compileNode.Compile(request);
@@ -329,7 +329,7 @@ namespace Yama.Parser
             {
                 if (this.Deklaration.IsMethodsReferenceMode) this.AddAssemblyName(this.VirtualClassData, m);
                 if (m.Klasse is null) return false;
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
+                //if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;
                 compileNode.Compile(request);
@@ -358,7 +358,7 @@ namespace Yama.Parser
             {
                 if (m.Klasse is null) return false;
                 if (m.Parameters.Count == 1 && this.ReflectionClassData.Data.Refelection is not null) this.ReflectionClassData.Data.Refelection.EmptyCtor = m;
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
+                //if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;
                 compileNode.Compile(request);

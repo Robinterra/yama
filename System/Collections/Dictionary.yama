@@ -1,0 +1,80 @@
+namespace "System.Collections"
+{
+    using "System";
+    using "System.IO";
+
+    public class Dictionary<TItem>
+    {
+
+        #region get/set
+
+        private Array array;
+        public int Length;
+        private bool isPrimitiv;
+        private Func<bool, object> GetHashCodeDelegate;
+
+        #endregion get/set
+
+        #region ctor
+
+        public this new()
+        {
+            this.Length = 0;
+            this.array = Array.New[16];
+            this.isPrimitiv = false;
+            this.GetHashCodeDelegate = (Dictionary.GetHashCodeReference) as Func;
+
+            return this;
+        }
+
+        public this ~()
+        {
+            int length = this.Length;
+            Array array = this.array;
+
+            if (!this.isPrimitiv)
+            {
+                for (int i = 0; i < length; i = i + 1)
+                {
+                    object obj = (array.Data[i]) as object;
+                    if (obj is null) continue;
+
+                    obj = ~obj;
+                }
+            }
+
+            array = ~array;
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        private static int GetHashCodeReference(&object data)
+        {
+            int hashResult = (data) as int;
+            hashResult = hashResult >> 2;
+            hashResult = hashResult & 0xf;
+
+            return hashResult;
+        }
+
+        private static int GetHashCodePrimitivString(string primitivString)
+        {
+            int length = primitivString.Length;
+            int hashResult = 0;
+            for (int i = 0; i < length; i = i + 1)
+            {
+                int charValue = primitivString.Data[i];
+                hashResult = hashResult + charValue;
+                hashResult = hashResult * charValue;
+                hashResult = hashResult & 0xf;
+            }
+
+            return hashResult;
+        }
+
+        #endregion methods
+
+    }
+}
