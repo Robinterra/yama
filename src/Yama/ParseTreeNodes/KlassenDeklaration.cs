@@ -300,11 +300,7 @@ namespace Yama.Parser
         public bool Compile(RequestParserTreeCompile request)
         {
             if (this.Deklaration is null) return false;
-            if (this.Deklaration.IsMethodsReferenceMode)
-            {
-                this.VirtualClassData.UseHandler = this.Deklaration.Ctors.FirstOrDefault();
-                if (!this.VirtualClassData.IsUsed) return true;
-            }
+            if (this.Deklaration.IsMethodsReferenceMode) this.VirtualClassData.UseHandler = this.Deklaration.Ctors.FirstOrDefault();
             if (this.ReflectionClassData.Data.Refelection is not null) this.ReflectionClassData.Data.Refelection.VirtuelClassData = this.VirtualClassData;
 
             foreach (IMethode m in this.Deklaration.StaticMethods)
@@ -325,6 +321,17 @@ namespace Yama.Parser
                 compileNode.Compile(request);
             }
 
+            foreach (IndexPropertyDeklaration m in this.Deklaration.IndexStaticProperties)
+            {
+                if (m.Klasse is null) continue;
+                if (!m.Klasse.Equals(this.Deklaration)) continue;
+
+                if (m.Use is not ICompileNode compileNode) continue;
+                compileNode.Compile(request);
+            }
+
+            if (this.Deklaration.IsMethodsReferenceMode && !this.VirtualClassData.IsUsed) return true;
+
             foreach (IMethode m in this.Deklaration.Methods)
             {
                 if (this.Deklaration.IsMethodsReferenceMode) this.AddAssemblyName(this.VirtualClassData, m);
@@ -339,15 +346,6 @@ namespace Yama.Parser
             {
                 if (m.Klasse is null) continue;
                 if (this.Deklaration.IsMethodsReferenceMode) this.AddPropteryToRefelection(m);
-                if (!m.Klasse.Equals(this.Deklaration)) continue;
-
-                if (m.Use is not ICompileNode compileNode) continue;
-                compileNode.Compile(request);
-            }
-
-            foreach (IndexPropertyDeklaration m in this.Deklaration.IndexStaticProperties)
-            {
-                if (m.Klasse is null) continue;
                 if (!m.Klasse.Equals(this.Deklaration)) continue;
 
                 if (m.Use is not ICompileNode compileNode) continue;

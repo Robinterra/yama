@@ -3,12 +3,32 @@ namespace "System.Collections"
     using "System";
     using "System.IO";
 
+    public struct KeyValuePair
+    {
+        public int Key;
+        public int Value;
+
+        public static KeyValuePair Init(int key, int value)
+        {
+            Result.Key = key;
+            Result.Value = value;
+
+            return Result;
+        }
+
+        public this ~()
+        {
+
+        }
+    }
+
     public class Dictionary<TItem>
     {
 
         #region get/set
 
-        private Array array;
+        private Array keyArray;
+        private Array valueArray;
         public int Length;
         private bool isPrimitiv;
         private Func<bool, object> GetHashCodeDelegate;
@@ -19,8 +39,9 @@ namespace "System.Collections"
 
         public this new()
         {
-            this.Length = 0;
-            this.array = Array.New[16];
+            this.Length = 16;
+            this.keyArray = Array.New[16];
+            this.valueArray = Array.New[16];
             this.isPrimitiv = false;
             this.GetHashCodeDelegate = (Dictionary.GetHashCodeReference) as Func;
 
@@ -30,20 +51,32 @@ namespace "System.Collections"
         public this ~()
         {
             int length = this.Length;
-            Array array = this.array;
+            Array valueArray = this.valueArray;
+
+            for (int i = 0; i < length; i = i + 1)
+            {
+                object obj = (valueArray.Data[i]) as object;
+                if (obj is null) continue;
+
+                obj = ~obj;
+            }
+
+            valueArray = ~valueArray;
+
+            Array keyArray = this.keyArray;
 
             if (!this.isPrimitiv)
             {
-                for (int i = 0; i < length; i = i + 1)
+                for (int j = 0; j < length; j = j + 1)
                 {
-                    object obj = (array.Data[i]) as object;
+                    object obj = (keyArray.Data[j]) as object;
                     if (obj is null) continue;
 
                     obj = ~obj;
                 }
             }
 
-            array = ~array;
+            keyArray = ~keyArray;
         }
 
         #endregion ctor
@@ -72,6 +105,32 @@ namespace "System.Collections"
             }
 
             return hashResult;
+        }
+
+        public KeyValuePair GetFromIteration(int pos)
+        {
+            Array valueArray = this.valueArray;
+            int value = valueArray.Data[pos];
+
+            Array keyArray = this.keyArray;
+            int key = keyArray.Data[pos];
+
+            return KeyValuePair.Init(key, value);
+        }
+
+        public bool Add(int key, TItem item)
+        {
+            Func<bool, object> getHashCode = (this.GetHashCodeDelegate) as Func;
+            int hashCode = (getHashCode(key)) as int;
+
+            Array valueArray = this.valueArray;
+            int newValue = (item) as int;
+            valueArray.Data[hashCode] = newValue;
+
+            Array keyArray = this.keyArray;
+            keyArray.Data[hashCode] = key;
+
+            return true;
         }
 
         #endregion methods
