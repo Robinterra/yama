@@ -1,9 +1,9 @@
 namespace "System"
 {
     /**
-    * Pointer
+    * Any
     */
-    public primitive class Pointer
+    public primitive class Any
     {
         public int Value;
     }

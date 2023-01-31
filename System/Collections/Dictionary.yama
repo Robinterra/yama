@@ -5,10 +5,10 @@ namespace "System.Collections"
 
     public struct KeyValuePair
     {
-        public Pointer Key;
-        public Pointer Value;
+        public Any Key;
+        public Any Value;
 
-        public static KeyValuePair Init(Pointer key, Pointer value)
+        public static KeyValuePair Init(Any key, Any value)
         {
             Result.Key = key;
             Result.Value = value;
@@ -31,7 +31,7 @@ namespace "System.Collections"
         private Array valueArray;
         public int Length;
         private bool isPrimitiv;
-        private Func<Pointer, Pointer> GetHashCodeDelegate;
+        private Func<int, Any> GetHashCodeDelegate;
 
         #endregion get/set
 
@@ -77,7 +77,7 @@ namespace "System.Collections"
 
         #region methods
 
-        private static int GetHashCodeReference(Pointer data)
+        private static int GetHashCodeReference(Any data)
         {
             int hashResult = (data) as int;
             hashResult = hashResult >> 2;
@@ -104,17 +104,17 @@ namespace "System.Collections"
         public KeyValuePair GetFromIteration(int pos)
         {
             Array valueArray = this.valueArray;
-            Pointer value = valueArray.Data[pos];
+            Any value = valueArray.Data[pos];
 
             Array keyArray = this.keyArray;
-            Pointer key = keyArray.Data[pos];
+            Any key = keyArray.Data[pos];
 
             return KeyValuePair.Init(key, value);
         }
 
-        public bool Add(Pointer key, TItem item)
+        public bool Add(Any key, TItem item)
         {
-            Func<int, Pointer> getHashCode = (this.GetHashCodeDelegate) as Func;
+            Func<int, Any> getHashCode = (this.GetHashCodeDelegate) as Func;
             int hashCode = getHashCode(key);
 
             Array valueArray = this.valueArray;

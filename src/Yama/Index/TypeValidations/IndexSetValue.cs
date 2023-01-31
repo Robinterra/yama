@@ -47,7 +47,7 @@ namespace Yama.Index
             //string leftName = request.Index.GetTypeName(this.LeftRef);
             //string rightName = request.Index.GetTypeName(this.RightRef);
 
-            if (leftHost.Name == "Pointer") return true;
+            if (leftHost.Name == "Any") return true;
             if ( leftHost.Name == rightHost.Name ) return true;
             if ( request.Index.ExistTypeInheritanceHistory ( leftHost.Name, this.RightRef ) ) return true;
 

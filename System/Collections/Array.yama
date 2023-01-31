@@ -25,7 +25,7 @@ namespace "System.Collections"
             set{}
         }
 
-        public int Data[int index]
+        public Any Data[int index]
         {
             get
             {
@@ -35,7 +35,7 @@ namespace "System.Collections"
 
                 index = 4 + index;
                 int address = index + this;
-                Pointer pointer = address as Pointer;
+                Any pointer = address;
 
                 return pointer.Value;
             }
@@ -47,9 +47,9 @@ namespace "System.Collections"
 
                 index = 4 + index;
                 int address = index + this;
-                Pointer pointer = address as Pointer;
+                Any pointer = address;
 
-                pointer.Value = value;
+                pointer.Value = value as int;
             }
         }
 

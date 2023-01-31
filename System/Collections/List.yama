@@ -140,7 +140,7 @@ namespace "System.Collections"
             Array array = this.array;
             for (int i = 0; i < length; i = i + 1)
             {
-                int existPointer = array.Data[i];
+                int existPointer = (array.Data[i]) as int;
                 if (existPointer == item) return i;
             }
 
@@ -153,7 +153,7 @@ namespace "System.Collections"
             Array array = this.array;
             for (int i = 0; i < length; i = i + 1)
             {
-                int existPointer = array.Data[i];
+                int existPointer = (array.Data[i]) as int;
                 if (existPointer == item) return true;
             }
 
@@ -166,7 +166,7 @@ namespace "System.Collections"
             Array array = this.array;
             for (int i = 0; i < length; i = i + 1)
             {
-                int existPointer = array.Data[i];
+                int existPointer = (array.Data[i]) as int;
                 if (existPointer != item) continue;
 
                 int newStart = i + 1;
