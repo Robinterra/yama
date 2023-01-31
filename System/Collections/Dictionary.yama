@@ -31,7 +31,7 @@ namespace "System.Collections"
         private Array valueArray;
         public int Length;
         private bool isPrimitiv;
-        private Func<int, object> GetHashCodeDelegate;
+        private Func<Pointer, Pointer> GetHashCodeDelegate;
 
         #endregion get/set
 
@@ -112,9 +112,9 @@ namespace "System.Collections"
             return KeyValuePair.Init(key, value);
         }
 
-        public bool Add(int key, TItem item)
+        public bool Add(Pointer key, TItem item)
         {
-            Func<int, object> getHashCode = (this.GetHashCodeDelegate) as Func;
+            Func<int, Pointer> getHashCode = (this.GetHashCodeDelegate) as Func;
             int hashCode = getHashCode(key);
 
             Array valueArray = this.valueArray;
@@ -122,7 +122,7 @@ namespace "System.Collections"
             valueArray.Data[hashCode] = newValue;
 
             Array keyArray = this.keyArray;
-            keyArray.Data[hashCode] = key;
+            keyArray.Data[hashCode] = (key) as int;
 
             return true;
         }
