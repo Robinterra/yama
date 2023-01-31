@@ -67,6 +67,11 @@ namespace "System.Collections"
                 Array array = (MemoryManager.Malloc ( sizeOnDisk )) as Array;
                 array.size = orgSize;
 
+                for (int i = 0; i < array.Size; i = i + 1)
+                {
+                    array.Data[i] = null;
+                }
+
                 return array;
             }
             set {}

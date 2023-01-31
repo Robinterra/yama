@@ -206,7 +206,11 @@ namespace Yama.Index
                 if (reference.IsOwnerInUse(depth)) return true;
             }
 
-            if (this.Klasse.InheritanceBase is null) return false;
+            if (this.Klasse.InheritanceBase is null)
+            {
+                if (this.Type == MethodeType.DeCtor) return this.Klasse.IsInUse(depth);
+                return false;
+            }
             if (this.Klasse.InheritanceBase.Deklaration is not IndexKlassenDeklaration dek) return false;
 
             IMethode? parentMethods = dek.Methods.FirstOrDefault(u=>u.KeyName == this.KeyName);

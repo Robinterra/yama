@@ -55,9 +55,6 @@ namespace "System.Collections"
                 for (int i = 0; i < length; i = i + 1)
                 {
                     object obj = (array.Data[i]) as object;
-                    if (obj is null) continue;
-
-                    obj = ~obj;
                 }
             }
 
@@ -109,7 +106,7 @@ namespace "System.Collections"
             {
                 &TItem data = this.Get(i);
                 if (data is null) continue;
-                bool isok = (preDelg(data)) as bool;
+                bool isok = preDelg(data);
                 if (!isok) continue;
 
                 //TItem ownerData = this.GetOwner(i);

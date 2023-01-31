@@ -41,15 +41,18 @@ namespace Yama.Index
             if (rightHost is null) return false;
 
             if (leftHost is IndexDelegateDeklaration idd) return this.CheckDelegate(idd, rightHost, request);
+            if (rightHost is IndexDelegateDeklaration iddr && this.RightRef.IsMethodCalled) rightHost = request.Index.GetIndexType(iddr.ReturnValue);
+            if (rightHost is null) return false;
 
             //string leftName = request.Index.GetTypeName(this.LeftRef);
             //string rightName = request.Index.GetTypeName(this.RightRef);
 
+            if (leftHost.Name == "Pointer") return true;
             if ( leftHost.Name == rightHost.Name ) return true;
             if ( request.Index.ExistTypeInheritanceHistory ( leftHost.Name, this.RightRef ) ) return true;
 
             request.Index.CreateError(this.LeftRef == null ? this.RightRef.Use : this.LeftRef.Use, string.Format("Set Value has not correct type, expectet: {0}, currently: {1}", leftHost.Name, rightHost.Name));
-             rightHost = request.Index.GetIndexType(this.RightRef);
+            rightHost = request.Index.GetIndexType(this.RightRef);
 
             return false;
         }
