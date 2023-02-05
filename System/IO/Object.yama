@@ -6,10 +6,34 @@ namespace "System.IO"
     public class object
     {
 
+        #region ctor
+
         public this ~()
         {
             return null;
         }
+
+        #endregion ctor
+
+        #region methods
+
+        public bool Equals(&object obj)
+        {
+            int leftAdress = this as int;
+
+            return leftAdress == obj;
+        }
+
+        public int GetHashCode()
+        {
+            int hashResult = this as int;
+            hashResult = hashResult >> 2;
+            hashResult = hashResult & 0xf;
+
+            return hashResult;
+        }
+
+        #endregion methods
 
     }
 }

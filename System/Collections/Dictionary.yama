@@ -7,11 +7,22 @@ namespace "System.Collections"
     {
         public Any Key;
         public Any Value;
+        public bool IsEmptyEntry;
 
         public static KeyValuePair Init(Any key, Any value)
         {
             Result.Key = key;
             Result.Value = value;
+            Result.IsEmptyEntry = false;
+
+            return Result;
+        }
+
+        public static KeyValuePair Nothing()
+        {
+            Result.IsEmptyEntry = true;
+            Result.Key = null;
+            Result.Value = null;
 
             return Result;
         }
@@ -32,6 +43,7 @@ namespace "System.Collections"
         public int Length;
         private bool isPrimitiv;
         private Func<int, Any> GetHashCodeDelegate;
+        private Func<bool, Any, Any> CheckEquals;
 
         #endregion get/set
 
@@ -39,11 +51,12 @@ namespace "System.Collections"
 
         public this new()
         {
-            this.Length = 16;
-            this.keyArray = Array.New[16];
-            this.valueArray = Array.New[16];
+            this.Length = 0x10;
+            this.keyArray = Array.New[0x10];
+            this.valueArray = Array.New[0x10];
             this.isPrimitiv = false;
             this.GetHashCodeDelegate = (Dictionary.GetHashCodeReference) as Func;
+            this.CheckEquals = (Dictionary.DefaultEqualsCheck) as Func;
 
             return this;
         }
@@ -77,11 +90,30 @@ namespace "System.Collections"
 
         #region methods
 
+        private static bool DefaultEqualsCheck(&object left, &object right)
+        {
+            if (left is null) return false;
+            if (right is null) return false;
+
+            bool isequal = left.Equals(right);
+
+            return isequal;
+        }
+
+        private static bool StringEqualsCheck(string left, string right)
+        {
+            bool isequal = left == right;
+
+            return isequal;
+        }
+
         private static int GetHashCodeReference(Any data)
         {
-            int hashResult = (data) as int;
-            hashResult = hashResult >> 2;
-            hashResult = hashResult & 0xf;
+            &object obj = data as object;
+            int hashResult = obj.GetHashCode();
+            //int hashResult = data as int;
+            //hashResult = hashResult >> 2;
+            //hashResult = hashResult & 0xf;
 
             return hashResult;
         }
@@ -108,8 +140,32 @@ namespace "System.Collections"
 
             Array keyArray = this.keyArray;
             Any key = keyArray.Data[pos];
+            if (key is null) return KeyValuePair.Nothing();
 
             return KeyValuePair.Init(key, value);
+        }
+
+        public KeyValuePair Get(Any key)
+        {
+            Func<int, Any> getHashCode = (this.GetHashCodeDelegate) as Func;
+
+            for (int hashCode = getHashCode(key); hashCode < this.Length; hashCode = hashCode + 0x10)
+            {
+                Array keyArray = this.keyArray;
+                Any keyValue = keyArray.Data[hashCode];
+                Func<bool, Any, Any> equalsCheck = (this.CheckEquals) as Func;
+                bool isequal = equalsCheck(key, keyValue);
+                if (!isequal) continue;
+
+                Array valueArray = this.valueArray;
+                Any value = valueArray.Data[hashCode];
+
+                return KeyValuePair.Init(keyValue, value);
+            }
+
+            Any tkey = key;//todo: remove this line, bug in Registerallocater
+
+            return KeyValuePair.Nothing();
         }
 
         public bool Add(Any key, TItem item)
@@ -117,12 +173,73 @@ namespace "System.Collections"
             Func<int, Any> getHashCode = (this.GetHashCodeDelegate) as Func;
             int hashCode = getHashCode(key);
 
+            Array keyArray = this.keyArray;
+            Any currentContent = keyArray.Data[hashCode];
+            while (currentContent isnot null)
+            {
+                hashCode = hashCode + 0x10;
+                if (hashCode >= this.Length) this.Grow();
+
+                currentContent = keyArray.Data[hashCode];
+            }
+
+            int newValue = item as int;
             Array valueArray = this.valueArray;
-            int newValue = (item) as int;
             valueArray.Data[hashCode] = newValue;
 
-            Array keyArray = this.keyArray;
             keyArray.Data[hashCode] = (key) as int;
+
+            return true;
+        }
+
+        public bool Remove(Any key)
+        {
+            Func<int, Any> getHashCode = (this.GetHashCodeDelegate) as Func;
+
+            for (int hashCode = getHashCode(key); hashCode < this.Length; hashCode = hashCode + 0x10)
+            {
+                Array keyArray = this.keyArray;
+                Any keyValue = keyArray.Data[hashCode];
+                Func<bool, Any, Any> equalsCheck = (this.CheckEquals) as Func;
+                bool isequal = equalsCheck(key, keyValue);
+                if (!isequal) continue;
+
+                Array valueArray = this.valueArray;
+                object obj = (valueArray.Data[hashCode]) as object;
+                valueArray.Data[hashCode] = null;
+
+                return true;
+            }
+
+            Any tkey = key;//todo: remove this line, bug in Registerallocater
+
+            return false;
+        }
+
+        private bool Grow()
+        {
+            Array keyArray = this.keyArray;
+
+            int orgSize = keyArray.Size;
+            int newSize = orgSize + 0x10;
+
+            Array newArray = Array.New[newSize];
+
+            Array.Copy(newArray, keyArray, 0, 0, orgSize);
+            this.keyArray = newArray;
+
+            keyArray = ~keyArray;
+
+            Array valueArray = this.valueArray;
+
+            newArray = Array.New[newSize];
+
+            Array.Copy(newArray, valueArray, 0, 0, orgSize);
+            this.valueArray = newArray;
+
+            valueArray = ~valueArray;
+
+            this.Length = this.Length + 0x10;
 
             return true;
         }
