@@ -249,8 +249,12 @@ namespace Yama.Index
             return true;
         }
 
+        bool ispreMapped = false;
         public bool PreMappen(ValidUses uses)
         {
+            if (ispreMapped) return true;
+            ispreMapped = true;
+
             this.ParentUsesSet = uses;
 
             if (this.InheritanceBase == null) return true;

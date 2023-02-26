@@ -451,7 +451,11 @@ namespace Yama.Index
                 if (t.Deklaration is IndexMethodDeklaration mdu) { mdu.References.Add(this); continue; }
             }
 
-            if (this.Deklaration is IndexKlassenDeklaration kd) return kd.AddReference(this);
+            if (this.Deklaration is IndexKlassenDeklaration kd)
+            {
+                kd.PreMappen(uses);
+                return kd.AddReference(this);
+            }
             if (this.Deklaration is IndexMethodDeklaration md) { md.References.Add(this); return true; }
             if (this.Deklaration is IndexPropertyDeklaration pd) { pd.References.Add(this); return true; }
             if (this.Deklaration is IndexVariabelnDeklaration) return true;
