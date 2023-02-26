@@ -44,6 +44,12 @@ namespace Yama.Compiler
             }
         }
 
+        public Dictionary<string, SSAVariableMap>? LastContinueOrBreakMaps
+        {
+            get;
+            set;
+        }
+
         public Stack<Dictionary<string, SSAVariableMap>> StackVarMapper
         {
             get;
@@ -68,7 +74,7 @@ namespace Yama.Compiler
             set;
         } = new List<SSACompileLine>();
 
-        public bool HasReturned
+        public bool HasReturn
         {
             get;
             set;
@@ -93,12 +99,6 @@ namespace Yama.Compiler
         }
 
         public SSAVariableMap? ReturnType
-        {
-            get;
-            set;
-        }
-
-        public bool HasReturn
         {
             get;
             set;

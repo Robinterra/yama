@@ -549,10 +549,10 @@ namespace Yama.Compiler
             this.ContainerMgmt.LoopStack.Pop();
 
             CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
-            if (container.HasReturned) return true;
             if (this.ContainerMgmt.CurrentMethod is null) return true;
 
             Dictionary<string, SSAVariableMap>? containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
+            if (container.HasReturn) return true;//containerMaps = loop.LastContinueOrBreakMaps;
             if (containerMaps is null) return true;
 
             SSACompileLine? firstLine = container.Lines.FirstOrDefault();
@@ -593,7 +593,7 @@ namespace Yama.Compiler
             if (this.ContainerMgmt.ContainerStack.Count == 0) yield break;
 
             CompileContainer container = this.ContainerMgmt.ContainerStack.Pop();
-            if (container.HasReturned) yield break;
+            //if (container.HasReturn) yield break;
             if (this.ContainerMgmt.CurrentMethod is null) yield break;
 
             Dictionary<string, SSAVariableMap>? containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
