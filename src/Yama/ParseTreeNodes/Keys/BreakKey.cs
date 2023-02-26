@@ -99,6 +99,8 @@ namespace Yama.Parser
                 varMap.Value.LoopBranchReferencesForPhis.Add(varMap.Value.Reference);
             }
 
+            currentLoop.LastContinueOrBreakMaps.Add(currentMethod.VarMapper);
+
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
             return true;

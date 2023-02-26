@@ -44,11 +44,10 @@ namespace Yama.Compiler
             }
         }
 
-        public Dictionary<string, SSAVariableMap>? LastContinueOrBreakMaps
+        public List<Dictionary<string, SSAVariableMap>> LastContinueOrBreakMaps
         {
             get;
-            set;
-        }
+        } = new List<Dictionary<string, SSAVariableMap>>();
 
         public Stack<Dictionary<string, SSAVariableMap>> StackVarMapper
         {

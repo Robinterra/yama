@@ -100,6 +100,8 @@ namespace Yama.Parser
                 if (varMap.Value.Value == SSAVariableMap.LastValue.Null) varMap.Value.Reference = null;
             }
 
+            currentLoop.LastContinueOrBreakMaps.Add(currentMethod.VarMapper);
+
             this.JumpTo.Compile(request.Compiler, null, request.Mode);
 
             return true;

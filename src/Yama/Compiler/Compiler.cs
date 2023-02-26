@@ -539,6 +539,29 @@ namespace Yama.Compiler
             return true;
         }
 
+        public Dictionary<string, SSAVariableMap> LoopContainerVarMpsContinueBreak(List<Dictionary<string, SSAVariableMap>> lastContinueOrBreakMaps)
+        {
+            Dictionary<string, SSAVariableMap> result = new Dictionary<string, SSAVariableMap>();
+            foreach (Dictionary<string, SSAVariableMap> varmap in lastContinueOrBreakMaps)
+            {
+                foreach (KeyValuePair<string, SSAVariableMap> entry in varmap)
+                {
+                    if (!result.TryGetValue(entry.Key, out SSAVariableMap? map))
+                    {
+                        map = new SSAVariableMap(entry.Value);
+                        result.Add(entry.Key, map);
+                        continue;
+                    }
+                    if (map.Value == entry.Value.Value) continue;
+                    if (map.Value == SSAVariableMap.LastValue.Unknown) continue;
+                    if (entry.Value.Value == SSAVariableMap.LastValue.Null) map.Value = SSAVariableMap.LastValue.Unknown;
+                    if (entry.Value.Value == SSAVariableMap.LastValue.NotNull) map.Value = SSAVariableMap.LastValue.Unknown;
+                }
+            }
+
+            return result;
+        }
+
         public bool PopContainerForLoops(List<SSACompileLine> phis)
         {
             if (this.ContainerMgmt.ContainerStack.Count == 0) return false;
@@ -552,8 +575,9 @@ namespace Yama.Compiler
             if (this.ContainerMgmt.CurrentMethod is null) return true;
 
             Dictionary<string, SSAVariableMap>? containerMaps = this.ContainerMgmt.CurrentMethod.PopVarMap();
-            if (container.HasReturn) return true;//containerMaps = loop.LastContinueOrBreakMaps;
             if (containerMaps is null) return true;
+            if (!container.HasReturn) loop.LastContinueOrBreakMaps.Add(containerMaps);
+            containerMaps = this.LoopContainerVarMpsContinueBreak(loop.LastContinueOrBreakMaps);
 
             SSACompileLine? firstLine = container.Lines.FirstOrDefault();
             if (firstLine is null) return true;
