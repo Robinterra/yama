@@ -1,0 +1,35 @@
+namespace "System.Runtime"
+{
+    using "System";
+
+    //
+    public enum FileFlags
+    {
+        ReadOnly = 0x0,
+        WriteOnly = 0x1,
+        ReadWrite = 0x2,
+        Create = 0x40,
+        Truncate = 0x200,
+        Append = 0x400,
+        OpenOnlyWhenUserIsOwner_EXCL = 0x80
+    }
+
+    // ReadOwner | WriteOwner | WriteGroup | ReadGroup | ReadOthers | WriteOthers
+    public enum FileModes
+    {
+        WriteOwner = 0x80,
+        ReadOwner = 0x100,
+        ExecuteOwner = 0x40,
+        ReadWriteExecuteOwner = 0x1c0,
+        WriteOthers = 0x2,
+        ReadOthers = 0x4,
+        ExecuteOthers = 0x1,
+        ReadWriteExecuteOthers = 0x7,
+        WriteGroup = 0x10,
+        ReadGroup = 0x20,
+        ExecuteGroup = 0x8,
+        ReadWriteExecuteGroup = 0x38,
+        ReadWriteEverything = 0x1b6,
+        ISTXT = 0x200
+    }
+}

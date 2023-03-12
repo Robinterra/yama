@@ -25,7 +25,7 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
-        public static int OpenFile(string filename)
+        public static int OpenFile(string filename, int fileflags, int fileModes)
         {
             int fileId = #defalgo Exec,OpenFile:;
 

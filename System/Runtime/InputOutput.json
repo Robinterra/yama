@@ -125,7 +125,7 @@
                 {
                     "Name": "[SSAPOP]",
                     "Values": [
-                      "1"
+                      "3"
                     ]
                   },
                   {
@@ -137,10 +137,10 @@
             "PostKeys": [],
             "AssemblyCommands": [
             "push { r0, r2, r7 }",
-            "mov r0, [SSAPOP[0]]",
+            "mov r0, [SSAPOP[2]]",
             "add r0, r0, #4",
-            "mov r1, #82",
-            "mov r2, #666",
+            "mov r1, [SSAPOP[1]]",
+            "mov r2, [SSAPOP[0]]",
             "mov r7, #5",
             "svc #0",
             "mov [SSAPUSH], r0",
