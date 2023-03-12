@@ -15,11 +15,8 @@ namespace "System.Runtime.IO"
 
         #region ctor
 
-        public this new(string fileName)
+        public this new(string fileName, int fileFlags)
         {
-            int fileFlags = FileFlags.ReadWrite;
-            fileFlags = fileFlags | FileFlags.Create;
-            fileFlags = fileFlags | FileFlags.Truncate;
             this.buffer = ByteArray.New[0x180];
             this.IsReadable = true;
             this.IsSeekable = true;
@@ -63,7 +60,14 @@ namespace "System.Runtime.IO"
         {
             if (this.unflushedChanges) this.Flush();
 
-            return true;
+            int readedBytes = InputOutput.Read(this.fileId, this.buffer);
+
+            this.RealPosition = this.RealPosition + readedBytes;
+
+            this.BufferLength = readedBytes;
+            this.ReadPosition = 0;
+
+            return readedBytes != 0;
         }
 
         public bool Seek(int position)

@@ -60,6 +60,18 @@ namespace "System.Runtime"
         // -----------------------------------------------
 
         /**
+         * Gibt die gelesenden Bytes zurück
+         */
+        public static int Read(int fileId, ByteArray buffer)
+        {
+            int readedBytes = #defalgo Exec,Read:;
+
+            return readedBytes;
+        }
+
+        // -----------------------------------------------
+
+        /**
          * returend True on Success
          */
         public static bool Close(int fileId)

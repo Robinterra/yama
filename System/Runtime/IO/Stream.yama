@@ -165,7 +165,7 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
-        public ByteArray? ReadUntil(Func<bool, Stream> preDelg)
+        public ByteArray? ReadUntil(Func<bool, InternalStreamReadUntil> preDelg)
         {
             &Stream stream = (this) as Stream;
             InternalStreamReadUntil result = InternalStreamReadUntil.Init(this.ReadPosition, stream);
@@ -204,6 +204,17 @@ namespace "System.Runtime.IO"
             result.lastReadedPosition = 0;
 
             return this.ReadNext();
+        }
+
+        // -----------------------------------------------
+
+        public RefString GetCurrentBuffer()
+        {
+            Result.Source = this.buffer as string;
+            Result.Start = 0;
+            Result.Length = this.BufferLength;
+
+            return Result;
         }
 
         // -----------------------------------------------
