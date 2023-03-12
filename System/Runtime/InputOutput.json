@@ -30,6 +30,92 @@
             },
             {
               "Name": "Exec",
+              "Mode": "Write",
+              "Description": "Write Bytes",
+              "Keys": [
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "3"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+              "push { r0, r2, r7 }",
+              "mov r0, [SSAPOP[0]]",
+              "mov r1, [SSAPOP[1]]",
+              "add r1, r1, #4",
+              "mov r2, [SSAPOP[2]]",
+              "mov r7, #4",
+              "svc #0",
+              "mov [SSAPUSH], r0",
+              "pop { r0, r2, r7 }"
+              ]
+          },
+          {
+            "Name": "Exec",
+            "Mode": "Close",
+            "Description": "Close File",
+            "Keys": [
+                {
+                    "Name": "[SSAPOP]",
+                    "Values": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "Name": "[SSAPUSH]",
+                    "Values": [
+                    ]
+                  }
+            ],
+            "PostKeys": [],
+            "AssemblyCommands": [
+            "push { r0, r7 }",
+            "mov r0, [SSAPOP[0]]",
+            "mov r7, #6",
+            "svc #0",
+            "mov [SSAPUSH], r0",
+            "pop { r0, r7 }"
+            ]
+        },
+        {
+          "Name": "Exec",
+          "Mode": "Seek",
+          "Description": "Seek Offset",
+          "Keys": [
+              {
+                  "Name": "[SSAPOP]",
+                  "Values": [
+                    "3"
+                  ]
+                },
+                {
+                  "Name": "[SSAPUSH]",
+                  "Values": [
+                  ]
+                }
+          ],
+          "PostKeys": [],
+          "AssemblyCommands": [
+          "push { r0, r2, r7 }",
+          "mov r0, [SSAPOP[2]]",
+          "mov r1, [SSAPOP[1]]",
+          "mov r2, [SSAPOP[0]]",
+          "mov r7, #19",
+          "svc #0",
+          "mov [SSAPUSH], r0",
+          "pop { r0, r2, r7 }"
+          ]
+      },
+            {
+              "Name": "Exec",
               "Mode": "OpenFile",
               "Description": "Open a File",
               "Keys": [
@@ -147,6 +233,92 @@
             "pop { r0, r2, r7 }"
             ]
         },
+        {
+          "Name": "Exec",
+          "Mode": "Write",
+          "Description": "Write Bytes",
+          "Keys": [
+              {
+                  "Name": "[SSAPOP]",
+                  "Values": [
+                    "3"
+                  ]
+                },
+                {
+                  "Name": "[SSAPUSH]",
+                  "Values": [
+                  ]
+                }
+          ],
+          "PostKeys": [],
+          "AssemblyCommands": [
+          "push { r0, r2, r7 }",
+          "mov r0, [SSAPOP[2]]",
+          "mov r1, [SSAPOP[1]]",
+          "add r1, r1, #4",
+          "mov r2, [SSAPOP[0]]",
+          "mov r7, #4",
+          "svc #0",
+          "mov [SSAPUSH], r0",
+          "pop { r0, r2, r7 }"
+          ]
+      },
+      {
+        "Name": "Exec",
+        "Mode": "Seek",
+        "Description": "Seek Offset",
+        "Keys": [
+            {
+                "Name": "[SSAPOP]",
+                "Values": [
+                  "3"
+                ]
+              },
+              {
+                "Name": "[SSAPUSH]",
+                "Values": [
+                ]
+              }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+        "push { r0, r2, r7 }",
+        "mov r0, [SSAPOP[2]]",
+        "mov r1, [SSAPOP[1]]",
+        "mov r2, [SSAPOP[0]]",
+        "mov r7, #19",
+        "svc #0",
+        "mov [SSAPUSH], r0",
+        "pop { r0, r2, r7 }"
+        ]
+    },
+      {
+        "Name": "Exec",
+        "Mode": "Close",
+        "Description": "Close File",
+        "Keys": [
+            {
+                "Name": "[SSAPOP]",
+                "Values": [
+                  "1"
+                ]
+              },
+              {
+                "Name": "[SSAPUSH]",
+                "Values": [
+                ]
+              }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+        "push { r0, r7 }",
+        "mov r0, [SSAPOP[0]]",
+        "mov r7, #6",
+        "svc #0",
+        "mov [SSAPUSH], r0",
+        "pop { r0, r7 }"
+        ]
+    },
         {
           "Name": "Exec",
           "Mode": "Mmap2",

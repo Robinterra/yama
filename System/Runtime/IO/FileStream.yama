@@ -1,0 +1,94 @@
+namespace "System.Runtime.IO"
+{
+    using "System";
+    using "System.IO";
+    using "System.Collections";
+
+    public class FileStream : Stream
+    {
+
+        #region vars
+
+        private int fileId;
+
+        #endregion vars
+
+        #region ctor
+
+        public this new(string fileName)
+        {
+            int fileFlags = FileFlags.ReadWrite;
+            fileFlags = fileFlags | FileFlags.Create;
+            fileFlags = fileFlags | FileFlags.Truncate;
+            this.buffer = ByteArray.New[0x180];
+            this.IsReadable = true;
+            this.IsSeekable = true;
+            this.RealPosition = 0;
+            this.ReadPosition = 0;
+            this.BufferLength = 0;
+            this.fileId = InputOutput.OpenFile(fileName, fileFlags, FileModes.ReadWriteEverything);
+            this.unflushedChanges = false;
+
+            return this;
+        }
+
+        public this ~()
+        {
+            if (this.unflushedChanges) this.Flush();
+
+            this.buffer = ~this.buffer;
+
+            InputOutput.Close(this.fileId);
+
+            return null;
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        public bool Flush()
+        {
+            this.unflushedChanges = false;
+
+            int writedBytes = InputOutput.Write(this.fileId, this.buffer, this.BufferLength);
+
+            this.RealPosition = this.RealPosition + this.BufferLength;
+            this.BufferLength = 0;
+
+            return true;
+        }
+
+        public bool ReadNext()
+        {
+            if (this.unflushedChanges) this.Flush();
+
+            return true;
+        }
+
+        public bool Seek(int position)
+        {
+            if (this.unflushedChanges) this.Flush();
+
+            this.ReadPosition = position;
+            InputOutput.Seek(this.fileId, position, FileSeekHence.Set);
+
+            return true;
+        }
+
+        /*public RefString ToRefString()
+        {
+            if (this.unflushedChanges) this.Flush();
+
+            ByteArray memory = this.memory;
+            Result.Source = (memory) as string;
+            Result.Start = 0;
+            Result.Length = memory.Size;
+
+            return Result;
+        }*/
+
+        #endregion methods
+
+    }
+}

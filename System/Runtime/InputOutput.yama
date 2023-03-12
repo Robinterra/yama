@@ -25,11 +25,48 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        /**
+         * fileflags und filemodes gibt es enums
+         * Gibt die FileId zurück
+         */
         public static int OpenFile(string filename, int fileflags, int fileModes)
         {
             int fileId = #defalgo Exec,OpenFile:;
 
             return fileId;
+        }
+
+        // -----------------------------------------------
+
+        /**
+         * Gibt die geschriebenen Bytes zurück
+         */
+        public static int Write(int fileId, ByteArray data, int length)
+        {
+            int writedBytes = #defalgo Exec,Write:;
+
+            return writedBytes;
+        }
+
+        // -----------------------------------------------
+
+        public static int Seek(int fileId, int offset, int whence)
+        {
+            int resultOffsetFromBeginningOfTheFile = #defalgo Exec,Seek:;
+
+            return resultOffsetFromBeginningOfTheFile;
+        }
+
+        // -----------------------------------------------
+
+        /**
+         * returend True on Success
+         */
+        public static bool Close(int fileId)
+        {
+            bool issucess = #defalgo Exec,Close:;
+
+            return !issucess;
         }
 
         // -----------------------------------------------

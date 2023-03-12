@@ -32,4 +32,13 @@ namespace "System.Runtime"
         ReadWriteEverything = 0x1b6,
         ISTXT = 0x200
     }
+
+    public enum FileSeekHence
+    {
+        Set = 0x0,
+        Current = 0x1,
+        End = 0x2,
+        Data = 0x3,
+        Hole = 0x4
+    }
 }
