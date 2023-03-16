@@ -52,7 +52,7 @@
               "add r1, [SSAPOP[1]], #4",
               "mov r2, [SSAPOP[0]]",
               "mov r7, #4",
-              "svc #0",
+              "exec r0",
               "mov [SSAPUSH], r0",
               "pop { r0, r2, r7 }"
               ]
@@ -81,7 +81,7 @@
             "ldr r2, [[SSAPOP[0]],#0]",
             "add r1, [SSAPOP[0]], #4",
             "mov r7, #3",
-            "svc #0",
+            "exec r0",
             "mov [SSAPUSH], r0",
             "pop { r0, r2, r7 }"
             ]
@@ -108,7 +108,7 @@
             "push { r0, r7 }",
             "mov r0, [SSAPOP[0]]",
             "mov r7, #6",
-            "svc #0",
+            "exec r0",
             "mov [SSAPUSH], r0",
             "pop { r0, r7 }"
             ]
@@ -137,7 +137,7 @@
           "mov r1, [SSAPOP[1]]",
           "mov r2, [SSAPOP[0]]",
           "mov r7, #19",
-          "svc #0",
+          "exec r0",
           "mov [SSAPUSH], r0",
           "pop { r0, r2, r7 }"
           ]

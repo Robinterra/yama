@@ -731,6 +731,18 @@ namespace Yama.Parser
                 compileReference.CompilePoint0(compiler, "setpoint");
             }
 
+            num = new CompileNumConst();
+            num.Compile(compiler, new Number { Token = new IdentifierToken { Value = 0 } }, mode);
+
+            CompileReferenceCall thisvar = new CompileReferenceCall();
+            thisvar.CompileDek(compiler, dek);
+
+            foreach (IndexPropertyDeklaration propDek in this.Deklaration.Klasse.IndexProperties)
+            {
+                CompileReferenceCall referenceCall = new CompileReferenceCall();
+                referenceCall.CompileDirect(compiler, propDek, "setpoint");
+            }
+
             return compiler.Definition.ParaClean();
         }
 

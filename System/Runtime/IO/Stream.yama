@@ -191,6 +191,23 @@ namespace "System.Runtime.IO"
 
         // -----------------------------------------------
 
+        public ByteArray ReadToEnd()
+        {
+            InternalStreamReadUntil result = InternalStreamReadUntil.Init(0, this);
+
+            result.Append(this.buffer, 0, this.BufferLength);
+            while (this.ReadNext())
+            {
+                result.Append(this.buffer, 0, this.BufferLength);
+            }
+
+            ByteArray daten = result.Daten;
+
+            return daten;
+        }
+
+        // -----------------------------------------------
+
         private bool ReadNextByteUntil(InternalStreamReadUntil result)
         {
             this.ReadPosition = this.ReadPosition + 1;
@@ -294,6 +311,7 @@ namespace "System.Runtime.IO"
             }
             else
             {
+                startOnDaten = daten.Size;
                 daten = this.CreateNewDaten(daten, length);
             }
 

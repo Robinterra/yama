@@ -409,6 +409,44 @@ namespace Yama.Compiler
             return query;
         }
 
+        public bool CompileDirect(Compiler compiler, IndexPropertyDeklaration node, string mode = "default")
+        {
+            compiler.AssemblerSequence.Add(this);
+
+            this.Algo = compiler.GetAlgo(this.AlgoName, mode);
+            if (this.Algo == null) return false;
+
+            SSACompileArgument arg1 = compiler.ContainerMgmt.StackArguments.Pop();
+            SSACompileArgument arg2 = compiler.ContainerMgmt.StackArguments.Pop();
+
+            compiler.ContainerMgmt.StackArguments.Push(arg2);
+            compiler.ContainerMgmt.StackArguments.Push(arg1);
+
+            SSACompileLine line = new SSACompileLine(this, true);
+            compiler.AddSSALine(line);
+            this.Line = line;
+
+            this.PrimaryKeys = new Dictionary<string, string>();
+
+            foreach (AlgoKeyCall key in this.Algo.Keys)
+            {
+                DefaultRegisterQuery query = this.BuildQuery(node.References.FirstOrDefault(), key, mode, line);
+
+                Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+
+                foreach (KeyValuePair<string, string> pair in result)
+                {
+                    if (!this.PrimaryKeys.TryAdd ( pair.Key, pair.Value )) return compiler.AddError(string.Format ("Es wurde bereits ein Keyword hinzugefügt {0}", key.Name), null);
+                }
+            }
+
+            compiler.ContainerMgmt.StackArguments.Push(arg2);
+            compiler.ContainerMgmt.StackArguments.Push(arg1);
+
+            return true;
+        }
+
         public bool Compile(Compiler compiler, IndexVariabelnReference node, string mode = "default")
         {
             if (this.CheckRelevanz(compiler, node, mode)) return true;
