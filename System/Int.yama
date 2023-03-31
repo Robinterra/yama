@@ -360,6 +360,7 @@ namespace "System"
             for (int i = 0; i < length; i = i + 1)
             {
                 int zeichen = value.Data[(length - i) - 1];
+                if (zeichen == 0x78) break;
                 if (zeichen < 0x30) return IntParseResult.Failed();
                 if ((zeichen > 0x39) & (zeichen < 0x61)) return IntParseResult.Failed();
                 if (zeichen > 0x66) return IntParseResult.Failed();
