@@ -102,6 +102,23 @@ namespace Yama.Parser
 
             indexNode.Indezieren(request);
 
+            IndexVariabelnReference? indexVariabelnReference = container.VariabelnReferences.LastOrDefault();
+            //this.SetIndex(request, indexVariabelnReference);
+
+            return true;
+        }
+
+        private bool SetIndex(RequestParserTreeIndezieren request, IndexVariabelnReference? indexVariabelnReference)
+        {
+            if (indexVariabelnReference is null) return false;
+            if (request.Index.CurrentMethode is not IndexMethodDeklaration imd) return false;
+            if (imd.Name == "TestA")
+            {
+                Console.WriteLine("a");
+            }
+
+            request.Index.IndexTypeSafeties.Add(new IndexSetValue(imd.ReturnValue, indexVariabelnReference));
+
             return true;
         }
 

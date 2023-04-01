@@ -365,6 +365,8 @@ namespace Yama.Parser
             IndexVariabelnReference returnValue = this.GetReturnValueIndex(klasse, this.TypeDefinition);
 
             IndexMethodDeklaration deklaration = new IndexMethodDeklaration(this, this.Token.Text, returnValue);
+            //TODO: Kommentar entfernen
+            //request.Index.CurrentMethode = deklaration;
             this.MakeTags(deklaration);
             this.Deklaration = deklaration;
 
