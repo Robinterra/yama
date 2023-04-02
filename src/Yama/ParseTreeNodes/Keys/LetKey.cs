@@ -17,7 +17,7 @@ namespace Yama.Parser
             set;
         }
 
-        public IParseTreeNode? Statement
+        public VariabelDeklaration? Statement
         {
             get;
             set;
@@ -102,9 +102,28 @@ namespace Yama.Parser
 
         public bool Compile(RequestParserTreeCompile request)
         {
-            if (this.Statement is not ICompileNode statementNode) return false;
+            if (this.Statement is null) return false;
+            if (this.Statement.Deklaration is null) return false;
 
-            return statementNode.Compile(new RequestParserTreeCompile(request.Compiler, request.Mode, true));
+            if (!this.Statement.Compile(new RequestParserTreeCompile(request.Compiler, request.Mode, true))) return false;
+            if (this.Statement.Deklaration.Type.Deklaration is not IndexKlassenDeklaration ikd) return true;
+            if (ikd.MemberModifier != ClassMemberModifiers.Struct) return true;
+
+            Compiler.Compiler compiler = request.Compiler;
+
+            CompileNumConst num = new CompileNumConst();
+            num.Compile(compiler, new Number { Token = new IdentifierToken { Value = 0 } });
+
+            CompileReferenceCall thisvar = new CompileReferenceCall();
+            thisvar.CompileDek(compiler, this.Statement.Deklaration);
+
+            foreach (IndexPropertyDeklaration propDek in ikd.IndexProperties)
+            {
+                CompileReferenceCall referenceCall = new CompileReferenceCall();
+                referenceCall.CompileDirect(compiler, propDek, "setpoint");
+            }
+
+            return true;
         }
 
         #endregion methods
