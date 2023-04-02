@@ -184,7 +184,7 @@ namespace Yama.Debug
             FileStream stream = this.FileStreamMapper[id];
             int result = stream.Read(runtime.Memory, adresse, size);
 
-            if (result == 0)
+            if (result < 0)
             {
                 runtime.Register[12] = 0;
 
