@@ -18,26 +18,6 @@ chronological order
 1. Networkstreaming on ARM Linux
 2. Web API Server Framework
 
-## What can current use?
- - AVR and ARM Assembler and Runtime Assembler (ARM Current testet)
- - ARM Assembler and Runtime Assembler can be translate to Binary
- - Debugger for Assembler and binary code (Support Runtime assembly)
- - static and non static Methods
- - Array Get Set Methods and Call
- - Enums
- - Properties (no static Properties aviable)
- - Classes and Object instances
- - Delegate Methods (not tested)
- - Namespaces and usings
- - Conditional Compilation
-  1. region and endregion
-  2. `#defalgo <name>,<mode>:` read from a json file a assembly algo and replace it with des assemlby commands
- - keyword they work = if, else, while, for, continue, break, return, this, base, true, false, null, class, enum, static, namespace, using, is, as, primitive
- - Simple Inheritance (base, this, override methods from the base class, "is" to check in a if statement a class is the right type and cast it to his type).
-  1. Possible is this case: `class A` `class B : A` `class C : A` `class D : B`
-  2. Not Possible is this case: `class A` `class B` `class C : A, B`
-  3. Not Possible is this case: `class A : B` `class B : A`
-
 ## What are the current features of Yama language?
 
 - It supports AVR and ARM Assembler as well as Runtime Assembler (ARM has been tested).
