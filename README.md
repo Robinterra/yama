@@ -88,7 +88,6 @@ namespace "Program"
     {
         private int globalVariable;
 
-        /* Properties are currently buggy :)
         public int PropertyOne
         {
             get
@@ -97,9 +96,9 @@ namespace "Program"
             }
             set
             {
-                this.globalVariable = invalue;
+                this.globalVariable = value;
             }
-        }*/
+        }
 
         public static int main()
         {
@@ -107,20 +106,20 @@ namespace "Program"
 
             MyStartClass classTest = new MyStartClass();
 
-            classTest.globalVariable = 5;
+            classTest.PropertyOne = 5;
 
-            if (classTest.globalVariable < 10)
+            if (classTest.PropertyOne < 10)
             {
-                classTest.globalVariable = classTest.globalVariable + 1;
+                classTest.PropertyOne = classTest.PropertyOne + 1;
 
-                int outputInt = classTest.globalVariable;
+                int outputInt = classTest.PropertyOne;
                 String outputText = outputInt.ToString();
 
                 Console.Print("The Number is: 0x");
                 Console.PrintLine(outputText.Content);
             }
 
-            return classTest.globalVariable;
+            return classTest.PropertyOne;
         }
 
         public this new()
