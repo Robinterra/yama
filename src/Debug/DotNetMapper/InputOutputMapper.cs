@@ -33,48 +33,6 @@ namespace Yama.Debug
 
         #region methods
 
-        private bool WriteData(uint adresse, Runtime runtime)
-        {
-            string path = runtime.GetStringFromRegister(2);
-            uint length = BitConverter.ToUInt32(runtime.Memory, (int)adresse);
-            byte[] data = new byte[length];
-
-            Array.Copy(runtime.Memory, adresse + 4, data, 0, data.Length);
-            File.WriteAllBytes(path, data);
-
-            return true;
-        }
-
-        private bool ReadData(Runtime runtime)
-        {
-            string path = runtime.GetStringFromRegister(2);
-
-            byte[] data = File.ReadAllBytes(path);
-
-            byte[] result = new byte[data.Length + 4];
-
-            Array.Copy(data, 0, result, 4, data.Length);
-            Array.Copy(BitConverter.GetBytes(data.Length), 0, result, 0, 4);
-
-            runtime.AddObjectToMemory(result, out uint adresse);
-
-            runtime.Register[12] = adresse;
-
-            return true;
-        }
-
-        private bool ReadObject(Runtime runtime)
-        {
-            string path = runtime.GetStringFromRegister(2);
-
-            byte[] data = File.ReadAllBytes(path);
-
-            runtime.AddObjectToMemory(data, out uint adresse);
-
-            runtime.Register[12] = adresse;
-
-            return true;
-        }
         private bool Exist(Runtime runtime)
         {
             string path = runtime.GetStringFromRegister(2);
@@ -90,12 +48,16 @@ namespace Yama.Debug
         public bool OpenStream(Runtime runtime)
         {
             string path = runtime.GetStringFromRegister(2);
+            uint flags = runtime.Register[0];
+            uint mode = runtime.Register[3];
+
+            FileMode fileMode = this.TranslateLinuxFileFlagsToDotNetFileMode(flags, path);
 
             FileStream? stream = null;
             try
             {
-                stream = File.Open(path, (FileMode)runtime.Register[1]);
-            } catch { Console.WriteLine("Can not open Read stream"); runtime.Register[12] = 0; return true; }
+                stream = flags == 0 ? File.OpenRead(path) : File.Open(path, fileMode);
+            } catch { Console.WriteLine("Can not open stream"); runtime.Register[12] = 0; return true; }
 
             this.filemapId = this.filemapId + 1;
 
@@ -106,48 +68,24 @@ namespace Yama.Debug
             return true;
         }
 
-        public bool OpenReadStream(Runtime runtime)
+        private FileMode TranslateLinuxFileFlagsToDotNetFileMode(uint flags, string filename)
         {
-            string path = runtime.GetStringFromRegister(2);
-
-            FileStream? stream = null;
-            try
+            FileMode fileMode = FileMode.Open;
+            if ((flags & 0x400) == 0x400) fileMode = FileMode.Append;
+            if ((flags & 0x40) == 0x40) fileMode = FileMode.OpenOrCreate;
+            if ((flags & 0x200) == 0x200)
             {
-                stream = File.OpenRead(path);
-            } catch { Console.WriteLine("Can not open Read stream"); runtime.Register[12] = 0; return true; }
+                if (fileMode == FileMode.OpenOrCreate && !File.Exists(filename)) return fileMode;
 
-            this.filemapId = this.filemapId + 1;
+                fileMode = FileMode.Truncate;
+            }
 
-            this.FileStreamMapper.Add(this.filemapId, stream);
-
-            runtime.Register[12] = (uint)this.filemapId;
-
-            return true;
-        }
-
-        private bool OpenWriteStream(Runtime runtime)
-        {
-            string path = runtime.GetStringFromRegister(2);
-
-            FileStream? stream = null;
-            try
-            {
-                if (File.Exists(path)) File.Delete(path);
-                stream = File.OpenWrite(path);
-            } catch { Console.WriteLine("Can not open Write stream"); runtime.Register[12] = 0; return true; }
-
-            this.filemapId = this.filemapId + 1;
-
-            this.FileStreamMapper.Add(this.filemapId, stream);
-
-            runtime.Register[12] = (uint)this.filemapId;
-
-            return true;
+            return fileMode;
         }
 
         private bool WriteStream(Runtime runtime)
         {
-            int id = (int)runtime.Register[2];
+            int id = (int)runtime.Register[0];
             uint adresse = runtime.Register[3];
             if (id == 0 || !this.FileStreamMapper.ContainsKey(id))
             {
@@ -156,10 +94,10 @@ namespace Yama.Debug
                 return true;
             }
 
-            uint length = BitConverter.ToUInt32(runtime.Memory, (int)adresse);
+            uint length = runtime.Register[2];
             byte[] data = new byte[length];
 
-            Array.Copy(runtime.Memory, adresse + 4, data, 0, data.Length);
+            Array.Copy(runtime.Memory, adresse, data, 0, data.Length);
 
             FileStream stream = this.FileStreamMapper[id];
             stream.Write(data);
@@ -207,7 +145,7 @@ namespace Yama.Debug
             return true;
         }
 
-        public bool CloseReadStream(Runtime runtime)
+        public bool CloseStream(Runtime runtime)
         {
             int id = (int)runtime.Register[2];
             if (id == 0 || !this.FileStreamMapper.ContainsKey(id))
@@ -230,15 +168,15 @@ namespace Yama.Debug
 
         public bool Execute (Runtime runtime)
         {
-            if (runtime.Register[1] == 1) return this.WriteData(runtime.Register[3] - 4, runtime);
-            if (runtime.Register[1] == 2) return this.WriteData(runtime.Register[3], runtime);
-            if (runtime.Register[1] == 3) return this.ReadObject(runtime);
-            if (runtime.Register[1] == 4) return this.ReadData(runtime);
+            //if (runtime.Register[1] == 1) return this.WriteData(runtime.Register[3] - 4, runtime);
+            //if (runtime.Register[1] == 2) return this.WriteData(runtime.Register[3], runtime);
+            //if (runtime.Register[1] == 3) return this.ReadObject(runtime);
+            //if (runtime.Register[1] == 4) return this.ReadData(runtime);
             if (runtime.Register[1] == 5) return this.Exist(runtime);
-            if (runtime.Register[1] == 6) return this.OpenReadStream(runtime);
+            if (runtime.Register[1] == 6) return this.OpenStream(runtime);
             if (runtime.Register[1] == 7) return this.ReadStream(runtime);
-            if (runtime.Register[1] == 8) return this.CloseReadStream(runtime);
-            if (runtime.Register[1] == 9) return this.OpenWriteStream(runtime);
+            if (runtime.Register[1] == 8) return this.CloseStream(runtime);
+            //if (runtime.Register[1] == 9) return this.OpenWriteStream(runtime);
             if (runtime.Register[1] == 10) return this.WriteStream(runtime);
             if (runtime.Register[1] == 11) return this.SeekStream(runtime);
 

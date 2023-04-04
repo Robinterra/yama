@@ -47,14 +47,15 @@
               ],
               "PostKeys": [],
               "AssemblyCommands": [
-              "push { r0, r2, r7 }",
+              "push { r0, r2, r3, r7 }",
               "mov r0, [SSAPOP[2]]",
-              "add r1, [SSAPOP[1]], #4",
+              "mov r1, #10",
+              "add r3, [SSAPOP[1]], #4",
               "mov r2, [SSAPOP[0]]",
-              "mov r7, #4",
-              "exec r0",
+              "mov r7, #6",
+              "exec r7",
               "mov [SSAPUSH], r12",
-              "pop { r0, r2, r7 }"
+              "pop { r0, r2, r3, r7 }"
               ]
           },
           {
@@ -164,12 +165,14 @@
               ],
               "PostKeys": [],
               "AssemblyCommands": [
-              "push { r2 }",
+              "push { r0, r2, r3, r7 }",
+              "mov r0, [SSAPOP[1]]",
               "mov r1, #6",
               "mov r2, [SSAPOP[2]]",
-              "mov r3, #6",
-              "exec r3",
-              "pop { r2 }"
+              "mov r3, [SSAPOP[0]]",
+              "mov r7, #6",
+              "exec r7",
+              "pop { r0, r2, r3, r7 }"
               ]
           },
             {
