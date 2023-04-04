@@ -294,9 +294,10 @@ namespace Yama.Parser
         private bool CompileNonStaticCall(Compiler.Compiler compiler, string mode, IndexPropertyGetSetDeklaration methdek)
         {
             if (methdek.Type == MethodeType.PropertyStaticGetSet) return true;
+            if (methdek.Klasse is not null) mode = methdek.Klasse.IsMethodsReferenceMode ? "copy" : "default";
 
             CompilePushResult compilePushResult = new CompilePushResult();
-            compilePushResult.Compile(compiler, null, "copy");
+            compilePushResult.Compile(compiler, null, mode);
 
             return true;
         }
