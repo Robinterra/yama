@@ -76,6 +76,21 @@ namespace Yama.Compiler.Definition
 
         public RegisterMap? GetReferenceRegister(SSACompileLine? line, SSACompileLine from)
         {
+            RegisterMap? result = this.FindRegisterAllocation(line, from);
+            if (result is null) return result;
+            if (this.Defintion is null) return result;
+            if (result.Type != RegisterType.Stack) return result;
+
+            string name = this.LastVirtuell ? this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterStart) : this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterLast);
+            RegisterMap res = new RegisterMap(name, result.RegisterId, RegisterType.Stack, RegisterUseMode.UsedAblage);
+            res.Line = result.Line;
+            this.LastVirtuell = !this.LastVirtuell;
+
+            return res;
+        }
+
+        private RegisterMap? FindRegisterAllocation(SSACompileLine? line, SSACompileLine from)
+        {
             if (from == line && this.CheckLastSet(from)) return from.LastSet!.RegisterMap;
             if (this.Defintion is null) return null;
             if (line is null) return null;
@@ -111,12 +126,7 @@ namespace Yama.Compiler.Definition
 
                 this.CheckToFreeRegister(map, line, from);
 
-                string name = this.LastVirtuell ? this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterStart) : this.Defintion.GetRegister(this.Defintion.PlaceToKeepRegisterLast);
-                RegisterMap res = new RegisterMap(name, map.RegisterId, RegisterType.Stack, RegisterUseMode.UsedAblage);
-                res.Line = map.Line;
-                this.LastVirtuell = !this.LastVirtuell;
-
-                return res;
+                return map;
             }
 
             this.LastVirtuell = false;
