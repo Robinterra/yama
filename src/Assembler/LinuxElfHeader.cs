@@ -266,7 +266,7 @@ namespace Yama.Assembler
             BitConverter.TryWriteBytes(span.Slice(0x0c), (uint)this.PAddresse);//p_paddr
             BitConverter.TryWriteBytes(span.Slice(0x10), (uint)this.FileSize);//p_filesz (uint)programSize - startAdress
             BitConverter.TryWriteBytes(span.Slice(0x14), (uint)this.MemorySize);//p_memsz
-            BitConverter.TryWriteBytes(span.Slice(0x18), (uint)P_Flags.PF_R | (uint)P_Flags.PF_X | (uint)P_Flags.PF_W);//p_flags
+            BitConverter.TryWriteBytes(span.Slice(0x18), (uint)P_Flags.PF_Read | (uint)P_Flags.PF_Executeble | (uint)P_Flags.PF_Write);//p_flags
             BitConverter.TryWriteBytes(span.Slice(0x1c), (uint)this.PAlign);//p_align
 
             stream.Write(span);
@@ -286,9 +286,9 @@ namespace Yama.Assembler
         public enum P_Flags
         {
             None,
-            PF_X = 1,
-            PF_W = 2,
-            PF_R = 4,
+            PF_Executeble = 1,
+            PF_Write = 2,
+            PF_Read = 4,
 
         }
 

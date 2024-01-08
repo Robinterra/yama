@@ -446,17 +446,22 @@
         "PostKeys": [],
         "AssemblyCommands": [
           ".syntax unified",
-          "ldr r0,=THE_END",
+          "mov r7, #0xc0",
+          "mov r0, #0x0",
+          "ldr r1,*MEMORYSIZE",
+          "mov r2, #0x3",
+          "mov r3, #0x22",
+          "svc #0",
           "mov r10,r0",
           "ldr r11,=0x1",
-          "sub r12,sp,r10",
           "str r11,[r10,#0]",
           "str r12,[r10,#4]",
           "ldr r12,=main",
           "blx r12",
           "mov r0, r12",
           "mov r7, #1",
-          "svc #0"
+          "svc #0",
+          "MEMORYSIZE: .word 0x100000"
         ]
       },
       {
