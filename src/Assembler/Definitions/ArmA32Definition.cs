@@ -1,4 +1,5 @@
 using Yama.Assembler.ARMA32;
+using Yama.Assembler.ARMT32;
 using Yama.Assembler.Runtime;
 
 namespace Yama.Assembler.Definitions
@@ -54,6 +55,8 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new CommandImediate("svc", format2, 0xf, 4, 0xfffff));
 
             definition.Commands.Add(new CommandData());
+            definition.Commands.Add(new CommandWord());
+            definition.Commands.Add(new CommandSpace());
             definition.Commands.Add(new CommandDataList(0));
 
             return format2;
