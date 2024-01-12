@@ -1073,7 +1073,6 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov lr, r0"
                 ]
             },
             {
@@ -1089,7 +1088,7 @@
                 ],
                 "PostKeys": [],
                 "AssemblyCommands": [
-                    "mov [SSAPUSH], lr"
+                    "mov [SSAPUSH], r0"
                 ]
             },
             {

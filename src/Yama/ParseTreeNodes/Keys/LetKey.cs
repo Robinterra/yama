@@ -6,6 +6,10 @@ using Yama.Lexer;
 
 namespace Yama.Parser
 {
+    /**
+     * Let hab ich gemacht um eine Deklaration ohne zuweisung zu ermöglichen
+     * z.b. für die ref structs
+     */
     public class LetKey : IParseTreeNode, IIndexNode, ICompileNode, IContainer
     {
 

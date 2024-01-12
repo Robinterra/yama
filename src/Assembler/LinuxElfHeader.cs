@@ -78,19 +78,23 @@ namespace Yama.Assembler
             uint size = this.Size;
 
             stream.Write(this.EI_NIDENT);
-            stream.Write(BitConverter.GetBytes((ushort)this.Type));
-            stream.Write(BitConverter.GetBytes((ushort)this.Machine));
-            stream.Write(BitConverter.GetBytes((uint)1));//e_version
-            stream.Write(BitConverter.GetBytes((uint)size | startAdress));//e_entry
-            stream.Write(BitConverter.GetBytes((uint)this.EI_NIDENT.Length + 0x24));//e_phoff
-            stream.Write(BitConverter.GetBytes((uint)this.SectionHeaders.Count));//e_shoff, bei falschen größen hier, kann das programm nicht mit gängigen reverse tools gelesen werden
-            stream.Write(BitConverter.GetBytes((uint)E_Flags.EF_MIR_NICHT_BEKANNT | (uint)E_Flags.EF_SPARC_SUN_US1));
-            stream.Write(BitConverter.GetBytes((ushort)(this.EI_NIDENT.Length + 0x24)));//e_ehsize
-            stream.Write(BitConverter.GetBytes((ushort)ElfProgramHeader.Size));//e_phentsize
-            stream.Write(BitConverter.GetBytes((ushort)this.ProgramHeaders.Count));//e_phnum
-            stream.Write(BitConverter.GetBytes((ushort)ElfSectionHeader.Size));//e_shentsize
-            stream.Write(BitConverter.GetBytes((ushort)this.SectionHeaders.Count));//e_shnum
-            stream.Write(BitConverter.GetBytes((ushort)0x03));//e_shstrndx
+
+            Span<byte> span = stackalloc byte[0x24];
+            BitConverter.TryWriteBytes(span.Slice(0x00), (ushort)this.Type);
+            BitConverter.TryWriteBytes(span.Slice(0x02), (ushort)this.Machine);
+            BitConverter.TryWriteBytes(span.Slice(0x04), (uint)1);//e_version
+            BitConverter.TryWriteBytes(span.Slice(0x08), (uint)size | startAdress);//e_entry
+            BitConverter.TryWriteBytes(span.Slice(0x0c), (uint)this.EI_NIDENT.Length + 0x24);//e_phoff
+            BitConverter.TryWriteBytes(span.Slice(0x10), (uint)this.SectionHeaders.Count);//e_shoff, bei falschen größen hier, kann das programm nicht mit gängigen reverse tools gelesen werden
+            BitConverter.TryWriteBytes(span.Slice(0x14), (uint)E_Flags.EF_MIR_NICHT_BEKANNT | (uint)E_Flags.EF_SPARC_SUN_US1);
+            BitConverter.TryWriteBytes(span.Slice(0x18), (ushort)(this.EI_NIDENT.Length + 0x24));//e_ehsize
+            BitConverter.TryWriteBytes(span.Slice(0x1a), (ushort)ElfProgramHeader.Size);//e_phentsize
+            BitConverter.TryWriteBytes(span.Slice(0x1c), (ushort)this.ProgramHeaders.Count);//e_phnum
+            BitConverter.TryWriteBytes(span.Slice(0x1e), (ushort)ElfSectionHeader.Size);//e_shentsize
+            BitConverter.TryWriteBytes(span.Slice(0x20), (ushort)this.SectionHeaders.Count);//e_shnum
+            BitConverter.TryWriteBytes(span.Slice(0x22), (ushort)0x03);//e_shstrndx
+
+            stream.Write(span);
 
             //phent Program Header Table
             foreach (ElfProgramHeader ph in this.ProgramHeaders)
@@ -98,7 +102,7 @@ namespace Yama.Assembler
                 ph.StreamData(stream);
             }
 
-            stream.Write(new byte[0xc]);
+            stream.Write(stackalloc byte[0xc]);
 
             return startAdress;
         }
@@ -168,7 +172,10 @@ namespace Yama.Assembler
             EM_88K,
             FUTURE_0,
             EM_860,
-            EM_ARM = 40
+            EM_ARM = 40,//32Bit
+            EM_X86_64 = 62,//64Bit AMD
+            EM_AARCH64 = 183,//64Bit
+            EM_RISCV = 243,
         }
 
     }
@@ -252,14 +259,17 @@ namespace Yama.Assembler
 
         public uint StreamData(Stream stream)
         {
-            stream.Write(BitConverter.GetBytes((uint)this.Type));//p_type
-            stream.Write(BitConverter.GetBytes((uint)0x0));//p_offset
-            stream.Write(BitConverter.GetBytes(this.VAddresse));//p_vaddr
-            stream.Write(BitConverter.GetBytes(this.PAddresse));//p_paddr
-            stream.Write(BitConverter.GetBytes(this.FileSize));//p_filesz (uint)programSize - startAdress
-            stream.Write(BitConverter.GetBytes(this.MemorySize));//p_memsz
-            stream.Write(BitConverter.GetBytes((uint)P_Flags.PF_R | (uint)P_Flags.PF_X | (uint) P_Flags.PF_W));//p_flags
-            stream.Write(BitConverter.GetBytes((uint)this.PAlign));//p_align
+            Span<byte> span = stackalloc byte[Size];
+            BitConverter.TryWriteBytes(span.Slice(0x00), (uint)this.Type);//p_type
+            BitConverter.TryWriteBytes(span.Slice(0x04), (uint)0x0);//p_offset
+            BitConverter.TryWriteBytes(span.Slice(0x08), (uint)this.VAddresse);//p_vaddr
+            BitConverter.TryWriteBytes(span.Slice(0x0c), (uint)this.PAddresse);//p_paddr
+            BitConverter.TryWriteBytes(span.Slice(0x10), (uint)this.FileSize);//p_filesz (uint)programSize - startAdress
+            BitConverter.TryWriteBytes(span.Slice(0x14), (uint)this.MemorySize);//p_memsz
+            BitConverter.TryWriteBytes(span.Slice(0x18), (uint)P_Flags.PF_Read | (uint)P_Flags.PF_Executeble | (uint)P_Flags.PF_Write);//p_flags
+            BitConverter.TryWriteBytes(span.Slice(0x1c), (uint)this.PAlign);//p_align
+
+            stream.Write(span);
 
             return Size;
         }
@@ -276,9 +286,9 @@ namespace Yama.Assembler
         public enum P_Flags
         {
             None,
-            PF_X = 1,
-            PF_W = 2,
-            PF_R = 4,
+            PF_Executeble = 1,
+            PF_Write = 2,
+            PF_Read = 4,
 
         }
 
