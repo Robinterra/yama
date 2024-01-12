@@ -448,9 +448,13 @@
           ".syntax unified",
           "mov r7, #0xc0",
           "mov r0, #0x0",
-          "ldr r1,*MEMORYSIZE",
+          "ldr r12,=0x500000",
+          "mov r1, r12",
           "mov r2, #0x3",
           "mov r3, #0x22",
+          "mov r4, #0x0",
+          "sub r4, r4, #0x1",
+          "mov r5, #0x0",
           "svc #0",
           "mov r10,r0",
           "ldr r11,=0x1",
@@ -460,8 +464,7 @@
           "blx r12",
           "mov r0, r12",
           "mov r7, #1",
-          "svc #0",
-          "MEMORYSIZE: .word 0x100000"
+          "svc #0"
         ]
       },
       {
