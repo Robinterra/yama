@@ -42,6 +42,14 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
+        public bool DoPackageRefresh
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
@@ -143,7 +151,7 @@ namespace Yama.ProjectConfig
 
             foreach ( Package package in project.Packages )
             {
-                if ( !this.BindPackage ( definition, package ) ) isok = false;
+                if ( !this.BindPackage ( definition, package, file ) ) isok = false;
             }
 
             return isok;
@@ -161,28 +169,22 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
-        private bool BindPackage ( LanguageDefinition definition, Package package )
+        private bool BindPackage ( LanguageDefinition definition, Package package, FileInfo file)
         {
-            if ( string.IsNullOrEmpty ( package.Name ) ) return false;
+            if ( string.IsNullOrEmpty ( package.Name ) ) return this.PrintingError("Package name can not be empty, please Define a Packagename", file);
             if ( this.BinPackages.ContainsKey ( package.Name ) ) return true;
 
             this.BinPackages.Add(package.Name, package);
 
-            string packagePath = Path.Combine ( Program.PackagePath.FullName, package.Name );
-            DirectoryInfo packDir = new DirectoryInfo ( packagePath );
+            DirectoryInfo? packDir = package.Type switch
+            {
+                Package.PackageType.Git => this.BindPackage_Git(definition, package),
+                Package.PackageType.Local => this.BindPackage_Local(definition, package),
+                _ => null
+            };
 
-            this.Output.Print(new ConfigPackageRefreshStart(package));
-
-            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-            stopwatch.Start();
-
-            bool isok = this.TryCloneOrPullRepository ( packDir, package );
-
-            stopwatch.Stop();
-
-            this.Output.Print(new OutputEnde(stopwatch, isok));
-
-            if (!isok) return false;
+            if (packDir is null) return false;
+            if (!packDir.Exists) return false;
 
             FileInfo projectConfig = new FileInfo ( Path.Combine ( packDir.FullName, "config.yproj" ) );
             if ( !projectConfig.Exists ) return this.PrintingError("Project config file can not be found", projectConfig);
@@ -190,11 +192,39 @@ namespace Yama.ProjectConfig
             return this.BuildOne ( definition, projectConfig );
         }
 
+        private DirectoryInfo? BindPackage_Local(LanguageDefinition definition, Package package)
+        {
+            if ( string.IsNullOrEmpty ( package.LocalPath ) ) return null;
+
+            string packagePath = Path.Combine ( package.LocalPath );
+            DirectoryInfo packDir = new DirectoryInfo ( packagePath );
+
+            return packDir;
+        }
+
+        // -----------------------------------------------
+
+        private DirectoryInfo? BindPackage_Git(LanguageDefinition definition, Package package)
+        {
+            string packagePath = Path.Combine ( Program.PackagePath.FullName, package.Name! );
+            DirectoryInfo packDir = new DirectoryInfo ( packagePath );
+
+            bool isok = this.TryCloneOrPullRepository ( packDir, package );
+
+            if ( !isok ) return null;
+            return packDir;
+        }
+
         // -----------------------------------------------
 
         private bool TryCloneOrPullRepository ( DirectoryInfo packDir, Package package )
         {
             if ( !packDir.Exists ) return this.ClonePackage (packDir, package);
+            if ( !package.GitAutomaticUpdate && !this.DoPackageRefresh ) return true;
+
+            this.Output.Print(new ConfigPackageRefreshStart(package));
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
 
             try
             {
@@ -210,8 +240,14 @@ namespace Yama.ProjectConfig
             }
             catch
             {
+                stopwatch.Stop();
+                this.Output.Print(new OutputEnde(stopwatch, false));
+
                 return false;
             }
+
+            stopwatch.Stop();
+            this.Output.Print(new OutputEnde(stopwatch, true));
 
             return true;
         }
@@ -220,6 +256,10 @@ namespace Yama.ProjectConfig
 
         private bool ClonePackage ( DirectoryInfo packDir, Package package )
         {
+            this.Output.Print(new ConfigPackageRefreshStart(package, true));
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
             CloneOptions cloneOptions = new CloneOptions ();
 
             try
@@ -232,9 +272,13 @@ namespace Yama.ProjectConfig
             }
             catch
             {
+                stopwatch.Stop();
+                this.Output.Print(new OutputEnde(stopwatch, false));
                 return false;
             }
 
+            stopwatch.Stop();
+            this.Output.Print(new OutputEnde(stopwatch, true));
             return true;
         }
 
@@ -327,6 +371,9 @@ namespace Yama.ProjectConfig
 
             parserLayer.ParserMembers.Add ( new PackageGitRepositoryNode () );
             parserLayer.ParserMembers.Add ( new PackageGitBranchNode () );
+            parserLayer.ParserMembers.Add ( new PackageLocalPathNode () );
+            parserLayer.ParserMembers.Add ( new PackageNameNode () );
+            parserLayer.ParserMembers.Add ( new PackageGitAutoUpdateNode () );
 
             return parserLayer;
         }
