@@ -212,7 +212,7 @@ namespace Yama
             if (Program.yama == null) Program.yama = new LanguageDefinition();
 
             FileInfo projectConfig = new FileInfo("config.yproj");
-            if (projectConfig.Exists) if (!Program.BuildWithProjectConfig(projectConfig, defs)) return false;
+            if (projectConfig.Exists) if (!Program.BuildWithProjectConfig(projectConfig, defs, commands)) return false;
 
             foreach ( ICommandLine command in commands )
             {
@@ -238,9 +238,14 @@ namespace Yama
 
         // -----------------------------------------------
 
-        private static bool BuildWithProjectConfig(FileInfo projectConfigFile, DefinitionManager defs )
+        private static bool BuildWithProjectConfig(FileInfo projectConfigFile, DefinitionManager defs, List<ICommandLine> commands)
         {
             ConfigDefinition projectConfig = new ConfigDefinition(defs, new());
+
+            foreach (ICommandLine commandLine in commands)
+            {
+                if (commandLine is DoPackageRefreshExpression) projectConfig.DoPackageRefresh = true;
+            }
 
             if (!projectConfig.Build(yama, projectConfigFile)) return false;
 
@@ -333,6 +338,7 @@ namespace Yama
             compileArgs.Add( new StartNamespace () );
             compileArgs.Add( new IROutputExpression  () );
             compileArgs.Add( new ExtensionDirectoryExpression () );
+            compileArgs.Add( new DoPackageRefreshExpression () );
 
             List<ICommandLine> debugArgs = new List<ICommandLine>();
             debugArgs.Add(new SizeExpression ());
@@ -362,6 +368,7 @@ namespace Yama
             Program.EnabledCommandLines.Add ( new IROutputExpression (  ) );
             Program.EnabledCommandLines.Add ( new OptimizingExpression (  ) );
             Program.EnabledCommandLines.Add ( new OutputFileExpression (  ) );
+            Program.EnabledCommandLines.Add ( new DoPackageRefreshExpression (  ) );
             Program.EnabledCommandLines.Add ( new StartNamespace (  ) );
             Program.EnabledCommandLines.Add ( new DefinesExpression (  ) );
             Program.EnabledCommandLines.Add ( new SkipExpression (  ) );

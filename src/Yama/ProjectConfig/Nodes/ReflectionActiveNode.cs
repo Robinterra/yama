@@ -87,7 +87,7 @@ namespace Yama.ProjectConfig.Nodes
 
             token = request.Parser.Peek(token, 1);
             if (token is null) return null;
-            if (token.Kind != IdentifierKind.True && token.Kind == IdentifierKind.False) return new ParserError(token, $"Expectet a True/False and not a {token.Kind}", result.AllTokens.ToArray());
+            if (token.Kind != IdentifierKind.True && token.Kind != IdentifierKind.False) return new ParserError(token, $"Expectet a True/False and not a {token.Kind}", result.AllTokens.ToArray());
             result.AllTokens.Add(token);
             result.ValueToken = token;
 

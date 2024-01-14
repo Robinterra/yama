@@ -31,6 +31,10 @@ namespace Yama.ProjectConfig
 
                 return this.name;
             }
+            set
+            {
+                this.name = value;
+            }
         }
 
         // -----------------------------------------------
@@ -51,9 +55,45 @@ namespace Yama.ProjectConfig
 
         // -----------------------------------------------
 
+        public string? LocalPath
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public bool GitAutomaticUpdate
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------
+
+        public PackageType Type
+        {
+            get
+            {
+                if ( !string.IsNullOrEmpty ( this.GitRepository ) ) return PackageType.Git;
+                if ( !string.IsNullOrEmpty ( this.LocalPath ) ) return PackageType.Local;
+
+                return PackageType.None;
+            }
+        }
+
+        // -----------------------------------------------
+
         #endregion get/set
 
         // -----------------------------------------------
+
+        public enum PackageType
+        {
+            None,  
+            Local,
+            Git
+        }
 
     }
 }

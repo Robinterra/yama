@@ -13,13 +13,19 @@ namespace Yama.InformationOutput.Nodes
             get;
         }
 
+        public bool IsClone
+        {
+            get;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public ConfigPackageRefreshStart(Package package)
+        public ConfigPackageRefreshStart(Package package, bool isclone = false)
         {
             this.Package = package;
+            this.IsClone = isclone;
         }
 
         #endregion ctor
@@ -28,7 +34,8 @@ namespace Yama.InformationOutput.Nodes
 
         public bool Print(RequestOutput o)
         {
-            string printMessage = $"Refresh '{Package.Name}' Package ";
+            string typeName = IsClone ? "Clone" : "Refresh";
+            string printMessage = $"{typeName} '{Package.Name}' Package ";
 
             o.Info.Write(printMessage);
 
