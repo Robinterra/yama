@@ -1,5 +1,110 @@
 namespace "System"
 {
+
+    public primitive class uint
+    {
+        // -----------------------------------------------
+
+        #region compare
+
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to  Less than
+        *
+        * @param[in] a (Int) Der Linke Child der vom Operator steht
+        * @param[in] b (Int) Der Rechte Child der vom Operator steht
+        *
+        * @return (bool) Wenn a kleiner ist dann true ansonsten false
+        */
+        copy operator bool <(uint a, uint b)
+        {
+            #defalgo IntCompare,LessThan:
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to Greater than
+        *
+        * @param[in] a (Int) Der Linke Child der vom Operator steht
+        * @param[in] b (Int) Der Rechte Child der vom Operator steht
+        *
+        * @return (bool) Wenn a kleiner ist dann true ansonsten false
+        */
+        copy operator bool >(uint a, uint b)
+        {
+            #defalgo IntCompare,GreaterThan:
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to Greater than or equals
+        *
+        * @param[in] a (Int) Der Linke Child der vom Operator steht
+        * @param[in] b (Int) Der Rechte Child der vom Operator steht
+        *
+        * @return (bool) Wenn a kleiner ist dann true ansonsten false
+        */
+        copy operator bool >=(uint a, uint b)
+        {
+            #defalgo IntCompare,GreaterEqualsThan:
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to Equal or Less than
+        *
+        * @param[in] a (Int) The left Child of the Operator
+        * @param[in] b (Int) The rigth Child of the Operator
+        *
+        * @return (bool) if equals or Less than then return true
+        */
+        copy operator bool <=(uint a, uint b)
+        {
+            #defalgo IntCompare,LessEqualsThan:
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to Equal
+        *
+        * @param[in] a (Int) The left Child of the Operator
+        * @param[in] b (Int) The rigth Child of the Operator
+        *
+        * @return (bool) if equals then return true
+        */
+        copy operator bool ==(uint a, uint b)
+        {
+            #defalgo IntCompare,Equals:
+        }
+
+        // -----------------------------------------------
+
+        /**
+        * Compare 2 Values to Not Equal
+        *
+        * @param[in] a (Int) The left Child of the Operator
+        * @param[in] b (Int) The rigth Child of the Operator
+        *
+        * @return (bool) if equals then return true
+        */
+        copy operator bool !=(uint a, uint b)
+        {
+            #defalgo IntCompare,NotEquals:
+        }
+
+        // -----------------------------------------------
+
+        #endregion compare
+
+        // -----------------------------------------------
+
+    }
+
     /**
     * Integer current 16 Bit
     */
@@ -26,7 +131,7 @@ namespace "System"
         */
         copy operator bool <(int a, int b)
         {
-            #defalgo IntCompare,LessThan:
+            #defalgo IntCompare,SignedLessThan:
         }
 
         // -----------------------------------------------
@@ -41,7 +146,7 @@ namespace "System"
         */
         copy operator bool >(int a, int b)
         {
-            #defalgo IntCompare,GreaterThan:
+            #defalgo IntCompare,SignedGreaterThan:
         }
 
         // -----------------------------------------------
@@ -56,7 +161,7 @@ namespace "System"
         */
         copy operator bool >=(int a, int b)
         {
-            #defalgo IntCompare,GreaterEqualsThan:
+            #defalgo IntCompare,SignedGreaterEqualsThan:
         }
 
         // -----------------------------------------------
@@ -71,7 +176,7 @@ namespace "System"
         */
         copy operator bool <=(int a, int b)
         {
-            #defalgo IntCompare,LessEqualsThan:
+            #defalgo IntCompare,SignedLessEqualsThan:
         }
 
         // -----------------------------------------------

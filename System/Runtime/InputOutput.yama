@@ -25,6 +25,15 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        public static bool Exit(int returncode)
+        {
+            bool result = #defalgo Exec,Exit:;
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         /**
          * fileflags und filemodes gibt es enums
          * Gibt die FileId zurück

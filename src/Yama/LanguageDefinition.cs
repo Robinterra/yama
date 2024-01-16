@@ -531,7 +531,7 @@ namespace Yama
             rules.Add ( new KeyWord ( "private", IdentifierKind.Private ) );
             rules.Add ( new KeyWord ( "simple", IdentifierKind.Simple ) );
             rules.Add ( new KeyWord ( "copy", IdentifierKind.Copy ) );
-            rules.Add ( new KeyWord ( "uint", IdentifierKind.UInt32Bit ) );
+            //rules.Add ( new KeyWord ( "uint", IdentifierKind.UInt32Bit ) );
             rules.Add ( new KeyWord ( "ushort", IdentifierKind.UInt16Bit ) );
             rules.Add ( new KeyWord ( "short", IdentifierKind.Int16Bit ) );
             rules.Add ( new KeyWord ( "long", IdentifierKind.Int64Bit ) );

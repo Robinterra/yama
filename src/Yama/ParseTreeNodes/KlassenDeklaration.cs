@@ -119,6 +119,7 @@ namespace Yama.Parser
             if (token.Kind == IdentifierKind.Int16Bit) return true;
             if (token.Kind == IdentifierKind.Int64Bit) return true;
             if (token.Kind == IdentifierKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.UInt32Bit) return true;
 
             return false;
         }
@@ -144,6 +145,7 @@ namespace Yama.Parser
             if (token.Kind == IdentifierKind.Int16Bit) return true;
             if (token.Kind == IdentifierKind.Int64Bit) return true;
             if (token.Kind == IdentifierKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.UInt32Bit) return true;
 
             return false;
         }
