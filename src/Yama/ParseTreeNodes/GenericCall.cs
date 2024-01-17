@@ -155,6 +155,7 @@ namespace Yama.Parser
             if (kind == IdentifierKind.Int16Bit) return true;
             if (kind == IdentifierKind.Int64Bit) return true;
             if (kind == IdentifierKind.Float32Bit) return true;
+            if (kind == IdentifierKind.UInt32Bit) return true;
 
             return false;
         }

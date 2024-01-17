@@ -99,6 +99,7 @@ namespace Yama.Parser
             if (token.Kind == IdentifierKind.Int16Bit) return true;
             if (token.Kind == IdentifierKind.Int64Bit) return true;
             if (token.Kind == IdentifierKind.Float32Bit) return true;
+            if (token.Kind == IdentifierKind.UInt32Bit) return true;
             if (token.Kind == IdentifierKind.Void) return true;
             if (token.Kind == IdentifierKind.This) return true;
 

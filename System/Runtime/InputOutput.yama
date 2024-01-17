@@ -25,6 +25,22 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        public static int Fork()
+        {
+            #defalgo Exec,Fork:
+        }
+
+        // -----------------------------------------------
+
+        public static bool Exit(int returncode)
+        {
+            bool result = #defalgo Exec,Exit:;
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         /**
          * fileflags und filemodes gibt es enums
          * Gibt die FileId zurück
@@ -34,6 +50,24 @@ namespace "System.Runtime"
             int fileId = #defalgo Exec,OpenFile:;
 
             return fileId;
+        }
+
+        // -----------------------------------------------
+
+        public static int WaitPid(int pid, int fileflags, int fileModes)
+        {
+            int returncode = #defalgo Exec,WaitPid:;
+
+            return returncode;
+        }
+
+        // -----------------------------------------------
+
+        public static int Kill(int pid, int sig)
+        {
+            int rc = #defalgo Exec,Kill:;
+
+            return rc;
         }
 
         // -----------------------------------------------
@@ -79,6 +113,15 @@ namespace "System.Runtime"
             bool issucess = #defalgo Exec,Close:;
 
             return !issucess;
+        }
+
+        // -----------------------------------------------
+
+        public static int Wait4(int pid, int options)
+        {
+            int returncode = #defalgo Exec,Wait4:;
+
+            return returncode;
         }
 
         // -----------------------------------------------
@@ -154,6 +197,7 @@ namespace "System.Runtime"
         // -----------------------------------------------
 
     }
+
 }
 
 // --[EOF]--

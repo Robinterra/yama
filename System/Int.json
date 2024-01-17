@@ -715,7 +715,139 @@
                   "[JUMPTO[0]]:",
                   "mov [SSAPUSH], r12"
                 ]
-            }
+            },
+            {
+              "Name": "IntCompare",
+              "Mode": "SignedLessThan",
+              "Description": "LessThan",
+              "Keys": [
+                  {
+                      "Name": "[JUMPTO]",
+                      "Values": [
+                      "1"
+                      ]
+                  },
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+              "mov r12, #0xff",
+              "cmp [SSAPOP[0]], [SSAPOP[1]]",
+              "blt [JUMPTO[0]]",
+              "mov r12, #0x0",
+              "[JUMPTO[0]]:",
+              "mov [SSAPUSH], r12"
+              ]
+          },
+          {
+              "Name": "IntCompare",
+              "Mode": "SignedLessEqualsThan",
+              "Description": "LessEqualsThan",
+              "Keys": [
+                  {
+                      "Name": "[JUMPTO]",
+                      "Values": [
+                      "1"
+                      ]
+                  },
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+              "mov r12, #0xff",
+              "cmp [SSAPOP[0]], [SSAPOP[1]]",
+              "ble [JUMPTO[0]]",
+              "mov r12, #0x0",
+              "[JUMPTO[0]]:",
+              "mov [SSAPUSH], r12"
+              ]
+          },
+          {
+              "Name": "IntCompare",
+              "Mode": "SignedGreaterThan",
+              "Description": "GreaterThan",
+              "Keys": [
+                  {
+                      "Name": "[JUMPTO]",
+                      "Values": [
+                      "1"
+                      ]
+                  },
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+              "mov r12, #0xff",
+              "cmp [SSAPOP[0]], [SSAPOP[1]]",
+              "bgt [JUMPTO[0]]",
+              "mov r12, #0x0",
+              "[JUMPTO[0]]:",
+              "mov [SSAPUSH], r12"
+              ]
+          },
+          {
+              "Name": "IntCompare",
+              "Mode": "SignedGreaterEqualsThan",
+              "Description": "GreaterEqualsThan",
+              "Keys": [
+                  {
+                      "Name": "[JUMPTO]",
+                      "Values": [
+                      "1"
+                      ]
+                  },
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+                "mov r12, #0xff",
+                "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                "bge [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r12"
+              ]
+          }
        ],
         "AdvancedKeyReplaces": [
         ],
@@ -1180,7 +1312,139 @@
                     "[JUMPTO[0]]:",
                     "mov [SSAPUSH], r12"
                 ]
-            }
+            },
+            {
+              "Name": "IntCompare",
+              "Mode": "SignedLessThan",
+              "Description": "LessThan",
+              "Keys": [
+                  {
+                      "Name": "[JUMPTO]",
+                      "Values": [
+                      "1"
+                      ]
+                  },
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+                  "mov r12, #0xff",
+                  "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                  "blt [JUMPTO[0]]",
+                  "mov r12, #0x0",
+                  "[JUMPTO[0]]:",
+                  "mov [SSAPUSH], r12"
+              ]
+          },
+          {
+              "Name": "IntCompare",
+              "Mode": "SignedLessEqualsThan",
+              "Description": "LessEqualsThan",
+              "Keys": [
+                  {
+                      "Name": "[JUMPTO]",
+                      "Values": [
+                      "1"
+                      ]
+                  },
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+                  "mov r12, #0xff",
+                  "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                  "ble [JUMPTO[0]]",
+                  "mov r12, #0x0",
+                  "[JUMPTO[0]]:",
+                  "mov [SSAPUSH], r12"
+              ]
+          },
+          {
+              "Name": "IntCompare",
+              "Mode": "SignedGreaterThan",
+              "Description": "GreaterThan",
+              "Keys": [
+                  {
+                      "Name": "[JUMPTO]",
+                      "Values": [
+                      "1"
+                      ]
+                  },
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+                  "mov r12, #0xff",
+                  "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                  "bgt [JUMPTO[0]]",
+                  "mov r12, #0x0",
+                  "[JUMPTO[0]]:",
+                  "mov [SSAPUSH], r12"
+              ]
+          },
+          {
+              "Name": "IntCompare",
+              "Mode": "SignedGreaterEqualsThan",
+              "Description": "GreaterEqualsThan",
+              "Keys": [
+                  {
+                      "Name": "[JUMPTO]",
+                      "Values": [
+                      "1"
+                      ]
+                  },
+                  {
+                      "Name": "[SSAPOP]",
+                      "Values": [
+                        "2"
+                      ]
+                    },
+                    {
+                      "Name": "[SSAPUSH]",
+                      "Values": [
+                      ]
+                    }
+              ],
+              "PostKeys": [],
+              "AssemblyCommands": [
+                  "mov r12, #0xff",
+                  "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                  "bge [JUMPTO[0]]",
+                  "mov r12, #0x0",
+                  "[JUMPTO[0]]:",
+                  "mov [SSAPUSH], r12"
+            ]
+          }
        ],
         "AdvancedKeyReplaces": [
         ],
@@ -1646,7 +1910,139 @@
                   "[JUMPTO[0]]:",
                   "mov [SSAPUSH], r12"
               ]
-          }
+          },
+          {
+            "Name": "IntCompare",
+            "Mode": "SignedLessThan",
+            "Description": "LessThan",
+            "Keys": [
+                {
+                    "Name": "[JUMPTO]",
+                    "Values": [
+                    "1"
+                    ]
+                },
+                {
+                    "Name": "[SSAPOP]",
+                    "Values": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "Name": "[SSAPUSH]",
+                    "Values": [
+                    ]
+                  }
+            ],
+            "PostKeys": [],
+            "AssemblyCommands": [
+                "mov r12, #0xff",
+                "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                "blts [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r12"
+            ]
+        },
+        {
+            "Name": "IntCompare",
+            "Mode": "SignedLessEqualsThan",
+            "Description": "LessEqualsThan",
+            "Keys": [
+                {
+                    "Name": "[JUMPTO]",
+                    "Values": [
+                    "1"
+                    ]
+                },
+                {
+                    "Name": "[SSAPOP]",
+                    "Values": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "Name": "[SSAPUSH]",
+                    "Values": [
+                    ]
+                  }
+            ],
+            "PostKeys": [],
+            "AssemblyCommands": [
+                "mov r12, #0xff",
+                "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                "bles [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r12"
+            ]
+        },
+        {
+            "Name": "IntCompare",
+            "Mode": "SignedGreaterThan",
+            "Description": "GreaterThan",
+            "Keys": [
+                {
+                    "Name": "[JUMPTO]",
+                    "Values": [
+                    "1"
+                    ]
+                },
+                {
+                    "Name": "[SSAPOP]",
+                    "Values": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "Name": "[SSAPUSH]",
+                    "Values": [
+                    ]
+                  }
+            ],
+            "PostKeys": [],
+            "AssemblyCommands": [
+                "mov r12, #0xff",
+                "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                "bgts [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r12"
+            ]
+        },
+        {
+            "Name": "IntCompare",
+            "Mode": "SignedGreaterEqualsThan",
+            "Description": "GreaterEqualsThan",
+            "Keys": [
+                {
+                    "Name": "[JUMPTO]",
+                    "Values": [
+                    "1"
+                    ]
+                },
+                {
+                    "Name": "[SSAPOP]",
+                    "Values": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "Name": "[SSAPUSH]",
+                    "Values": [
+                    ]
+                  }
+            ],
+            "PostKeys": [],
+            "AssemblyCommands": [
+                "mov r12, #0xff",
+                "cmp [SSAPOP[0]], [SSAPOP[1]]",
+                "bges [JUMPTO[0]]",
+                "mov r12, #0x0",
+                "[JUMPTO[0]]:",
+                "mov [SSAPUSH], r12"
+            ]
+        }
      ],
       "AdvancedKeyReplaces": [
       ],

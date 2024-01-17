@@ -52,6 +52,11 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new CommandJumpPoint("blt", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedLessThan, true));
             definition.Commands.Add(new CommandJumpPoint("ble", format2, 0xA, 4, 0xFFFFFF, ConditionMode.UnsignedLessThanOrEqual, true));
 
+            definition.Commands.Add(new CommandJumpPoint("bles", format2, 0xA, 4, 0xFFFFFF, ConditionMode.SignedLessThanOrEqual, true));
+            definition.Commands.Add(new CommandJumpPoint("blts", format2, 0xA, 4, 0xFFFFFF, ConditionMode.SignedLessThan, true));
+            definition.Commands.Add(new CommandJumpPoint("bgts", format2, 0xA, 4, 0xFFFFFF, ConditionMode.SignedGreaterThan, true));
+            definition.Commands.Add(new CommandJumpPoint("bges", format2, 0xA, 4, 0xFFFFFF, ConditionMode.SignedGreaterThanOrEqual, true));
+
             definition.Commands.Add(new CommandImediate("svc", format2, 0xf, 4, 0xfffff));
 
             definition.Commands.Add(new CommandData());

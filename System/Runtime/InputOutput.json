@@ -118,6 +118,81 @@
         },
         {
           "Name": "Exec",
+          "Mode": "Exit",
+          "Description": "Exit Syscall",
+          "Keys": [
+              {
+                  "Name": "[SSAPOP]",
+                  "Values": [
+                    "1"
+                  ]
+                },
+                {
+                  "Name": "[SSAPUSH]",
+                  "Values": [
+                  ]
+                }
+          ],
+          "PostKeys": [],
+          "AssemblyCommands": [
+          "push { r0, r2, r7 }",
+          "mov r1, [SSAPOP[0]]",
+          "mov r12, #3",
+          "exec r12",
+          "mov [SSAPUSH], r12",
+          "pop { r0, r2, r7 }"
+          ]
+      },
+      {
+        "Name": "Exec",
+        "Mode": "Kill",
+        "Description": "Exit Syscall",
+        "Keys": [
+            {
+                "Name": "[SSAPOP]",
+                "Values": [
+                  "1"
+                ]
+              },
+              {
+                "Name": "[SSAPUSH]",
+                "Values": [
+                ]
+              }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+        "push { r0, r2, r7 }",
+        "mov r1, [SSAPOP[0]]",
+        "mov r12, #3",
+        "exec r12",
+        "mov [SSAPUSH], r12",
+        "pop { r0, r2, r7 }"
+        ]
+    },
+      {
+        "Name": "Exec",
+        "Mode": "Fork",
+        "Description": "Fork Syscall, TODO Exit Call",
+        "Keys": [
+              {
+                "Name": "[SSAPUSH]",
+                "Values": [
+                ]
+              }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+        "push { r0, r2, r7 }",
+        "mov r1, 0",
+        "mov r12, #3",
+        "exec r12",
+        "mov [SSAPUSH], r12",
+        "pop { r0, r2, r7 }"
+        ]
+    },
+        {
+          "Name": "Exec",
           "Mode": "Seek",
           "Description": "Seek Offset",
           "Keys": [
@@ -239,6 +314,34 @@
           },
           {
             "Name": "Exec",
+            "Mode": "Kill",
+            "Description": "Seek Offset",
+            "Keys": [
+                {
+                    "Name": "[SSAPOP]",
+                    "Values": [
+                      "2"
+                    ]
+                  },
+                  {
+                    "Name": "[SSAPUSH]",
+                    "Values": [
+                    ]
+                  }
+            ],
+            "PostKeys": [],
+            "AssemblyCommands": [
+            "push { r0, r7 }",
+            "mov r0, [SSAPOP[1]]",
+            "mov r1, [SSAPOP[0]]",
+            "mov r7, #37",
+            "svc #0",
+            "mov [SSAPUSH], r0",
+            "pop { r0, r7 }"
+            ]
+        },
+          {
+            "Name": "Exec",
             "Mode": "OpenFile",
             "Description": "Open a File",
             "Keys": [
@@ -353,6 +456,38 @@
         "pop { r0, r2, r7 }"
         ]
     },
+    {
+      "Name": "Exec",
+      "Mode": "Wait4",
+      "Description": "Wait4 Offset",
+      "Keys": [
+          {
+              "Name": "[SSAPOP]",
+              "Values": [
+                "2"
+              ]
+            },
+            {
+              "Name": "[SSAPUSH]",
+              "Values": [
+              ]
+            }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+      "push { r0, r2, r3, r7 }",
+      "sub sp, sp, #0x10",
+      "mov r0, [SSAPOP[1]]",
+      "mov r1, sp",
+      "mov r2, [SSAPOP[0]]",
+      "mov r3, #0x0",
+      "mov r7, #114",
+      "svc #0",
+      "add sp, sp, #0x10",
+      "mov [SSAPUSH], r0",
+      "pop { r0, r2, r3, r7 }"
+      ]
+  },
       {
         "Name": "Exec",
         "Mode": "Close",
@@ -380,6 +515,53 @@
         "pop { r0, r7 }"
         ]
     },
+    {
+      "Name": "Exec",
+      "Mode": "Exit",
+      "Description": "Exit Syscall",
+      "Keys": [
+          {
+              "Name": "[SSAPOP]",
+              "Values": [
+                "1"
+              ]
+            },
+            {
+              "Name": "[SSAPUSH]",
+              "Values": [
+              ]
+            }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+      "push { r0, r7 }",
+      "mov r0, [SSAPOP[0]]",
+      "mov r7, #1",
+      "svc #0",
+      "mov [SSAPUSH], r0",
+      "pop { r0, r7 }"
+      ]
+  },
+  {
+    "Name": "Exec",
+    "Mode": "Fork",
+    "Description": "Fork Syscall",
+    "Keys": [
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+    ],
+    "PostKeys": [],
+    "AssemblyCommands": [
+    "push { r0, r7 }",
+    "mov r7, #2",
+    "svc #0",
+    "mov [SSAPUSH], r0",
+    "pop { r0, r7 }"
+    ]
+  },
         {
           "Name": "Exec",
           "Mode": "Mmap2",
@@ -399,7 +581,7 @@
           ],
           "PostKeys": [],
           "AssemblyCommands": [
-          "push { r0, r2, r5, r7 }",
+          "push { r0, r2, r3, r4, r5, r7 }",
           "mov r5, [SSAPOP[0]]",
           "mov r4, [SSAPOP[1]]",
           "mov r0, #0",
@@ -409,7 +591,7 @@
           "mov r7, #192",
           "svc #0",
           "mov [SSAPUSH], r0",
-          "pop { r0, r2, r5, r7 }"
+          "pop { r0, r2, r3, r4, r5, r7 }"
           ]
       },
       {

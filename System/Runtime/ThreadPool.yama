@@ -1,0 +1,140 @@
+namespace "System.Runtime"
+{
+    using "System";
+
+    public class ThreadPool
+    {
+
+        // -----------------------------------------------
+
+        #region vars
+
+        // -----------------------------------------------
+
+        private List<Thread> threads;
+
+        // -----------------------------------------------
+
+        #endregion vars
+
+        // -----------------------------------------------
+
+        #region ctor
+
+        // -----------------------------------------------
+
+        public this new()
+        {
+            this.threads = new List<Thread>();
+
+            return this;
+        }
+
+        public this ~()
+        {
+
+        }
+
+        // -----------------------------------------------
+
+        #endregion ctor
+
+        // -----------------------------------------------
+
+        #region methods
+
+        // -----------------------------------------------
+
+        public &Thread? StartNewThread(Any data, Func<int, Any> methodToRunInNewThread)
+        {
+            this.Clean();
+
+            int threadId = InputOutput.Fork();
+
+            if (threadId < 0) return null;
+            if (threadId) return this.HandleOfThreads(threadId);
+
+            int returncode = methodToRunInNewThread(data);
+
+            InputOutput.Exit(returncode);
+
+            return null;
+        }
+
+        // -----------------------------------------------
+
+        private &Thread? HandleOfThreads(int threadId)
+        {
+            Thread thread = new Thread(threadId);
+
+            &List<Thread> threads = this.threads;
+            if (threads is null) return null;
+
+            int position = threads.Add(thread);
+
+            &Thread result = threads.Get(position);
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        public bool Clean()
+        {
+            &List<Thread> threads = this.threads;
+            if (threads is null) return false;
+
+            int length = threads.Length;
+
+            for (int i = 0; i < length; i = i + 1)
+            {
+                &Thread thread = threads.Get(i);
+                if (thread is null) continue;
+                if (thread.IsRunning()) continue;
+
+                threads.Remove(thread);
+                thread = ~thread;
+                i = i - 1;
+                length = length - 1;
+            }
+        }
+
+        // -----------------------------------------------
+
+        #endregion methods
+
+        // -----------------------------------------------
+
+    }
+
+    public class Thread
+    {
+        private int id;
+
+        public this new(int id)
+        {
+            this.id = id;
+        }
+
+        public this ~()
+        {
+
+        }
+
+        public bool IsRunning()
+        {
+            //0x1 = WNOHANG
+            int state = InputOutput.Wait4(this.id, 0x1);
+            if (state == 0) return true;
+
+            return false;
+        }
+
+        public bool Kill()
+        {
+            int state = InputOutput.Kill(this.id, 1);
+            if (state < 0) return false;
+
+            return true;
+        }
+    }
+}

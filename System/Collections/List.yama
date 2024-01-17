@@ -117,7 +117,7 @@ namespace "System.Collections"
             return result;
         }
 
-        public bool Add(TItem item?)
+        public int Add(TItem item?)
         {
             int orgLength = this.Length;
             this.Length = orgLength + 1;
@@ -131,7 +131,7 @@ namespace "System.Collections"
             array = this.array;
             array.Data[orgLength] = value;
 
-            return true;
+            return orgLength;
         }
 
         public int AtPosition(TItem item)
@@ -160,7 +160,7 @@ namespace "System.Collections"
             return false;
         }
 
-        public bool Remove(TItem item)
+        public bool Remove(&TItem item)
         {
             int length = this.Length;
             Array array = this.array;
