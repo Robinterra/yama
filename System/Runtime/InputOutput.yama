@@ -25,6 +25,13 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        public static int Fork()
+        {
+            #defalgo Exec,Fork:
+        }
+
+        // -----------------------------------------------
+
         public static bool Exit(int returncode)
         {
             bool result = #defalgo Exec,Exit:;

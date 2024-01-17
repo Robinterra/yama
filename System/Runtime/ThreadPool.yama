@@ -46,14 +46,16 @@ namespace "System.Runtime"
         // -----------------------------------------------
 
         public bool StartNewThread(Any data, Func<int, Any> methodToRunInNewThread)
-        {/*
+        {
             int threadId = InputOutput.Fork();
+
+            if (threadId < 0) return false;
             if (threadId) return this.HandleOfThreads(threadId);
 
             int returncode = methodToRunInNewThread(data);
 
             InputOutput.Exit(returncode);
-*/
+
             return true;
         }
 
@@ -64,6 +66,8 @@ namespace "System.Runtime"
             Thread thread = new Thread(threadId);
 
             List<Thread> threads = this.threads;
+            if (threads is null) return true;
+
             threads.Add(thread);
 
             return true;
@@ -105,9 +109,14 @@ namespace "System.Runtime"
             this.id = id;
         }
 
+        public this ~()
+        {
+
+        }
+
         public bool IsRunning()
         {
-            //int state = InputOutput.GetResult(this.id);
+            //int state = InputOutput.WaitPid(this.id);
 
             return false;
         }
