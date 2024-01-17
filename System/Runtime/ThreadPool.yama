@@ -45,32 +45,35 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
-        public bool StartNewThread(Any data, Func<int, Any> methodToRunInNewThread)
+        public &Thread? StartNewThread(Any data, Func<int, Any> methodToRunInNewThread)
         {
+            //this.Clean();
+
             int threadId = InputOutput.Fork();
 
-            if (threadId < 0) return false;
+            if (threadId < 0) return null;
             if (threadId) return this.HandleOfThreads(threadId);
 
             int returncode = methodToRunInNewThread(data);
 
             InputOutput.Exit(returncode);
 
-            return true;
+            return null;
         }
 
         // -----------------------------------------------
 
-        public bool HandleOfThreads(int threadId)
+        private &Thread? HandleOfThreads(int threadId)
         {
             Thread thread = new Thread(threadId);
 
             List<Thread> threads = this.threads;
-            if (threads is null) return true;
+            if (threads is null) return null;
 
-            threads.Add(thread);
+            int position = threads.Add(thread);
 
-            return true;
+            &Thread result = threads.Get(position);
+            return result;
         }
 
         // -----------------------------------------------
@@ -78,11 +81,14 @@ namespace "System.Runtime"
         public bool Clean()
         {
             List<Thread> threads = this.threads;
+            if (threads is null) return false;
+
             int length = threads.Length;
 
             for (int i = 0; i < length; i = i + 1)
             {
                 &Thread thread = threads.Get(i);
+                if (thread is null) continue;
                 if (thread.IsRunning()) continue;
 
                 threads.Remove(thread);
@@ -119,6 +125,14 @@ namespace "System.Runtime"
             //int state = InputOutput.WaitPid(this.id);
 
             return false;
+        }
+
+        public bool Kill()
+        {
+            int state = InputOutput.Kill(this.id, 1);
+            if (state < 0) return false;
+
+            return true;
         }
     }
 }
