@@ -47,7 +47,7 @@ namespace "System.Runtime"
 
         public &Thread? StartNewThread(Any data, Func<int, Any> methodToRunInNewThread)
         {
-            //this.Clean();
+            this.Clean();
 
             int threadId = InputOutput.Fork();
 
@@ -67,7 +67,7 @@ namespace "System.Runtime"
         {
             Thread thread = new Thread(threadId);
 
-            List<Thread> threads = this.threads;
+            &List<Thread> threads = this.threads;
             if (threads is null) return null;
 
             int position = threads.Add(thread);
@@ -80,7 +80,7 @@ namespace "System.Runtime"
 
         public bool Clean()
         {
-            List<Thread> threads = this.threads;
+            &List<Thread> threads = this.threads;
             if (threads is null) return false;
 
             int length = threads.Length;
@@ -122,7 +122,9 @@ namespace "System.Runtime"
 
         public bool IsRunning()
         {
-            //int state = InputOutput.WaitPid(this.id);
+            //0x1 = WNOHANG
+            int state = InputOutput.Wait4(this.id, 0x1);
+            if (state == 0) return true;
 
             return false;
         }
