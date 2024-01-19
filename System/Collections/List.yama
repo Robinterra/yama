@@ -76,12 +76,12 @@ namespace "System.Collections"
         {
             if (pos >= this.Length) return null;
 
-            TItem item = (this.array.Data[pos]) as TItem;
+            &TItem item = (this.array.Data[pos]) as TItem;
             if (item is null) return null;
 
-            this.Remove(item);
+            TItem result = this.Remove(item);
 
-            return item;
+            return result;
         }
 
         public &TItem? Find(Func<bool, TItem> preDelg)
@@ -160,7 +160,7 @@ namespace "System.Collections"
             return false;
         }
 
-        public bool Remove(&TItem item)
+        public TItem? Remove(&TItem item)
         {
             int length = this.Length;
             Array array = this.array;
@@ -173,10 +173,10 @@ namespace "System.Collections"
                 Array.Copy(array, array, i, newStart, length - newStart);
                 this.Length = length - 1;
 
-                return true;
+                return existPointer;
             }
 
-            return false;
+            return null;
         }
 
         private bool Grow()

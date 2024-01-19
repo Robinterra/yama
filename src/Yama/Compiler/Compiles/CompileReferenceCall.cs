@@ -192,7 +192,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(null, key, "default", line);
 
                 Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0} 1", key.Name ), node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -227,7 +227,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQueryDek(node, key, mode, line);
 
                 Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0} 2", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -264,7 +264,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQueryDek(node, key, "set", lineset);
 
                 Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0} 4", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -433,7 +433,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(node.References.FirstOrDefault(), key, mode, line);
 
                 Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+                if (result == null) return compiler.AddError("Only Creating a Instance of a Class is not Allowed, please set all Proprties to a default value", this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -477,7 +477,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(node, key, mode, line);
 
                 Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), this.Node);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0} 7", key.Name ), this.Node);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {
@@ -620,7 +620,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(null, key, "point0", line);
 
                 Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0} 8", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {

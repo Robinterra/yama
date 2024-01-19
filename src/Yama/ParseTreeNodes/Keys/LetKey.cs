@@ -124,6 +124,7 @@ namespace Yama.Parser
             foreach (IndexPropertyDeklaration propDek in ikd.IndexProperties)
             {
                 CompileReferenceCall referenceCall = new CompileReferenceCall();
+                referenceCall.Node = this;
                 referenceCall.CompileDirect(compiler, propDek, "setpoint");
             }
 
