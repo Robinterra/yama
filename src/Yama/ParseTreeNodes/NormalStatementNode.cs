@@ -79,6 +79,7 @@ namespace Yama.Parser
 
             IParseTreeNode? statementnode = request.Parser.ParseCleanToken(ende, this.statementLayer, false);
             if (statementnode is not IParentNode parentNode) return null;
+
             request.Parser.SetChild(parentNode, node);
 
             if (statementnode is IContainer statementContainer) ende = statementContainer.Ende;
@@ -124,7 +125,29 @@ namespace Yama.Parser
         {
             if (this.StatementChild is not ICompileNode statementChild) return false;
 
-            return statementChild.Compile(request);
+            if (!statementChild.Compile(request)) return false;
+
+            if (statementChild is MethodeCallNode mcn) this.CompileMemoryClean(request, mcn);
+
+            return true;
+        }
+
+        private void CompileMemoryClean(RequestParserTreeCompile request, MethodeCallNode mcn)
+        {
+            if (mcn.Reference is null) return;
+            if (mcn.Reference.Deklaration is null) return;
+            if (mcn.Reference.Deklaration.Use is not MethodeDeclarationNode mdn) return;
+            if (mdn.Deklaration is null) return;
+            if (!mdn.Deklaration.IsReturnValueReference) return;
+            if (mdn.Deklaration.IsBorrowing) return;
+
+            SSACompileArgument arg = request.Compiler.ContainerMgmt.StackArguments.Pop();
+
+            bool isNullable = mdn.NullableToken is not null;
+            //if (isNullable) Console.WriteLine("CompileMemoryClean with null");
+            //else Console.WriteLine("CompileMemoryClean");
+
+            request.Compiler.AddError("Possible of memory leak", this);
         }
 
         #endregion methods

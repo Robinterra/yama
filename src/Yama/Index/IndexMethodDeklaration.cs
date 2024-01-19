@@ -169,6 +169,8 @@ namespace Yama.Index
             get;
             set;
         }
+        public bool IsReturnValueReference { get; internal set; }
+        public bool IsBorrowing { get; internal set; }
 
         #endregion get/set
 
@@ -188,6 +190,20 @@ namespace Yama.Index
         #endregion ctor
 
         #region methods
+
+        private bool TypeIsKlassenDeklaration ( IndexKlassenDeklaration kd, Index getIndex)
+        {
+            if ( kd.MemberModifier != ClassMemberModifiers.None )
+            {
+                if (this.IsBorrowing) getIndex.AddError(new IndexError(this.Use, "Borrowing is only possilbe on varaibles by reference"));
+
+                return true;
+            }
+
+            this.IsReturnValueReference = true;
+
+            return true;
+        }
 
         public bool IsInUse (int depth)
         {
@@ -261,6 +277,8 @@ namespace Yama.Index
             }
 
             this.ReturnValue.Mappen(this.ThisUses);
+
+            if ( this.ReturnValue.Deklaration is IndexKlassenDeklaration kd ) return this.TypeIsKlassenDeklaration ( kd, uses.GetIndex );
 
             return true;
         }

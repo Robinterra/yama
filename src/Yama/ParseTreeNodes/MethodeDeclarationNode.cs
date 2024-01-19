@@ -367,6 +367,7 @@ namespace Yama.Parser
             IndexVariabelnReference returnValue = this.GetReturnValueIndex(klasse, this.TypeDefinition);
 
             IndexMethodDeklaration deklaration = new IndexMethodDeklaration(this, this.Token.Text, returnValue);
+            deklaration.IsBorrowing = this.BorrowingToken is not null;
             //TODO: Kommentar entfernen
             //request.Index.CurrentMethode = deklaration;
             this.MakeTags(deklaration);
