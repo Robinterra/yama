@@ -147,7 +147,7 @@ namespace Yama.Parser
             //if (isNullable) Console.WriteLine("CompileMemoryClean with null");
             //else Console.WriteLine("CompileMemoryClean");
 
-            request.Compiler.AddError("Possible of memory leak", this);
+            request.Compiler.AddError("Possible of memory leak, solution: save the return value to a variable, so that memory can be cleaned automaticly", this);
         }
 
         #endregion methods
