@@ -98,7 +98,7 @@ namespace Yama.Compiler
                 Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
                 if (result == null)
                 {
-                    compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), node);
+                    compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden  44 {0}", key.Name ), node);
 
                     return null;
                 }

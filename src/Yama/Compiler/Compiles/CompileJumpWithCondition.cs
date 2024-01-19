@@ -142,7 +142,7 @@ namespace Yama.Compiler
                 DefaultRegisterQuery query = this.BuildQuery(this.Punkt, key, mode, line);
 
                 Dictionary<string, string>? result = compiler.Definition.KeyMapping(query);
-                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden {0}", key.Name ), null);
+                if (result == null) return compiler.AddError(string.Format ("Es konnten keine daten zum Keyword geladen werden 77 {0}", key.Name ), null);
 
                 foreach (KeyValuePair<string, string> pair in result)
                 {

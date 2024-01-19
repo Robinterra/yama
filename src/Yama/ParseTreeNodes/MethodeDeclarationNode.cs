@@ -367,6 +367,7 @@ namespace Yama.Parser
             IndexVariabelnReference returnValue = this.GetReturnValueIndex(klasse, this.TypeDefinition);
 
             IndexMethodDeklaration deklaration = new IndexMethodDeklaration(this, this.Token.Text, returnValue);
+            deklaration.IsBorrowing = this.BorrowingToken is not null;
             //TODO: Kommentar entfernen
             //request.Index.CurrentMethode = deklaration;
             this.MakeTags(deklaration);
@@ -744,6 +745,7 @@ namespace Yama.Parser
             foreach (IndexPropertyDeklaration propDek in this.Deklaration.Klasse.IndexProperties)
             {
                 CompileReferenceCall referenceCall = new CompileReferenceCall();
+                referenceCall.Node = this;
                 referenceCall.CompileDirect(compiler, propDek, "setpoint");
             }
 
