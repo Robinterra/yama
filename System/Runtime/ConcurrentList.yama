@@ -1,0 +1,105 @@
+namespace "System.Runtime.ConcurrentSachen"
+{
+    using "System";
+    using "System.IO";
+    using "System.Runtime";
+    using "System.Collections";
+
+    public class ConcurrentList<TItem> : List
+    {
+
+        #region vars
+
+        private Concurrenter concurrenter;
+
+        #endregion vars
+
+        #region get/set
+
+        #endregion get/set
+
+        #region ctor
+
+        public this new()
+        {
+            this.concurrenter = new Concurrenter();
+            this.Length = 0;
+            this.array = Array.New[16];
+            this.isPrimitiv = false;
+
+            return this;
+        }
+
+        public this ~()
+        {
+            int length = this.Length;
+            Array array = this.array;
+
+            if (!this.isPrimitiv)
+            {
+                for (int i = 0; i < length; i = i + 1)
+                {
+                    object obj = (array.Data[i]) as object;
+                }
+            }
+
+            array = ~array;
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        public &TItem? Get(int pos)
+        {
+            this.concurrenter.Lock();
+
+            &TItem result = base.Get(pos);
+
+            this.concurrenter.Unlock();
+
+            return result;
+        }
+
+        public TItem? GetOwner(int pos)
+        {
+            this.concurrenter.Lock();
+
+            if (pos >= this.Length) return null;
+
+            &TItem item = (this.array.Data[pos]) as TItem;
+            if (item is null) return null;
+
+            TItem result = base.Remove(item);
+
+            this.concurrenter.Unlock();
+
+            return result;
+        }
+
+        public int Add(TItem item?)
+        {
+            this.concurrenter.Lock();
+
+            int result = base.Add(item);
+
+            this.concurrenter.Unlock();
+
+            return result;
+        }
+
+        public TItem? Remove(&TItem item)
+        {
+            this.concurrenter.Lock();
+
+            TItem result = base.Remove(item);
+
+            this.concurrenter.Unlock();
+
+            return result;
+        }
+
+        #endregion methods
+
+    }
+}

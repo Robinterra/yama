@@ -1,0 +1,46 @@
+[
+    {
+        "Name": "arm-a32-linux",
+        "Algos": [
+            {
+                "Name": "Concurrenter",
+                "Mode": "TryToWrite",
+                "Description": "Exec Call",
+                "Keys": [
+                    {
+                        "Name": "[SSAPOP]",
+                        "Values": [
+                          "2"
+                        ]
+                      },
+                      {
+                        "Name": "[JUMPTO]",
+                        "Values": [
+                        "1"
+                        ]
+                      },
+                      {
+                        "Name": "[SSAPUSH]",
+                        "Values": [
+                        ]
+                      }
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                "push { r0 }",
+                "add [SSAPOP[1]], [SSAPOP[1]], #4",
+                "ldrex r0,[[SSAPOP[1]],#0]",
+                "cmp r0, [SSAPOP[1]]",
+                "beq [JUMPTO[0]]",
+                "strex r0, [SSAPOP[1]], [SSAPOP[0]]",
+                "[JUMPTO[0]]:",
+                "clrex #0",
+                "clrex #0",
+                "eor r0, r0, #1",
+                "mov [SSAPUSH], r0",
+                "pop { r0 }"
+                ]
+            }
+        ]
+    }
+]

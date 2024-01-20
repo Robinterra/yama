@@ -58,6 +58,7 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new CommandJumpPoint("bges", format2, 0xA, 4, 0xFFFFFF, ConditionMode.SignedGreaterThanOrEqual, true));
 
             definition.Commands.Add(new CommandImediate("svc", format2, 0xf, 4, 0xfffff));
+            definition.Commands.Add(new CommandImediate("clrex", format2, 0x5, 4, 0x0, immediateOverride: 0x7ff01f));
 
             definition.Commands.Add(new CommandData());
             definition.Commands.Add(new CommandWord());
@@ -80,6 +81,8 @@ namespace Yama.Assembler.Definitions
 
             definition.Commands.Add(new Command2Register("cmp", format1, 0x15, 4, Command2Register.RegisterMode.Left_Right));
 
+            definition.Commands.Add(new Command3Register("strex", format1, 0x18, 4, stype: 1, immediateOverride: 0x1f));
+
             definition.Commands.Add(new Command3Register("adc", format1, 0x0A, 4));
             definition.Commands.Add(new Command3Register("add", format1, 0x08, 4));
             definition.Commands.Add(new Command3Register("and", format1, 0x00, 4));
@@ -100,6 +103,7 @@ namespace Yama.Assembler.Definitions
             definition.Commands.Add(new Command1Register("mrs", format1, 0x10, 4, registerLeft: 0xf));
         }
 
+        //https://developer.arm.com/documentation/ddi0597/2023-12/Base-Instructions/LDREX--Load-Register-Exclusive-?lang=en
         private void T3ImmediateDefinitionen(AssemblerDefinition definition, ArmAFormat2 format2)
         {
             ArmAFormat3 format3 = new ArmAFormat3(this);
@@ -121,6 +125,8 @@ namespace Yama.Assembler.Definitions
 
             definition.Commands.Add(new Command1Register1Container("ldr", format3, 0x59, 4, 15, 1));
             definition.Commands.Add(new Command1Register1Container("str", format3, 0x58, 4, 15, 1));
+
+            definition.Commands.Add(new Command1Register1Container("ldrex", format3, 0x19, 4, 15, 1, immediateOverride:0xf9f));
 
             definition.Commands.Add(new ArmLdrJumpPoint("ldr", format3, 0x59, format2, 0xa, 12));
             definition.Commands.Add(new ArmLdrConst("ldr", format3, 0x59, format2, 0xa, 12));
@@ -160,6 +166,7 @@ namespace Yama.Assembler.Definitions
             if (condition == ConditionMode.SignedLessThan) return 0xb;
             if (condition == ConditionMode.SignedGreaterThan) return 0xc;
             if (condition == ConditionMode.SignedLessThanOrEqual) return 0xd;
+            if (condition == ConditionMode.FullBits) return 0xf;
 
             return 0;
         }

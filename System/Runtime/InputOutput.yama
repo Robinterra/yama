@@ -32,6 +32,16 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        //Gebe Rechenzeit ab
+        public static int Sched_yield()
+        {
+            int returncode = #defalgo Exec,Sched_yield:;
+
+            return returncode;
+        }
+
+        // -----------------------------------------------
+
         public static bool Exit(int returncode)
         {
             bool result = #defalgo Exec,Exit:;

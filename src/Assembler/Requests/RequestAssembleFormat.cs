@@ -81,7 +81,8 @@ namespace Yama.Assembler
         SignedGreaterThan,
         SignedLessThanOrEqual,
         Always,
-        SkipNext
+        SkipNext,
+        FullBits
     }
 
     public enum ArgumentMode

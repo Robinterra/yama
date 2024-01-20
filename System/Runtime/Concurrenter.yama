@@ -1,0 +1,112 @@
+namespace "System.Runtime"
+{
+    using "System.IO";
+
+    public class Concurrenter
+    {
+
+        #region vars
+
+        private int isLocked;
+        //private &ConcurrenterQueueLocker queueLocker;
+
+        #endregion vars
+
+        #region get/set
+
+        #endregion get/set
+
+        #region ctor
+
+        public this new()
+        {
+            this.isLocked = 0;
+            //this.queueLocker = null as ConcurrenterQueueLocker;
+            return this;
+        }
+
+        public this ~()
+        {
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        public bool Lock()
+        {
+            bool isok = Concurrenter.TryToWriteLock(this, 1);
+            while (!isok)
+            {
+                InputOutput.Sched_yield();
+
+                isok = Concurrenter.TryToWriteLock(this, 1);
+            }
+
+            return true;
+        }
+
+        public bool Unlock()
+        {
+            bool isok = Concurrenter.TryToWriteLock(this, 0);
+            while (!isok)
+            {
+                InputOutput.Sched_yield();
+
+                isok = Concurrenter.TryToWriteLock(this, 0);
+            }
+
+            return true;
+        }
+
+        public static bool TryToWriteLock(&Concurrenter concurrenter, int value)
+        {
+            #defalgo Concurrenter,TryToWrite:
+        }
+
+        #endregion methods
+
+    }
+
+    private class ConcurrenterQueueLocker
+    {
+
+        #region vars
+
+        public &ConcurrenterQueueLocker Next;
+
+        public bool IsLocked;
+
+        #endregion vars
+
+        #region ctor
+
+        public this new()
+        {
+            this.Next = null as ConcurrenterQueueLocker;
+            this.IsLocked = true;
+            return this;
+        }
+
+        public this ~()
+        {
+        }
+
+        #endregion ctor
+
+        #region methods
+
+        public bool Add(&ConcurrenterQueueLocker locker)
+        {
+            &ConcurrenterQueueLocker next = this.Next;
+            if (next is null)
+            {
+                this.Next = locker;
+                return true;
+            }
+
+            return next.Add(locker);
+        }
+
+    }
+}

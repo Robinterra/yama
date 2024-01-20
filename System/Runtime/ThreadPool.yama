@@ -91,8 +91,7 @@ namespace "System.Runtime"
                 if (thread is null) continue;
                 if (thread.IsRunning()) continue;
 
-                threads.Remove(thread);
-                thread = ~thread;
+                Thread tmp = threads.Remove(thread);
                 i = i - 1;
                 length = length - 1;
             }

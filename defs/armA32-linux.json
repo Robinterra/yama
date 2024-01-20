@@ -451,7 +451,7 @@
           "ldr r12,=0x500000",
           "mov r1, r12",
           "mov r2, #0x3",
-          "mov r3, #0x22",
+          "mov r3, #0x21",
           "mov r4, #0x0",
           "sub r4, r4, #0x1",
           "mov r5, #0x0",
