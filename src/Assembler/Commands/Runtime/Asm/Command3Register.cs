@@ -46,11 +46,17 @@ namespace Yama.Assembler.Runtime
             set;
         }
 
+        public int? Immediate
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public Command3Register(string key, IFormat format, uint id, int size, uint stype = 0)
+        public Command3Register(string key, IFormat format, uint id, int size, uint stype = 0, int? immediateOverride = null)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -58,6 +64,7 @@ namespace Yama.Assembler.Runtime
             this.CommandId = id;
             this.Size = size;
             this.stype = stype;
+            this.Immediate = immediateOverride;
         }
 
         public Command3Register(Command3Register t, IParseTreeNode node, List<byte> bytes)
@@ -86,6 +93,7 @@ namespace Yama.Assembler.Runtime
             assembleFormat.RegisterInputLeft = request.GetRegister(t.Argument1.Token.Text);
             assembleFormat.RegisterInputRight = request.GetRegister(t.Argument2.Token.Text);
             assembleFormat.Stype = stype;
+            assembleFormat.Immediate = (uint) (Immediate ?? 0);
 
             if (!Format.Assemble(assembleFormat)) return false;
 

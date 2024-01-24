@@ -39,6 +39,12 @@ namespace Yama.Assembler.Runtime
         }
         public int MaxSize { get; }
 
+        public int? ImmediateOverride
+        {
+            get;
+            set;
+        }
+
         public IParseTreeNode Node
         {
             get;
@@ -49,7 +55,7 @@ namespace Yama.Assembler.Runtime
 
         #region ctor
 
-        public CommandImediate(string key, IFormat format, uint id, int size, int maxsize)
+        public CommandImediate(string key, IFormat format, uint id, int size, int maxsize, int? immediateOverride = null)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -57,6 +63,7 @@ namespace Yama.Assembler.Runtime
             this.CommandId = id;
             this.Size = size;
             this.MaxSize = maxsize;
+            this.ImmediateOverride = immediateOverride;
         }
 
         public CommandImediate(CommandImediate t, IParseTreeNode node, List<byte> bytes)
@@ -80,7 +87,11 @@ namespace Yama.Assembler.Runtime
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
 
-            assembleFormat.Immediate = Convert.ToUInt32(t.Argument0.Token.Value);
+            uint valueOfImmediate = Convert.ToUInt32(t.Argument0.Token.Value);
+            if (this.ImmediateOverride.HasValue) valueOfImmediate = (uint)ImmediateOverride.Value;
+
+            assembleFormat.Immediate = valueOfImmediate;
+            if (this.ImmediateOverride.HasValue) assembleFormat.Condition = ConditionMode.FullBits;
 
             if (!Format.Assemble(assembleFormat)) return false;
 

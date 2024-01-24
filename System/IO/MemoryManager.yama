@@ -20,12 +20,16 @@ namespace "System.IO"
          */
         public static int Malloc ( int size )
         {
+            #defalgo Malloc,Locked:
+
             #defalgo Malloc,Init:
 
             int currentadress = null;
             int currentBlockState = null;
             int currentBlockSize = null;
             int nextAdress = #defalgo Malloc,CurrentAdress:;
+
+            nextAdress = nextAdress + #defalgo Malloc,HeaderSize:;
 
             while ( true )
             {
@@ -45,7 +49,11 @@ namespace "System.IO"
 
             currentBlockState = #defalgo Malloc,GetBlockState: = currentadress;
 
-            return MemoryManager.ReservedNewBlock ( currentadress, size, currentBlockState, currentBlockSize );
+            int result = MemoryManager.ReservedNewBlock ( currentadress, size, currentBlockState, currentBlockSize );
+
+            #defalgo Malloc,Unlocked:
+
+            return result;
         }
 
         // -----------------------------------------------
@@ -127,9 +135,15 @@ namespace "System.IO"
         {
             if (addresse == null) return null;
 
+            #Malloc,Locked:
+
             #defalgo MallocFree,default: = addresse
 
-            return MemoryManager.CleanMerge2Blocks ( addresse - #defalgo Malloc,HeaderSize: );
+            bool result = MemoryManager.CleanMerge2Blocks ( addresse - #defalgo Malloc,HeaderSize: );
+
+            #Malloc,Unlocked:
+
+            return result;
         }
 
         // -----------------------------------------------

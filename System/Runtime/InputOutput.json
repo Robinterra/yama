@@ -488,6 +488,26 @@
       "pop { r0, r2, r3, r7 }"
       ]
   },
+  {
+    "Name": "Exec",
+    "Mode": "Sched_yield",
+    "Description": "sched_yield Syscall",
+    "Keys": [
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+    ],
+    "PostKeys": [],
+    "AssemblyCommands": [
+    "push { r0, r7 }",
+    "mov r7, #158",
+    "svc #0",
+    "mov [SSAPUSH], r0",
+    "pop { r0, r7 }"
+    ]
+},
       {
         "Name": "Exec",
         "Mode": "Close",

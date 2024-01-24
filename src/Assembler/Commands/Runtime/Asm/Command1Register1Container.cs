@@ -46,11 +46,17 @@ namespace Yama.Assembler.Runtime
             set;
         }
 
+        public int? ImmediateOverride
+        {
+            get;
+            set;
+        }
+
         #endregion get/set
 
         #region ctor
 
-        public Command1Register1Container(string key, IFormat format, uint id, int size, int maxregister, uint teiler, bool issptwo = false)
+        public Command1Register1Container(string key, IFormat format, uint id, int size, int maxregister, uint teiler, bool issptwo = false, int? immediateOverride = null)
         {
             this.Node = new ParserError();
             this.Key = key;
@@ -60,6 +66,7 @@ namespace Yama.Assembler.Runtime
             this.MaxRegister = maxregister;
             this.Teiler = teiler;
             this.IsSpTwo = issptwo;
+            this.ImmediateOverride = immediateOverride;
         }
 
         public Command1Register1Container(Command1Register1Container t, IParseTreeNode node, List<byte> bytes)
@@ -84,11 +91,14 @@ namespace Yama.Assembler.Runtime
             if (s.Number is null) return false;
             if (Convert.ToUInt32(s.Number.Value) % this.Teiler != 0) return false;
 
+            uint immediate = Convert.ToUInt32(s.Number.Value) / this.Teiler;
+            if (this.ImmediateOverride.HasValue) immediate = (uint)this.ImmediateOverride.Value;
+
             RequestAssembleFormat assembleFormat = new RequestAssembleFormat();
             assembleFormat.Command = this.CommandId;
             assembleFormat.RegisterDestionation = request.GetRegister(t.Argument0.Token.Text);
             assembleFormat.RegisterInputLeft = request.GetRegister(s.Token.Text);
-            assembleFormat.Immediate = Convert.ToUInt32(s.Number.Value) / this.Teiler;
+            assembleFormat.Immediate = immediate;
 
             if (!Format.Assemble(assembleFormat)) return false;
 
