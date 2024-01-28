@@ -115,6 +115,60 @@ namespace "System.Runtime"
 
         // -----------------------------------------------
 
+        public static int CreateSocket(int domain, int type, int protocol)
+        {
+            int socketId = #defalgo Exec,CreateSocket:;
+
+            return socketId;
+        }
+
+        // -----------------------------------------------
+
+        public static int Bind(int socketId, Any address, int addressLength)
+        {
+            int result = #defalgo Exec,Bind:;
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        public static int Listen(int socketId, int backlog)
+        {
+            int result = #defalgo Exec,Listen:;
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        public static int Accept(int socketId)
+        {
+            int result = #defalgo Exec,Accept:;
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
+        public static int Send(int socketId, ByteArray buffer, int length, int flags)
+        {
+            int result = #defalgo Exec,Send:;
+
+            return result;
+        }
+
+        // -----------------------------------------------
+        
+        public static int Receive(int socketId, ByteArray buffer, int length)
+        {
+            int result = #defalgo Exec,Receive:;
+
+            return result;
+        }
+
+        // -----------------------------------------------
+
         /**
          * returend True on Success
          */

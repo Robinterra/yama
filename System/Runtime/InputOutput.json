@@ -340,6 +340,35 @@
             "pop { r0, r7 }"
             ]
         },
+        {
+          "Name": "Exec",
+          "Mode": "CreateSocket",
+          "Description": "Neuer Socket",
+          "Keys": [
+              {
+                  "Name": "[SSAPOP]",
+                  "Values": [
+                    "3"
+                  ]
+                },
+                {
+                  "Name": "[SSAPUSH]",
+                  "Values": [
+                  ]
+                }
+          ],
+          "PostKeys": [],
+          "AssemblyCommands": [
+          "push { r0, r2, r7 }",
+          "mov r0, [SSAPOP[2]]",
+          "mov r1, [SSAPOP[1]]",
+          "mov r2, [SSAPOP[0]]",
+          "mov r7, #281",
+          "svc #0",
+          "mov [SSAPUSH], r0",
+          "pop { r0, r2, r7 }"
+          ]
+      },
           {
             "Name": "Exec",
             "Mode": "OpenFile",
@@ -369,6 +398,152 @@
             "pop { r0, r2, r7 }"
             ]
         },
+        {
+          "Name": "Exec",
+          "Mode": "Bind",
+          "Description": "Bind Socket",
+          "Keys": [
+              {
+                  "Name": "[SSAPOP]",
+                  "Values": [
+                    "3"
+                  ]
+                },
+                {
+                  "Name": "[SSAPUSH]",
+                  "Values": [
+                  ]
+                }
+          ],
+          "PostKeys": [],
+          "AssemblyCommands": [
+          "push { r0, r2, r7 }",
+          "mov r0, [SSAPOP[2]]",
+          "mov r1, [SSAPOP[1]]",
+          "mov r2, [SSAPOP[0]]",
+          "mov r7, #282",
+          "svc #0",
+          "mov [SSAPUSH], r0",
+          "pop { r0, r2, r7 }"
+          ]
+      },
+      {
+        "Name": "Exec",
+        "Mode": "Listen",
+        "Description": "Seek Offset",
+        "Keys": [
+            {
+                "Name": "[SSAPOP]",
+                "Values": [
+                  "2"
+                ]
+              },
+              {
+                "Name": "[SSAPUSH]",
+                "Values": [
+                ]
+              }
+        ],
+        "PostKeys": [],
+        "AssemblyCommands": [
+        "push { r0, r7 }",
+        "mov r0, [SSAPOP[1]]",
+        "mov r1, [SSAPOP[0]]",
+        "mov r7, #284",
+        "svc #0",
+        "mov [SSAPUSH], r0",
+        "pop { r0, r7 }"
+        ]
+    },
+    {
+      "Name": "Exec",
+      "Mode": "Accept",
+      "Description": "Seek Offset",
+      "Keys": [
+          {
+              "Name": "[SSAPOP]",
+              "Values": [
+                "1"
+              ]
+            },
+            {
+              "Name": "[SSAPUSH]",
+              "Values": [
+              ]
+            }
+      ],
+      "PostKeys": [],
+      "AssemblyCommands": [
+      "push { r0, r2, r7 }",
+      "mov r0, [SSAPOP[0]]",
+      "mov r1, #0",
+      "mov r2, #0",
+      "mov r7, #285",
+      "svc #0",
+      "mov [SSAPUSH], r0",
+      "pop { r0, r2, r7 }"
+      ]
+  },
+  {
+    "Name": "Exec",
+    "Mode": "Send",
+    "Description": "Seek Offset",
+    "Keys": [
+        {
+            "Name": "[SSAPOP]",
+            "Values": [
+              "4"
+            ]
+          },
+          {
+            "Name": "[SSAPUSH]",
+            "Values": [
+            ]
+          }
+    ],
+    "PostKeys": [],
+    "AssemblyCommands": [
+    "push { r0, r2, r3 r7 }",
+    "mov r0, [SSAPOP[3]]",
+    "add r1, [SSAPOP[2]], #4",
+    "mov r2, [SSAPOP[1]]",
+    "mov r3, [SSAPOP[0]]",
+    "mov r7, #289",
+    "svc #0",
+    "mov [SSAPUSH], r0",
+    "pop { r0, r2, r3, r7 }"
+    ]
+},
+{
+  "Name": "Exec",
+  "Mode": "Receive",
+  "Description": "Seek Offset",
+  "Keys": [
+      {
+          "Name": "[SSAPOP]",
+          "Values": [
+            "3"
+          ]
+        },
+        {
+          "Name": "[SSAPUSH]",
+          "Values": [
+          ]
+        }
+  ],
+  "PostKeys": [],
+  "AssemblyCommands": [
+  "push { r0, r2, r3 r7 }",
+  "mov r0, [SSAPOP[2]]",
+  "add r1, [SSAPOP[1]], #4",
+  "mov r2, [SSAPOP[0]]",
+  "mov r3, #0",
+  "mov r7, #291",
+  "svc #0",
+  "mov [SSAPUSH], r0",
+  "pop { r0, r2, r3, r7 }"
+  ]
+},
         {
           "Name": "Exec",
           "Mode": "Read",
