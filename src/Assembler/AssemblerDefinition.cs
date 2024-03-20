@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yama.Assembler.Definitions;
 
 namespace Yama.Assembler
 {
@@ -39,5 +40,7 @@ namespace Yama.Assembler
             get;
             set;
         }
+
+        public Arm2x86Def? Arm2x86 { get; internal set; }
     }
 }

@@ -156,7 +156,8 @@ namespace Yama.Assembler
             {
                 new ArmT32Definition(),
                 new RuntimeDefinition(),
-                new ArmA32Definition()
+                new ArmA32Definition(),
+                new Arm2x86Def(),
             };
 
             IAssemblerDefinition? definition = definitions.Find(t=>t.Name == name);

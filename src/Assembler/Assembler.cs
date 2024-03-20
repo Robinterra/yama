@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Yama.Assembler.ARMT32;
+using Yama.Assembler.Definitions;
 using Yama.Compiler;
 using Yama.InformationOutput;
 using Yama.InformationOutput.Nodes;
@@ -163,9 +164,47 @@ namespace Yama.Assembler
 
             if (request.IsSkipper) this.Skipper();
 
+            if (this.Definition?.Arm2x86 is not null) return this.TranslateArm2x86();
             if (!this.IdentifyAndAssemble()) return this.PrintErrors();
 
             return true;
+        }
+
+        private bool TranslateArm2x86()
+        {
+            PushPopArm2x86 pushPop = new PushPopArm2x86(this.Definition!.Arm2x86!);
+            ArimeticsArm2x86 arimetics = new ArimeticsArm2x86(this.Definition!.Arm2x86!);
+            MemoryAccessArm2x86 memory = new MemoryAccessArm2x86(this.Definition!.Arm2x86!);
+            BranchesArm2x86 branches = new BranchesArm2x86(this.Definition!.Arm2x86!);
+
+            using StreamWriter writer = new StreamWriter(this.Stream!);
+
+            foreach (IParseTreeNode node in this.Parser!.ParentContainer!.Statements)
+            {
+                if (pushPop.Translate(writer, node)) continue;
+                if (arimetics.Translate(writer, node)) continue;
+                if (memory.Translate(writer, node)) continue;
+                if (branches.Translate(writer, node)) continue;
+                if (node is JumpPointMarker jmp) writer.WriteLine($"{jmp.Token.Text}:");
+                if (node is WordNode word) writer.WriteLine($"dd {Convert.ToInt32(word.Data!.Value)}");
+                if (node is CommandWith1ArgNode cmd) this.TranslateSpecial(writer, cmd);
+            }
+
+            return true;
+        }
+
+        private void TranslateSpecial(StreamWriter writer, CommandWith1ArgNode cmd)
+        {
+            switch (cmd.Token.Text.ToLower())
+            {
+                case "section":
+                    writer.WriteLine($"section .{cmd.Argument0.Token.Text}");
+                    break;
+                case "global":
+                    writer.WriteLine($"global {cmd.Argument0.Token.Text}");
+                    break;
+                default:break;
+            }
         }
 
         private bool Parse(ParserLayer startlayer, RequestAssemble request, Definitionen definition)
