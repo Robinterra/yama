@@ -268,8 +268,73 @@ namespace Yama.Assembler.Definitions
                 case "sub": return this.Sub(writer, cw);
                 case "mul": return this.Mul(writer, cw);
                 case "div": return this.Div(writer, cw);
+                case "lsl": return this.Lsl(writer, cw);
+                case "lsr": return this.Lsr(writer, cw);
+                case "and": return this.And(writer, cw);
+                case "eor": return this.Eor(writer, cw);
+                case "orr": return this.Orr(writer, cw);
                 default: return false;
             }
+        }
+
+        private bool Orr(TextWriter writer, CommandWith3ArgsNode cw)
+        {
+            string dest = this.Def.Translate(cw.Argument0.Token.Text);
+            string src1 = this.Def.Translate(cw.Argument1.Token.Text);
+            string src2 = this.Def.Translate(cw.Argument2.Token.Text);
+
+            if (src1 != dest) writer.WriteLine($"mov {dest}, {src1}");
+            writer.WriteLine($"or {dest}, {src2}");
+
+            return true;
+        }
+
+        private bool Eor(TextWriter writer, CommandWith3ArgsNode cw)
+        {
+            string dest = this.Def.Translate(cw.Argument0.Token.Text);
+            string src1 = this.Def.Translate(cw.Argument1.Token.Text);
+            string src2 = this.Def.Translate(cw.Argument2.Token.Text);
+
+            if (src1 != dest) writer.WriteLine($"mov {dest}, {src1}");
+            writer.WriteLine($"xor {dest}, {src2}");
+
+            return true;
+        }
+
+        private bool And(TextWriter writer, CommandWith3ArgsNode cw)
+        {
+            string dest = this.Def.Translate(cw.Argument0.Token.Text);
+            string src1 = this.Def.Translate(cw.Argument1.Token.Text);
+            string src2 = this.Def.Translate(cw.Argument2.Token.Text);
+
+            if (src1 != dest) writer.WriteLine($"mov {dest}, {src1}");
+            writer.WriteLine($"and {dest}, {src2}");
+
+            return true;
+        }
+
+        private bool Lsr(TextWriter writer, CommandWith3ArgsNode cw)
+        {
+            string dest = this.Def.Translate(cw.Argument0.Token.Text);
+            string src1 = this.Def.Translate(cw.Argument1.Token.Text);
+            string src2 = cw.Argument2.Token.Kind == Lexer.IdentifierKind.NumberToken ? cw.Argument2.Token.Text.ToString() : this.Def.Translate(cw.Argument2.Token.Text);
+
+            if (src1 != dest) writer.WriteLine($"mov {dest}, {src1}");
+            writer.WriteLine($"shr {dest}, {src2}");
+
+            return true;
+        }
+
+        private bool Lsl(TextWriter writer, CommandWith3ArgsNode cw)
+        {
+            string dest = this.Def.Translate(cw.Argument0.Token.Text);
+            string src1 = this.Def.Translate(cw.Argument1.Token.Text);
+            string src2 = cw.Argument2.Token.Kind == Lexer.IdentifierKind.NumberToken ? cw.Argument2.Token.Text.ToString() : this.Def.Translate(cw.Argument2.Token.Text);
+
+            if (src1 != dest) writer.WriteLine($"mov {dest}, {src1}");
+            writer.WriteLine($"shl {dest}, {src2}");
+
+            return true;
         }
 
         private bool Div(TextWriter writer, CommandWith3ArgsNode cw)
