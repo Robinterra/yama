@@ -50,6 +50,7 @@ namespace Yama.Assembler.Definitions
         public bool Translate(TextWriter writer, IParseTreeNode node)
         {
             if (node is CommandWith2ArgsNode c2r) return this.Cmp(writer, c2r);
+            if (node is DataNode dn) return this.Data(writer, dn);
             if (node is not CommandWith1ArgNode cw) return false;
             switch (cw.Token.Text.ToLower())
             {
@@ -61,8 +62,31 @@ namespace Yama.Assembler.Definitions
                 case "bge": return this.Bge(writer, cw);
                 case "beq": return this.Beq(writer, cw);
                 case "svc": return this.Svc(writer, cw);
+                case "bl": return this.Bl(writer, cw);
+                case "ret": return this.Ret(writer, cw);
                 default: return false;
             }
+        }
+
+        private bool Ret(TextWriter writer, CommandWith1ArgNode cw)
+        {
+            writer.WriteLine("ret");
+            return true;
+        }
+
+        private bool Bl(TextWriter writer, CommandWith1ArgNode cw)
+        {
+            string label = cw.Argument0.Token.Text;
+            writer.WriteLine($"call {label}");
+            return true;
+        }
+
+        private bool Data(TextWriter writer, DataNode dn)
+        {
+            string text = dn.Data.Value!.ToString()!;
+            text = text.Replace("\0", "\\0").Replace("\n", "\\n").Replace("\r", "\\r");
+            writer.WriteLine($"{dn.Token.Text}: db `{text}`");
+            return true;
         }
 
         private bool Svc(TextWriter writer, CommandWith1ArgNode cw)
