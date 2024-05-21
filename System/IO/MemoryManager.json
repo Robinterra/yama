@@ -238,6 +238,28 @@
         "Name": "arm-t32",
         "Algos": [
             {
+                "Name": "Malloc",
+                "Mode": "Locked",
+                "Description": "Dynamic memory allocate free",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "add r0, r0, #0x0"
+                ]
+            },
+            {
+                "Name": "Malloc",
+                "Mode": "Unlocked",
+                "Description": "Dynamic memory allocate free",
+                "Keys": [
+                ],
+                "PostKeys": [],
+                "AssemblyCommands": [
+                    "add r0, r0, #0x0"
+                ]
+            },
+            {
                 "Name": "MallocFree",
                 "Mode": "default",
                 "Description": "Dynamic memory allocate free",

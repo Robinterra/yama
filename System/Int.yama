@@ -484,6 +484,36 @@ namespace "System"
 
         // -----------------------------------------------
 
+        public String ToStringDec()
+        {
+            int number = this as int;
+            int length = 1;
+            number = number + 0;
+            int secnum = number + 0;
+
+            for (int count = 1; count != 8; count = count + 1)
+            {
+                secnum = secnum / 10;
+
+                if (secnum is null) break;
+                length = length + 1;
+            }
+
+            string result = string.New[length];
+
+            for (int i = 0; length != 0; i = i + 1)
+            {
+                length = length - 1;
+                int current = number % 10;
+                result.Data[length] = 0x30 + current;
+                number = number / 10;
+            }
+
+            return new String(result);
+        }
+
+        // -----------------------------------------------
+
         public String ToString()
         {
             int length = 1;

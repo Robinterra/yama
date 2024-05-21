@@ -442,6 +442,7 @@
           "ldr r10,*RAMBEGIN",
           "mov r11,#0x1",
           "sub r12,r12,r10",
+          "add r10,r10,#0x8",
           "str r11,[r10,#0]",
           "str r12,[r10,#4]",
           "ldr r12,=main",
